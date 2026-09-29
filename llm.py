@@ -367,4 +367,28 @@ def ask_text(system: str, messages: list, prefer: str = "local", max_tokens: int
                 claude_failed(e)
             else:
                 print(f"  ({brain} falló: {str(e)[:100]})")
-    raise RuntimeError(f"Ningún cerebro disponible ({last or 'Ollama apagado y Claude sin saldo/conexión'})")
+    raise RuntimeError(f"Ningún cerebro disponible ({last or why_unavailable(order)})")
+
+
+def why_unavailable(brains: list) -> str:
+    """Explica por qué no hay ningún cerebro de la lista, para que Felipe sepa qué arreglar."""
+    import modes
+
+    reasons = []
+    for brain in brains:
+        if brain == "gemini":
+            names = "/".join(NAMES.get(n, n) for n in FREE_BRAINS)
+            if not any(GEMINI_API_KEY if n == "gemini" else PROVIDERS.get(n, {}).get("key") for n in FREE_BRAINS):
+                reasons.append(f"sin claves de {names} en el .env")
+            else:
+                reasons.append(f"{names} sin cuota gratis por ahora")
+        elif brain == "local":
+            reasons.append("Ollama apagado")
+        elif brain == "claude":
+            if not modes.claude_allowed():
+                reasons.append("Claude desactivado (modo gratis)")
+            elif not ANTHROPIC_API_KEY:
+                reasons.append("sin clave de Claude en el .env")
+            else:
+                reasons.append(f"Claude: {claude_reason or 'sin saldo o sin conexión'}")
+    return ", ".join(reasons)
