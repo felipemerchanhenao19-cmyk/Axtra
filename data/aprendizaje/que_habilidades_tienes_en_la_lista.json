@@ -1,0 +1,237 @@
+{
+  "tema": "que habilidades tienes en la lista",
+  "descripcion": "Ruta integral desde la electrónica y el modelado mecánico hasta el control dinámico y la programación de marcha para construir un robot bípedo funcional.",
+  "nivel": "bueno comensemos con robotica, especialmente la robotica tipo humanoide",
+  "meta": "para aprender a construir",
+  "creado": "2026-09-26",
+  "modulos": [
+    {
+      "titulo": "Fundamentos Eléctricos y Sistemas de Potencia",
+      "objetivo": "Comprender los principios eléctricos esenciales para alimentar y controlar de forma segura actuadores robóticos de alto consumo.",
+      "lecciones": [
+        {
+          "titulo": "Leyes eléctricas básicas y cálculo de consumo",
+          "objetivo": "Calcular caídas de tensión y requerimientos de corriente para circuitos robóticos con múltiples cargas.",
+          "hecha": true,
+          "fecha": "2026-09-26"
+        },
+        {
+          "titulo": "Baterías LiPo y sistemas de distribución de energía",
+          "objetivo": "Seleccionar, conectar y proteger bancos de baterías y reguladores de voltaje (BEC/BMS) para robótica móvil.",
+          "hecha": false
+        },
+        {
+          "titulo": "Buses de comunicación: I2C, SPI y UART",
+          "objetivo": "Cablear y diagnosticar señales de comunicación digital entre sensores y microcontroladores.",
+          "hecha": false
+        },
+        {
+          "titulo": "Protección de circuitos y desacoplo de ruido",
+          "objetivo": "Implementar diodos flyback, optoacopladores y condensadores para aislar el ruido inductivo de los motores.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Diseño Mecánico y Fabricación Digital para Humanoides",
+      "objetivo": "Diseñar piezas estructurales optimizadas para impresión 3D capaces de soportar el peso y los esfuerzos de un robot bípedo.",
+      "lecciones": [
+        {
+          "titulo": "Introducción al CAD paramétrico para robots",
+          "objetivo": "Modelar eslabones y soportes de articulaciones considerando tolerancias mecánicas.",
+          "hecha": false
+        },
+        {
+          "titulo": "Distribución de grados de libertad (DoF)",
+          "objetivo": "Definir la arquitectura articular mínima (cadera, rodilla, tobillo) para permitir la locomoción bípeda.",
+          "hecha": false
+        },
+        {
+          "titulo": "Optimización para impresión 3D (FDM)",
+          "objetivo": "Configurar patrones de relleno, orientación de piezas y selección de materiales (PLA+, PETG, ABS) según el esfuerzo mecánico.",
+          "hecha": false
+        },
+        {
+          "titulo": "Selección de tornillería y rodamientos",
+          "objetivo": "Integrar rodamientos radiales y axiales para eliminar holguras y reducir la fricción en las uniones.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Actuadores y Transmisiones Mecánicas",
+      "objetivo": "Seleccionar, parametrizar y controlar los motores responsables del movimiento articular del humanoide.",
+      "lecciones": [
+        {
+          "titulo": "Servomotores de alto torque vs. Motores BLDC",
+          "objetivo": "Comparar tecnologías de actuadores evaluando relación torque-peso, velocidad y ancho de banda de control.",
+          "hecha": false
+        },
+        {
+          "titulo": "Reductoras planetarias y armónicas",
+          "objetivo": "Comprender el funcionamiento de los reductores de velocidad para multiplicar el torque en espacios compactos.",
+          "hecha": false
+        },
+        {
+          "titulo": "Control de posición en lazo cerrado",
+          "objetivo": "Programar lectura de encoders magnéticos absolutos para retroalimentación precisa de ángulo articular.",
+          "hecha": false
+        },
+        {
+          "titulo": "Monitoreo de corriente y límites térmicos",
+          "objetivo": "Medir el consumo en tiempo real para estimar el esfuerzo mecánico y prevenir sobrecalentamiento.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Programación Embebida y Fusión Sensorial",
+      "objetivo": "Programar el sistema de bajo nivel encargado de procesar la telemetría del robot a alta frecuencia.",
+      "lecciones": [
+        {
+          "titulo": "Arquitectura de microcontroladores en tiempo real",
+          "objetivo": "Configurar interrupciones periódicas y timers en ESP32 o Teensy para un bucle de control determinista.",
+          "hecha": false
+        },
+        {
+          "titulo": "Calibración de la Unidad de Medición Inercial (IMU)",
+          "objetivo": "Adquirir y compensar errores de desvío (bias) del acelerómetro y giroscopio.",
+          "hecha": false
+        },
+        {
+          "titulo": "Filtros complementarios y Madgwick",
+          "objetivo": "Implementar un algoritmo de orientación espacial para conocer la inclinación del torso en tiempo real.",
+          "hecha": false
+        },
+        {
+          "titulo": "Sensores de fuerza en la planta del pie (FSR)",
+          "objetivo": "Acondicionar y leer sensores táctiles para detectar la fase de contacto con el suelo.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Cinemática del Robot Bípedo",
+      "objetivo": "Aplicar modelos matemáticos para determinar la posición espacial de las extremidades a partir de los ángulos de los motores.",
+      "lecciones": [
+        {
+          "titulo": "Sistemas de coordenadas y matrices de rotación",
+          "objetivo": "Representar la orientación y posición relativa de los eslabones en el espacio 3D.",
+          "hecha": false
+        },
+        {
+          "titulo": "Cinemática Directa (Convención Denavit-Hartenberg)",
+          "objetivo": "Calcular la posición del pie en el espacio cartesiano dada una combinación de ángulos articulares.",
+          "hecha": false
+        },
+        {
+          "titulo": "Cinemática Inversa Geométrica y Numérica",
+          "objetivo": "Resolver los ángulos de motor necesarios para ubicar el pie en una coordenada de apoyo específica.",
+          "hecha": false
+        },
+        {
+          "titulo": "Simulación cinemática previa en Python",
+          "objetivo": "Escribir un script que visualice el movimiento de las piernas antes de cargar el código al hardware real.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Estabilidad y Dinámica de Locomoción Bípeda",
+      "objetivo": "Dominar los conceptos físicos y de control que permiten mantener en equilibrio a una estructura bípeda.",
+      "lecciones": [
+        {
+          "titulo": "Centro de Masa (CoM) y Polígono de Sustentación",
+          "objetivo": "Calcular la proyección del centro de masa sobre la base de apoyo durante la marcha estática.",
+          "hecha": false
+        },
+        {
+          "titulo": "Zero Moment Point (ZMP)",
+          "objetivo": "Comprender y calcular el ZMP para evitar que el robot bascule o caiga durante aceleraciones.",
+          "hecha": false
+        },
+        {
+          "titulo": "Control PID de balance dinámico",
+          "objetivo": "Ajustar ganancias PID usando la IMU para contrarrestar perturbaciones e inclinaciones involuntarias.",
+          "hecha": false
+        },
+        {
+          "titulo": "Generación de trayectorias de paso (Gait Generation)",
+          "objetivo": "Construir curvas cíclicas de balanceo de pierna y traslación de cadera para dar un paso estable.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Arquitectura de Software de Alto Nivel y Simulación",
+      "objetivo": "Estructurar la comunicación entre el control central y los actuadores utilizando herramientas estándar de la industria.",
+      "lecciones": [
+        {
+          "titulo": "Introducción a ROS 2 para robots humanoides",
+          "objetivo": "Crear nodos, tópicos y servicios para desacoplar las tareas de planificación y ejecución.",
+          "hecha": false
+        },
+        {
+          "titulo": "Modelado URDF del robot",
+          "objetivo": "Definir propiedades de masa, inercia y colisión en formato URDF para su uso en simuladores.",
+          "hecha": false
+        },
+        {
+          "titulo": "Simulación física en Gazebo o Isaac Sim",
+          "objetivo": "Importar el modelo al simulador y probar el control de equilibrio en un entorno virtual sin riesgo de rotura.",
+          "hecha": false
+        },
+        {
+          "titulo": "Teleoperación e interfaz de comandos",
+          "objetivo": "Mapear órdenes de movimiento desde un mando o interfaz serial hacia el generador de marcha.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Ensamblaje, Calibración y Puesta en Marcha",
+      "objetivo": "Integrar el hardware físico, cablear el sistema completo y ejecutar los primeros pasos del robot en el mundo real.",
+      "lecciones": [
+        {
+          "titulo": "Ensamblaje mecánico y enrutamiento de cables",
+          "objetivo": "Montar la estructura evitando tensiones mecánicas y fatiga en el cableado durante el movimiento articular.",
+          "hecha": false
+        },
+        {
+          "titulo": "Calibración del punto cero y límites de software",
+          "objetivo": "Alinear mecánicamente todos los servos y programar barreras de software para evitar colisiones internas.",
+          "hecha": false
+        },
+        {
+          "titulo": "Protocolo de encendido por etapas y pruebas de seguridad",
+          "objetivo": "Verificar voltajes, consumos en reposo y paradas de emergencia (E-Stop) antes del primer arranque dinámico.",
+          "hecha": false
+        },
+        {
+          "titulo": "Ajuste fino de la marcha en hardware real",
+          "objetivo": "Ejecutar y corregir el ciclo de caminata en piso firme compensando las flexiones mecánicas del material.",
+          "hecha": false
+        }
+      ]
+    }
+  ],
+  "tarjetas": [
+    {
+      "pregunta": "¿Qué ocurre con la corriente total al conectar múltiples cargas en paralelo?",
+      "respuesta": "La corriente total es la suma del consumo de cada carga individual.",
+      "caja": 0,
+      "proxima": "2026-09-27"
+    },
+    {
+      "pregunta": "¿Qué ocurre con la corriente total al conectar múltiples cargas en paralelo?",
+      "respuesta": "La corriente total es la suma del consumo de cada carga individual.",
+      "caja": 0,
+      "proxima": "2026-09-27"
+    }
+  ],
+  "debilidades": [
+    "margen de seguridad y cálculo de caída de tensión en los cables"
+  ],
+  "sesiones": 1,
+  "minutos": 10.9
+}

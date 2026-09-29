@@ -1,0 +1,247 @@
+{
+  "tema": "la que estabamos trabajando ya sobre robotica para prototipos de robot humanoides",
+  "descripcion": "Ruta integral desde los fundamentos mecánicos y electrónicos hasta el control de locomoción bípeda y la simulación avanzada para construir un robot humanoide funcional.",
+  "nivel": "cosas muy basicas sobre modelos muy viejos y conocimiento muy basico sobre algunas cosas",
+  "meta": "para aprender a crear",
+  "creado": "2026-09-26",
+  "modulos": [
+    {
+      "titulo": "Módulo 1: Fundamentos Matemáticos y de Programación para Robótica",
+      "objetivo": "Dominar las herramientas de cálculo vectorial, matrices y programación básica en Python orientadas a la geometría espacial de un robot.",
+      "lecciones": [
+        {
+          "titulo": "Vectores, matrices y transformaciones en 3D",
+          "objetivo": "Calcular traslaciones y rotaciones en el espacio tridimensional usando matrices de transformación homogénea.",
+          "hecha": true,
+          "fecha": "2026-09-26"
+        },
+        {
+          "titulo": "Física básica aplicada: torque, inercia y centro de masa",
+          "objetivo": "Calcular centros de masa y momentos de inercia para eslabones mecánicos interconectados.",
+          "hecha": true,
+          "fecha": "2026-09-26"
+        },
+        {
+          "titulo": "Python para robótica: computación científica básica",
+          "objetivo": "Implementar operaciones matriciales y simulaciones numéricas simples utilizando NumPy y Matplotlib.",
+          "hecha": false
+        },
+        {
+          "titulo": "Entornos de desarrollo y control de versiones",
+          "objetivo": "Configurar Linux (Ubuntu), Git y un entorno de trabajo limpio para proyectos de robótica.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Módulo 2: Diseño Mecánico y Fabricación Digital",
+      "objetivo": "Crear las estructuras esqueléticas y articulaciones del humanoide usando software CAD y técnicas de manufactura aditiva.",
+      "lecciones": [
+        {
+          "titulo": "Principios de diseño esquelético humanoide",
+          "objetivo": "Definir grados de libertad (DoF) y rangos articulares basados en la biomecánica de piernas, torso y brazos.",
+          "hecha": false
+        },
+        {
+          "titulo": "Modelado 3D en CAD para robótica",
+          "objetivo": "Modelar eslabones, alojamientos de motor y soportes estructurales en software de diseño paramétrico.",
+          "hecha": false
+        },
+        {
+          "titulo": "Optimización para impresión 3D y selección de materiales",
+          "objetivo": "Elegir entre PLA+, PETG, ABS y filamentos de fibra de carbono considerando resistencia, peso e impacto.",
+          "hecha": false
+        },
+        {
+          "titulo": "Diseño de articulaciones y rodamientos",
+          "objetivo": "Integrar rodamientos, ejes y acoples para minimizar la holgura mecánica y el desgaste articular.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Módulo 3: Actuadores y Electrónica de Potencia",
+      "objetivo": "Seleccionar, cablear y alimentar servomotores y motores brushless capaces de mover cargas dinámicas con precisión.",
+      "lecciones": [
+        {
+          "titulo": "Tipos de actuadores: servos de bus serie vs. motores BLDC",
+          "objetivo": "Comparar curvas de torque, velocidad, peso y costo entre servomotores inteligentes y motores brushless quasi-direct drive.",
+          "hecha": false
+        },
+        {
+          "titulo": "Sistemas de reducción y transmisiones mecánicas",
+          "objetivo": "Comprender la relación de transmisión, reductores planetarios, cycloidales y correas síncronas.",
+          "hecha": false
+        },
+        {
+          "titulo": "Diseño del sistema de energía y baterías",
+          "objetivo": "Dimensionar paquetes de baterías LiPo/LiFePO4, reguladores de voltaje y calcular corrientes pico y nominales.",
+          "hecha": false
+        },
+        {
+          "titulo": "Drivers de motor y buses de comunicación",
+          "objetivo": "Conectar controladores mediante protocolos UART, CAN bus y RS485 para controlar múltiples actuadores en cadena.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Módulo 4: Cinemática de Cadenas Articuladas",
+      "objetivo": "Resolver la posición y orientación de las extremidades del robot en el espacio mediante cinemática directa e inversa.",
+      "lecciones": [
+        {
+          "titulo": "Cinemática directa y descripción de cadenas cinemáticas",
+          "objetivo": "Determinar la posición del pie o la mano a partir de los ángulos articulares conocidos.",
+          "hecha": false
+        },
+        {
+          "titulo": "Cinemática inversa geométrica y analítica",
+          "objetivo": "Calcular los ángulos de motor necesarios para situar el pie en una coordenada cartesiana específica.",
+          "hecha": false
+        },
+        {
+          "titulo": "El Jacobiano y singularidades",
+          "objetivo": "Relacionar las velocidades articulares con las velocidades en el espacio cartesiano e identificar configuraciones singulares.",
+          "hecha": false
+        },
+        {
+          "titulo": "Implementación práctica de IK para una pierna de 3 a 6 DoF",
+          "objetivo": "Escribir un script de Python que posicione una extremidad inferior en trayectorias suaves en tiempo real.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Módulo 5: Sensado, Estimación de Estado y Microcontroladores",
+      "objetivo": "Capturar datos del estado físico del robot y fusionarlos para estimar la orientación y el contacto en el suelo.",
+      "lecciones": [
+        {
+          "titulo": "Microcontroladores para control en tiempo real",
+          "objetivo": "Configurar microcontroladores de alta velocidad (ESP32 / Teensy / STM32) para muestreo determinista de señales.",
+          "hecha": false
+        },
+        {
+          "titulo": "Unidades de Medición Inercial (IMU) y orientación espacial",
+          "objetivo": "Leer acelerómetros y giroscopios para medir inclinaciones del torso en balanceo y cabeceo.",
+          "hecha": false
+        },
+        {
+          "titulo": "Filtros de estimación de estado (Complementario y Kalman)",
+          "objetivo": "Fusionar señales ruidosas de la IMU para obtener una estimación limpia del ángulo del robot sin desfase.",
+          "hecha": false
+        },
+        {
+          "titulo": "Encoders angulares y sensores de contacto en los pies",
+          "objetivo": "Implementar lectura de retroalimentación de posición absoluta y detección del impacto de pisada.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Módulo 6: Simulación y Arquitectura de Software (ROS 2)",
+      "objetivo": "Simular digitalmente el gemelo virtual del humanoide en entornos basados en físicas antes de la prueba en hardware.",
+      "lecciones": [
+        {
+          "titulo": "Introducción a ROS 2 para robots bípedos",
+          "objetivo": "Crear nodos, publicadores, suscriptores y servicios para estructurar el software modular del robot.",
+          "hecha": false
+        },
+        {
+          "titulo": "Creación del modelo URDF/Xacro del robot",
+          "objetivo": "Exportar e integrar la geometría, masa e inercias del modelo CAD a un archivo de descripción robótica.",
+          "hecha": false
+        },
+        {
+          "titulo": "Simulación física en Gazebo o MuJoCo",
+          "objetivo": "Cargar el robot en un motor de físicas para evaluar colisiones, gravedad y respuesta de motores virtuales.",
+          "hecha": false
+        },
+        {
+          "titulo": "Controlador de articulaciones y teleoperación en simulación",
+          "objetivo": "Comandar trayectorias coordinadas a los motores del modelo simulado usando ROS 2 Control.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Módulo 7: Control de Equilibrio y Patrones de Marcha Bípeda",
+      "objetivo": "Implementar algoritmos de balanceo reactivo y generadores de paso para conseguir locomoción bípeda estable.",
+      "lecciones": [
+        {
+          "titulo": "El modelo del Péndulo Invertido Lineal (LIPM)",
+          "objetivo": "Modelar la dinámica simplificada del cuerpo humanoide durante la fase de soporte de la marcha.",
+          "hecha": false
+        },
+        {
+          "titulo": "Punto de Momento Cero (ZMP) y estabilidad dinámica",
+          "objetivo": "Calcular y monitorizar el ZMP para evitar que el robot pierda contacto o vuelque al caminar.",
+          "hecha": false
+        },
+        {
+          "titulo": "Generación de trayectorias de marcha (Gait Generation)",
+          "objetivo": "Diseñar ciclos periódicos de movimiento para piernas de apoyo y balanceo con curvas suaves (splines).",
+          "hecha": false
+        },
+        {
+          "titulo": "Control reactivo de balance ante perturbaciones",
+          "objetivo": "Implementar un lazo cerrado PID o de impedancia articular para absorber empujes y mantener el equilibrio erguido.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Módulo 8: Integración, Calibración y Pruebas del Prototipo Físico",
+      "objetivo": "Construir, calibrar y desplegar el software en el prototipo físico real de manera segura y metódica.",
+      "lecciones": [
+        {
+          "titulo": "Montaje paso a paso y ruteo de cables seguro",
+          "objetivo": "Ensamblar el hardware evitando puntos de fricción, dobleces de cables y bucles de masa eléctrica.",
+          "hecha": false
+        },
+        {
+          "titulo": "Calibración de offsets de motores y alineación cero",
+          "objetivo": "Calibrar los puntos cero de cada articulación para asegurar que la postura física coincida con el modelo matemático.",
+          "hecha": false
+        },
+        {
+          "titulo": "Pruebas en arnés de seguridad y marcha asistida",
+          "objetivo": "Ejecutar rutinas de encendido progresivo, pruebas de límites y primeros pasos suspendidos con arnés de protección.",
+          "hecha": false
+        },
+        {
+          "titulo": "Diagnóstico de fallos, optimización y próximos pasos",
+          "objetivo": "Analizar registros de corriente, vibraciones y estabilidad para iterar mejoras mecánicas y explorar control por IA.",
+          "hecha": false
+        }
+      ]
+    }
+  ],
+  "tarjetas": [
+    {
+      "pregunta": "¿Qué combina una matriz de transformación homogénea?",
+      "respuesta": "La rotación y la traslación espacial en una sola matriz de cuatro por cuatro.",
+      "caja": 0,
+      "proxima": "2026-09-27"
+    },
+    {
+      "pregunta": "¿Qué combina una matriz de transformación homogénea?",
+      "respuesta": "La rotación y la traslación espacial en una sola matriz de cuatro por cuatro.",
+      "caja": 0,
+      "proxima": "2026-09-27"
+    },
+    {
+      "pregunta": "¿Qué pasa con la inercia si la distancia se duplica?",
+      "respuesta": "Se cuadruplica",
+      "caja": 0,
+      "proxima": "2026-09-27"
+    }
+  ],
+  "debilidades": [
+    "Detallar la forma exacta de combinar rotación y traslación en la matriz y explicar la multiplicación paso a paso.",
+    "Cálculo de centro de masa ponderado y relación entre inercia y distancia al eje",
+    "Relación matemática cuadrática entre inercia y distancia al eje",
+    "Ninguna (concepto dominado)"
+  ],
+  "sesiones": 1,
+  "minutos": 0
+}

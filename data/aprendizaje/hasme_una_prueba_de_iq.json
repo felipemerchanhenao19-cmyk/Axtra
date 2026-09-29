@@ -1,0 +1,195 @@
+{
+  "tema": "hasme una prueba de IQ",
+  "descripcion": "Aprende a crear, validar y administrar pruebas de IQ desde cero hasta nivel avanzado.",
+  "nivel": "una prueba de IQ sobre pensamiento analitico",
+  "meta": "medir mis capacidades neuronales",
+  "creado": "2026-09-27",
+  "modulos": [
+    {
+      "titulo": "Fundamentos de psicología y medición",
+      "objetivo": "Comprender los conceptos básicos de la psicología cognitiva y la teoría de la medición.",
+      "lecciones": [
+        {
+          "titulo": "Introducción a la psicología cognitiva",
+          "objetivo": "Conocer los procesos mentales básicos que evalúan las pruebas de IQ.",
+          "hecha": false
+        },
+        {
+          "titulo": "Historia de las pruebas de inteligencia",
+          "objetivo": "Revisar los hitos y teorías clave en la medición de la inteligencia.",
+          "hecha": false
+        },
+        {
+          "titulo": "Conceptos de validez y fiabilidad",
+          "objetivo": "Entender cómo se evalúan la precisión y consistencia de una prueba.",
+          "hecha": false
+        },
+        {
+          "titulo": "Ética en la evaluación psicológica",
+          "objetivo": "Identificar consideraciones éticas y de confidencialidad.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Bases estadísticas para pruebas psicométricas",
+      "objetivo": "Dominar los métodos estadísticos esenciales para construir y validar ítems.",
+      "lecciones": [
+        {
+          "titulo": "Estadística descriptiva y distribución normal",
+          "objetivo": "Interpretar medias, desviaciones y curvas de Gauss.",
+          "hecha": false
+        },
+        {
+          "titulo": "Correlación y regresión lineal",
+          "objetivo": "Analizar relaciones entre variables y predecir puntajes.",
+          "hecha": false
+        },
+        {
+          "titulo": "Análisis de ítems (p‑valor y discriminación)",
+          "objetivo": "Evaluar la calidad de cada pregunta.",
+          "hecha": false
+        },
+        {
+          "titulo": "Alfa de Cronbach y consistencia interna",
+          "objetivo": "Calcular la fiabilidad global de la prueba.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Neurociencia básica aplicada a la inteligencia",
+      "objetivo": "Relacionar estructuras cerebrales con procesos cognitivos medidos en IQ.",
+      "lecciones": [
+        {
+          "titulo": "Neuroanatomía de la cognición",
+          "objetivo": "Identificar regiones cerebrales implicadas en razonamiento y memoria.",
+          "hecha": false
+        },
+        {
+          "titulo": "Neuroplasticidad y aprendizaje",
+          "objetivo": "Comprender cómo el cerebro se adapta a la práctica de pruebas.",
+          "hecha": false
+        },
+        {
+          "titulo": "Métodos de neuroimagen en investigación de IQ",
+          "objetivo": "Explorar fMRI, EEG y sus aportes a la validación de ítems.",
+          "hecha": false
+        },
+        {
+          "titulo": "Bases neurobiológicas de la variabilidad individual",
+          "objetivo": "Interpretar por qué los puntajes difieren entre personas.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Diseño de ítems y tipos de preguntas",
+      "objetivo": "Crear preguntas que evalúen razonamiento analítico, verbal, espacial y de memoria.",
+      "lecciones": [
+        {
+          "titulo": "Clasificación de ítems (verbal, numérico, espacial)",
+          "objetivo": "Definir categorías y ejemplos típicos.",
+          "hecha": false
+        },
+        {
+          "titulo": "Construcción de preguntas de razonamiento analítico",
+          "objetivo": "Diseñar ítems que midan lógica y resolución de problemas.",
+          "hecha": false
+        },
+        {
+          "titulo": "Redacción clara y libre de sesgos",
+          "objetivo": "Evitar ambigüedades y sesgos culturales.",
+          "hecha": false
+        },
+        {
+          "titulo": "Piloto y revisión de ítems",
+          "objetivo": "Probar preguntas con una muestra y ajustar según resultados.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Escalamiento y puntuación",
+      "objetivo": "Transformar respuestas crudas en puntajes estandarizados comparables.",
+      "lecciones": [
+        {
+          "titulo": "Métodos de puntuación (puntuación directa vs. puntuación ponderada)",
+          "objetivo": "Seleccionar el esquema de puntuación adecuado.",
+          "hecha": false
+        },
+        {
+          "titulo": "Curvas de calibración y normas",
+          "objetivo": "Crear tablas de referencia basadas en población normativa.",
+          "hecha": false
+        },
+        {
+          "titulo": "Escalas de percentil y puntuación Z",
+          "objetivo": "Convertir puntuaciones a métricas interpretables.",
+          "hecha": false
+        },
+        {
+          "titulo": "Ajuste por factores demográficos",
+          "objetivo": "Controlar edad, nivel educativo y origen cultural.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Validación empírica de la prueba",
+      "objetivo": "Comprobar que la prueba mide lo que pretende medir y es útil en contextos reales.",
+      "lecciones": [
+        {
+          "titulo": "Estudios de validez de criterio",
+          "objetivo": "Comparar resultados con otras pruebas de inteligencia.",
+          "hecha": false
+        },
+        {
+          "titulo": "Análisis factorial exploratorio y confirmatorio",
+          "objetivo": "Identificar dimensiones subyacentes del test.",
+          "hecha": false
+        },
+        {
+          "titulo": "Pruebas de consistencia test‑retest",
+          "objetivo": "Evaluar estabilidad temporal de los puntajes.",
+          "hecha": false
+        },
+        {
+          "titulo": "Interpretación de resultados y elaboración de informes",
+          "objetivo": "Comunicar hallazgos de forma clara y ética.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Implementación práctica y adaptación digital",
+      "objetivo": "Lanzar la prueba en formato presencial y/o en línea, garantizando calidad y accesibilidad.",
+      "lecciones": [
+        {
+          "titulo": "Plataformas de administración digital",
+          "objetivo": "Seleccionar herramientas para pruebas en línea.",
+          "hecha": false
+        },
+        {
+          "titulo": "Seguridad de datos y privacidad",
+          "objetivo": "Implementar protocolos de protección de la información del participante.",
+          "hecha": false
+        },
+        {
+          "titulo": "Adaptación a diferentes poblaciones (niños, adultos mayores)",
+          "objetivo": "Ajustar ítems y normas según grupo objetivo.",
+          "hecha": false
+        },
+        {
+          "titulo": "Mantenimiento y actualización continua",
+          "objetivo": "Establecer procesos de revisión periódica de ítems y normas.",
+          "hecha": false
+        }
+      ]
+    }
+  ],
+  "tarjetas": [],
+  "debilidades": [],
+  "sesiones": 1,
+  "minutos": 0
+}
