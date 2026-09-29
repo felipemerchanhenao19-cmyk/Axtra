@@ -37,7 +37,10 @@ class CerebroGemini(Cerebro):
             respuesta = self._cliente_api().models.generate_content(
                 model=self.modelo,
                 contents=contenidos,
-                config=types.GenerateContentConfig(system_instruction=sistema),
+                config=types.GenerateContentConfig(
+                    system_instruction=sistema,
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+                ),
             )
         except Exception as e:  # el SDK de Google lanza varios tipos de error
             raise ErrorCerebro(f"Gemini falló: {e}") from e
