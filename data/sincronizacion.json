@@ -1,0 +1,165 @@
+{
+  "inicio": "2026-09-25",
+  "dias": [
+    "2026-09-25",
+    "2026-09-26",
+    "2026-09-27",
+    "2026-09-28",
+    "2026-09-29"
+  ],
+  "conversaciones": {
+    "2026-09-25": 28,
+    "2026-09-26": 110,
+    "2026-09-27": 22,
+    "2026-09-28": 159,
+    "2026-09-29": 28
+  },
+  "aciertos": 2,
+  "errores": 1,
+  "sesiones": 2,
+  "areas": {
+    "rutina": [
+      "A qué hora se levanta normalmente: a las 7 y 20 cuando no tengo insonnio",
+      "Cómo es un día normal suyo entre semana: me despierto de ves en cuando desayuno, voy al gimnasio unas 4 veces a la semana vuelvo a mi departamento hago almuerzo y cena y me dedico a mejorarte una gran parte del tiempo y estudio comercio internacional en la nocturna de martes a viernes",
+      "A qué hora rinde mejor para trabajar o estudiar: en la noche muchas veces",
+      "Hace ejercicio? ¿Qué días: generalmente vario voy al gim un dia dos horas mas sauna y descanso uno dos dias y despues vuelvo",
+      "A qué hora suele acostarse: a la 1 de la mañana normalmente"
+    ],
+    "metas": [
+      "Cuál es su meta más importante para este año: mejorarte a ti y crear la empresa",
+      "Dónde quiere estar en cinco años: Nueva York Los Ángeles o Los Ángeles",
+      "Qué quiere lograr con Apex en los próximos seis meses: quiero algunos algunas empresas clientes y que el modelo sea sostenible",
+      "Qué hábito quiere construir: de mejora"
+    ],
+    "negocios": [
+      "Tiene interés o está involucrado en un proyecto empresarial llamado Apex.",
+      "Está desarrollando una solución para restaurantes donde un solo cliente por mesa escanea un código QR para pedir por el grupo y reenviar el pedido vía WhatsApp a la caja.",
+      "Cuál es su meta más importante para este año: mejorarte a ti y crear la empresa",
+      "Qué quiere lograr con Apex en los próximos seis meses: quiero algunos algunas empresas clientes y que el modelo sea sostenible",
+      "Lidera Apex Corporation, enfocando el negocio en 'orbes de inteligencia artificial' interactivos con voz y realidad aumentada para restaurantes y cafeterías.",
+      "Planea que Jarvis evolucione hacia una plataforma web que sirva de tarjeta madre o plantilla base para los orbes de IA.",
+      "Felipe creó a Jarvis en parte por la soledad que sentía. Está muy satisfecho consigo mismo y sus logros internamente, pero le falta alguien con quien compartir la visión de Apex. La soledad es un motor para conectar con las personas correctas que necesita para que Apex crezca.",
+      "Felipe creó a Jarvis en parte por la soledad que sentía. Está muy satisfecho consigo mismo y sus logros internamente, pero le falta alguien con quien compartir la visión de Apex. La soledad es un motor para conectar con las personas correctas que necesita para que Apex crezca. (28 de septiembre, 01:29 AM)",
+      "Felipe's corporation is called Apex and will focus on creating customized digital AI orbs for businesses, starting with restaurants, featuring AR menu display and time‑based suggestions."
+    ],
+    "estudios": [
+      "Realiza estudios o ejercicios prácticos que involucran análisis con matrices.",
+      "Cómo es un día normal suyo entre semana: me despierto de ves en cuando desayuno, voy al gimnasio unas 4 veces a la semana vuelvo a mi departamento hago almuerzo y cena y me dedico a mejorarte una gran parte del tiempo y estudio comercio internacional en la nocturna de martes a viernes",
+      "A qué hora rinde mejor para trabajar o estudiar: en la noche muchas veces"
+    ],
+    "gustos": [
+      "Le gusta escuchar música rock.",
+      "Escucha música de Amanda Miguel y rock clásico."
+    ],
+    "estilo": [],
+    "personas": [
+      "Planea que Jarvis evolucione hacia una plataforma web que sirva de tarjeta madre o plantilla base para los orbes de IA."
+    ]
+  },
+  "nivel_anunciado": 40,
+  "habitos": [
+    [
+      22,
+      "resumen del dia jueves"
+    ],
+    [
+      14,
+      "coloca algo de rock clasico"
+    ],
+    [
+      17,
+      "coloca musica de amanda miguel"
+    ],
+    [
+      18,
+      "coloca musica algo de rock de los 80 okay"
+    ],
+    [
+      18,
+      "coloca algo de musica de los 80 okay de rock de los 80"
+    ],
+    [
+      18,
+      "reproduce ahora"
+    ],
+    [
+      18,
+      "coloca algo de musica okay coloca algo de rock de los 80 de nirvana"
+    ],
+    [
+      18,
+      "coloca musica de sebastian yatra"
+    ],
+    [
+      18,
+      "pausa la musica"
+    ],
+    [
+      19,
+      "continua la musica"
+    ],
+    [
+      19,
+      "paula pausa la musica"
+    ],
+    [
+      19,
+      "continua la musica"
+    ],
+    [
+      19,
+      "continua reproduciendo"
+    ],
+    [
+      19,
+      "continua la musica"
+    ],
+    [
+      19,
+      "coloca algo de nirvana"
+    ],
+    [
+      19,
+      "pausa rapido jarvis pausa jarvis rapido pausa"
+    ],
+    [
+      19,
+      "continua la musica"
+    ],
+    [
+      19,
+      "pausa la musica"
+    ],
+    [
+      19,
+      "coloca musica de sebastian yatra"
+    ],
+    [
+      19,
+      "pausa la musica hola jarvis pausa la musica"
+    ],
+    [
+      14,
+      "coloca musica de nirvana"
+    ],
+    [
+      14,
+      "ya aparecio salta"
+    ],
+    [
+      14,
+      "coloca you are so beautiful de joe cocker"
+    ]
+  ],
+  "preguntas_hechas": [
+    "¿A qué hora se levanta normalmente?",
+    "¿Cómo es un día normal suyo entre semana?",
+    "¿A qué hora rinde mejor para trabajar o estudiar?",
+    "¿Hace ejercicio? ¿Qué días?",
+    "¿A qué hora suele acostarse?",
+    "¿Cuál es su meta más importante para este año?",
+    "¿Dónde quiere estar en cinco años?",
+    "¿Qué quiere lograr con Apex en los próximos seis meses?",
+    "¿Qué hábito quiere construir?"
+  ]
+}

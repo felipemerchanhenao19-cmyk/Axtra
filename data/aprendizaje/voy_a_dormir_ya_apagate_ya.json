@@ -1,0 +1,220 @@
+{
+  "tema": "voy a dormir Ya apágate ya",
+  "descripcion": "Aprender a conciliar, profundizar y optimizar el sueño para lograr un descanso pleno y saludable.",
+  "nivel": "apaga todo ya jarvis",
+  "meta": "",
+  "creado": "2026-09-27",
+  "modulos": [
+    {
+      "titulo": "Fundamentos de la fisiología del sueño",
+      "objetivo": "Comprender cómo funciona el sueño a nivel biológico.",
+      "lecciones": [
+        {
+          "titulo": "Ciclos del sueño: REM y NREM",
+          "objetivo": "Identificar las fases del sueño y su importancia.",
+          "hecha": false
+        },
+        {
+          "titulo": "Ritmos circadianos y melatonina",
+          "objetivo": "Entender el reloj interno y su influencia en la somnolencia.",
+          "hecha": false
+        },
+        {
+          "titulo": "Neurotransmisores y hormonas del sueño",
+          "objetivo": "Reconocer los químicos que regulan el sueño y la vigilia.",
+          "hecha": false
+        },
+        {
+          "titulo": "Factores que alteran el sueño",
+          "objetivo": "Detectar causas comunes de insomnio y fragmentación del sueño.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Higiene del sueño",
+      "objetivo": "Establecer hábitos ambientales y conductuales que favorezcan el descanso.",
+      "lecciones": [
+        {
+          "titulo": "Entorno físico óptimo",
+          "objetivo": "Configurar luz, temperatura y ruido para dormir mejor.",
+          "hecha": false
+        },
+        {
+          "titulo": "Rutinas pre‑sueño",
+          "objetivo": "Diseñar actividades relajantes antes de acostarse.",
+          "hecha": false
+        },
+        {
+          "titulo": "Uso de dispositivos electrónicos",
+          "objetivo": "Gestionar la exposición a pantallas y luz azul.",
+          "hecha": false
+        },
+        {
+          "titulo": "Alimentación y estimulantes",
+          "objetivo": "Aprender qué comer y beber y cuándo para no interferir con el sueño.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Técnicas de relajación y respiración",
+      "objetivo": "Dominar métodos rápidos para calmar la mente y el cuerpo.",
+      "lecciones": [
+        {
+          "titulo": "Respiración diafragmática",
+          "objetivo": "Practicar una respiración profunda que induzca somnolencia.",
+          "hecha": false
+        },
+        {
+          "titulo": "Relajación muscular progresiva",
+          "objetivo": "Aprender a tensar y relajar grupos musculares para liberar tensión.",
+          "hecha": false
+        },
+        {
+          "titulo": "Visualización guiada",
+          "objetivo": "Crear imágenes mentales que faciliten el sueño.",
+          "hecha": false
+        },
+        {
+          "titulo": "Meditación de atención plena (mindfulness)",
+          "objetivo": "Entrenar la mente para reducir pensamientos intrusivos al acostarse.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Control cognitivo del insomnio",
+      "objetivo": "Aplicar estrategias psicológicas para detener la rumiación nocturna.",
+      "lecciones": [
+        {
+          "titulo": "Reestructuración de pensamientos",
+          "objetivo": "Identificar y modificar creencias que dificultan el sueño.",
+          "hecha": false
+        },
+        {
+          "titulo": "Técnica de la “caja de preocupaciones”",
+          "objetivo": "Aprender a posponer preocupaciones para evitar que interfieran con el sueño.",
+          "hecha": false
+        },
+        {
+          "titulo": "Entrenamiento de estímulo‑respuesta (asociación cama‑sueño)",
+          "objetivo": "Condicionar la cama como único lugar para dormir.",
+          "hecha": false
+        },
+        {
+          "titulo": "Uso de registros de sueño (sleep diary)",
+          "objetivo": "Monitorear patrones y ajustar estrategias en base a datos reales.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Cronobiología y ajuste de horarios",
+      "objetivo": "Sincronizar los horarios de sueño con el ritmo biológico propio.",
+      "lecciones": [
+        {
+          "titulo": "Determinación del cronotipo personal",
+          "objetivo": "Descubrir si eres madrugador, vespertino o intermedio.",
+          "hecha": false
+        },
+        {
+          "titulo": "Planificación de horarios consistentes",
+          "objetivo": "Crear una agenda de sueño regular que respete tu cronotipo.",
+          "hecha": false
+        },
+        {
+          "titulo": "Exposición a luz natural y oscura",
+          "objetivo": "Utilizar la luz del día y la oscuridad para reforzar el ritmo circadiano.",
+          "hecha": false
+        },
+        {
+          "titulo": "Manejo de desfases horarios (jet‑lag, turnos)",
+          "objetivo": "Aplicar técnicas para adaptarse rápidamente a cambios de horario.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Optimización avanzada del sueño",
+      "objetivo": "Implementar estrategias de alto nivel para maximizar la calidad del descanso.",
+      "lecciones": [
+        {
+          "titulo": "Técnicas de “sleep restriction” y “stimulus control”",
+          "objetivo": "Reducir el tiempo en cama para aumentar la presión de sueño.",
+          "hecha": false
+        },
+        {
+          "titulo": "Uso de suplementos y aromaterapia",
+          "objetivo": "Evaluar la evidencia de melatonina, magnesio y aceites esenciales.",
+          "hecha": false
+        },
+        {
+          "titulo": "Biofeedback y dispositivos de seguimiento",
+          "objetivo": "Interpretar datos de pulso, respiración y ondas cerebrales para afinar la práctica.",
+          "hecha": false
+        },
+        {
+          "titulo": "Micro‑siestas estratégicas",
+          "objetivo": "Aprender a tomar siestas breves que no alteren el sueño nocturno.",
+          "hecha": false
+        }
+      ]
+    },
+    {
+      "titulo": "Mantenimiento y adaptación a largo plazo",
+      "objetivo": "Crear un plan sostenible para preservar hábitos de sueño saludables.",
+      "lecciones": [
+        {
+          "titulo": "Revisión trimestral del registro de sueño",
+          "objetivo": "Analizar tendencias y ajustar rutinas según sea necesario.",
+          "hecha": false
+        },
+        {
+          "titulo": "Gestión del estrés crónico",
+          "objetivo": "Incorporar técnicas de manejo del estrés para prevenir recaídas.",
+          "hecha": false
+        },
+        {
+          "titulo": "Adaptación a cambios de vida (estudios, trabajo, familia)",
+          "objetivo": "Modificar el plan de sueño ante nuevas demandas sin perder calidad.",
+          "hecha": false
+        },
+        {
+          "titulo": "Construcción de un “plan de sueño de emergencia”",
+          "objetivo": "Diseñar acciones rápidas para noches de insomnio inesperado.",
+          "hecha": false
+        }
+      ]
+    }
+  ],
+  "tarjetas": [
+    {
+      "pregunta": "¿Qué fase del sueño está asociada a los sueños vívidos?",
+      "respuesta": "REM.",
+      "caja": 0,
+      "proxima": "2026-09-28"
+    },
+    {
+      "pregunta": "¿Qué fase del sueño está asociada a los sueños vívidos?",
+      "respuesta": "REM.",
+      "caja": 0,
+      "proxima": "2026-09-28"
+    },
+    {
+      "pregunta": "¿Qué fase del sueño está asociada a los sueños vívidos?",
+      "respuesta": "REM.",
+      "caja": 0,
+      "proxima": "2026-09-28"
+    },
+    {
+      "pregunta": "¿Qué fase del sueño está asociada a los sueños vívidos?",
+      "respuesta": "REM.",
+      "caja": 0,
+      "proxima": "2026-09-28"
+    }
+  ],
+  "debilidades": [],
+  "sesiones": 1,
+  "minutos": 7.4
+}

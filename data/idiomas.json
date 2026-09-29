@@ -1,0 +1,41 @@
+{
+  "ingles": {
+    "clases": 1,
+    "minutos": 3.6,
+    "vocabulario": [],
+    "errores": [],
+    "nivel": "[E"
+  },
+  "frances": {
+    "clases": 2,
+    "minutos": 15.5,
+    "vocabulario": [
+      "projet = plan, iniciativa",
+      "reformuler = volver a decir de otra manera",
+      "série = programa de televisión",
+      "film = película, série = serie de TV",
+      "sport = deporte",
+      "type = tipo, musique = música",
+      "écouter = escuchar",
+      "objectif = meta, atteindre = lograr",
+      "souvent = a menudo, travailler = trabajar",
+      "dire = decir, simplement = simplemente",
+      "prénom = nombre de pila",
+      "simplement = solo, decir = decir",
+      "jour = día, semaine = semana",
+      "couleur = color",
+      "reprendre = continuar, pratiquer = practicar",
+      "maintenant = ahora, faire = hacer",
+      "temps libre = tiempo libre, aimer = gustar",
+      "fruit = fruta, préféré = favorito",
+      "boisson = bebida, aimer = gustar"
+    ],
+    "errores": [
+      "Buen lluvia -> Bonjour",
+      "That's all I need, and I must spend an eternity. -> Utilise le français pour répondre, par ex. « C’est tout ce dont j’ai besoin ».",
+      "Spagnar -> série en espagnol",
+      "non Alain -> non, pas Alain"
+    ],
+    "nivel": "A1"
+  }
+}

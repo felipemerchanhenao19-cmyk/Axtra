@@ -1,0 +1,79 @@
+{
+  "2026-09-23": {
+    "usd": 1.02676,
+    "llamadas": 167,
+    "busquedas": 17,
+    "por_origen": {
+      "conversación": 0.64557,
+      "aprendizaje autónomo": 0.37655,
+      "clase de inglés": 0.00464
+    }
+  },
+  "2026-09-24": {
+    "usd": 0.48088,
+    "llamadas": 28,
+    "busquedas": 14,
+    "por_origen": {
+      "aprendizaje autónomo": 0.31237,
+      "conversación": 0.16851
+    },
+    "gratis_local": 57,
+    "gratis_directo": 6
+  },
+  "2026-09-25": {
+    "usd": 0.22121,
+    "llamadas": 20,
+    "busquedas": 3,
+    "por_origen": {
+      "conversación": 0.15742,
+      "aprendizaje autónomo": 0.06379
+    },
+    "gratis_local": 3,
+    "gratis_groq": 95,
+    "gratis_openrouter": 1,
+    "gratis_gemini": 7,
+    "gratis_directo": 6
+  },
+  "2026-09-26": {
+    "usd": 0.08222,
+    "llamadas": 16,
+    "busquedas": 0,
+    "por_origen": {
+      "conversación": 0.08222
+    },
+    "gratis_gemini": 19,
+    "gratis_groq": 69,
+    "gratis_directo": 3
+  },
+  "2026-09-27": {
+    "usd": 0.33191,
+    "llamadas": 17,
+    "busquedas": 6,
+    "por_origen": {
+      "conversación": 0.33191
+    },
+    "gratis_groq": 19,
+    "gratis_gemini": 6
+  },
+  "2026-09-28": {
+    "usd": 0.19287,
+    "llamadas": 19,
+    "busquedas": 1,
+    "por_origen": {
+      "conversación": 0.19287
+    },
+    "gratis_gemini": 8,
+    "gratis_groq": 117,
+    "gratis_directo": 24,
+    "gratis_openrouter": 1
+  },
+  "2026-09-29": {
+    "usd": 0.0,
+    "llamadas": 0,
+    "busquedas": 0,
+    "por_origen": {},
+    "gratis_directo": 5,
+    "gratis_groq": 21,
+    "gratis_gemini": 1
+  }
+}
