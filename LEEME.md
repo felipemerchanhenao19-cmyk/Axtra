@@ -289,7 +289,7 @@ Solo con la voz de alguien que **te dé permiso**.
 |---|---|
 | `JARVIS_VOICE_THRESHOLD` | Qué tan estricto es con tu voz. Si otra persona pasa, súbelo (0.80). Si a ti te rechaza, bájalo (0.70) |
 | `JARVIS_WAKE_MODE` | `es` = decir "Axtra" en español (por defecto); `en` = decir "Hey Axtra" en inglés |
-| `JARVIS_PAUSA_FINAL` | Segundos de silencio para saber que terminaste (1.6). Si te corta, súbelo a 2.2 |
+| `JARVIS_PAUSA_FINAL` | Segundos de silencio para saber que terminaste (0.5). Si te corta a mitad de frase, súbelo a 0.8 |
 | `JARVIS_RECONOCIMIENTO` | `google` (mejor, gratis, en la nube) o `whisper` (local, privado) |
 | `JARVIS_INTERRUMPIR` | `1` para poder interrumpirlo, `0` para desactivar |
 | `JARVIS_WHISPER_MODEL` | `small` entiende mejor; `base` es más rápido si tu PC va lento |
