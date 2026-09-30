@@ -55,7 +55,7 @@ def main():
     from audio import pick_microphone
 
     print(f"  - Micrófono: {pick_microphone()}")
-    print("  - Cargando oído (Whisper)...")
+    print("  - Cargando oído...")
     stt = STT()
     print("  - Cargando palabra de activación...")
     if config.WAKE_MODE == "en":
