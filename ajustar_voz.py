@@ -72,7 +72,7 @@ def probar(frases: int = 5) -> None:
     if recomendado < 0.45:
         print("Ojo: con un umbral tan bajo otra persona podría pasar. Vuelve a registrar tu voz "
               "(python axtra.py registrar) con el micrófono que usas siempre.")
-    if input(f"¿Lo guardo en el .env? (s/n): ").strip().lower().startswith("s"):
+    if input("¿Lo guardo en el .env? (s/n): ").strip().lower().startswith("s"):
         set_threshold(recomendado)
 
 

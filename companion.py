@@ -13,6 +13,7 @@ Privacidad: para saber qué haces solo usa el TIPO de programa (navegador, Word,
 nunca el contenido de la pantalla.
 """
 import json
+import os
 import random
 import threading
 import time
@@ -89,8 +90,12 @@ def touch() -> None:
     _last_talk = time.time()
 
 
-# ---------- ¿Qué está haciendo en el PC? (solo Windows) ----------
+# ---------- ¿Qué está haciendo en el PC? (Windows y Linux) ----------
 def idle_seconds():
+    if os.name != "nt":
+        import linux
+
+        return linux.idle_seconds()
     try:
         import ctypes
 
@@ -106,6 +111,10 @@ def idle_seconds():
 
 
 def active_window() -> str:
+    if os.name != "nt":
+        import linux
+
+        return linux.active_window()
     try:
         import ctypes
 

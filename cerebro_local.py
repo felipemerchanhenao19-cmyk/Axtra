@@ -19,7 +19,10 @@ def main():
             exe = p
     if not exe:
         print("Ollama no está instalado. Instálalo con este comando y vuelve a ejecutar 'python axtra.py cerebro':\n")
-        print("    winget install -e --id Ollama.Ollama\n")
+        if os.name == "nt":
+            print("    winget install -e --id Ollama.Ollama\n")
+        else:
+            print("    curl -fsSL https://ollama.com/install.sh | sh\n")
         print("(o descárgalo de ollama.com). Después cierra y abre la terminal.")
         sys.exit(1)
 

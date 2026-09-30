@@ -1,7 +1,8 @@
-"""Instalador de AXTRA en Python puro.
+"""Instalador de AXTRA en Python puro (Windows y Linux).
 
 Uso (desde una terminal abierta en la carpeta axtra):
     python instalar.py
+En Linux es mejor usar  bash instalar_linux.sh , que antes instala los programas del sistema.
 """
 import os
 import shutil
@@ -12,6 +13,7 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent
 VENV = BASE / "venv"
 VENV_PY = VENV / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+WINDOWS = os.name == "nt"
 
 # (paquete pip, ¿es obligatorio?)
 PAQUETES = [
@@ -44,11 +46,20 @@ PAQUETES = [
     ("pillow", False),
     ("uiautomation", False),
     ("winsdk", False),
+    ("pytesseract", False),
     ("opencv-contrib-python-headless==4.10.0.84", False),
     ("scipy", False),
     ("librosa", False),
     ("torch", False),  # solo para reconocer tu voz
 ]
+# Solo existen en Windows (volumen, botones y lectura de pantalla de Windows)
+SOLO_WINDOWS = {"comtypes", "pycaw", "uiautomation", "winsdk"}
+# Solo en Linux: lee el texto de la pantalla con Tesseract
+SOLO_LINUX = {"pytesseract"}
+if WINDOWS:
+    PAQUETES = [(p, o) for p, o in PAQUETES if p not in SOLO_LINUX]
+else:
+    PAQUETES = [(p, o) for p, o in PAQUETES if p not in SOLO_WINDOWS]
 
 
 def run(cmd):
@@ -79,7 +90,11 @@ def main():
     fallos = []
     for paquete, obligatorio in PAQUETES:
         print(f"\n--- {paquete} ---")
-        if not run([VENV_PY, "-m", "pip", "install", paquete]):
+        extra = []
+        if paquete == "torch" and not WINDOWS:
+            # En Linux pip baja por defecto la versión para tarjetas NVIDIA (varios GB); esta es la liviana
+            extra = ["--index-url", "https://download.pytorch.org/whl/cpu"]
+        if not run([VENV_PY, "-m", "pip", "install", paquete] + extra):
             fallos.append((paquete, obligatorio))
 
     print("\n--- resemblyzer (reconocimiento de voz) ---")
@@ -102,9 +117,20 @@ def main():
     if obligatorios:
         print(f"FALLARON (obligatorios): {', '.join(obligatorios)}")
         print("  -> Tu versión de Python es muy nueva para estas librerías.")
-        print("     Solución: instala Python 3.12 al lado del tuyo (no borra nada):")
-        print("        winget install -e --id Python.Python.3.12")
-        print("     Borra la carpeta venv y ejecuta:  py -3.12 instalar.py")
+        if WINDOWS:
+            print("     Solución: instala Python 3.12 al lado del tuyo (no borra nada):")
+            print("        winget install -e --id Python.Python.3.12")
+            print("     Borra la carpeta venv y ejecuta:  py -3.12 instalar.py")
+        else:
+            print("     Revisa que corriste primero:  bash instalar_linux.sh")
+    elif not WINDOWS:
+        print("\nSiguientes pasos:")
+        print("  1. Abre el archivo .env (nano .env  o  xed .env) y pega tus claves")
+        print("  2. python3 axtra.py registrar   (registra tu voz)")
+        print("  3. Cerebro local gratis (opcional, recomendado):")
+        print("        curl -fsSL https://ollama.com/install.sh | sh")
+        print("        python3 axtra.py cerebro")
+        print("  4. python3 axtra.py             (inicia Axtra)")
     else:
         print("\nSiguientes pasos:")
         print("  1. Abre el archivo .env con el Bloc de notas y pega tu clave de Anthropic")

@@ -5,9 +5,10 @@
 2. Cuadrícula: "cuadrícula" divide la pantalla en 9 cuadros numerados; dices un número y ese cuadro
    se divide otra vez; "clic" hace clic en el centro del cuadro elegido.
 3. Clic por nombre: "haz clic en Enviar". Busca botones y menús con UI Automation de Windows y,
-   si no los encuentra, lee el texto de la pantalla con el OCR de Windows.
+   si no los encuentra, lee el texto de la pantalla con el OCR de Windows (en Linux, con Tesseract).
 4. Teclado: "escribe aquí hola", "presiona enter", "copia", "pega", "deshacer", "cambia de ventana"...
 """
+import os
 import queue
 import re
 import threading
@@ -134,6 +135,8 @@ def escribir(texto: str) -> None:
 # ---------------- Clic por nombre ----------------
 def _uia_find(target: str):
     """Busca un botón, enlace o menú por su nombre en la ventana activa (UI Automation)."""
+    if os.name != "nt":
+        return None   # UI Automation solo existe en Windows; en Linux se lee la pantalla
     import uiautomation as auto
 
     with auto.UIAutomationInitializerInThread():
@@ -165,6 +168,8 @@ def _uia_find(target: str):
 
 def _ocr_find(target: str):
     """Lee el texto de la pantalla con el OCR de Windows (gratis, sin internet) y busca la frase."""
+    if os.name != "nt":
+        return _ocr_find_linux(target)
     import asyncio
 
     from PIL import ImageGrab
@@ -209,6 +214,8 @@ _CUENTA_REGRESIVA = re.compile(r"\b(puedes?|podr[aá]s?)\b|\ben\s*\d|\d\s*s(eg)?
 
 def _uia_find_saltar():
     """Una sola pasada por la pantalla buscando el botón REAL de saltar anuncio (no la cuenta regresiva)."""
+    if os.name != "nt":
+        return None
     import uiautomation as auto
 
     with auto.UIAutomationInitializerInThread():
@@ -240,6 +247,8 @@ def _uia_find_saltar():
 
 def _ocr_find_saltar():
     """Una sola captura + OCR buscando el texto real del botón, descartando la cuenta regresiva."""
+    if os.name != "nt":
+        return _ocr_find_saltar_linux()
     import asyncio
 
     from PIL import ImageGrab
@@ -268,6 +277,41 @@ def _ocr_find_saltar():
             x1, y1 = min(r.x for r in rs), min(r.y for r in rs)
             x2, y2 = max(r.x + r.width for r in rs), max(r.y + r.height for r in rs)
             return int((x1 + x2) / 2), int((y1 + y2) / 2)
+    return None
+
+
+def _box_center(words) -> tuple:
+    """Centro del rectángulo que cubre varias palabras (x, y, ancho, alto) del OCR de Linux."""
+    x1 = min(w[1] for w in words)
+    y1 = min(w[2] for w in words)
+    x2 = max(w[1] + w[3] for w in words)
+    y2 = max(w[2] + w[4] for w in words)
+    return int((x1 + x2) / 2), int((y1 + y2) / 2)
+
+
+def _ocr_find_linux(target: str):
+    """Como _ocr_find, pero leyendo la pantalla con Tesseract (Linux)."""
+    import linux
+
+    want = target.split()
+    for zoom in (1, 2):   # si no lo encuentra, lee otra vez con la pantalla ampliada
+        for words in linux.ocr_lines(zoom):
+            texts = [_norm(w[0]).strip(".,:;!?¿¡()[]\"'") for w in words]
+            for i in range(len(texts) - len(want) + 1):
+                if all(want[j] in texts[i + j] for j in range(len(want))):
+                    return _box_center(words[i:i + len(want)])
+    return None
+
+
+def _ocr_find_saltar_linux():
+    """Como _ocr_find_saltar, pero con Tesseract (Linux)."""
+    import linux
+
+    for zoom in (1, 2):   # si no lo encuentra, lee otra vez con la pantalla ampliada
+        for words in linux.ocr_lines(zoom):
+            texto = _norm(" ".join(w[0] for w in words))
+            if any(p in texto for p in ("saltar anuncio", "omitir anuncio", "skip ad")) and not _CUENTA_REGRESIVA.search(texto):
+                return _box_center(words)
     return None
 
 

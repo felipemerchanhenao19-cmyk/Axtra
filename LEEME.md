@@ -14,6 +14,8 @@ Asistente de voz personal: se activa diciendo **"Axtra"** en español y solo obe
 
 ## Instalación en tu ASUS Vivobook Go (Windows)
 
+> ¿Vas a cambiar Windows por Linux? Sigue la guía **LINUX.md** (instalar Linux Mint y luego Axtra con `bash instalar_linux.sh`).
+
 1. Descomprime el zip (clic derecho → "Extraer todo") y entra a la carpeta `axtra`.
 2. Clic derecho en un espacio vacío de la carpeta → **"Abrir en Terminal"**.
 3. Escribe y presiona Enter:

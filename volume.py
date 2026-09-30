@@ -1,8 +1,10 @@
-"""Volumen real de Windows (no teclas a ciegas): leer, subir, bajar, fijar, silenciar.
+"""Volumen real del PC, en Windows y Linux (no teclas a ciegas): leer, subir, bajar, fijar, silenciar.
 
 Axtra SIEMPRE se asegura de poder ser escuchado antes de hablar: si el PC quedó silenciado o con el
 volumen casi en cero, lo sube a un nivel audible. Así nunca queda "mudo" por un silencio accidental.
 """
+import os
+
 MIN_AUDIBLE = 0.12
 RESTORE_TO = 0.35
 
@@ -38,6 +40,10 @@ def _com():
 
 def get():
     """(porcentaje 0-100, silenciado) o None si no se puede leer."""
+    if os.name != "nt":
+        import linux
+
+        return linux.volume_get()
     _com()
     ev = _endpoint()
     if ev is None:
@@ -49,6 +55,10 @@ def get():
 
 
 def set_level(pct: float) -> bool:
+    if os.name != "nt":
+        import linux
+
+        return linux.volume_set(pct)
     _com()
     ev = _endpoint()
     if ev is None:
@@ -69,6 +79,10 @@ def change(delta_pct: float) -> bool:
 
 
 def mute(on: bool = True) -> bool:
+    if os.name != "nt":
+        import linux
+
+        return linux.volume_mute(on)
     _com()
     ev = _endpoint()
     if ev is None:
@@ -97,6 +111,6 @@ def ensure_audible() -> None:
 def status_text() -> str:
     g = get()
     if g is None:
-        return "No puedo leer el volumen de Windows en este momento, señor."
+        return "No puedo leer el volumen del PC en este momento, señor."
     pct, muted = g
     return f"El volumen está en {pct} por ciento" + (", silenciado." if muted else ".")
