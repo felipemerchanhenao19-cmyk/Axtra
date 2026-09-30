@@ -94,7 +94,7 @@ MIN_SPEECH_LEVEL = float(os.getenv("JARVIS_MIN_SPEECH_LEVEL", "60"))
 # Micrófono a usar (parte del nombre, p. ej. "USB"). Vacío = el predeterminado de Windows.
 MIC_DEVICE = os.getenv("JARVIS_MICROFONO", "").strip()
 # Segundos de silencio para saber que terminaste de hablar (súbelo si te corta)
-END_PAUSE = float(os.getenv("JARVIS_PAUSA_FINAL", "0.5"))
+END_PAUSE = float(os.getenv("JARVIS_PAUSA_FINAL", "1.6"))
 # Reconocimiento de voz: google (gratis, en la nube, entiende mejor) o whisper (local)
 STT_PROVIDER = os.getenv("JARVIS_RECONOCIMIENTO", "google").lower()
 STT_LANGUAGE = os.getenv("JARVIS_IDIOMA", "es-CO")
