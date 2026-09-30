@@ -135,7 +135,7 @@ CAMERA_INDEX = int(os.getenv("JARVIS_CAMARA", "0"))           # 0 = cámara del 
 CAMERA_GREETING = os.getenv("JARVIS_CAMARA_SALUDO", "1") == "1"  # saludarte al verte llegar
 
 # --- Seguridad por voz ---
-VOICE_THRESHOLD = float(os.getenv("JARVIS_VOICE_THRESHOLD", "0.75"))
+VOICE_THRESHOLD = float(os.getenv("JARVIS_VOICE_THRESHOLD", "0.50"))
 REQUIRE_VOICE_MATCH = os.getenv("JARVIS_REQUIRE_VOICE_MATCH", "1") == "1"
 
 # --- Rutas y audio ---

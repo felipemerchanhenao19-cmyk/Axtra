@@ -287,7 +287,7 @@ Solo con la voz de alguien que **te dé permiso**.
 ## Ajustes (archivo `.env`)
 | Ajuste | Para qué |
 |---|---|
-| `JARVIS_VOICE_THRESHOLD` | Qué tan estricto es con tu voz. Si otra persona pasa, súbelo (0.80). Si a ti te rechaza, bájalo (0.70) |
+| `JARVIS_VOICE_THRESHOLD` | Qué tan estricto es con tu voz. Por defecto 0.50. Si otra persona pasa, súbelo (0.60). Si a ti te rechaza, bájalo (0.45) |
 | `JARVIS_WAKE_MODE` | `es` = decir "Axtra" en español (por defecto); `en` = decir "Hey Axtra" en inglés |
 | `JARVIS_PAUSA_FINAL` | Segundos de silencio para saber que terminaste (0.5). Si te corta a mitad de frase, súbelo a 0.8 |
 | `JARVIS_RECONOCIMIENTO` | `google` (mejor, gratis, en la nube) o `whisper` (local, privado) |
