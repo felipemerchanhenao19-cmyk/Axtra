@@ -103,6 +103,22 @@ Di *"Axtra, activa protocolo de inteligencia avanzada"* (o *"... en neurociencia
 ## Ondas de mar
 Una ventana con olas que se mueven suaves en espera, se agitan cuando Axtra **razona**, laten cuando **habla** y se animan cuando **escucha**. Se abre sola con el protocolo; también: *"muestra las ondas"* / *"cierra las ondas"*.
 
+## Axtra en el navegador (estilo Gemini)
+```
+python axtra.py web
+```
+Se abre **http://localhost:8765** en tu navegador: una página como la de Gemini, pero con el cerebro, la memoria y las herramientas de Axtra.
+- **Todo lo que responde lo dice en voz alta** con su misma voz. Puedes detenerlo con el botón ■ o la tecla Esc, volver a escuchar cualquier respuesta con el altavoz, o apagar la voz en el menú de la izquierda.
+- **Micrófono:** toca el micrófono, habla y se detiene solo cuando te callas. Axtra te entiende con su mismo oído.
+- **Imágenes:** *"Crea una imagen de un orbe futurista"* o el botón **Imagen**. Usa Gemini con tu clave; si no hay cuota, un servicio gratis sin clave. Quedan en `mis_documentos/imagenes`.
+- **Documentos Word:** *"Haz un documento sobre..."*, *"Redacta una carta para..."* o el botón **Documento**. Lo ves en la página, lo puedes escuchar y lo descargas en Word. Quedan en `mis_documentos/documentos`.
+- Las propuestas, bocetos y gráficas que Axtra crea con sus herramientas aparecen en el chat para abrir o descargar.
+- Conversaciones guardadas a la izquierda (`data/web_chats.json`). La memoria es la misma que por voz: lo que hables en un lado, Axtra lo sabe en el otro.
+- El dictado, las clases de idiomas y la sincronización siguen siendo por voz o por el Escritorio.
+- **Privacidad:** lo que pides como imagen se envía a Gemini o al servicio de imágenes, y el texto de los documentos lo escribe Gemini (plan gratis). No pidas documentos con datos privados de clientes; para eso pídele la propuesta normal, que la hace Claude.
+- **Desde el celular (mismo Wi-Fi):** en `.env` pon `JARVIS_WEB_RED=1` y `JARVIS_WEB_CLAVE=una_clave_larga`. Al iniciar muestra la dirección para abrir en el celular y te pide la clave. El micrófono de la página solo funciona en el PC.
+- Puedes tener abiertos a la vez a Axtra por voz (`python axtra.py`) y la página (`python axtra.py web`), en dos terminales.
+
 ## Escritorio: escríbele a Axtra
 - Di *"Axtra, activa escritorio"* (o *"abre el escritorio"*, *"modo escritorio"*, *"quiero escribirte"*). Se abre una ventana.
 - Escribe abajo y presiona **Enter**: Axtra **siempre responde en voz alta** y también lo ves escrito.
