@@ -320,7 +320,11 @@ async function api(path, opts = {}) {
 const post = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 
 // ---------------- Orbe (agujero negro azul hielo) ----------------
-const FRAG = `precision mediump float;
+const FRAG = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
 uniform vec2 res; uniform float t, energy, swirl;
 const vec3 c1 = vec3(0.043, 0.239, 0.569), c2 = vec3(0.247, 0.816, 1.0), c3 = vec3(0.545, 0.914, 1.0);
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -335,9 +339,9 @@ void main(){
   if (r < R) {
     float z = sqrt(R*R - r*r) / R; vec2 p = uv / R; vec2 q = p * (1.0 + 0.35*(1.0 - z));
     float ang = atan(q.y, q.x), rad = length(q);
-    float sw = 2.4 * (1.0 - rad) + t * 0.09 * swirl;
+    float sw = 2.4 * (1.0 - rad) + t * 0.32 * swirl;
     vec2 sq = vec2(cos(ang + sw), sin(ang + sw)) * rad;
-    float n = fbm(sq*2.2 + vec2(t*0.03, -t*0.02)); float n2 = fbm(sq*4.0 + n*1.6 - vec2(t*0.05));
+    float n = fbm(sq*2.2 + vec2(t*0.09, -t*0.06)); float n2 = fbm(sq*4.0 + n*1.6 - vec2(t*0.13));
     vec3 neb = mix(c1*0.18, c1*1.2, smoothstep(0.25, 0.7, n));
     neb = mix(neb, c2, smoothstep(0.5, 0.85, n2) * 0.85); neb *= 0.5 + 0.7*n2;
     float d = length(vec2(p.x, p.y*2.8)); float ring = exp(-pow((d - 0.5)*6.5, 2.0));
@@ -368,14 +372,14 @@ function crearOrbe(canvas) {
 }
 let t0 = performance.now();
 function dibujar(now) {
-  const t = 14 + (now - t0) / 1000;
-  let energy = 1, swirl = 1;
-  if (S.estado === "escuchando") energy = 1.15 + 0.1 * Math.sin(t * 6);
-  if (S.estado === "pensando") { swirl = 6; energy = 1.05; }
-  if (S.estado === "hablando") energy = 1 + 0.22 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1));
+  const t = 14 + ((now - t0) / 1000) % 900;            // acotado: los teléfonos pierden precisión con números grandes
+  let energy = 1 + 0.07 * Math.sin(t * 1.7), swirl = 1;   // en reposo respira suave
+  if (S.estado === "escuchando") energy = 1.18 + 0.12 * Math.sin(t * 6);
+  if (S.estado === "pensando") { swirl = 4; energy = 1.08 + 0.05 * Math.sin(t * 4); }
+  if (S.estado === "hablando") energy = 1.05 + 0.3 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1));
   for (const o of orbes) {
     if (!o.canvas.offsetParent && o.canvas.id !== "mini") continue;   // no dibuja lo que no se ve
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5), w = Math.round(o.canvas.clientWidth * dpr);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2), w = Math.round(o.canvas.clientWidth * dpr);
     if (!w) continue;
     if (o.canvas.width !== w) { o.canvas.width = o.canvas.height = w; o.gl.viewport(0, 0, w, w); }
     o.gl.uniform2f(o.U("res"), w, w); o.gl.uniform1f(o.U("t"), t);
@@ -393,7 +397,7 @@ const V = { token: 0, audio: null };
 function frasesVoz(texto) {
   const limpio = String(texto).replace(/[#*_`>|]/g, " ").replace(/https?:\/\/\S+/g, "").replace(/\s+/g, " ").trim();
   const partes = limpio.match(/[^.!?¿¡]+[.!?]*/g) || [limpio]; const out = []; let cur = "";
-  for (const p of partes) { if (cur && (cur + p).length > (out.length ? 220 : 110)) { out.push(cur.trim()); cur = p; } else cur += p; }
+  for (const p of partes) { if (cur && (cur + p).length > (out.length ? 280 : 90)) { out.push(cur.trim()); cur = p; } else cur += p; }
   if (cur.trim()) out.push(cur.trim());
   return out.filter(Boolean);
 }
@@ -410,10 +414,14 @@ async function decir(texto, { idioma = null, lento = false, boton = null } = {})
   callar(); const token = V.token; const partes = idioma ? [texto] : frasesVoz(texto);
   if (!partes.length) return;
   estado("hablando"); $("#speaking").hidden = false; if (boton) boton.classList.add("on");
-  let sig = audioDe(partes[0], idioma, lento).catch(() => null);
+  // Pide todos los audios ya (de a 3 a la vez): mientras suena una frase, las siguientes ya están listas
+  const audios = new Array(partes.length); let siguiente = 0;
+  const trabajador = async () => { while (siguiente < partes.length && token === V.token) { const i = siguiente++;
+    audios[i] = audioDe(partes[i], idioma, lento).catch(() => null); await audios[i]; } };
+  for (let k = 0; k < Math.min(3, partes.length); k++) trabajador();
   for (let i = 0; i < partes.length; i++) {
-    const url = await sig; if (token !== V.token) return;
-    sig = i + 1 < partes.length ? audioDe(partes[i + 1], idioma, lento).catch(() => null) : null;
+    while (!audios[i]) { await new Promise((r) => setTimeout(r, 30)); if (token !== V.token) return; }
+    const url = await audios[i]; if (token !== V.token) return;
     if (!url) continue;
     await new Promise((listo) => { const a = new Audio(url); V.audio = a;
       a.onended = a.onerror = () => { URL.revokeObjectURL(url); listo(); }; a.play().catch(listo); });
@@ -424,48 +432,44 @@ async function decir(texto, { idioma = null, lento = false, boton = null } = {})
 
 // ---------------- Micrófono ----------------
 const REC = { on: false };
+const TIPO_AUDIO = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"]
+  .find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
 async function grabar(alTerminar) {
   if (REC.on) return pararGrabacion();
+  if (!window.MediaRecorder) { toast("Este navegador no permite grabar audio. Use Chrome."); return; }
   let stream;
-  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } }); }
   catch { toast("Permita el micrófono: toque el candado de la barra de direcciones."); return; }
   callar();
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const src = ctx.createMediaStreamSource(stream), node = ctx.createScriptProcessor(4096, 1, 1);
-  const trozos = []; let oyo = false, silencio = 0; const inicio = Date.now();
-  node.onaudioprocess = (e) => {
-    const d = new Float32Array(e.inputBuffer.getChannelData(0)); trozos.push(d);
-    let s = 0; for (const v of d) s += v * v; const rms = Math.sqrt(s / d.length);
-    if (rms > 0.02) { oyo = true; silencio = 0; } else if (oyo) silencio += d.length / ctx.sampleRate;
-    if ((oyo && silencio > 1.4) || Date.now() - inicio > 30000) pararGrabacion();
-  };
-  src.connect(node); node.connect(ctx.destination);
-  Object.assign(REC, { on: true, stream, ctx, node, trozos, alTerminar });
+  const rec = new MediaRecorder(stream, TIPO_AUDIO ? { mimeType: TIPO_AUDIO, audioBitsPerSecond: 64000 } : undefined);
+  const trozos = []; rec.ondataavailable = (e) => { if (e.data.size) trozos.push(e.data); };
+  rec.onstop = () => { stream.getTracks().forEach((t) => t.stop());
+    if (REC.cancelado || !trozos.length) return; REC.alTerminar(new Blob(trozos, { type: rec.mimeType || TIPO_AUDIO || "audio/webm" })); };
+  // Detecta cuándo dejó de hablar (sin tocar el audio que se graba)
+  const ctx = new (window.AudioContext || window.webkitAudioContext)(), an = ctx.createAnalyser(); an.fftSize = 1024;
+  ctx.createMediaStreamSource(stream).connect(an);
+  const d = new Float32Array(an.fftSize); let oyo = false, ultimaVoz = Date.now(), base = 0.01; const inicio = Date.now();
+  const vigia = setInterval(() => {
+    an.getFloatTimeDomainData(d); let s = 0; for (const v of d) s += v * v; const rms = Math.sqrt(s / d.length);
+    if (Date.now() - inicio < 400) { base = Math.max(base, rms * 1.8); return; }    // mide el ruido del cuarto
+    if (rms > Math.max(0.015, base)) { oyo = true; ultimaVoz = Date.now(); }
+    const callado = Date.now() - ultimaVoz;
+    if ((oyo && callado > 1600) || (!oyo && callado > 8000) || Date.now() - inicio > 45000) pararGrabacion();
+  }, 80);
+  rec.start(250);
+  Object.assign(REC, { on: true, rec, ctx, vigia, alTerminar, cancelado: false });
   estado("escuchando"); actualizarBoton();
-}
-function aWav(trozos, rate) {
-  const total = trozos.reduce((n, c) => n + c.length, 0), datos = new Float32Array(total); let o = 0;
-  for (const c of trozos) { datos.set(c, o); o += c.length; }
-  const k = rate / 16000, n = Math.floor(total / k), pcm = new Int16Array(n);
-  for (let i = 0; i < n; i++) { const a = Math.floor(i * k), b = Math.min(total, Math.floor((i + 1) * k)); let s = 0;
-    for (let j = a; j < b; j++) s += datos[j]; const v = Math.max(-1, Math.min(1, s / Math.max(1, b - a))); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
-  const buf = new ArrayBuffer(44 + pcm.length * 2), dv = new DataView(buf);
-  const w = (p, s) => [...s].forEach((ch, i) => dv.setUint8(p + i, ch.charCodeAt(0)));
-  w(0, "RIFF"); dv.setUint32(4, 36 + pcm.length * 2, true); w(8, "WAVE"); w(12, "fmt "); dv.setUint32(16, 16, true);
-  dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, 16000, true); dv.setUint32(28, 32000, true);
-  dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, "data"); dv.setUint32(40, pcm.length * 2, true);
-  new Int16Array(buf, 44).set(pcm); return new Blob([buf], { type: "audio/wav" });
 }
 function pararGrabacion() {
   if (!REC.on) return; REC.on = false;
-  REC.node.disconnect(); REC.stream.getTracks().forEach((t) => t.stop());
-  const rate = REC.ctx.sampleRate; REC.ctx.close(); estado("reposo"); actualizarBoton();
-  REC.alTerminar(aWav(REC.trozos, rate));
+  clearInterval(REC.vigia); REC.ctx.close().catch(() => {});
+  estado("reposo"); actualizarBoton();
+  if (REC.rec.state !== "inactive") REC.rec.stop();
 }
 async function dictar() {
-  grabar(async (wav) => {
+  grabar(async (audio) => {
     estado("pensando");
-    try { const { texto } = await (await api("/api/escuchar", { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav })).json();
+    try { const { texto } = await (await api("/api/escuchar", { method: "POST", headers: { "Content-Type": audio.type }, body: audio })).json();
       estado("reposo"); if (texto) enviar(texto); else toast("No le escuché bien, señor. Intente de nuevo."); }
     catch (e) { estado("reposo"); toast("No pude entender el audio: " + e.message); }
   });
@@ -506,12 +510,12 @@ function conectarLeccion(el, lec) {
     rep.onclick = () => {
       if (REC.on) return pararGrabacion();
       rep.classList.add("rec"); rep.innerHTML = svg("stop") + "Escuchando…";
-      grabar(async (wav) => {
+      grabar(async (audio) => {
         rep.classList.remove("rec"); rep.innerHTML = svg("mic") + "Repetir";
         const box = card.querySelector(".resultado"); box.hidden = false; box.innerHTML = `<span class="shimmer">Revisando su pronunciación…</span>`;
         try {
           const q = new URLSearchParams({ idioma: lec.idioma, objetivo: f.frase, guia: f.pronunciacion });
-          const r = await (await api("/api/idiomas/pronunciacion?" + q, { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav })).json();
+          const r = await (await api("/api/idiomas/pronunciacion?" + q, { method: "POST", headers: { "Content-Type": audio.type }, body: audio })).json();
           const color = r.puntaje >= 80 ? "var(--c2)" : r.puntaje >= 50 ? "var(--accent)" : "var(--bad)";
           box.innerHTML = `<div class="score"><div class="ring" style="background:conic-gradient(${color} 0 ${r.puntaje}%, var(--line) 0)"><span>${r.puntaje}</span></div>
             <div><div class="tag">Su pronunciación</div><div class="muted" style="font-size:13px">Entendí: «${esc(r.oido || "…")}»</div></div></div>

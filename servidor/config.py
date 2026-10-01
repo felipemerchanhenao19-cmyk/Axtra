@@ -59,7 +59,7 @@ PRECIOS = {
 
 # ---------- Voz (edge-tts, gratis): la misma voz de mayordomo del Axtra del PC ----------
 VOZ_AXTRA = os.getenv("VOZ_AXTRA", "es-ES-AlvaroNeural")
-VOZ_VELOCIDAD = os.getenv("VOZ_VELOCIDAD", "-8%")
+VOZ_VELOCIDAD = os.getenv("VOZ_VELOCIDAD", "+4%")
 VOZ_TONO = os.getenv("VOZ_TONO", "-12Hz")
 
 # ---------- Acceso (Cloudflare Access: solo tu cuenta de Google entra) ----------

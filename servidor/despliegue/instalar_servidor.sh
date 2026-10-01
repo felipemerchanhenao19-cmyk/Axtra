@@ -31,7 +31,7 @@ Host github-axtra
   IdentityFile /root/.ssh/axtra_github
   IdentitiesOnly yes
 CFG
-  ssh-keyscan -q github.com >> /root/.ssh/known_hosts
+  ssh-keyscan github.com >> /root/.ssh/known_hosts 2>/dev/null
 fi
 echo
 echo "Copia esta llave y agrégala en GitHub: repositorio Axtra -> Settings -> Deploy keys -> Add deploy key"
