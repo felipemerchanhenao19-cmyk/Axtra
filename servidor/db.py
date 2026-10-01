@@ -1,4 +1,5 @@
 """Base de datos del servidor (SQLite): conversaciones y gasto mensual por cerebro."""
+import json
 import sqlite3
 import threading
 import time
@@ -24,6 +25,10 @@ def conn() -> sqlite3.Connection:
             CREATE TABLE IF NOT EXISTS mensajes (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT, rol TEXT,
                                                  texto TEXT, cerebro TEXT, creado REAL);
             CREATE INDEX IF NOT EXISTS mensajes_chat ON mensajes (chat_id, id);
+            CREATE TABLE IF NOT EXISTS datos_pc (clave TEXT PRIMARY KEY, valor TEXT, actualizado REAL);
+            CREATE TABLE IF NOT EXISTS recordatorios (id INTEGER PRIMARY KEY AUTOINCREMENT, mensaje TEXT,
+                                                      cuando REAL, enviado INTEGER DEFAULT 0);
+            CREATE TABLE IF NOT EXISTS suscripciones (endpoint TEXT PRIMARY KEY, datos TEXT, creado REAL);
             CREATE TABLE IF NOT EXISTS practicas (idioma TEXT, frase TEXT, mejor REAL, intentos INTEGER,
                                                   ultima REAL, PRIMARY KEY (idioma, frase));
         """)
@@ -116,3 +121,71 @@ def practicas(idioma: str) -> dict:
 
 def idiomas_practicados() -> list:
     return [r["idioma"] for r in conn().execute("SELECT DISTINCT idioma FROM practicas ORDER BY idioma")]
+
+
+# ---------- Datos que sube el Axtra del PC ----------
+def guardar_pc(datos: dict) -> None:
+    now = time.time()
+    with _lock:
+        for clave, valor in datos.items():
+            conn().execute("INSERT INTO datos_pc VALUES (?, ?, ?) ON CONFLICT (clave) DO UPDATE SET "
+                           "valor = excluded.valor, actualizado = excluded.actualizado",
+                           (clave, json.dumps(valor, ensure_ascii=False), now))
+        conn().commit()
+
+
+def leer_pc(clave: str, defecto=None):
+    row = conn().execute("SELECT valor FROM datos_pc WHERE clave = ?", (clave,)).fetchone()
+    return json.loads(row["valor"]) if row else defecto
+
+
+def ultima_sincronizacion():
+    row = conn().execute("SELECT max(actualizado) AS t FROM datos_pc").fetchone()
+    return row["t"] if row else None
+
+
+# ---------- Recordatorios y notificaciones ----------
+def crear_recordatorio(mensaje: str, cuando: float) -> int:
+    with _lock:
+        cur = conn().execute("INSERT INTO recordatorios (mensaje, cuando) VALUES (?, ?)", (mensaje, cuando))
+        conn().commit()
+        return cur.lastrowid
+
+
+def recordatorios_pendientes() -> list:
+    rows = conn().execute("SELECT id, mensaje, cuando FROM recordatorios WHERE enviado = 0 ORDER BY cuando")
+    return [dict(r) for r in rows]
+
+
+def recordatorios_vencidos(ahora: float) -> list:
+    rows = conn().execute("SELECT id, mensaje, cuando FROM recordatorios WHERE enviado = 0 AND cuando <= ?", (ahora,))
+    return [dict(r) for r in rows]
+
+
+def marcar_enviado(rid: int) -> None:
+    with _lock:
+        conn().execute("UPDATE recordatorios SET enviado = 1 WHERE id = ?", (rid,))
+        conn().commit()
+
+
+def borrar_recordatorio(rid: int) -> None:
+    with _lock:
+        conn().execute("DELETE FROM recordatorios WHERE id = ?", (rid,))
+        conn().commit()
+
+
+def guardar_suscripcion(sub: dict) -> None:
+    with _lock:
+        conn().execute("INSERT OR REPLACE INTO suscripciones VALUES (?, ?, ?)",
+                       (sub["endpoint"], json.dumps(sub), time.time()))
+        conn().commit()
+
+
+def suscripciones() -> list:
+    return [json.loads(r["datos"]) for r in conn().execute("SELECT datos FROM suscripciones")]
+
+
+def borrar_suscripcion(endpoint: str) -> None:
+    with _lock:
+        conn().execute("DELETE FROM suscripciones WHERE endpoint = ?", (endpoint,))
+        conn().commit()

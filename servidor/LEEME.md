@@ -31,7 +31,14 @@ El mismo servidor entrega la app. En el celular se abre la dirección de Axtra y
 - **Idiomas:** *"¿Cómo se dice hola, cómo estás en ruso?"* → la frase, cómo suena escrito en español (sílaba fuerte en MAYÚSCULAS), voz nativa, versión lenta y **Repetir**: te escucha en ese idioma, compara palabra por palabra, da un puntaje y un consejo. Ruso, inglés, francés, portugués, alemán, italiano, japonés, chino, coreano y árabe. Todo gratis.
 - **Progreso por idioma de 0 a 100 %** en *Aprender*: frases dominadas (80 puntos o más) sobre una meta de 500. Nivel aproximado: A1 hasta 50 frases, A2 hasta 150, B1 hasta 300, B2 hasta 500 y C1 desde ahí.
 - **Yo:** gasto del mes, topes y qué cerebros están activos.
-- El Protocolo y la Sincronización llegan cuando se conecte el Axtra del PC (paso 4).
+- **Aprender:** tu Sincronización (con sus cinco partes), los temas del Protocolo de inteligencia avanzada y tus idiomas.
+- **Recordatorios:** *"Recuérdame en 20 minutos sacar la ropa"*, *"Despiértame mañana a las 6:30"*, *"¿Qué recordatorios tengo?"*. Llegan como **notificación** al celular aunque la app esté cerrada (actívalas en *Yo*).
+
+## Conexión con el Axtra del PC
+El Axtra del PC (`nube.py`) sube cada 10 minutos tus recuerdos, el perfil de tus empresas, el CRM, tareas, Sincronización y Protocolo. Entra con su propio **token de servicio** de Cloudflare: tu cuenta no puede subir datos en su nombre y nadie más tampoco. En la nube esos datos **solo** se le dan a Claude o Grok (de pago); los cerebros gratis nunca los ven. Prueba: `python axtra.py nube`.
+
+## Publicar
+Todo lo necesario está en `despliegue/`: el servidor con el túnel seguro de Cloudflare (sin puertos abiertos), actualizaciones automáticas desde GitHub cada 10 minutos y copias de seguridad diarias. Sigue **`despliegue/DESPLIEGUE.md`**.
 
 ## Activar Grok más adelante
 Crea la cuenta en console.x.ai, carga saldo y pon en el `.env` del servidor `XAI_API_KEY=...` y el `GROK_MODELO` y precios que muestre la consola. Reinicia: el enrutador lo usa solo.
@@ -64,4 +71,5 @@ Pruebas automáticas: `python -m pytest servidor/tests`
 - `voz.py`, `oido.py`: la voz de Axtra (edge-tts) y entender tu voz (Groq Whisper / Google).
 - `idiomas.py`: lecciones, pronunciación y progreso.
 - `app_movil/`: la app del celular (página instalable, funciona en el A32).
-- `Dockerfile`: para publicarlo en el servidor (paso 5).
+- `contexto.py`: tus datos del PC para los cerebros de pago. `recordatorios.py` y `push.py`: recordatorios y notificaciones.
+- `Dockerfile` y `despliegue/`: para publicarlo (guía en `despliegue/DESPLIEGUE.md`).

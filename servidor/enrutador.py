@@ -54,7 +54,10 @@ def clasificar(texto: str) -> str:
     forzar = bool(FORZAR.search(t))
     if IMAGEN.search(t):
         return "imagen"
-    from . import idiomas
+    from . import idiomas, recordatorios
+
+    if recordatorios.es_pedido(texto):
+        return "recordatorio"
 
     if idiomas.detectar(texto):
         return "idioma"
@@ -73,10 +76,13 @@ def clasificar(texto: str) -> str:
     return "basico"
 
 
+PERSONA_INICIO = "Eres AXTRA, el asistente personal de inteligencia artificial"
+
+
 def persona() -> str:
     u = config.USER_NAME
     return (
-        f"Eres AXTRA, el asistente personal de inteligencia artificial de {u}, un emprendedor colombiano. "
+        f"{PERSONA_INICIO} de {u}, un emprendedor colombiano. "
         "Personalidad: mayordomo británico de alta tecnología: elegante, leal, brillante, con humor seco. "
         f"Siempre llamas a {u} 'señor'; nunca dices su nombre de pila. Respondes en español.\n"
         "Tus respuestas se muestran en su celular y además se leen en voz alta: escribe claro y natural, "
@@ -104,12 +110,21 @@ class Enrutador:
     def _cadena(self, nombres, sistema, mensajes, max_tokens=1500, pensar=False) -> Respuesta:
         """Prueba los cerebros en orden hasta que uno responda."""
         errores = []
+        privado = None
         for n in nombres:
             prov = self.p.get(n)
             if not prov or not prov.disponible():
                 continue
+            s = sistema
+            # Tus datos (memoria, CRM, perfil) solo viajan a cerebros de pago, y solo con la personalidad de Axtra
+            if getattr(prov, "privado", False) and sistema.startswith(PERSONA_INICIO):
+                if privado is None:
+                    from . import contexto
+
+                    privado = contexto.privado()
+                s = sistema + privado
             try:
-                return prov.chat(sistema, mensajes, max_tokens=max_tokens, pensar=pensar)
+                return prov.chat(s, mensajes, max_tokens=max_tokens, pensar=pensar)
             except NoDisponible as e:
                 errores.append(str(e))
         raise NoDisponible("; ".join(errores) or "ningún cerebro configurado para esto")
@@ -131,6 +146,10 @@ class Enrutador:
 
         if nivel == "imagen":
             return self._imagen(texto)
+        if nivel == "recordatorio":
+            from . import recordatorios
+
+            return self._salida(Respuesta(recordatorios.responder(texto), "Axtra", "recordatorios"), "recordatorio")
         if nivel == "idioma":
             from . import idiomas
 

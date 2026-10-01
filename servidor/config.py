@@ -66,5 +66,8 @@ VOZ_TONO = os.getenv("VOZ_TONO", "-12Hz")
 CF_ACCESS_EQUIPO = os.getenv("CF_ACCESS_EQUIPO", "")   # ej: axtra  (de axtra.cloudflareaccess.com)
 CF_ACCESS_AUD = os.getenv("CF_ACCESS_AUD", "")
 CORREO_PERMITIDO = os.getenv("AXTRA_CORREO", "").lower()
+# Token de servicio de Cloudflare Access que usa el Axtra del PC para subir tus datos (su "Client ID")
+CF_SERVICIO_ID = os.getenv("CF_ACCESS_SERVICIO_ID", "")
+ZONA_HORARIA = os.getenv("AXTRA_ZONA", "America/Bogota")
 # Solo para probar en tu computador, nunca en el servidor publicado
 MODO_DESARROLLO = os.getenv("AXTRA_MODO", "") == "desarrollo"

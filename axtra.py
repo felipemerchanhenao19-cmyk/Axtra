@@ -9,6 +9,7 @@
     python axtra.py cerebros   -> prueba todos los cerebros gratis y la búsqueda en internet
     python axtra.py microfono  -> muestra los micrófonos y qué tan fuerte te oye
     python axtra.py voz        -> pone el umbral de tu voz en 0.50 (o "voz 0.45", "voz probar")
+    python axtra.py nube       -> sube tus datos a Axtra en la nube y prueba la conexión
 """
 import os
 import subprocess
@@ -31,6 +32,8 @@ if arg == "google":
     sys.exit(subprocess.call([str(VENV_PY), "-c", "import google_services as g; g.connect_interactive()"]))
 if arg.startswith("micro"):
     sys.exit(subprocess.call([str(VENV_PY), "probar_microfono.py"]))
+if arg == "nube":
+    sys.exit(subprocess.call([str(VENV_PY), "nube.py"]))
 if arg == "voz":
     sys.exit(subprocess.call([str(VENV_PY), "ajustar_voz.py"] + sys.argv[2:]))
 if arg == "cerebros":

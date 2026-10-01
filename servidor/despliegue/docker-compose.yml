@@ -1,0 +1,24 @@
+# Axtra en el servidor: la app + el túnel seguro de Cloudflare (no se abre ningún puerto a internet).
+# Lo usa instalar_servidor.sh; las claves van en ../.env
+services:
+  axtra:
+    build:
+      context: ../..
+      dockerfile: servidor/Dockerfile
+    env_file: ../.env
+    volumes:
+      - axtra_datos:/datos
+    restart: unless-stopped
+    expose:
+      - "8080"
+
+  tunel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    env_file: ../.env            # usa TUNNEL_TOKEN
+    restart: unless-stopped
+    depends_on:
+      - axtra
+
+volumes:
+  axtra_datos:

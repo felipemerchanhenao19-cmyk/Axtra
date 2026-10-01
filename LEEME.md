@@ -103,6 +103,9 @@ Di *"Axtra, activa protocolo de inteligencia avanzada"* (o *"... en neurociencia
 ## Ondas de mar
 Una ventana con olas que se mueven suaves en espera, se agitan cuando Axtra **razona**, laten cuando **habla** y se animan cuando **escucha**. Se abre sola con el protocolo; también: *"muestra las ondas"* / *"cierra las ondas"*.
 
+## Axtra en la nube y en tu celular
+La carpeta `servidor/` tiene a Axtra en la nube con su app para el celular (orbe, voz, idiomas, recordatorios). Cómo publicarla: `servidor/despliegue/DESPLIEGUE.md`. Cuando esté publicada, pon en este `.env` `AXTRA_NUBE_URL`, `CF_ACCESS_CLIENT_ID` y `CF_ACCESS_CLIENT_SECRET`, y prueba con `python axtra.py nube`: desde ahí tus datos suben solos cada 10 minutos.
+
 ## Escritorio: escríbele a Axtra
 - Di *"Axtra, activa escritorio"* (o *"abre el escritorio"*, *"modo escritorio"*, *"quiero escribirte"*). Se abre una ventana.
 - Escribe abajo y presiona **Enter**: Axtra **siempre responde en voz alta** y también lo ves escrito.

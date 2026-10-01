@@ -59,7 +59,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hello p { margin-top: 6px; color: var(--muted); }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 20px; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; text-align: left; }
-.card .k { font-size: 12px; color: var(--muted); }
+.card .k { font-size: 12px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .card .v { font: 400 17px Sora; margin-top: 4px; }
 .bar { height: 5px; border-radius: 3px; background: var(--line); margin-top: 9px; overflow: hidden; }
 .bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--c2), var(--c3)); }
@@ -150,6 +150,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ---------- Paneles ---------- */
 .section-title { font: 400 22px Sora; margin: 6px 0 14px; }
+.sub { font: 400 15px Sora; color: var(--muted); margin: 22px 0 10px; }
+.partes { display: grid; gap: 7px; margin-top: 12px; }
+.parte { display: grid; grid-template-columns: 92px 1fr 34px; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.parte .bar { margin: 0; }
+.btn-line { margin-top: 10px; }
 .list { display: flex; flex-direction: column; gap: 10px; }
 .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 #drawer { position: fixed; inset: 0; z-index: 20; display: flex; }
@@ -212,16 +217,22 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
   <main class="view" id="v-aprender" hidden>
     <h2 class="section-title">Aprender</h2>
+    <div class="list" id="sync-box"></div>
+    <h3 class="sub">Protocolo de inteligencia avanzada</h3>
+    <div class="list" id="protocolo-lista"></div>
+    <h3 class="sub">Idiomas</h3>
     <div class="list" id="idiomas-lista"></div>
-    <p class="muted" style="margin:18px 0 10px">Empiece una lección:</p>
+    <p class="muted" style="margin:14px 0 10px">Empiece una lección:</p>
     <div class="chips" id="aprender-ideas" style="justify-content:flex-start"></div>
-    <p class="muted" style="margin-top:22px;font-size:13px">El Protocolo de inteligencia avanzada y la Sincronización aparecerán aquí cuando conectemos su Axtra del PC (paso 4).</p>
   </main>
 
   <main class="view" id="v-yo" hidden>
     <h2 class="section-title">Yo</h2>
     <div class="list">
       <div class="card row"><div><div class="k">Leer en voz alta todas las respuestas</div></div><button class="toggle" id="t-voz" aria-label="Voz"></button></div>
+      <div class="card row"><div><div class="k">Notificaciones en este teléfono</div><div class="muted" style="font-size:12px">Recordatorios y avisos de Axtra</div></div><button class="toggle" id="t-push" aria-label="Notificaciones"></button></div>
+      <div class="card"><div class="k">Recordatorios</div><div id="recordatorios" style="margin-top:6px;font-size:14px">—</div>
+        <div class="muted" style="font-size:12px;margin-top:8px">Pídalos así: «recuérdame en 20 minutos sacar la ropa».</div></div>
       <div class="card"><div class="k">Gasto de este mes</div><div id="gasto" class="v">—</div></div>
       <div class="card"><div class="k">Cerebros disponibles</div><div id="cerebros" class="muted" style="margin-top:6px;font-size:14px">—</div></div>
     </div>
@@ -584,7 +595,26 @@ function vista(v) {
   document.querySelectorAll(".nav button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
   if (v === "aprender") cargarAprender(); if (v === "yo") cargarYo();
 }
+function haceCuanto(ts) {
+  if (!ts) return "nunca"; const m = Math.round((Date.now() / 1000 - ts) / 60);
+  return m < 1 ? "hace un momento" : m < 60 ? `hace ${m} min` : m < 1440 ? `hace ${Math.round(m / 60)} h` : `hace ${Math.round(m / 1440)} días`;
+}
+const barra = (pct) => `<div class="bar"><i style="width:${Math.max(1, Math.min(100, pct))}%"></i></div>`;
 async function cargarAprender() {
+  try {
+    const a = await (await api("/api/aprendizaje")).json(), s = a.sincronizacion || {};
+    $("#sync-box").innerHTML = s.total !== undefined ? `<div class="card"><div class="row"><div class="k">Sincronización · ${esc(s.nivel)}</div><div class="k">${haceCuanto(a.ultima_sincronizacion)}</div></div>
+      <div class="v">${s.total} %</div>${barra(s.total)}
+      <div class="partes">${Object.entries(s.partes || {}).map(([k, v]) => { const max = { identidad: 10, conocimiento: 35, experiencia: 20, precision: 20, confianza: 15 }[k] || 20;
+        return `<div class="parte"><span>${esc(k[0].toUpperCase() + k.slice(1))}</span>${barra(100 * v / max)}<span>${v}</span></div>`; }).join("")}</div>
+      ${s.que_desbloquea ? `<div class="tip">Nivel ${esc(s.nivel)}: ${esc(s.que_desbloquea)}.</div>` : ""}</div>`
+      : `<div class="card"><div class="k">Sincronización</div><div class="v" style="font-size:15px">Conecte su Axtra del PC</div><div class="tip">En el PC: <b>python axtra.py nube</b>. Desde ahí se actualiza solo cada 10 minutos.</div></div>`;
+    $("#protocolo-lista").innerHTML = (a.protocolo || []).length ? a.protocolo.map((t) => `<div class="card">
+      <div class="row"><div class="k">${esc(t.tema)}</div><div class="k">${t.tarjetas} tarjetas</div></div>
+      <div class="v">${t.porcentaje} %</div>${barra(t.porcentaje)}
+      ${t.modulo_actual ? `<div class="tip">Ahora: ${esc(t.modulo_actual)}</div>` : ""}</div>`).join("")
+      : `<div class="card"><div class="k">${s.total !== undefined ? "Aún no hay temas." : "Llega al conectar su Axtra del PC."}</div><div class="tip">Dígale a su Axtra del PC: «activa protocolo de inteligencia avanzada en neurociencia».</div></div>`;
+  } catch {}
   const box = $("#idiomas-lista");
   try {
     const lista = await (await api("/api/idiomas/progreso")).json();
@@ -593,8 +623,35 @@ async function cargarAprender() {
       : `<div class="card"><div class="k">Aún no ha practicado idiomas.</div><div class="v" style="font-size:15px">Pídale una frase a Axtra y toque «Repetir».</div></div>`;
   } catch { box.innerHTML = ""; }
 }
+async function pushActivo() {
+  try { const reg = await navigator.serviceWorker.ready; return !!(await reg.pushManager.getSubscription()); } catch { return false; }
+}
+function b64aBytes(b64) { const pad = "=".repeat((4 - b64.length % 4) % 4), raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
+  return Uint8Array.from(raw, (c) => c.charCodeAt(0)); }
+async function activarPush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return toast("Este navegador no permite notificaciones.");
+  const reg = await navigator.serviceWorker.ready, actual = await reg.pushManager.getSubscription();
+  if (actual) { await actual.unsubscribe(); $("#t-push").classList.remove("on"); return toast("Notificaciones apagadas en este teléfono."); }
+  if (await Notification.requestPermission() !== "granted") return toast("Permita las notificaciones en los ajustes del navegador.");
+  try {
+    const { clave } = await (await api("/api/push/clave")).json();
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64aBytes(clave) });
+    await post("/api/push/suscribir", sub.toJSON()); await post("/api/push/probar", {});
+    $("#t-push").classList.add("on"); toast("Listo: le llegó una notificación de prueba.");
+  } catch (e) { toast("No pude activar las notificaciones: " + e.message); }
+}
+async function cargarRecordatorios() {
+  try {
+    const lista = await (await api("/api/recordatorios")).json();
+    $("#recordatorios").innerHTML = lista.length ? lista.map((r) => `<div class="row" style="padding:4px 0"><span>${esc(r.mensaje)} <span class="muted">· ${new Date(r.cuando * 1000).toLocaleString("es-CO", { weekday: "short", hour: "numeric", minute: "2-digit" })}</span></span>
+      <button class="icon-btn" data-id="${r.id}" aria-label="Borrar">${svg("del")}</button></div>`).join("") : `<span class="muted">Ninguno pendiente.</span>`;
+    $("#recordatorios").querySelectorAll("button").forEach((b) => b.onclick = async () => { await api("/api/recordatorios/" + b.dataset.id, { method: "DELETE" }); cargarRecordatorios(); });
+  } catch {}
+}
 async function cargarYo() {
   $("#t-voz").classList.toggle("on", S.voz);
+  $("#t-push").classList.toggle("on", await pushActivo());
+  cargarRecordatorios();
   try {
     const e = await (await api("/api/estado")).json();
     $("#gasto").innerHTML = `Claude US$${e.gasto_mes_usd.claude.toFixed(2)} de ${e.topes_usd.claude} · Grok US$${e.gasto_mes_usd.grok.toFixed(2)} de ${e.topes_usd.grok}`;
@@ -607,7 +664,11 @@ async function cargarInicio() {
   $("#saludo").textContent = (h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches") + ", señor.";
   const cards = [];
   try {
-    const [est, idi] = await Promise.all([api("/api/estado").then((r) => r.json()), api("/api/idiomas/progreso").then((r) => r.json())]);
+    const [est, idi, apr] = await Promise.all([api("/api/estado").then((r) => r.json()), api("/api/idiomas/progreso").then((r) => r.json()),
+      api("/api/aprendizaje").then((r) => r.json())]);
+    const s = apr.sincronizacion || {}, t = [...(apr.protocolo || [])].sort((a, b) => b.porcentaje - a.porcentaje)[0];
+    if (s.total !== undefined) cards.push(`<button class="card" data-v="aprender"><div class="k">Sincronización · ${esc(s.nivel)}</div><div class="v">${s.total} %</div>${barra(s.total)}</button>`);
+    if (t) cards.push(`<button class="card" data-v="aprender"><div class="k">Protocolo · ${esc(t.tema)}</div><div class="v">${t.porcentaje} %</div>${barra(t.porcentaje)}</button>`);
     const p = idi.sort((a, b) => b.practicadas - a.practicadas)[0];
     cards.push(p ? `<button class="card" data-v="aprender"><div class="k">${esc(p.nombre)} · ${p.nivel}</div><div class="v">${p.porcentaje} %</div><div class="bar"><i style="width:${Math.max(p.porcentaje, 1)}%"></i></div></button>`
       : `<button class="card" data-q="¿Cómo se dice hola, cómo estás en ruso?"><div class="k">Idiomas</div><div class="v">Empezar</div><div class="bar"><i style="width:1%"></i></div></button>`);
@@ -646,6 +707,7 @@ $("#b-menu").onclick = abrirMenu;
 $("#scrim").onclick = cerrarMenu; $("#b-new").onclick = nuevaConversacion;
 $("#b-avatar").onclick = () => vista("yo");
 $("#b-stop").onclick = callar;
+$("#t-push").onclick = activarPush;
 $("#t-voz").onclick = () => { S.voz = !S.voz; store.set("voz", S.voz); $("#t-voz").classList.toggle("on", S.voz); if (!S.voz) callar(); };
 $("#ideas").innerHTML = IDEAS.map((q) => `<button class="chip">${esc(q)}</button>`).join("");
 $("#aprender-ideas").innerHTML = LECCIONES.map((q) => `<button class="chip">${esc(q)}</button>`).join("");

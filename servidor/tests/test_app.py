@@ -52,10 +52,12 @@ def cloudflare(monkeypatch):
 
     monkeypatch.setattr(seguridad, "_cliente", lambda: ClienteJWK())
 
-    def token(correo="felipe@ejemplo.com", aud="aud123", vence=300):
+    def token(correo="felipe@ejemplo.com", aud="aud123", vence=300, **extra):
         ahora = int(time.time())
-        return jwt.encode({"email": correo, "aud": aud, "iss": "https://axtra.cloudflareaccess.com",
-                           "iat": ahora, "exp": ahora + vence}, llave, algorithm="RS256")
+        datos = {"aud": aud, "iss": "https://axtra.cloudflareaccess.com", "iat": ahora, "exp": ahora + vence, **extra}
+        if correo is not None:
+            datos["email"] = correo
+        return jwt.encode(datos, llave, algorithm="RS256")
     return token
 
 

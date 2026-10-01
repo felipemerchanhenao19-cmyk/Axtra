@@ -4,17 +4,26 @@ Para probar en tu PC:  AXTRA_MODO=desarrollo uvicorn servidor.app:app --reload
 En el servidor:        uvicorn servidor.app:app --host 0.0.0.0 --port 8080   (detrás de Cloudflare Access)
 """
 import re
+from contextlib import asynccontextmanager
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import config, db, idiomas, oido, seguridad, voz
+from . import config, db, idiomas, oido, push, recordatorios, seguridad, voz
 from .enrutador import Enrutador
 from .proveedores import NoDisponible
 
-app = FastAPI(title="Axtra", docs_url=None, redoc_url=None, openapi_url=None)
+
+
+@asynccontextmanager
+async def _vida(app):
+    recordatorios.iniciar_vigilante()   # entrega los recordatorios a su hora
+    yield
+
+
+app = FastAPI(title="Axtra", docs_url=None, redoc_url=None, openapi_url=None, lifespan=_vida)
 _enrutador = None
 
 
@@ -158,6 +167,71 @@ def pronunciacion(idioma: str, objetivo: str, guia: str = "", audio: bytes = Bod
 @app.get("/api/idiomas/progreso")
 def progreso_idiomas(u: str = Depends(usuario)):
     return [idiomas.progreso(i) for i in db.idiomas_practicados()]
+
+
+# ---------------- Datos del Axtra del PC ----------------
+CLAVES_PC = {"recuerdos", "crm", "tareas", "recordatorios", "idiomas_pc", "perfil", "sincronizacion", "protocolo"}
+
+
+@app.post("/api/pc/sincronizar")
+async def sincronizar_pc(request: Request, u: str = Depends(usuario)):
+    if u != "pc" and not config.MODO_DESARROLLO:
+        raise HTTPException(403, "solo el Axtra del PC puede subir datos")
+    cuerpo = await request.body()
+    if len(cuerpo) > 5_000_000:
+        raise HTTPException(413, "demasiados datos")
+    try:
+        import json
+
+        datos = json.loads(cuerpo)
+    except ValueError:
+        raise HTTPException(400, "JSON inválido")
+    if not isinstance(datos, dict):
+        raise HTTPException(400, "JSON inválido")
+    validos = {k: v for k, v in datos.items() if k in CLAVES_PC}
+    db.guardar_pc(validos)
+    return {"ok": True, "guardado": sorted(validos)}
+
+
+@app.get("/api/aprendizaje")
+def aprendizaje(u: str = Depends(usuario)):
+    return {"protocolo": db.leer_pc("protocolo", []), "sincronizacion": db.leer_pc("sincronizacion", {}),
+            "ultima_sincronizacion": db.ultima_sincronizacion()}
+
+
+# ---------------- Recordatorios y notificaciones ----------------
+@app.get("/api/recordatorios")
+def lista_recordatorios(u: str = Depends(usuario)):
+    return db.recordatorios_pendientes()
+
+
+@app.delete("/api/recordatorios/{rid}")
+def borrar_recordatorio(rid: int, u: str = Depends(usuario)):
+    db.borrar_recordatorio(rid)
+    return {"ok": True}
+
+
+@app.get("/api/push/clave")
+def clave_push(u: str = Depends(usuario)):
+    return {"clave": push.clave_publica()}
+
+
+class Suscripcion(BaseModel):
+    endpoint: str = Field(max_length=2000)
+    keys: dict
+
+
+@app.post("/api/push/suscribir")
+def suscribir(s: Suscripcion, u: str = Depends(usuario)):
+    if not s.endpoint.startswith("https://") or not {"p256dh", "auth"} <= set(s.keys):
+        raise HTTPException(400, "suscripción inválida")
+    db.guardar_suscripcion({"endpoint": s.endpoint, "keys": {k: s.keys[k] for k in ("p256dh", "auth")}})
+    return {"ok": True}
+
+
+@app.post("/api/push/probar")
+def probar_push(u: str = Depends(usuario)):
+    return {"enviadas": push.enviar("Axtra", "Las notificaciones funcionan, señor.")}
 
 
 # ---------------- La app del celular ----------------

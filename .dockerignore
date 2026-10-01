@@ -1,0 +1,6 @@
+# La imagen del servidor solo necesita la carpeta servidor/ (y nunca las claves ni los datos)
+*
+!servidor/
+servidor/.env
+servidor/datos/
+**/__pycache__

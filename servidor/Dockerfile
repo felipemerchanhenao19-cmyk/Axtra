@@ -1,4 +1,5 @@
-FROM python:3.12-slim
+ARG BASE=python:3.12-slim
+FROM ${BASE}
 WORKDIR /app
 COPY servidor/requirements.txt servidor/requirements.txt
 RUN pip install --no-cache-dir -r servidor/requirements.txt

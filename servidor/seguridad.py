@@ -37,7 +37,10 @@ def verificar(token: str) -> str:
     except jwt.PyJWTError as e:
         raise PermissionError(f"sesión inválida ({type(e).__name__})")
     correo = str(datos.get("email", "")).lower()
-    if correo != config.CORREO_PERMITIDO:
+    servicio = str(datos.get("common_name", ""))
+    if not correo and config.CF_SERVICIO_ID and servicio == config.CF_SERVICIO_ID:
+        return "pc"            # el Axtra del PC, con su token de servicio
+    if not correo or correo != config.CORREO_PERMITIDO:
         raise PermissionError("cuenta no autorizada")
     if datos.get("exp", 0) < time.time() - 30:
         raise PermissionError("sesión vencida")

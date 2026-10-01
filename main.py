@@ -73,6 +73,9 @@ def main():
 
     autonomy.speaker = tts.say  # para avisos, alertas y recordatorios por su cuenta
     autonomy.start()
+    import nube
+
+    nube.iniciar()   # sube tus datos a Axtra en la nube (si está configurada)
     import vision
 
     vision.watcher.start()
