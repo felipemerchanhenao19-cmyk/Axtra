@@ -7,10 +7,26 @@ import requests
 from . import config
 
 
-def _groq(wav: bytes, idioma: str) -> str:
+# Formatos que manda el celular: WAV (antiguo) o audio comprimido de MediaRecorder
+def formato(audio: bytes) -> str:
+    if audio[:4] == b"RIFF" and audio[8:12] == b"WAVE":
+        return "wav"
+    if audio[:4] == b"\x1aE\xdf\xa3":
+        return "webm"
+    if audio[:4] == b"OggS":
+        return "ogg"
+    if audio[4:8] == b"ftyp":
+        return "mp4"
+    return ""
+
+
+_MIME = {"wav": "audio/wav", "webm": "audio/webm", "ogg": "audio/ogg", "mp4": "audio/mp4"}
+
+
+def _groq(audio: bytes, idioma: str, fmt: str = "wav") -> str:
     r = requests.post("https://api.groq.com/openai/v1/audio/transcriptions", timeout=60,
                       headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
-                      files={"file": ("voz.wav", wav, "audio/wav")},
+                      files={"file": (f"voz.{fmt}", audio, _MIME[fmt])},
                       data={"model": config.GROQ_MODELO_OIDO, "language": idioma, "temperature": "0",
                             "response_format": "json"})
     r.raise_for_status()
@@ -28,24 +44,31 @@ def _google(wav: bytes, idioma_region: str) -> str:
         return ""
 
 
-def transcribir(wav: bytes, idioma: str = "es", region: str = "es-CO") -> str:
-    """wav: audio WAV mono de 16 bits (así lo manda la app). idioma: 'es', 'ru', 'en'..."""
-    try:
-        with wave.open(io.BytesIO(wav)) as w:
-            if w.getsampwidth() != 2 or w.getnchannels() != 1:
-                raise ValueError("el audio debe ser WAV mono de 16 bits")
-            if w.getnframes() / w.getframerate() > 120:
-                raise ValueError("audio demasiado largo (máximo 2 minutos)")
-    except (wave.Error, EOFError) as e:
-        raise ValueError(f"audio dañado ({e})")
+def transcribir(audio: bytes, idioma: str = "es", region: str = "es-CO") -> str:
+    """audio: WAV mono de 16 bits o audio comprimido del celular (webm/ogg/mp4). idioma: 'es', 'ru', 'en'..."""
+    fmt = formato(audio)
+    if not fmt:
+        raise ValueError("audio dañado o en un formato desconocido")
+    if fmt == "wav":
+        try:
+            with wave.open(io.BytesIO(audio)) as w:
+                if w.getsampwidth() != 2 or w.getnchannels() != 1:
+                    raise ValueError("el audio debe ser WAV mono de 16 bits")
+                if w.getnframes() / w.getframerate() > 120:
+                    raise ValueError("audio demasiado largo (máximo 2 minutos)")
+        except (wave.Error, EOFError) as e:
+            raise ValueError(f"audio dañado ({e})")
     errores = []
     if config.GROQ_API_KEY:
         try:
-            return _groq(wav, idioma)
+            return _groq(audio, idioma, fmt)
         except requests.RequestException as e:
             errores.append(f"Groq: {e}")
-    try:
-        return _google(wav, region)
-    except Exception as e:
-        errores.append(f"Google: {e}")
+    if fmt == "wav":                    # el reconocedor de Google de respaldo solo entiende WAV
+        try:
+            return _google(audio, region)
+        except Exception as e:
+            errores.append(f"Google: {e}")
+    else:
+        errores.append("sin Groq no hay respaldo para este formato")
     raise RuntimeError("No pude entender el audio (" + "; ".join(errores) + ")")

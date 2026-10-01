@@ -92,3 +92,28 @@ def test_api_voz(cliente, monkeypatch):
 def test_la_app_se_sirve(cliente):
     assert "AXTRA" in cliente.get("/").text
     assert cliente.get("/manifest.webmanifest").json()["name"] == "Axtra"
+
+
+def test_api_escuchar_audio_del_celular(cliente, monkeypatch):
+    """El celular manda audio comprimido (webm/ogg/mp4): va a Groq con su formato."""
+    enviados = []
+
+    def falso_groq(audio, idioma, fmt):
+        enviados.append((fmt, idioma))
+        return "hola axtra"
+
+    monkeypatch.setattr(config, "GROQ_API_KEY", "x")
+    monkeypatch.setattr(oido, "_groq", falso_groq)
+    webm = b"\x1aE\xdf\xa3" + b"\x00" * 200
+    r = cliente.post("/api/escuchar", content=webm, headers={"Content-Type": "audio/webm;codecs=opus"})
+    assert r.status_code == 200 and r.json()["texto"] == "hola axtra"
+    cliente.post("/api/escuchar", params={"idioma": "ruso"}, content=b"OggS" + b"\x00" * 100,
+                 headers={"Content-Type": "audio/ogg"})
+    cliente.post("/api/escuchar", content=b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 100, headers={"Content-Type": "audio/mp4"})
+    assert enviados == [("webm", "es"), ("ogg", "ru"), ("mp4", "es")]
+
+
+def test_audio_comprimido_sin_groq_avisa(monkeypatch):
+    monkeypatch.setattr(config, "GROQ_API_KEY", "")
+    with pytest.raises(RuntimeError):
+        oido.transcribir(b"\x1aE\xdf\xa3" + b"\x00" * 50)
