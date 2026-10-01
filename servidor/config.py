@@ -25,6 +25,7 @@ FILES_DIR.mkdir(exist_ok=True)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_BASICO = os.getenv("GROQ_MODELO_BASICO", "openai/gpt-oss-20b")         # charla: rápido
 GROQ_INTERMEDIO = os.getenv("GROQ_MODELO_INTERMEDIO", "openai/gpt-oss-120b")  # explicar, resumir, planear
+GROQ_MODELO_OIDO = os.getenv("GROQ_MODELO_OIDO", "whisper-large-v3-turbo")        # tu voz a texto (gratis)
 CEREBRAS_API_KEY = os.getenv("CEREBRAS_API_KEY", "")
 CEREBRAS_MODELO = os.getenv("CEREBRAS_MODELO", "gpt-oss-120b")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -55,6 +56,11 @@ PRECIOS = {
     "claude-opus-5-5": (4.0, 20.0),
     GROK_MODELO: (_f("GROK_PRECIO_ENTRADA", 3.0), _f("GROK_PRECIO_SALIDA", 15.0)),
 }
+
+# ---------- Voz (edge-tts, gratis): la misma voz de mayordomo del Axtra del PC ----------
+VOZ_AXTRA = os.getenv("VOZ_AXTRA", "es-ES-AlvaroNeural")
+VOZ_VELOCIDAD = os.getenv("VOZ_VELOCIDAD", "-8%")
+VOZ_TONO = os.getenv("VOZ_TONO", "-12Hz")
 
 # ---------- Acceso (Cloudflare Access: solo tu cuenta de Google entra) ----------
 CF_ACCESS_EQUIPO = os.getenv("CF_ACCESS_EQUIPO", "")   # ej: axtra  (de axtra.cloudflareaccess.com)

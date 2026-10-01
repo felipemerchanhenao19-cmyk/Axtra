@@ -5,11 +5,12 @@ En el servidor:        uvicorn servidor.app:app --host 0.0.0.0 --port 8080   (de
 """
 import re
 
-from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi import Body, Depends, FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, Response
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import config, db, seguridad
+from . import config, db, idiomas, oido, seguridad, voz
 from .enrutador import Enrutador
 from .proveedores import NoDisponible
 
@@ -102,3 +103,64 @@ def archivo(nombre: str, u: str = Depends(usuario)):
     if not ruta.is_file() or ruta.parent != config.FILES_DIR.resolve():
         raise HTTPException(404, "no existe")
     return FileResponse(ruta, filename=nombre if ruta.suffix == ".docx" else None)
+
+
+# ---------------- Voz, oído e idiomas ----------------
+class PedidoVoz(BaseModel):
+    texto: str = Field(min_length=1, max_length=5000)
+    idioma: str | None = None     # None = voz de Axtra en español; "ruso", "ingles"... = voz nativa
+    lento: bool = False
+
+
+@app.post("/api/voz")
+def hablar(p: PedidoVoz, u: str = Depends(usuario)):
+    try:
+        audio = voz.sintetizar(p.texto, p.idioma if p.idioma in voz.IDIOMAS else None, p.lento)
+    except Exception as e:
+        raise HTTPException(503, f"la voz no está disponible: {e}")
+    return Response(audio, media_type="audio/mpeg", headers={"Cache-Control": "no-store"})
+
+
+def _codigos(idioma: str):
+    if idioma in voz.IDIOMAS:
+        return voz.IDIOMAS[idioma][0], voz.IDIOMAS[idioma][2]
+    return "es", "es-CO"
+
+
+@app.post("/api/escuchar")
+def escuchar(audio: bytes = Body(..., media_type="audio/wav"), idioma: str = "", u: str = Depends(usuario)):
+    if len(audio) > 8_000_000:
+        raise HTTPException(413, "audio demasiado largo")
+    try:
+        return {"texto": oido.transcribir(audio, *_codigos(idioma))}
+    except (ValueError, RuntimeError) as e:
+        raise HTTPException(422, str(e))
+
+
+@app.post("/api/idiomas/pronunciacion")
+def pronunciacion(idioma: str, objetivo: str, guia: str = "", audio: bytes = Body(..., media_type="audio/wav"),
+                  u: str = Depends(usuario)):
+    if idioma not in voz.IDIOMAS:
+        raise HTTPException(400, "idioma no disponible")
+    if len(audio) > 8_000_000 or len(objetivo) > 500:
+        raise HTTPException(413, "demasiado largo")
+    try:
+        oido_texto = oido.transcribir(audio, *_codigos(idioma))
+    except (ValueError, RuntimeError) as e:
+        raise HTTPException(422, str(e))
+    r = idiomas.evaluar(objetivo, idioma, oido_texto)
+    r["consejo"] = idiomas.consejo(enrutador(), objetivo, guia, r)
+    db.registrar_practica(idioma, objetivo, r["puntaje"])
+    r["progreso"] = idiomas.progreso(idioma)
+    return r
+
+
+@app.get("/api/idiomas/progreso")
+def progreso_idiomas(u: str = Depends(usuario)):
+    return [idiomas.progreso(i) for i in db.idiomas_practicados()]
+
+
+# ---------------- La app del celular ----------------
+APP_DIR = config.BASE / "app_movil"
+if APP_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=APP_DIR, html=True), name="app")

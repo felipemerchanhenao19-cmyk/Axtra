@@ -54,6 +54,10 @@ def clasificar(texto: str) -> str:
     forzar = bool(FORZAR.search(t))
     if IMAGEN.search(t):
         return "imagen"
+    from . import idiomas
+
+    if idiomas.detectar(texto):
+        return "idioma"
     if INVERSION.search(t):
         return "equipo_inversion"
     if DOCUMENTO.search(t):
@@ -127,6 +131,12 @@ class Enrutador:
 
         if nivel == "imagen":
             return self._imagen(texto)
+        if nivel == "idioma":
+            from . import idiomas
+
+            lec = idiomas.leccion(self, texto, idiomas.detectar(texto) or "ingles", historial)
+            r = Respuesta(lec["explicacion"] or "Así se dice, señor:", lec["cerebro"], "idiomas")
+            return self._salida(r, "idioma", extra={"leccion": lec})
         if nivel in ("documento", "equipo_documento"):
             out = self._documento(texto, mensajes, equipo=(nivel == "equipo_documento"), privado=privado)
             from . import creacion

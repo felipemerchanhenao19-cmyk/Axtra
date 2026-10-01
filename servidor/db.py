@@ -24,6 +24,8 @@ def conn() -> sqlite3.Connection:
             CREATE TABLE IF NOT EXISTS mensajes (id INTEGER PRIMARY KEY AUTOINCREMENT, chat_id TEXT, rol TEXT,
                                                  texto TEXT, cerebro TEXT, creado REAL);
             CREATE INDEX IF NOT EXISTS mensajes_chat ON mensajes (chat_id, id);
+            CREATE TABLE IF NOT EXISTS practicas (idioma TEXT, frase TEXT, mejor REAL, intentos INTEGER,
+                                                  ultima REAL, PRIMARY KEY (idioma, frase));
         """)
     return _conn
 
@@ -94,3 +96,23 @@ def borrar_chat(chat_id: str) -> None:
         conn().execute("DELETE FROM mensajes WHERE chat_id = ?", (chat_id,))
         conn().execute("DELETE FROM chats WHERE id = ?", (chat_id,))
         conn().commit()
+
+
+# ---------- Idiomas ----------
+def registrar_practica(idioma: str, frase: str, puntaje: float) -> None:
+    with _lock:
+        conn().execute("INSERT INTO practicas VALUES (?, ?, ?, 1, ?) ON CONFLICT (idioma, frase) DO UPDATE SET "
+                       "mejor = max(mejor, excluded.mejor), intentos = intentos + 1, ultima = excluded.ultima",
+                       (idioma, frase, puntaje, time.time()))
+        conn().commit()
+
+
+def practicas(idioma: str) -> dict:
+    row = conn().execute("SELECT count(*) AS practicadas, sum(mejor >= 80) AS dominadas, avg(mejor) AS promedio "
+                         "FROM practicas WHERE idioma = ?", (idioma,)).fetchone()
+    return {"practicadas": row["practicadas"] or 0, "dominadas": row["dominadas"] or 0,
+            "promedio": round(row["promedio"] or 0, 1)}
+
+
+def idiomas_practicados() -> list:
+    return [r["idioma"] for r in conn().execute("SELECT DISTINCT idioma FROM practicas ORDER BY idioma")]

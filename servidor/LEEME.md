@@ -22,6 +22,17 @@ El cerebro que usará la app del celular. Vive en un servidor en internet, detr�
 - **Topes de gasto:** `TOPE_CLAUDE_USD` y `TOPE_GROK_USD` (US$10 cada uno por defecto). Al llegar, ese cerebro se pausa hasta el mes siguiente.
 - Con Claude Opus 5.5 y Sonnet 5.5 está activado el **respaldo de seguridad de Anthropic**: si rechaza algo por sus filtros, la API lo reintenta sola con otro modelo de Claude.
 
+## La app del celular (`app_movil/`)
+El mismo servidor entrega la app. En el celular se abre la dirección de Axtra y se instala con **Agregar a pantalla de inicio**: queda con su ícono y en pantalla completa.
+- **Orbe** con el diseño aprobado: cambia al escuchar, pensar y hablar. Tócalo para hablarle.
+- **Voz:** todo lo que responde lo dice en voz alta, con la voz de mayordomo (se puede apagar en *Yo*).
+- **Micrófono:** te entiende con Groq Whisper (gratis) y, de respaldo, el reconocedor de Google.
+- **Herramientas (+):** Imagen, Documento, Documento importante y Piénsalo bien.
+- **Idiomas:** *"¿Cómo se dice hola, cómo estás en ruso?"* → la frase, cómo suena escrito en español (sílaba fuerte en MAYÚSCULAS), voz nativa, versión lenta y **Repetir**: te escucha en ese idioma, compara palabra por palabra, da un puntaje y un consejo. Ruso, inglés, francés, portugués, alemán, italiano, japonés, chino, coreano y árabe. Todo gratis.
+- **Progreso por idioma de 0 a 100 %** en *Aprender*: frases dominadas (80 puntos o más) sobre una meta de 500. Nivel aproximado: A1 hasta 50 frases, A2 hasta 150, B1 hasta 300, B2 hasta 500 y C1 desde ahí.
+- **Yo:** gasto del mes, topes y qué cerebros están activos.
+- El Protocolo y la Sincronización llegan cuando se conecte el Axtra del PC (paso 4).
+
 ## Activar Grok más adelante
 Crea la cuenta en console.x.ai, carga saldo y pon en el `.env` del servidor `XAI_API_KEY=...` y el `GROK_MODELO` y precios que muestre la consola. Reinicia: el enrutador lo usa solo.
 
@@ -50,4 +61,7 @@ Pruebas automáticas: `python -m pytest servidor/tests`
 - `seguridad.py`: verificación de tu cuenta.
 - `db.py`: conversaciones y gasto del mes (SQLite, en la carpeta `datos`).
 - `app.py`: la API que usa la app del celular.
+- `voz.py`, `oido.py`: la voz de Axtra (edge-tts) y entender tu voz (Groq Whisper / Google).
+- `idiomas.py`: lecciones, pronunciación y progreso.
+- `app_movil/`: la app del celular (página instalable, funciona en el A32).
 - `Dockerfile`: para publicarlo en el servidor (paso 5).

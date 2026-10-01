@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#03060d">
+<title>Axtra</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-192.png">
+<style>
+@font-face { font-family: Sora; font-weight: 300; font-display: swap; src: url(fonts/sora-latin-300-normal.woff2); }
+@font-face { font-family: Sora; font-weight: 400; font-display: swap; src: url(fonts/sora-latin-400-normal.woff2); }
+@font-face { font-family: Sora; font-weight: 600; font-display: swap; src: url(fonts/sora-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 400; font-display: swap; src: url(fonts/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 500; font-display: swap; src: url(fonts/inter-latin-500-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; font-display: swap; src: url(fonts/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 400; font-display: swap; src: url(fonts/inter-cyrillic-400-normal.woff2); unicode-range: U+0400-04FF; }
+@font-face { font-family: Inter; font-weight: 600; font-display: swap; src: url(fonts/inter-cyrillic-600-normal.woff2); unicode-range: U+0400-04FF; }
+:root {
+  --bg: #03060d; --bg2: #0a1220; --card: rgba(120,190,255,.06); --line: rgba(140,200,255,.14);
+  --text: #e8f3ff; --muted: #8aa0b8; --c1: #0b3d91; --c2: #3fd0ff; --c3: #8be9ff; --accent: #ff8a3d;
+  --glow: rgba(63,208,255,.35); --bad: #ff6b6b;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: radial-gradient(120% 60% at 50% 12%, var(--bg2), var(--bg) 70%) fixed; color: var(--text);
+  font: 15px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden;
+}
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.ic { width: 24px; height: 24px; fill: currentColor; flex: none; }
+.muted { color: var(--muted); }
+#app { position: fixed; inset: 0; display: flex; flex-direction: column; }
+
+/* ---------- Barra superior ---------- */
+.top { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 6px; height: 60px; flex: none; }
+.icon-btn { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); }
+.icon-btn:active { background: var(--card); }
+.brand { display: flex; align-items: center; gap: 10px; }
+.wordmark { font: 600 15px Sora; letter-spacing: .42em; padding-left: .42em; }
+#mini { width: 34px; height: 34px; display: none; }
+.chatting #mini { display: block; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 600 14px Sora;
+  border: 1.5px solid var(--accent); color: var(--accent); }
+
+/* ---------- Vistas ---------- */
+.view { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 16px; }
+#portada { display: flex; flex-direction: column; align-items: center; }
+.orb-wrap { width: min(72vw, 290px); aspect-ratio: 1; margin-top: 4px; position: relative; flex: none; }
+.orb-wrap canvas { width: 100%; height: 100%; display: block; }
+.orb-wrap button { position: absolute; inset: 12%; border-radius: 50%; }
+.state { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-top: 2px; min-height: 20px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c2); box-shadow: 0 0 10px var(--c2); }
+.hello { text-align: center; margin-top: 14px; }
+.hello h1 { font: 300 26px/1.2 Sora; }
+.hello p { margin-top: 6px; color: var(--muted); }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; text-align: left; }
+.card .k { font-size: 12px; color: var(--muted); }
+.card .v { font: 400 17px Sora; margin-top: 4px; }
+.bar { height: 5px; border-radius: 3px; background: var(--line); margin-top: 9px; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--c2), var(--c3)); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; justify-content: center; }
+.chip { border: 1px solid var(--line); border-radius: 18px; padding: 7px 14px; font-size: 13px; background: var(--card); }
+
+/* ---------- Conversación ---------- */
+#chat { display: flex; flex-direction: column; gap: 14px; padding-top: 6px; }
+.u { align-self: flex-end; max-width: 84%; background: rgba(255,255,255,.07); border: 1px solid var(--line);
+  padding: 10px 14px; border-radius: 18px 18px 4px 18px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.a { max-width: 100%; overflow-wrap: anywhere; }
+.a .md p { margin: 0 0 10px; } .a .md p:last-child { margin-bottom: 0; }
+.md h1, .md h2, .md h3 { font: 600 17px/1.3 Sora; margin: 14px 0 6px; }
+.md ul, .md ol { margin: 0 0 10px; padding-left: 22px; }
+.md code { background: var(--card); border-radius: 6px; padding: 1px 5px; }
+.md pre { background: var(--card); border-radius: 12px; padding: 12px; overflow-x: auto; }
+.md table { border-collapse: collapse; display: block; overflow-x: auto; margin: 6px 0 10px; }
+.md th, .md td { border: 1px solid var(--line); padding: 5px 10px; text-align: left; }
+.md a { color: var(--c2); }
+.meta { display: flex; align-items: center; gap: 4px; margin-top: 6px; color: var(--muted); font-size: 12px; }
+.meta .icon-btn { width: 34px; height: 34px; }
+.meta .icon-btn .ic { width: 19px; height: 19px; }
+.meta .icon-btn.on { color: var(--c2); }
+.badge { margin-left: auto; border: 1px solid var(--line); border-radius: 10px; padding: 1px 8px; }
+.aviso { font-size: 12px; color: var(--accent); margin-top: 6px; }
+.thinking { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.shimmer { background: linear-gradient(90deg, var(--muted) 25%, var(--text) 50%, var(--muted) 75%); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: sh 1.6s linear infinite; }
+@keyframes sh { to { background-position: -200% 0; } }
+.fuentes { margin-top: 8px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.fuentes a { color: var(--muted); border: 1px solid var(--line); border-radius: 10px; padding: 2px 8px; text-decoration: none;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.img { display: block; margin-top: 10px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+.img img { display: block; width: 100%; height: auto; }
+.file { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line); color: var(--text); text-decoration: none; }
+.doc { border: 1px solid var(--line); border-radius: 16px; margin-top: 10px; overflow: hidden; }
+.doc summary { list-style: none; padding: 10px 14px; background: var(--card); font-weight: 600; cursor: pointer; }
+.doc .md { padding: 4px 14px 12px; max-height: 50vh; overflow-y: auto; }
+
+/* ---------- Lección de idiomas ---------- */
+.lesson { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 14px; margin-top: 10px; position: relative; overflow: hidden; }
+.lesson::before { content: ""; position: absolute; inset: -40% -25% auto auto; width: 170px; height: 170px; border-radius: 50%;
+  background: radial-gradient(var(--glow), transparent 70%); pointer-events: none; }
+.tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--c2); }
+.frase { font: 600 23px/1.25 Inter; margin-top: 6px; }
+.pron { font: 400 17px Sora; color: var(--c3); margin-top: 4px; }
+.pron em { font-style: normal; font-weight: 600; color: var(--accent); }
+.trad { color: var(--muted); font-size: 14px; margin-top: 2px; }
+.btns { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.btn { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 18px; font-size: 13px;
+  border: 1px solid var(--line); white-space: nowrap; }
+.btn .ic { width: 18px; height: 18px; }
+.btn.primary { background: var(--c2); color: var(--bg); border: 0; font-weight: 600; }
+.btn.rec { background: var(--bad); color: #fff; border: 0; }
+.resultado { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+.score { display: flex; align-items: center; gap: 12px; }
+.ring { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; font: 600 15px Sora; position: relative; flex: none; }
+.ring::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: var(--bg2); }
+.ring span { position: relative; z-index: 1; }
+.words { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.w { padding: 2px 10px; border-radius: 10px; font-size: 14px; border: 1px solid var(--line); }
+.w.bien { color: var(--c3); } .w.casi { color: var(--accent); border-color: var(--accent); }
+.w.repetir { color: var(--bad); border-color: var(--bad); }
+.tip { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* ---------- Escribir ---------- */
+.composer { flex: none; padding: 8px 12px calc(10px + var(--safe-b)); display: flex; align-items: flex-end; gap: 8px; }
+.input { flex: 1; min-height: 52px; border-radius: 26px; background: rgba(255,255,255,.05); border: 1px solid var(--line);
+  display: flex; align-items: flex-end; padding: 4px 6px 4px 4px; }
+.input textarea { flex: 1; border: 0; outline: 0; resize: none; background: transparent; color: var(--text); font: inherit;
+  padding: 11px 6px; max-height: 140px; }
+.input textarea::placeholder { color: var(--muted); }
+.round { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; color: var(--bg); flex: none;
+  background: radial-gradient(circle at 35% 30%, var(--c3), var(--c2) 55%, var(--c1)); box-shadow: 0 0 20px var(--glow); }
+.round.rec { background: var(--bad); color: #fff; box-shadow: 0 0 0 6px rgba(255,107,107,.25); animation: pulse 1.2s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 12px rgba(255,107,107,.1); } }
+.tools { display: flex; gap: 6px; padding: 0 12px; flex: none; overflow-x: auto; }
+.tool { border: 1px solid var(--line); border-radius: 16px; padding: 5px 12px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.tool.on { color: var(--bg); background: var(--c2); border-color: var(--c2); }
+
+/* ---------- Menú inferior ---------- */
+.nav { flex: none; display: flex; justify-content: space-around; align-items: center; height: calc(58px + var(--safe-b));
+  padding-bottom: var(--safe-b); border-top: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: 11px; color: var(--muted); }
+.nav button { display: grid; justify-items: center; gap: 1px; padding: 4px 18px; }
+.nav .on { color: var(--c2); }
+.chatting .nav { display: none; }
+
+/* ---------- Paneles ---------- */
+.section-title { font: 400 22px Sora; margin: 6px 0 14px; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+#drawer { position: fixed; inset: 0; z-index: 20; display: flex; }
+#drawer .panel { width: min(82vw, 320px); background: var(--bg2); border-right: 1px solid var(--line); padding: 16px; overflow-y: auto; }
+#drawer .scrim { flex: 1; background: rgba(0,0,0,.5); }
+.chat-item { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-radius: 14px; font-size: 14px; }
+.chat-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-item.on { background: var(--card); }
+.new { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 22px; border: 1px solid var(--line); margin-bottom: 16px; }
+.toggle { width: 46px; height: 28px; border-radius: 14px; background: var(--line); position: relative; flex: none; }
+.toggle::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--muted); transition: .2s; }
+.toggle.on { background: var(--c1); } .toggle.on::after { left: 21px; background: var(--c2); }
+#speaking { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(90px + var(--safe-b)); z-index: 10;
+  display: flex; align-items: center; gap: 8px; background: var(--bg2); border: 1px solid var(--line); border-radius: 20px;
+  padding: 4px 6px 4px 14px; font-size: 13px; }
+.bars { display: flex; gap: 3px; align-items: center; height: 14px; }
+.bars i { width: 3px; border-radius: 2px; background: var(--c2); animation: b 1s ease-in-out infinite; }
+.bars i:nth-child(2) { animation-delay: .15s } .bars i:nth-child(3) { animation-delay: .3s }
+@keyframes b { 0%,100% { height: 3px } 50% { height: 14px } }
+#toast { position: fixed; left: 16px; right: 16px; bottom: calc(96px + var(--safe-b)); z-index: 30; background: #2a1414;
+  border: 1px solid var(--bad); color: #ffd7d7; border-radius: 14px; padding: 10px 14px; font-size: 14px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16v1.6H4zm0 4.2h16v1.6H4zm0 4.2h10v1.6H4z"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5.3-3a5.3 5.3 0 0 1-10.6 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-1.7z"/></symbol>
+  <symbol id="send" viewBox="0 0 24 24"><path d="M3.4 20.4 20.85 12.9a1 1 0 0 0 0-1.84L3.4 3.6a1 1 0 0 0-1.39.91L2 9.12c0 .5.37.93.87.99L17 12 2.87 13.88c-.5.07-.87.5-.87 1l.01 4.61c0 .71.73 1.2 1.39.91z"/></symbol>
+  <symbol id="stop" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M11 5h2v14h-2zM5 11h14v2H5z"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></symbol>
+  <symbol id="learn" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3zm-6 9.7V17l6 3.3 6-3.3v-4.3L12 16l-6-3.3z"/></symbol>
+  <symbol id="me" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.7-8 5v1h16v-1c0-3.3-4.7-5-8-5z"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="vol" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></symbol>
+  <symbol id="copy" viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></symbol>
+  <symbol id="doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 12h8v2H8zm0 4h8v2H8z"/></symbol>
+  <symbol id="back" viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></symbol>
+  <symbol id="del" viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+  <symbol id="edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+</svg>
+
+<div id="app">
+  <header class="top">
+    <button class="icon-btn" id="b-menu" aria-label="Conversaciones"><svg class="ic"><use href="#menu"/></svg></button>
+    <div class="brand"><canvas id="mini"></canvas><span class="wordmark">AXTRA</span></div>
+    <button class="avatar" id="b-avatar" aria-label="Yo">F</button>
+  </header>
+
+  <main class="view" id="v-inicio">
+    <section id="portada">
+      <div class="orb-wrap"><canvas id="orb"></canvas><button id="b-orb" aria-label="Hablarle a Axtra"></button></div>
+      <div class="state"><span class="dot"></span><span id="state-label">En línea · toque el orbe para hablar</span></div>
+      <div class="hello"><h1 id="saludo">Hola, señor.</h1><p>¿En qué trabajamos hoy?</p></div>
+      <div class="cards" id="cards"></div>
+      <div class="chips" id="ideas"></div>
+    </section>
+    <section id="chat" hidden aria-live="polite"></section>
+  </main>
+
+  <main class="view" id="v-aprender" hidden>
+    <h2 class="section-title">Aprender</h2>
+    <div class="list" id="idiomas-lista"></div>
+    <p class="muted" style="margin:18px 0 10px">Empiece una lección:</p>
+    <div class="chips" id="aprender-ideas" style="justify-content:flex-start"></div>
+    <p class="muted" style="margin-top:22px;font-size:13px">El Protocolo de inteligencia avanzada y la Sincronización aparecerán aquí cuando conectemos su Axtra del PC (paso 4).</p>
+  </main>
+
+  <main class="view" id="v-yo" hidden>
+    <h2 class="section-title">Yo</h2>
+    <div class="list">
+      <div class="card row"><div><div class="k">Leer en voz alta todas las respuestas</div></div><button class="toggle" id="t-voz" aria-label="Voz"></button></div>
+      <div class="card"><div class="k">Gasto de este mes</div><div id="gasto" class="v">—</div></div>
+      <div class="card"><div class="k">Cerebros disponibles</div><div id="cerebros" class="muted" style="margin-top:6px;font-size:14px">—</div></div>
+    </div>
+  </main>
+
+  <div class="tools" id="tools" hidden>
+    <button class="tool" data-nivel="imagen">Imagen</button>
+    <button class="tool" data-nivel="documento">Documento</button>
+    <button class="tool" data-nivel="equipo_documento">Documento importante</button>
+    <button class="tool" data-nivel="avanzado">Piénsalo bien</button>
+  </div>
+  <form class="composer" id="composer">
+    <div class="input">
+      <button type="button" class="icon-btn" id="b-plus" aria-label="Herramientas"><svg class="ic"><use href="#plus"/></svg></button>
+      <textarea id="input" rows="1" placeholder="Escríbale a Axtra…" aria-label="Mensaje"></textarea>
+    </div>
+    <button type="button" class="round" id="b-main" aria-label="Hablar"><svg class="ic"><use href="#mic" id="main-icon"/></svg></button>
+  </form>
+  <nav class="nav">
+    <button class="on" data-v="inicio"><svg class="ic"><use href="#home"/></svg>Inicio</button>
+    <button data-v="aprender"><svg class="ic"><use href="#learn"/></svg>Aprender</button>
+    <button data-v="yo"><svg class="ic"><use href="#me"/></svg>Yo</button>
+  </nav>
+</div>
+
+<div id="drawer" hidden>
+  <div class="panel">
+    <button class="new" id="b-new"><svg class="ic"><use href="#edit"/></svg>Nueva conversación</button>
+    <div class="muted" style="font-size:12px;margin:0 0 6px 12px">Recientes</div>
+    <div id="chats"></div>
+  </div>
+  <div class="scrim" id="scrim"></div>
+</div>
+<div id="speaking" hidden><span class="bars"><i></i><i></i><i></i></span>Axtra está hablando
+  <button class="icon-btn" id="b-stop" aria-label="Detener"><svg class="ic"><use href="#stop"/></svg></button></div>
+<div id="toast" hidden></div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("axtra." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("axtra." + k, JSON.stringify(v)); } catch {} },
+};
+const S = { chatId: null, nivel: null, busy: false, voz: store.get("voz", true), estado: "reposo" };
+const IDIOMAS = { ruso: "ruso", ingles: "inglés", frances: "francés", portugues: "portugués", aleman: "alemán",
+  italiano: "italiano", japones: "japonés", chino: "chino", coreano: "coreano", arabe: "árabe" };
+
+// ---------------- Utilidades ----------------
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const svg = (id) => `<svg class="ic"><use href="#${id}"/></svg>`;
+function inline(s) {
+  return s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function md(text) {
+  const lines = esc(text).split("\n"); let html = "", list = null, table = [], code = null;
+  const close = () => { if (list) { html += `</${list}>`; list = null; } };
+  const flush = () => { if (!table.length) return;
+    const rows = table.filter((r) => !/^\|?[\s:\-|]+\|?$/.test(r));
+    html += "<table>" + rows.map((r, i) => "<tr>" + r.replace(/^\||\|$/g, "").split("|").map((c) => i ? `<td>${inline(c.trim())}</td>` : `<th>${inline(c.trim())}</th>`).join("") + "</tr>").join("") + "</table>"; table = []; };
+  for (const raw of lines) {
+    const l = raw.trimEnd(); let m;
+    if (code !== null) { if (l.startsWith("```")) { html += `<pre><code>${code}</code></pre>`; code = null; } else code += raw + "\n"; continue; }
+    if (l.startsWith("```")) { close(); flush(); code = ""; continue; }
+    if (l.trim().startsWith("|")) { close(); table.push(l.trim()); continue; }
+    flush();
+    if ((m = l.match(/^(#{1,4})\s+(.*)/))) { close(); html += `<h3>${inline(m[2])}</h3>`; }
+    else if ((m = l.match(/^\s*[-*•]\s+(.*)/))) { if (list !== "ul") { close(); html += "<ul>"; list = "ul"; } html += `<li>${inline(m[1])}</li>`; }
+    else if ((m = l.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== "ol") { close(); html += "<ol>"; list = "ol"; } html += `<li>${inline(m[1])}</li>`; }
+    else if (!l.trim()) close();
+    else { close(); html += `<p>${inline(l)}</p>`; }
+  }
+  close(); flush(); if (code !== null) html += `<pre><code>${code}</code></pre>`;
+  return html;
+}
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 5000); }
+async function api(path, opts = {}) {
+  const r = await fetch(path, { credentials: "same-origin", ...opts });
+  if (r.status === 401) { toast("Su sesión venció. Recargue la página para volver a entrar."); throw new Error("sesión"); }
+  if (!r.ok) { let d = ""; try { d = (await r.json()).detail || ""; } catch {} throw new Error(d || `error ${r.status}`); }
+  return r;
+}
+const post = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+
+// ---------------- Orbe (agujero negro azul hielo) ----------------
+const FRAG = `precision mediump float;
+uniform vec2 res; uniform float t, energy, swirl;
+const vec3 c1 = vec3(0.043, 0.239, 0.569), c2 = vec3(0.247, 0.816, 1.0), c3 = vec3(0.545, 0.914, 1.0);
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);
+  return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y); }
+float fbm(vec2 p){ float v = 0.0, a = 0.5; mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+  for (int i = 0; i < 5; i++){ v += a*noise(p); p = m*p; a *= 0.5; } return v; }
+void main(){
+  vec2 uv = (gl_FragCoord.xy - 0.5*res) / min(res.x, res.y);
+  float r = length(uv), R = 0.36; vec3 col = vec3(0.0);
+  col += c2 * 0.55 * exp(-max(r - R, 0.0) * 13.0) * energy * smoothstep(0.5, 0.38, r);
+  if (r < R) {
+    float z = sqrt(R*R - r*r) / R; vec2 p = uv / R; vec2 q = p * (1.0 + 0.35*(1.0 - z));
+    float ang = atan(q.y, q.x), rad = length(q);
+    float sw = 2.4 * (1.0 - rad) + t * 0.09 * swirl;
+    vec2 sq = vec2(cos(ang + sw), sin(ang + sw)) * rad;
+    float n = fbm(sq*2.2 + vec2(t*0.03, -t*0.02)); float n2 = fbm(sq*4.0 + n*1.6 - vec2(t*0.05));
+    vec3 neb = mix(c1*0.18, c1*1.2, smoothstep(0.25, 0.7, n));
+    neb = mix(neb, c2, smoothstep(0.5, 0.85, n2) * 0.85); neb *= 0.5 + 0.7*n2;
+    float d = length(vec2(p.x, p.y*2.8)); float ring = exp(-pow((d - 0.5)*6.5, 2.0));
+    neb += c2*ring*1.3 + c3*ring*ring;
+    neb *= 1.0 - smoothstep(0.24, 0.19, length(p))*0.98;
+    neb += c3 * exp(-pow((length(p) - 0.235)*30.0, 2.0)) * 1.1;
+    neb = neb*(0.6 + 0.5*z) + c3*pow(1.0 - z, 2.2)*0.85;
+    neb += vec3(1.0) * pow(max(0.0, dot(normalize(vec3(p, z)), normalize(vec3(-0.45, 0.55, 0.7)))), 48.0) * 0.28;
+    col = mix(col, neb * energy, smoothstep(R, R - 0.004, r));
+  }
+  col += c3 * exp(-pow((r - R)*170.0, 2.0)) * 0.55;
+  col = 1.0 - exp(-col * 1.25);
+  float alpha = r < R ? 1.0 : clamp(max(col.r, max(col.g, col.b)) * 1.15, 0.0, 1.0);
+  gl_FragColor = vec4(col, alpha);
+}`;
+const orbes = [];
+function crearOrbe(canvas) {
+  const gl = canvas.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: true });
+  if (!gl) return;
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+  const pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, "attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }"));
+  gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(pr); gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  orbes.push({ canvas, gl, U: (n) => gl.getUniformLocation(pr, n) });
+}
+let t0 = performance.now();
+function dibujar(now) {
+  const t = 14 + (now - t0) / 1000;
+  let energy = 1, swirl = 1;
+  if (S.estado === "escuchando") energy = 1.15 + 0.1 * Math.sin(t * 6);
+  if (S.estado === "pensando") { swirl = 6; energy = 1.05; }
+  if (S.estado === "hablando") energy = 1 + 0.22 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1));
+  for (const o of orbes) {
+    if (!o.canvas.offsetParent && o.canvas.id !== "mini") continue;   // no dibuja lo que no se ve
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5), w = Math.round(o.canvas.clientWidth * dpr);
+    if (!w) continue;
+    if (o.canvas.width !== w) { o.canvas.width = o.canvas.height = w; o.gl.viewport(0, 0, w, w); }
+    o.gl.uniform2f(o.U("res"), w, w); o.gl.uniform1f(o.U("t"), t);
+    o.gl.uniform1f(o.U("energy"), energy); o.gl.uniform1f(o.U("swirl"), swirl);
+    o.gl.drawArrays(o.gl.TRIANGLE_STRIP, 0, 4);
+  }
+  if (!document.hidden) requestAnimationFrame(dibujar);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) requestAnimationFrame(dibujar); });
+const ETIQUETAS = { reposo: "En línea · toque el orbe para hablar", escuchando: "Escuchando…", pensando: "Pensando…", hablando: "Hablando…" };
+function estado(e) { S.estado = e; $("#state-label").textContent = ETIQUETAS[e]; }
+
+// ---------------- Voz de Axtra ----------------
+const V = { token: 0, audio: null };
+function frasesVoz(texto) {
+  const limpio = String(texto).replace(/[#*_`>|]/g, " ").replace(/https?:\/\/\S+/g, "").replace(/\s+/g, " ").trim();
+  const partes = limpio.match(/[^.!?¿¡]+[.!?]*/g) || [limpio]; const out = []; let cur = "";
+  for (const p of partes) { if (cur && (cur + p).length > (out.length ? 220 : 110)) { out.push(cur.trim()); cur = p; } else cur += p; }
+  if (cur.trim()) out.push(cur.trim());
+  return out.filter(Boolean);
+}
+function callar() {
+  V.token++; if (V.audio) { V.audio.pause(); V.audio = null; }
+  $("#speaking").hidden = true; document.querySelectorAll(".speak.on").forEach((b) => b.classList.remove("on"));
+  if (S.estado === "hablando") estado("reposo");
+}
+async function audioDe(texto, idioma, lento) {
+  const r = await post("/api/voz", { texto, idioma: idioma || null, lento: !!lento });
+  return URL.createObjectURL(await r.blob());
+}
+async function decir(texto, { idioma = null, lento = false, boton = null } = {}) {
+  callar(); const token = V.token; const partes = idioma ? [texto] : frasesVoz(texto);
+  if (!partes.length) return;
+  estado("hablando"); $("#speaking").hidden = false; if (boton) boton.classList.add("on");
+  let sig = audioDe(partes[0], idioma, lento).catch(() => null);
+  for (let i = 0; i < partes.length; i++) {
+    const url = await sig; if (token !== V.token) return;
+    sig = i + 1 < partes.length ? audioDe(partes[i + 1], idioma, lento).catch(() => null) : null;
+    if (!url) continue;
+    await new Promise((listo) => { const a = new Audio(url); V.audio = a;
+      a.onended = a.onerror = () => { URL.revokeObjectURL(url); listo(); }; a.play().catch(listo); });
+    if (token !== V.token) return;
+  }
+  callar();
+}
+
+// ---------------- Micrófono ----------------
+const REC = { on: false };
+async function grabar(alTerminar) {
+  if (REC.on) return pararGrabacion();
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+  catch { toast("Permita el micrófono: toque el candado de la barra de direcciones."); return; }
+  callar();
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const src = ctx.createMediaStreamSource(stream), node = ctx.createScriptProcessor(4096, 1, 1);
+  const trozos = []; let oyo = false, silencio = 0; const inicio = Date.now();
+  node.onaudioprocess = (e) => {
+    const d = new Float32Array(e.inputBuffer.getChannelData(0)); trozos.push(d);
+    let s = 0; for (const v of d) s += v * v; const rms = Math.sqrt(s / d.length);
+    if (rms > 0.02) { oyo = true; silencio = 0; } else if (oyo) silencio += d.length / ctx.sampleRate;
+    if ((oyo && silencio > 1.4) || Date.now() - inicio > 30000) pararGrabacion();
+  };
+  src.connect(node); node.connect(ctx.destination);
+  Object.assign(REC, { on: true, stream, ctx, node, trozos, alTerminar });
+  estado("escuchando"); actualizarBoton();
+}
+function aWav(trozos, rate) {
+  const total = trozos.reduce((n, c) => n + c.length, 0), datos = new Float32Array(total); let o = 0;
+  for (const c of trozos) { datos.set(c, o); o += c.length; }
+  const k = rate / 16000, n = Math.floor(total / k), pcm = new Int16Array(n);
+  for (let i = 0; i < n; i++) { const a = Math.floor(i * k), b = Math.min(total, Math.floor((i + 1) * k)); let s = 0;
+    for (let j = a; j < b; j++) s += datos[j]; const v = Math.max(-1, Math.min(1, s / Math.max(1, b - a))); pcm[i] = v < 0 ? v * 0x8000 : v * 0x7fff; }
+  const buf = new ArrayBuffer(44 + pcm.length * 2), dv = new DataView(buf);
+  const w = (p, s) => [...s].forEach((ch, i) => dv.setUint8(p + i, ch.charCodeAt(0)));
+  w(0, "RIFF"); dv.setUint32(4, 36 + pcm.length * 2, true); w(8, "WAVE"); w(12, "fmt "); dv.setUint32(16, 16, true);
+  dv.setUint16(20, 1, true); dv.setUint16(22, 1, true); dv.setUint32(24, 16000, true); dv.setUint32(28, 32000, true);
+  dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, "data"); dv.setUint32(40, pcm.length * 2, true);
+  new Int16Array(buf, 44).set(pcm); return new Blob([buf], { type: "audio/wav" });
+}
+function pararGrabacion() {
+  if (!REC.on) return; REC.on = false;
+  REC.node.disconnect(); REC.stream.getTracks().forEach((t) => t.stop());
+  const rate = REC.ctx.sampleRate; REC.ctx.close(); estado("reposo"); actualizarBoton();
+  REC.alTerminar(aWav(REC.trozos, rate));
+}
+async function dictar() {
+  grabar(async (wav) => {
+    estado("pensando");
+    try { const { texto } = await (await api("/api/escuchar", { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav })).json();
+      estado("reposo"); if (texto) enviar(texto); else toast("No le escuché bien, señor. Intente de nuevo."); }
+    catch (e) { estado("reposo"); toast("No pude entender el audio: " + e.message); }
+  });
+}
+
+// ---------------- Mensajes ----------------
+function modoChat(on) { document.body.classList.toggle("chatting", on); $("#portada").hidden = on; $("#chat").hidden = !on; }
+function abajo() { const v = $("#v-inicio"); v.scrollTop = v.scrollHeight; }
+function burbujaUsuario(texto) { const d = document.createElement("div"); d.className = "u"; d.textContent = texto; $("#chat").append(d); abajo(); }
+function pensando() {
+  const d = document.createElement("div"); d.className = "a";
+  d.innerHTML = `<div class="thinking"><span class="shimmer">Pensando…</span></div>`; $("#chat").append(d); abajo(); return d;
+}
+function pron(s) { return esc(s).replace(/([A-ZÁÉÍÓÚÜÑ]{2,}|(?<=-|^|\s)[ÁÉÍÓÚ](?=-|\s|$|,))/g, "<em>$1</em>"); }
+const CEREBRO_GRATIS = /^(Groq|Cerebras|Gemini|OpenRouter|gratis)/;
+
+function leccionHtml(lec) {
+  return lec.frases.map((f, i) => `
+    <div class="lesson" data-i="${i}">
+      <div class="tag">${esc(lec.nombre)}${f.nota ? " · " + esc(f.nota) : ""}</div>
+      <div class="frase">${esc(f.frase)}</div>
+      <div class="pron">${pron(f.pronunciacion)}</div>
+      <div class="trad">${esc(f.traduccion || "")}</div>
+      <div class="btns">
+        <button class="btn primary b-nativa">${svg("play")}Voz nativa</button>
+        <button class="btn b-lento">${svg("play")}Despacio</button>
+        <button class="btn b-repetir">${svg("mic")}Repetir</button>
+      </div>
+      <div class="resultado" hidden></div>
+    </div>`).join("") + (lec.consejo ? `<div class="tip">${inline(esc(lec.consejo))}</div>` : "");
+}
+function conectarLeccion(el, lec) {
+  el.querySelectorAll(".lesson").forEach((card) => {
+    const f = lec.frases[+card.dataset.i];
+    card.querySelector(".b-nativa").onclick = (e) => decir(f.frase, { idioma: lec.idioma, boton: e.currentTarget });
+    card.querySelector(".b-lento").onclick = (e) => decir(f.frase, { idioma: lec.idioma, lento: true, boton: e.currentTarget });
+    const rep = card.querySelector(".b-repetir");
+    rep.onclick = () => {
+      if (REC.on) return pararGrabacion();
+      rep.classList.add("rec"); rep.innerHTML = svg("stop") + "Escuchando…";
+      grabar(async (wav) => {
+        rep.classList.remove("rec"); rep.innerHTML = svg("mic") + "Repetir";
+        const box = card.querySelector(".resultado"); box.hidden = false; box.innerHTML = `<span class="shimmer">Revisando su pronunciación…</span>`;
+        try {
+          const q = new URLSearchParams({ idioma: lec.idioma, objetivo: f.frase, guia: f.pronunciacion });
+          const r = await (await api("/api/idiomas/pronunciacion?" + q, { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wav })).json();
+          const color = r.puntaje >= 80 ? "var(--c2)" : r.puntaje >= 50 ? "var(--accent)" : "var(--bad)";
+          box.innerHTML = `<div class="score"><div class="ring" style="background:conic-gradient(${color} 0 ${r.puntaje}%, var(--line) 0)"><span>${r.puntaje}</span></div>
+            <div><div class="tag">Su pronunciación</div><div class="muted" style="font-size:13px">Entendí: «${esc(r.oido || "…")}»</div></div></div>
+            <div class="words">${r.palabras.map((p) => `<span class="w ${p.estado}">${esc(p.palabra)} ${p.estado === "bien" ? "✓" : "↻"}</span>`).join("")}</div>
+            <div class="tip">${inline(esc(r.consejo))}</div>
+            <div class="tip">${esc(r.progreso.nombre)} · ${r.progreso.nivel} · ${r.progreso.porcentaje} %</div>`;
+          if (S.voz) decir(r.consejo);
+        } catch (e) { box.innerHTML = `<div class="tip">No pude revisar la pronunciación: ${esc(e.message)}</div>`; }
+      });
+    };
+  });
+}
+function respuesta(el, r, { hablar = true } = {}) {
+  let html = `<div class="md">${md(r.texto || "")}</div>`;
+  if (r.leccion) html += leccionHtml(r.leccion);
+  if (r.markdown) html += `<details class="doc" open><summary>${esc(r.titulo || "Documento")}</summary><div class="md">${md(r.markdown)}</div></details>`;
+  for (const a of r.archivos || []) {
+    html += a.tipo === "imagen" ? `<a class="img" href="${esc(a.url)}" target="_blank"><img src="${esc(a.url)}" alt="Imagen creada por Axtra" loading="lazy"></a>`
+      : `<a class="file" href="${esc(a.url)}" download>${svg("doc")}<span>Descargar en Word</span></a>`;
+  }
+  if (r.fuentes && r.fuentes.length) html += `<div class="fuentes">${r.fuentes.map((f) => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.titulo)}</a>`).join("")}</div>`;
+  if (r.aviso) html += `<div class="aviso">${esc(r.aviso)}</div>`;
+  const quien = r.cerebro ? esc(r.cerebro) + (CEREBRO_GRATIS.test(r.cerebro) ? " · gratis" : "") : "";
+  html += `<div class="meta"><button class="icon-btn speak" aria-label="Escuchar">${svg("vol")}</button>
+    <button class="icon-btn copy" aria-label="Copiar">${svg("copy")}</button>${quien ? `<span class="badge">${quien}</span>` : ""}</div>`;
+  el.innerHTML = html;
+  const texto = r.markdown ? r.texto : (r.texto || "");
+  const sp = el.querySelector(".speak");
+  sp.onclick = () => sp.classList.contains("on") ? callar() : decir(r.markdown || texto, { boton: sp });
+  el.querySelector(".copy").onclick = () => navigator.clipboard?.writeText(r.markdown || r.texto || "").then(() => toast("Copiado."));
+  if (r.leccion) conectarLeccion(el, r.leccion);
+  if (hablar && S.voz && texto) decir(texto, { boton: sp });
+  abajo();
+}
+
+async function enviar(texto) {
+  texto = (texto || "").trim(); if (!texto || S.busy) return;
+  S.busy = true; callar(); modoChat(true); vista("inicio");
+  burbujaUsuario(texto); $("#input").value = ""; crecer(); actualizarBoton();
+  const el = pensando(); estado("pensando");
+  const nivel = S.nivel; ponerNivel(null); $("#tools").hidden = true;
+  try {
+    const r = await (await post("/api/chat", { texto, chat_id: S.chatId, nivel })).json();
+    const nuevo = S.chatId !== r.chat_id; S.chatId = r.chat_id; estado("reposo");
+    respuesta(el, r); if (nuevo) cargarChats();
+  } catch (e) { estado("reposo"); respuesta(el, { texto: "No pude comunicarme con el servidor: " + e.message }, { hablar: false }); }
+  finally { S.busy = false; actualizarBoton(); }
+}
+
+// ---------------- Conversaciones ----------------
+async function cargarChats() {
+  try {
+    const lista = await (await api("/api/chats")).json(); const box = $("#chats"); box.innerHTML = "";
+    for (const c of lista) {
+      const it = document.createElement("div"); it.className = "chat-item" + (c.id === S.chatId ? " on" : "");
+      it.innerHTML = `<span>${esc(c.titulo)}</span><button class="icon-btn" aria-label="Borrar">${svg("del")}</button>`;
+      it.querySelector("span").onclick = () => abrirChat(c.id);
+      it.querySelector("button").onclick = async () => { if (!confirm("¿Borrar esta conversación?")) return;
+        await api("/api/chats/" + c.id, { method: "DELETE" }); if (c.id === S.chatId) nuevaConversacion(); cargarChats(); };
+      box.append(it);
+    }
+  } catch {}
+}
+async function abrirChat(id) {
+  cerrarMenu(); callar();
+  const c = await (await api("/api/chats/" + id)).json(); S.chatId = id; $("#chat").innerHTML = ""; modoChat(true); vista("inicio");
+  for (const m of c.mensajes) {
+    if (m.rol === "user") burbujaUsuario(m.texto);
+    else { const d = document.createElement("div"); d.className = "a"; $("#chat").append(d); respuesta(d, { texto: m.texto, cerebro: m.cerebro }, { hablar: false }); }
+  }
+  cargarChats();
+}
+function nuevaConversacion() { cerrarMenu(); callar(); S.chatId = null; $("#chat").innerHTML = ""; modoChat(false); vista("inicio"); cargarChats(); cargarInicio(); }
+function abrirMenu() { $("#drawer").hidden = false; cargarChats(); }
+function cerrarMenu() { $("#drawer").hidden = true; }
+
+// ---------------- Vistas ----------------
+function vista(v) {
+  $("#tools").hidden = true;
+  for (const n of ["inicio", "aprender", "yo"]) $("#v-" + n).hidden = n !== v;
+  document.querySelectorAll(".nav button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
+  if (v === "aprender") cargarAprender(); if (v === "yo") cargarYo();
+}
+async function cargarAprender() {
+  const box = $("#idiomas-lista");
+  try {
+    const lista = await (await api("/api/idiomas/progreso")).json();
+    box.innerHTML = lista.length ? lista.map((p) => `<div class="card"><div class="row"><div class="k">${esc(p.nombre)} · ${p.nivel}</div><div class="k">${p.dominadas} frases dominadas</div></div>
+      <div class="v">${p.porcentaje} %</div><div class="bar"><i style="width:${Math.max(p.porcentaje, 1)}%"></i></div></div>`).join("")
+      : `<div class="card"><div class="k">Aún no ha practicado idiomas.</div><div class="v" style="font-size:15px">Pídale una frase a Axtra y toque «Repetir».</div></div>`;
+  } catch { box.innerHTML = ""; }
+}
+async function cargarYo() {
+  $("#t-voz").classList.toggle("on", S.voz);
+  try {
+    const e = await (await api("/api/estado")).json();
+    $("#gasto").innerHTML = `Claude US$${e.gasto_mes_usd.claude.toFixed(2)} de ${e.topes_usd.claude} · Grok US$${e.gasto_mes_usd.grok.toFixed(2)} de ${e.topes_usd.grok}`;
+    const nombres = { groq: "Groq", cerebras: "Cerebras", gemini: "Gemini", openrouter: "OpenRouter", claude: "Claude", grok: "Grok" };
+    $("#cerebros").innerHTML = Object.entries(nombres).map(([k, n]) => `${e.cerebros[k] ? "●" : "○"} ${n}`).join(" &nbsp; ");
+  } catch {}
+}
+async function cargarInicio() {
+  const h = new Date().getHours();
+  $("#saludo").textContent = (h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches") + ", señor.";
+  const cards = [];
+  try {
+    const [est, idi] = await Promise.all([api("/api/estado").then((r) => r.json()), api("/api/idiomas/progreso").then((r) => r.json())]);
+    const p = idi.sort((a, b) => b.practicadas - a.practicadas)[0];
+    cards.push(p ? `<button class="card" data-v="aprender"><div class="k">${esc(p.nombre)} · ${p.nivel}</div><div class="v">${p.porcentaje} %</div><div class="bar"><i style="width:${Math.max(p.porcentaje, 1)}%"></i></div></button>`
+      : `<button class="card" data-q="¿Cómo se dice hola, cómo estás en ruso?"><div class="k">Idiomas</div><div class="v">Empezar</div><div class="bar"><i style="width:1%"></i></div></button>`);
+    const g = est.gasto_mes_usd.claude + est.gasto_mes_usd.grok, tope = est.topes_usd.claude + est.topes_usd.grok;
+    cards.push(`<button class="card" data-v="yo"><div class="k">Gasto del mes</div><div class="v">US$${g.toFixed(2)}</div><div class="bar"><i style="width:${Math.min(100, 100 * g / Math.max(tope, 1))}%"></i></div></button>`);
+  } catch {}
+  $("#cards").innerHTML = cards.join("");
+  $("#cards").querySelectorAll("[data-v]").forEach((b) => b.onclick = () => vista(b.dataset.v));
+  $("#cards").querySelectorAll("[data-q]").forEach((b) => b.onclick = () => enviar(b.dataset.q));
+}
+const IDEAS = ["¿Cómo va el mercado hoy?", "Dame ideas para mejorar Apex", "Explícame qué es la inflación", "Crea una imagen de un orbe futurista"];
+const LECCIONES = ["¿Cómo se dice hola, cómo estás en ruso?", "Frases básicas en inglés para una entrevista", "Saludos en francés", "¿Cómo se dice gracias en japonés?"];
+
+// ---------------- Escribir ----------------
+function crecer() { const t = $("#input"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 140) + "px"; }
+function actualizarBoton() {
+  const hay = $("#input").value.trim().length > 0, b = $("#b-main");
+  b.classList.toggle("rec", REC.on);
+  $("#main-icon").setAttribute("href", REC.on ? "#stop" : hay ? "#send" : "#mic");
+  b.setAttribute("aria-label", REC.on ? "Detener" : hay ? "Enviar" : "Hablar");
+}
+function ponerNivel(n) {
+  S.nivel = n; document.querySelectorAll(".tool").forEach((b) => b.classList.toggle("on", b.dataset.nivel === n));
+  $("#input").placeholder = { imagen: "Describa la imagen…", documento: "¿Qué documento le preparo?", equipo_documento: "Documento importante: Claude escribe y otro cerebro revisa", avanzado: "Lo pensaré a fondo, señor…" }[n] || "Escríbale a Axtra…";
+}
+
+$("#input").addEventListener("input", () => { crecer(); actualizarBoton(); });
+$("#input").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing && window.innerWidth > 700) { e.preventDefault(); enviar($("#input").value); } });
+$("#composer").addEventListener("submit", (e) => { e.preventDefault(); enviar($("#input").value); });
+$("#b-main").onclick = () => { if (REC.on) return pararGrabacion(); if ($("#input").value.trim()) enviar($("#input").value); else dictar(); };
+$("#b-orb").onclick = () => REC.on ? pararGrabacion() : dictar();
+$("#b-plus").onclick = () => { $("#tools").hidden = !$("#tools").hidden; };
+document.querySelectorAll(".tool").forEach((b) => b.onclick = () => { ponerNivel(S.nivel === b.dataset.nivel ? null : b.dataset.nivel); $("#input").focus(); });
+document.querySelectorAll(".nav button").forEach((b) => b.onclick = () => vista(b.dataset.v));
+$("#b-menu").onclick = abrirMenu;
+$("#scrim").onclick = cerrarMenu; $("#b-new").onclick = nuevaConversacion;
+$("#b-avatar").onclick = () => vista("yo");
+$("#b-stop").onclick = callar;
+$("#t-voz").onclick = () => { S.voz = !S.voz; store.set("voz", S.voz); $("#t-voz").classList.toggle("on", S.voz); if (!S.voz) callar(); };
+$("#ideas").innerHTML = IDEAS.map((q) => `<button class="chip">${esc(q)}</button>`).join("");
+$("#aprender-ideas").innerHTML = LECCIONES.map((q) => `<button class="chip">${esc(q)}</button>`).join("");
+document.querySelectorAll("#ideas .chip, #aprender-ideas .chip").forEach((b) => b.onclick = () => enviar(b.textContent));
+window.addEventListener("popstate", () => { if (!$("#drawer").hidden) cerrarMenu(); });
+
+crearOrbe($("#orb")); crearOrbe($("#mini")); requestAnimationFrame(dibujar);
+cargarInicio();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
