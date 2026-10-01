@@ -45,7 +45,8 @@ Guárdalas en un lugar seguro (por ejemplo, una nota protegida). **Nunca** las m
 2. **Política 1** — Acción *Allow*, Incluir *Emails*: `felipemerchanhenao19@gmail.com`.
 3. **Inicio de sesión:** en *Settings → Authentication* agrega **Google** (o deja *One-time PIN*: te llega un código al correo).
 4. Copia el **Application Audience (AUD) Tag** → `CF_ACCESS_AUD`.
-5. Tu **nombre de equipo** está en *Settings → Custom pages* (`TU-EQUIPO.cloudflareaccess.com`) → `CF_ACCESS_EQUIPO` (solo `TU-EQUIPO`).
+5. **Para que el celular pueda instalar la app:** crea otra aplicación *Self-hosted* llamada `Axtra archivos públicos` con tu dominio y las rutas `manifest.webmanifest`, `icono-*`, `sw.js` y `fonts/*`, con una sola política de acción **Bypass** (Everyone). Son solo el ícono y la apariencia: tus conversaciones y datos siguen protegidos.
+6. Tu **nombre de equipo** está en *Settings → Custom pages* (`TU-EQUIPO.cloudflareaccess.com`) → `CF_ACCESS_EQUIPO` (solo `TU-EQUIPO`).
 
 ### Token para el Axtra del PC
 1. **Access → Service Auth → Create Service Token**. Nombre: `axtra-pc`, duración: sin vencimiento.

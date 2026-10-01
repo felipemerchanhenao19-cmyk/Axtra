@@ -9,3 +9,4 @@ pyjwt[crypto]>=2.8
 edge-tts>=6.1
 SpeechRecognition>=3.10
 pywebpush>=2.0
+tzdata
