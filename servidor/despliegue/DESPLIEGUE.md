@@ -2,7 +2,7 @@
 
 Al terminar tendrás Axtra en tu dominio (por ejemplo `https://axtra.app`), solo para tu cuenta de Google, instalada en tu celular y conectada con tu Axtra del PC.
 
-**Tiempo:** 1 a 2 horas. **Costo:** dominio (~US$15 al año) + servidor (~US$5 al mes) + lo que gastes en Claude (con tope).
+**Tiempo:** 1 a 2 horas. **Costo:** dominio (~US$15 al año) + servidor (US$6 al mes en DigitalOcean) + lo que gastes en Claude (con tope).
 
 ---
 
@@ -22,10 +22,10 @@ Guárdalas en un lugar seguro (por ejemplo, una nota protegida). **Nunca** las m
 
 ## Parte B. El servidor
 
-1. Crea una cuenta en **hetzner.com/cloud** (o DigitalOcean / Vultr, cualquiera sirve).
-2. Crea un servidor: **Ubuntu 24.04**, el plan más pequeño (2 GB de RAM alcanzan, ~US$5 al mes).
-3. Anota su dirección IP y la contraseña de `root` (o configura una llave SSH).
-4. Conéctate desde PowerShell: `ssh root@LA_IP`
+1. Crea una cuenta en **DigitalOcean** (o Hetzner / Vultr, cualquiera sirve).
+2. Crea un servidor (en DigitalOcean, *Droplet*): **Ubuntu 24.04 (LTS) x64**, región New York, plan Basic / Regular de **US$6 al mes** (1 GB de RAM; el instalador agrega 2 GB de memoria de respaldo en disco). Sin backups de pago.
+3. Autenticación con **llave SSH**. En PowerShell del PC: `ssh-keygen -t ed25519 -C "axtra"` (en PowerShell x86: `& "$env:windir\Sysnative\OpenSSH\ssh-keygen.exe" -t ed25519 -C "axtra"`) y pega en DigitalOcean el contenido de `$env:USERPROFILE\.ssh\id_ed25519.pub`. El archivo sin `.pub` nunca se comparte.
+4. Anota la dirección IP y conéctate desde PowerShell: `ssh root@LA_IP`
 
 ## Parte C. El dominio (el paso final que falta)
 

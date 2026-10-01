@@ -13,6 +13,13 @@ apt-get update -q
 apt-get install -y -q git curl ufw nano
 command -v docker >/dev/null || curl -fsSL https://get.docker.com | sh
 
+# Memoria de respaldo en disco (2 GB): con el plan de 1 GB evita quedarse sin memoria al instalar o actualizar
+if ! swapon --show | grep -q .; then
+  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile
+  grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  sysctl -q vm.swappiness=10 && echo 'vm.swappiness=10' > /etc/sysctl.d/99-axtra.conf
+fi
+
 # 1) Llave de solo lectura para descargar el repositorio privado
 if [ ! -f /root/.ssh/axtra_github ]; then
   mkdir -p /root/.ssh && chmod 700 /root/.ssh
