@@ -1,4 +1,4 @@
-"""Estado de la batería en Windows (sin librerías extra)."""
+"""Estado de la batería en Windows y Linux (sin librerías extra)."""
 import ctypes
 import os
 import time
@@ -9,7 +9,9 @@ _cache = {"t": 0.0, "v": False}
 def on_battery() -> bool:
     """True si el portátil está funcionando con batería (cargador desconectado)."""
     if os.name != "nt":
-        return False
+        import linux
+
+        return linux.on_battery()
     if time.time() - _cache["t"] < 20:
         return _cache["v"]
 

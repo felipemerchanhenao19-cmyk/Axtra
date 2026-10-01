@@ -55,7 +55,7 @@ def main():
     from audio import pick_microphone
 
     print(f"  - Micrófono: {pick_microphone()}")
-    print("  - Cargando oído (Whisper)...")
+    print("  - Cargando oído...")
     stt = STT()
     print("  - Cargando palabra de activación...")
     if config.WAKE_MODE == "en":
@@ -73,6 +73,9 @@ def main():
 
     autonomy.speaker = tts.say  # para avisos, alertas y recordatorios por su cuenta
     autonomy.start()
+    import nube
+
+    nube.iniciar()   # sube tus datos a Axtra en la nube (si está configurada)
     import vision
 
     vision.watcher.start()
@@ -148,7 +151,7 @@ def main():
             # una vez por conversación para no rechazarlas por falta de audio
             if voice_id is not None and not (verified and control_pc.recent()):
                 ok, score = voice_id.is_owner(audio)
-                print(f"  (voz: {score:.2f})")
+                print(f"  (voz: {score:.2f}, mínimo para aceptarte: {config.VOICE_THRESHOLD:.2f})")
                 if not ok:
                     tts.say("Lo siento, no reconozco su voz. Acceso denegado.")
                     break

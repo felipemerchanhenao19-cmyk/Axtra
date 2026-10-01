@@ -111,6 +111,11 @@ def abrir(que: str) -> dict:
     if q in APPS and os.name == "nt":
         os.startfile(APPS[q])
         return {"ok": True, "abierto": q}
+    if q in APPS:
+        import linux
+
+        if linux.open_app(q):
+            return {"ok": True, "abierto": q}
     url = SITES.get(q)
     if not url and re.match(r"^(https?://)?[\w-]+(\.[\w-]+)+(/\S*)?$", q):
         url = q if q.startswith("http") else "https://" + q

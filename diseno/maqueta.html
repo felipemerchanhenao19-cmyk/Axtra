@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Axtra · maqueta</title>
+<style>
+@font-face { font-family: Sora; font-weight: 300; src: url(fonts/sora-latin-300-normal.woff2); }
+@font-face { font-family: Sora; font-weight: 400; src: url(fonts/sora-latin-400-normal.woff2); }
+@font-face { font-family: Sora; font-weight: 600; src: url(fonts/sora-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 400; src: url(fonts/inter-latin-400-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 500; src: url(fonts/inter-latin-500-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 600; src: url(fonts/inter-latin-600-normal.woff2); }
+@font-face { font-family: Inter; font-weight: 400; src: url(fonts/inter-cyrillic-400-normal.woff2); unicode-range: U+0400-04FF; }
+@font-face { font-family: Inter; font-weight: 600; src: url(fonts/inter-cyrillic-600-normal.woff2); unicode-range: U+0400-04FF; }
+
+/* Propuesta A: Hielo cósmico (por defecto) */
+:root {
+  --bg: #03060d; --bg2: #0a1220; --card: rgba(120,190,255,.06); --line: rgba(140,200,255,.14);
+  --text: #e8f3ff; --muted: #8aa0b8; --c1: #0b3d91; --c2: #3fd0ff; --c3: #8be9ff; --accent: #ff8a3d;
+  --glow: rgba(63,208,255,.35);
+}
+[data-p="B"] {   /* Aurora esmeralda */
+  --bg: #020906; --bg2: #08150f; --card: rgba(120,255,200,.06); --line: rgba(140,255,210,.14);
+  --text: #e9fff6; --muted: #8fb3a4; --c1: #065a43; --c2: #34f5a6; --c3: #b4ffe2; --accent: #f5c451;
+  --glow: rgba(52,245,166,.32);
+}
+[data-p="C"] {   /* Horizonte de eventos */
+  --bg: #060302; --bg2: #140b06; --card: rgba(255,170,90,.06); --line: rgba(255,180,110,.15);
+  --text: #fff3e8; --muted: #b39a86; --c1: #4a1606; --c2: #ff8c2a; --c3: #ffd59a; --accent: #5ecbff;
+  --glow: rgba(255,140,42,.33);
+}
+* { box-sizing: border-box; margin: 0; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: radial-gradient(120% 60% at 50% 18%, var(--bg2), var(--bg) 70%); color: var(--text);
+  font: 15px/1.45 Inter, system-ui, sans-serif; overflow: hidden; -webkit-font-smoothing: antialiased;
+}
+.screen { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+.top { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 0; height: 60px; }
+.ic { width: 24px; height: 24px; fill: currentColor; }
+.wordmark { font: 600 15px Sora; letter-spacing: .42em; padding-left: .42em; }
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 600 14px Sora;
+  border: 1.5px solid var(--accent); color: var(--accent);
+}
+.muted { color: var(--muted); }
+
+/* ---------- Inicio ---------- */
+.orb-wrap { position: relative; width: 290px; height: 290px; margin: 6px auto 0; }
+.orb-wrap canvas { width: 100%; height: 100%; display: block; }
+.state {
+  display: flex; align-items: center; gap: 8px; justify-content: center; font-size: 13px; color: var(--muted);
+  margin-top: 2px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c2); box-shadow: 0 0 10px var(--c2); }
+.hello { text-align: center; margin-top: 18px; }
+.hello h1 { font: 300 27px/1.2 Sora; letter-spacing: -.01em; }
+.hello p { margin-top: 6px; color: var(--muted); font-size: 15px; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 22px 20px 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; }
+.card .k { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.card .k .ic { width: 15px; height: 15px; }
+.card .v { font: 400 17px Sora; margin-top: 4px; }
+.bar { height: 5px; border-radius: 3px; background: var(--line); margin-top: 9px; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--c2), var(--c3)); box-shadow: 0 0 8px var(--glow); }
+
+.composer { position: absolute; left: 14px; right: 14px; bottom: 74px; display: flex; align-items: center; gap: 10px; }
+.input {
+  flex: 1; height: 54px; border-radius: 27px; background: rgba(255,255,255,.05); border: 1px solid var(--line);
+  display: flex; align-items: center; gap: 10px; padding: 0 16px; color: var(--muted); backdrop-filter: blur(10px);
+}
+.mic {
+  width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; color: var(--bg);
+  background: radial-gradient(circle at 35% 30%, var(--c3), var(--c2) 55%, var(--c1));
+  box-shadow: 0 0 22px var(--glow);
+}
+.nav {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 64px; display: flex; justify-content: space-around;
+  align-items: center; border-top: 1px solid var(--line); background: rgba(0,0,0,.25); font-size: 11px; color: var(--muted);
+}
+.nav div { display: grid; justify-items: center; gap: 2px; }
+.nav .on { color: var(--c2); }
+
+/* ---------- Chat (lección de idiomas) ---------- */
+.chat-top { display: flex; align-items: center; gap: 12px; padding: 16px 18px 12px; border-bottom: 1px solid var(--line); }
+.mini { width: 44px; height: 44px; }
+.chat-top b { font: 600 15px Sora; letter-spacing: .3em; display: block; }
+.chat-top small { color: var(--c2); font-size: 12px; }
+.prog { margin-left: auto; text-align: right; font-size: 11px; color: var(--muted); width: 96px; }
+.prog .bar { margin-top: 5px; }
+.msgs { flex: 1; padding: 16px 16px 140px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+.u { align-self: flex-end; max-width: 80%; background: rgba(255,255,255,.07); border: 1px solid var(--line); padding: 10px 14px; border-radius: 18px 18px 4px 18px; }
+.a { max-width: 92%; }
+.a > p { margin-bottom: 8px; }
+.lesson { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px; position: relative; overflow: hidden; }
+.lesson::before { content: ""; position: absolute; inset: -40% -20% auto auto; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(var(--glow), transparent 70%); }
+.tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--c2); }
+.ru { font: 600 25px/1.25 Inter; margin-top: 6px; }
+.tr { font: 400 17px Sora; color: var(--c3); margin-top: 6px; }
+.tr em { font-style: normal; font-weight: 600; color: var(--accent); }
+.es { color: var(--muted); margin-top: 2px; font-size: 14px; }
+.btns { display: flex; gap: 6px; margin-top: 14px; }
+.btns .btn { padding: 0 12px; }
+.btn { white-space: nowrap; display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 18px; font-size: 13px; border: 1px solid var(--line); }
+.btn.primary { background: var(--c2); color: var(--bg); border: 0; font-weight: 600; }
+.btn .ic { width: 18px; height: 18px; }
+.score { display: flex; align-items: center; gap: 14px; }
+.ring { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font: 600 16px Sora;
+  background: conic-gradient(var(--c2) 0 82%, var(--line) 0); position: relative; flex: none; }
+.ring::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: var(--bg2); }
+.ring span { position: relative; z-index: 1; }
+.words { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.w { padding: 3px 10px; border-radius: 10px; font-size: 14px; border: 1px solid var(--line); }
+.w.ok { color: var(--c3); }
+.w.fix { color: var(--accent); border-color: var(--accent); }
+.tip { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.tip b { color: var(--text); font-weight: 600; }
+.speaking { display: flex; gap: 3px; align-items: center; height: 14px; }
+.speaking i { width: 3px; border-radius: 2px; background: var(--c2); animation: b 1s ease-in-out infinite; }
+.speaking i:nth-child(2) { animation-delay: .15s } .speaking i:nth-child(3) { animation-delay: .3s } .speaking i:nth-child(4) { animation-delay: .45s }
+@keyframes b { 0%,100% { height: 3px } 50% { height: 14px } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="menu" viewBox="0 0 24 24"><path d="M4 7h16v1.6H4zm0 4.2h16v1.6H4zm0 4.2h10v1.6H4z"/></symbol>
+  <symbol id="mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5.3-3a5.3 5.3 0 0 1-10.6 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-1.7z"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M11 5h2v14h-2z M5 11h14v2H5z"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></symbol>
+  <symbol id="learn" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3zm-6 9.7V17l6 3.3 6-3.3v-4.3L12 16l-6-3.3z"/></symbol>
+  <symbol id="chart" viewBox="0 0 24 24"><path d="M3.5 18.5 9.5 12.5l4 4L22 7l-1.4-1.4-7.1 8-4-4L2 17z"/></symbol>
+  <symbol id="me" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.7-8 5v1h16v-1c0-3.3-4.7-5-8-5z"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="sync" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 0 1 5.2 9l1.5 1.5A8 8 0 0 0 12 4zm-5.2 3.5L5.3 6A8 8 0 0 0 12 20v3l4-4-4-4v3a6 6 0 0 1-5.2-10.5z"/></symbol>
+  <symbol id="brain" viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V4a3 3 0 0 0-3-1zm6 0a3 3 0 0 0-3 1v13a3 3 0 0 0 6-1 3 3 0 0 0 2-5 3 3 0 0 0-2-5 3 3 0 0 0-3-3z"/></symbol>
+  <symbol id="lang" viewBox="0 0 24 24"><path d="M12.9 15.1 10.4 12.6v-.1A17 17 0 0 0 14 6h3V4h-7V2H8v2H1v2h11.2A15.8 15.8 0 0 1 9 11.4 15.6 15.6 0 0 1 6.7 8H4.7a17.6 17.6 0 0 0 3 4.5l-5.1 5L4 19l5-5 3.1 3.1zM18.5 10h-2L12 22h2l1.1-3h4.8l1.1 3h2zm-2.6 7 1.6-4.3 1.6 4.3z"/></symbol>
+</svg>
+
+<!-- Pantalla de inicio -->
+<section class="screen" id="inicio">
+  <div class="top">
+    <svg class="ic muted"><use href="#menu"/></svg>
+    <div class="wordmark">AXTRA</div>
+    <div class="avatar">F</div>
+  </div>
+  <div class="orb-wrap"><canvas id="orb"></canvas></div>
+  <div class="state"><span class="dot"></span><span id="state-label">En línea · toque el orbe para hablar</span></div>
+  <div class="hello">
+    <h1>Buenas noches, señor.</h1>
+    <p>¿En qué trabajamos hoy?</p>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="k"><svg class="ic"><use href="#sync"/></svg>Sincronización</div><div class="v">46 %</div><div class="bar"><i style="width:46%"></i></div></div>
+    <div class="card"><div class="k"><svg class="ic"><use href="#brain"/></svg>Protocolo · Neurociencia</div><div class="v">34 %</div><div class="bar"><i style="width:34%"></i></div></div>
+    <div class="card"><div class="k"><svg class="ic"><use href="#lang"/></svg>Ruso · A1</div><div class="v">12 %</div><div class="bar"><i style="width:12%"></i></div></div>
+    <div class="card"><div class="k"><svg class="ic"><use href="#chart"/></svg>Mercado</div><div class="v">Informe 4:15 p. m.</div><div class="bar"><i style="width:0"></i></div></div>
+  </div>
+  <div class="composer">
+    <div class="input"><svg class="ic"><use href="#plus"/></svg>Escríbale a Axtra…</div>
+    <div class="mic"><svg class="ic"><use href="#mic"/></svg></div>
+  </div>
+  <nav class="nav">
+    <div class="on"><svg class="ic"><use href="#home"/></svg>Inicio</div>
+    <div><svg class="ic"><use href="#learn"/></svg>Aprender</div>
+    <div><svg class="ic"><use href="#chart"/></svg>Mercado</div>
+    <div><svg class="ic"><use href="#me"/></svg>Yo</div>
+  </nav>
+</section>
+
+<!-- Pantalla de chat: lección de ruso -->
+<section class="screen" id="chat" hidden>
+  <div class="chat-top">
+    <canvas id="orb-mini" class="mini"></canvas>
+    <div><b>AXTRA</b><small><span class="speaking"><i></i><i></i><i></i><i></i></span></small></div>
+    <div class="prog">Ruso · A1 · 12 %<div class="bar"><i style="width:12%"></i></div></div>
+  </div>
+  <div class="msgs">
+    <div class="u">¿Cómo se dice «hola, cómo estás» en ruso?</div>
+    <div class="a">
+      <p>Así se dice, señor. Escúchelo y luego repítalo:</p>
+      <div class="lesson">
+        <div class="tag">Ruso · saludo informal</div>
+        <div class="ru">Привет, как дела?</div>
+        <div class="tr">pri-<em>VIÉT</em>, kak di-<em>LÁ</em></div>
+        <div class="es">Hola, ¿cómo estás?</div>
+        <div class="btns">
+          <div class="btn primary"><svg class="ic"><use href="#play"/></svg>Voz nativa</div>
+          <div class="btn"><svg class="ic"><use href="#play"/></svg>Despacio</div>
+          <div class="btn"><svg class="ic"><use href="#mic"/></svg>Repetir</div>
+        </div>
+      </div>
+    </div>
+    <div class="u">Privet, kak dela</div>
+    <div class="a">
+      <div class="lesson">
+        <div class="score"><div class="ring"><span>82</span></div>
+          <div><div class="tag">Su pronunciación</div><div style="font:400 16px Sora;margin-top:2px">¡Muy bien, señor!</div></div></div>
+        <div class="words"><span class="w ok">Привет ✓</span><span class="w ok">как ✓</span><span class="w fix">дела ↻</span></div>
+        <div class="tip">En <b>дела</b> la primera «е» suena casi como <b>«i»</b>: di-<b>LÁ</b>, no de-la.</div>
+      </div>
+    </div>
+  </div>
+  <div class="composer" style="bottom:16px">
+    <div class="input"><svg class="ic"><use href="#plus"/></svg>Escríbale a Axtra…</div>
+    <div class="mic"><svg class="ic"><use href="#mic"/></svg></div>
+  </div>
+</section>
+
+<script>
+const q = new URLSearchParams(location.search);
+const P = q.get("p") || "D";
+document.documentElement.dataset.p = P;
+if (q.get("s") === "chat") { document.getElementById("inicio").hidden = true; document.getElementById("chat").hidden = false; }
+const css = getComputedStyle(document.documentElement);
+const rgb = (v) => { const h = css.getPropertyValue(v).trim().slice(1); return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255); };
+
+const FRAG = `
+precision highp float;
+uniform vec2 res; uniform float t; uniform vec3 c1, c2, c3; uniform float hole, energy, swirlBoost;
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);
+  return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y); }
+float fbm(vec2 p){ float v = 0.0, a = 0.5; mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+  for (int i = 0; i < 6; i++){ v += a*noise(p); p = m*p; a *= 0.5; } return v; }
+void main(){
+  vec2 uv = (gl_FragCoord.xy - 0.5*res) / min(res.x, res.y);
+  float r = length(uv); float R = 0.36;
+  vec3 col = vec3(0.0);
+  vec2 g = floor(gl_FragCoord.xy / 2.0); float s = hash(g);
+  col += c2 * 0.55 * exp(-max(r - R, 0.0) * 13.0) * energy * smoothstep(0.5, 0.38, r);
+  if (r < R) {
+    float z = sqrt(R*R - r*r) / R;
+    vec2 p = uv / R;
+    vec2 q = p * (1.0 + 0.35*(1.0 - z));
+    float ang = atan(q.y, q.x), rad = length(q);
+    float sw = (hole > 0.5 ? 2.4 : 1.1) * (1.0 - rad) + t * 0.09 * swirlBoost;
+    vec2 sq = vec2(cos(ang + sw), sin(ang + sw)) * rad;
+    float n = fbm(sq*2.2 + vec2(t*0.03, -t*0.02));
+    float n2 = fbm(sq*4.0 + n*1.6 - vec2(t*0.05));
+    vec3 neb = mix(c1*0.18, c1*1.2, smoothstep(0.25, 0.7, n));
+    neb = mix(neb, c2, smoothstep(0.5, 0.85, n2) * 0.85);
+    neb *= 0.5 + 0.7*n2;
+    float a = t * 0.55; vec2 o = vec2(cos(a), sin(a)*0.5) * 0.34;
+    for (int k = 0; k < 2; k++) {
+      vec2 sp = (k == 0) ? o : -o*0.8;
+      float d = length(p - sp);
+      neb += (c3 + 0.35) * (0.0009 / (d*d + 0.0012));
+      neb += c2 * exp(-d*7.0) * 0.45;
+    }
+    if (hole > 0.5) {
+      float d = length(vec2(p.x, p.y*2.8));
+      float ring = exp(-pow((d - 0.5)*6.5, 2.0));
+      neb += c2*ring*1.3 + c3*ring*ring;
+      float core = smoothstep(0.24, 0.19, length(p));
+      neb *= (1.0 - core*0.98);
+      neb += c3 * exp(-pow((length(p) - 0.235)*30.0, 2.0)) * 1.1;
+    }
+    float fres = pow(1.0 - z, 2.2);
+    neb = neb*(0.6 + 0.5*z) + c3*fres*0.85;
+    neb += vec3(1.0) * pow(max(0.0, dot(normalize(vec3(p, z)), normalize(vec3(-0.45, 0.55, 0.7)))), 48.0) * 0.28;
+    col = mix(col, neb * energy, smoothstep(R, R - 0.004, r));
+  }
+  col += c3 * exp(-pow((r - R)*170.0, 2.0)) * 0.55;
+  col = 1.0 - exp(-col * 1.25);
+  float alpha = r < R ? 1.0 : clamp(max(col.r, max(col.g, col.b)) * 1.15, 0.0, 1.0);
+  gl_FragColor = vec4(col, alpha);
+}`;
+
+function orb(canvas, opts = {}) {
+  const dpr = Math.min(window.devicePixelRatio || 1, opts.dpr || 2);
+  const size = canvas.clientWidth;
+  canvas.width = canvas.height = Math.round(size * dpr);
+  const gl = canvas.getContext("webgl", { antialias: true, preserveDrawingBuffer: true, premultipliedAlpha: true, alpha: true });
+  if (!gl) return;
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s)); return s; };
+  const pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, "attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }"));
+  gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG)); gl.linkProgram(pr); gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const U = (n) => gl.getUniformLocation(pr, n);
+  gl.uniform2f(U("res"), canvas.width, canvas.height);
+  gl.uniform3fv(U("c1"), rgb("--c1")); gl.uniform3fv(U("c2"), rgb("--c2")); gl.uniform3fv(U("c3"), rgb("--c3"));
+  gl.uniform1f(U("hole"), P === "C" || P === "D" ? 1 : 0);
+  const t0 = performance.now(); const start = +(q.get("t") || 12);
+  function frame(now) {
+    const t = start + (now - t0) / 1000;
+    const st = window.orbState || "reposo";
+    let energy = 1.0, sw = 1.0;
+    if (st === "escuchando") energy = 1.15 + 0.1 * Math.sin(t * 6);
+    if (st === "pensando") { sw = 6.0; energy = 1.05; }
+    if (st === "hablando" || opts.speaking) energy = 1.0 + 0.22 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1));
+    gl.uniform1f(U("t"), t); gl.uniform1f(U("energy"), energy); gl.uniform1f(U("swirlBoost"), sw);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if (!q.has("still")) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+document.fonts.ready.then(() => {
+  if (q.get("s") === "chat") orb(document.getElementById("orb-mini"), { speaking: true });
+  else orb(document.getElementById("orb"), { dpr: +(q.get("dpr") || 2) });
+  window.ready = true;
+});
+// Para el video: recorre los estados del orbe
+if (q.has("estados")) {
+  const seq = [["reposo", "En línea · toque el orbe para hablar"], ["escuchando", "Escuchando…"],
+               ["pensando", "Pensando…"], ["hablando", "Hablando…"]];
+  let i = 0; const step = () => { const [s, l] = seq[i++ % seq.length]; window.orbState = s;
+    document.getElementById("state-label").textContent = l; };
+  step(); setInterval(step, 2500);
+}
+</script>
+</body>
+</html>

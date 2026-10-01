@@ -16,10 +16,9 @@ class STT:
     """Convierte tu voz en texto. Usa Google (gratis, entiende mejor) y Whisper local de respaldo."""
 
     def __init__(self, model_size: str = WHISPER_MODEL):
-        from faster_whisper import WhisperModel
-
-        # int8 = rápido en procesadores sin tarjeta de video
-        self.model = WhisperModel(model_size, device="cpu", compute_type="int8")
+        self.model_size = model_size
+        self._model = None
+        self._lock = threading.Lock()
         self.google = None
         if STT_PROVIDER == "google":
             try:
@@ -31,6 +30,24 @@ class STT:
             except ImportError:
                 print("  (Falta SpeechRecognition: uso Whisper. Instala con: "
                       "venv/Scripts/python -m pip install SpeechRecognition)")
+        if self.google is None:
+            self.model  # sin Google, Whisper es el oído principal: se carga de una vez
+        else:
+            print("  - Whisper (respaldo sin internet) se cargará solo si Google falla: ahorra RAM")
+
+    @property
+    def model(self):
+        """Whisper se carga la primera vez que se necesita. Con Google como oído principal casi nunca
+        hace falta, y así no ocupa memoria (unos 0.5 a 1 GB con el modelo "small")."""
+        if self._model is None:
+            with self._lock:
+                if self._model is None:
+                    from faster_whisper import WhisperModel
+
+                    print(f"  (cargando Whisper {self.model_size} como respaldo...)")
+                    # int8 = rápido en procesadores sin tarjeta de video
+                    self._model = WhisperModel(self.model_size, device="cpu", compute_type="int8")
+        return self._model
 
     def _google_call(self, fn, timeout: float = 3.5):
         """Corre la llamada a Google con un tope de tiempo: si internet está lento o falla a medias,

@@ -14,10 +14,14 @@ _lock = threading.Lock()
 
 
 def open_path(path) -> None:
-    """Abre un archivo en Windows (imagen, documento, página)."""
+    """Abre un archivo (imagen, documento, página) en Windows o Linux."""
     try:
         if os.name == "nt":
             os.startfile(str(path))
+        else:
+            import linux
+
+            linux.open_path(path)
     except Exception as e:
         print(f"  (no pude abrir {path}: {e})")
 

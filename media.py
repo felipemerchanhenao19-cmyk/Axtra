@@ -2,6 +2,7 @@
 import asyncio
 import io
 import json
+import os
 import re
 import time
 import urllib.parse
@@ -23,6 +24,10 @@ VK = {"pausar": 0xB3, "reanudar": 0xB3, "siguiente": 0xB0, "anterior": 0xB1,
 
 
 def _real_status_uncapped():
+    if os.name != "nt":
+        import linux
+
+        return linux.media_status()
     import asyncio
 
     from winsdk.windows.media.control import (
@@ -75,6 +80,12 @@ def _real_status(timeout: float = 1.2):
 
 
 def _press(vk: int, times: int = 1) -> None:
+    if os.name != "nt":
+        import linux
+
+        if not linux.media_key(vk, times):
+            print("  (no pude usar las teclas multimedia: revisa que playerctl esté instalado)")
+        return
     try:
         import ctypes
 

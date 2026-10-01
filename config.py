@@ -31,7 +31,7 @@ BRAIN_MODE = os.getenv("JARVIS_CEREBRO", "hibrido").lower()
 # Modelo local: qwen2.5:3b (equilibrado) | qwen2.5:1.5b (más rápido, más simple)
 LOCAL_MODEL = os.getenv("JARVIS_MODELO_LOCAL", "qwen2.5:3b")
 # Cuánto tiempo queda cargado el cerebro local sin usarse (más tiempo = responde rápido tras una pausa)
-LOCAL_KEEP_ALIVE = os.getenv("JARVIS_MANTENER_CEREBRO", "4h")
+LOCAL_KEEP_ALIVE = os.getenv("JARVIS_MANTENER_CEREBRO", "10m")
 OLLAMA_URL = os.getenv("JARVIS_OLLAMA_URL", "http://localhost:11434")
 # --- Gemini (Google): cerebro en la nube con plan gratuito, para charla e idiomas ---
 # Clave gratis en aistudio.google.com. Vacío = no se usa.
@@ -135,7 +135,7 @@ CAMERA_INDEX = int(os.getenv("JARVIS_CAMARA", "0"))           # 0 = cámara del 
 CAMERA_GREETING = os.getenv("JARVIS_CAMARA_SALUDO", "1") == "1"  # saludarte al verte llegar
 
 # --- Seguridad por voz ---
-VOICE_THRESHOLD = float(os.getenv("JARVIS_VOICE_THRESHOLD", "0.75"))
+VOICE_THRESHOLD = float(os.getenv("JARVIS_VOICE_THRESHOLD", "0.50"))
 REQUIRE_VOICE_MATCH = os.getenv("JARVIS_REQUIRE_VOICE_MATCH", "1") == "1"
 
 # --- Rutas y audio ---

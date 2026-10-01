@@ -14,6 +14,8 @@ Asistente de voz personal: se activa diciendo **"Axtra"** en español y solo obe
 
 ## Instalación en tu ASUS Vivobook Go (Windows)
 
+> ¿Vas a cambiar Windows por Linux? Sigue la guía **LINUX.md** (instalar Linux Mint y luego Axtra con `bash instalar_linux.sh`).
+
 1. Descomprime el zip (clic derecho → "Extraer todo") y entra a la carpeta `axtra`.
 2. Clic derecho en un espacio vacío de la carpeta → **"Abrir en Terminal"**.
 3. Escribe y presiona Enter:
@@ -100,6 +102,9 @@ Di *"Axtra, activa protocolo de inteligencia avanzada"* (o *"... en neurociencia
 
 ## Ondas de mar
 Una ventana con olas que se mueven suaves en espera, se agitan cuando Axtra **razona**, laten cuando **habla** y se animan cuando **escucha**. Se abre sola con el protocolo; también: *"muestra las ondas"* / *"cierra las ondas"*.
+
+## Axtra en la nube y en tu celular
+La carpeta `servidor/` tiene a Axtra en la nube con su app para el celular (orbe, voz, idiomas, recordatorios). Cómo publicarla: `servidor/despliegue/DESPLIEGUE.md`. Cuando esté publicada, pon en este `.env` `AXTRA_NUBE_URL`, `CF_ACCESS_CLIENT_ID` y `CF_ACCESS_CLIENT_SECRET`, y prueba con `python axtra.py nube`: desde ahí tus datos suben solos cada 10 minutos.
 
 ## Escritorio: escríbele a Axtra
 - Di *"Axtra, activa escritorio"* (o *"abre el escritorio"*, *"modo escritorio"*, *"quiero escribirte"*). Se abre una ventana.
@@ -287,7 +292,7 @@ Solo con la voz de alguien que **te dé permiso**.
 ## Ajustes (archivo `.env`)
 | Ajuste | Para qué |
 |---|---|
-| `JARVIS_VOICE_THRESHOLD` | Qué tan estricto es con tu voz. Si otra persona pasa, súbelo (0.80). Si a ti te rechaza, bájalo (0.70) |
+| `JARVIS_VOICE_THRESHOLD` | Qué tan estricto es con tu voz. Por defecto 0.50. Si otra persona pasa, súbelo (0.60). Si a ti te rechaza, bájalo (0.45) |
 | `JARVIS_WAKE_MODE` | `es` = decir "Axtra" en español (por defecto); `en` = decir "Hey Axtra" en inglés |
 | `JARVIS_PAUSA_FINAL` | Segundos de silencio para saber que terminaste (1.6). Si te corta, súbelo a 2.2 |
 | `JARVIS_RECONOCIMIENTO` | `google` (mejor, gratis, en la nube) o `whisper` (local, privado) |

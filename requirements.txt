@@ -25,9 +25,10 @@ pyttsx3
 pyautogui
 pyperclip
 pillow
-uiautomation
-winsdk
+uiautomation; sys_platform == "win32"
+winsdk; sys_platform == "win32"
 ddgs
 soundfile
-comtypes
-pycaw
+comtypes; sys_platform == "win32"
+pycaw; sys_platform == "win32"
+pytesseract; sys_platform == "linux"
