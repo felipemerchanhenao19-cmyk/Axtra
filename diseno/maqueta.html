@@ -210,7 +210,7 @@ body {
 
 <script>
 const q = new URLSearchParams(location.search);
-const P = q.get("p") || "A";
+const P = q.get("p") || "D";
 document.documentElement.dataset.p = P;
 if (q.get("s") === "chat") { document.getElementById("inicio").hidden = true; document.getElementById("chat").hidden = false; }
 const css = getComputedStyle(document.documentElement);
