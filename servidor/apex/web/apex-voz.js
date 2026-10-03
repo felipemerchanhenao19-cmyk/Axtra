@@ -26,8 +26,27 @@
 (function () {
   "use strict";
   const CLAVE = (r, m) => `apex:${r}:${m}`;
-  const TIPO = ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/mp4", "audio/webm"]
-    .find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
+  const HZ = 16000;                                    // lo que necesita el oído: 16 kHz, mono
+
+  /* Junta los pedacitos del micrófono y arma un WAV (16 kHz, 16 bits). El WAV lo entiende cualquier
+     servidor y no depende del grabador del navegador (MediaRecorder), que en algunos celulares deja el audio incompleto. */
+  function wav(trozos, hzOrigen) {
+    let n = 0; for (const t of trozos) n += t.length;
+    const todo = new Float32Array(n); let o = 0; for (const t of trozos) { todo.set(t, o); o += t.length; }
+    const paso = hzOrigen / HZ, largo = Math.floor(n / paso), datos = new DataView(new ArrayBuffer(44 + largo * 2));
+    const txt = (p, s) => { for (let i = 0; i < s.length; i++) datos.setUint8(p + i, s.charCodeAt(i)); };
+    txt(0, "RIFF"); datos.setUint32(4, 36 + largo * 2, true); txt(8, "WAVE"); txt(12, "fmt ");
+    datos.setUint32(16, 16, true); datos.setUint16(20, 1, true); datos.setUint16(22, 1, true);
+    datos.setUint32(24, HZ, true); datos.setUint32(28, HZ * 2, true); datos.setUint16(32, 2, true); datos.setUint16(34, 16, true);
+    txt(36, "data"); datos.setUint32(40, largo * 2, true);
+    for (let i = 0; i < largo; i++) {                   // promedio simple al bajar de 48 kHz a 16 kHz
+      const a = Math.floor(i * paso), b = Math.min(n, Math.floor((i + 1) * paso)); let s = 0;
+      for (let j = a; j < b; j++) s += todo[j];
+      const v = Math.max(-1, Math.min(1, s / Math.max(1, b - a)));
+      datos.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7fff, true);
+    }
+    return new Blob([datos], { type: "audio/wav" });
+  }
   const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
   class ApexVoz {
@@ -70,7 +89,17 @@
         try {          // sin micrófono también sirve: el cliente pide con botones y el orbe le habla
           this.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
           this.anMic = this.ctx.createAnalyser(); this.anMic.fftSize = 1024;
-          this.ctx.createMediaStreamSource(this.mic).connect(this.anMic);
+          const fuente = this.ctx.createMediaStreamSource(this.mic);
+          fuente.connect(this.anMic);
+          // Toma el sonido crudo del micrófono: guarda siempre el último medio segundo (para no cortar la primera sílaba)
+          this.proc = this.ctx.createScriptProcessor(4096, 1, 1);
+          this.previo = []; this.pcm = null;
+          this.proc.onaudioprocess = (e) => {
+            const t = new Float32Array(e.inputBuffer.getChannelData(0));
+            if (this.pcm) this.pcm.push(t);
+            else { this.previo.push(t); while (this.previo.length * 4096 > this.ctx.sampleRate * 0.5) this.previo.shift(); }
+          };
+          fuente.connect(this.proc); this.proc.connect(this.ctx.destination);      // la salida va en silencio
         } catch { this.mic = null; this.onsinmic(); }
         this._precargar();
         this.vigia = setInterval(() => this._vigilar(), 60);
@@ -151,20 +180,16 @@
     }
 
     _grabar() {
-      if (!window.MediaRecorder) return;
-      this.trozos = []; this.inicioGrab = this.ultimaVoz = Date.now(); this.despedida = false;
-      this.rec = new MediaRecorder(this.mic, TIPO ? { mimeType: TIPO, audioBitsPerSecond: 32000 } : undefined);
-      this.rec.ondataavailable = (e) => e.data.size && this.trozos.push(e.data);
-      this.rec.start(200);
+      if (!this.proc) return;
+      this.pcm = this.previo.slice(); this.inicioGrab = this.ultimaVoz = Date.now(); this.despedida = false;
       this._estado("oyendo");
     }
 
     async _enviar() {
-      const rec = this.rec; this.rec = null;
+      const trozos = this.pcm || []; this.pcm = null; this.previo = [];
       this._estado("pensando");
-      await new Promise((ok) => { rec.onstop = ok; rec.stop(); });
-      const audio = new Blob(this.trozos, { type: rec.mimeType || TIPO });
-      if (audio.size < 2500) return this._escuchar();                    // fue un ruido corto
+      const audio = wav(trozos, this.ctx.sampleRate);
+      if (audio.size < 44 + HZ * 2 * 0.4) return this._escuchar();       // menos de 0,4 s: fue un ruido corto
       await this._turno(() => fetch(this.api + "/v1/turno", { method: "POST", body: audio,
         headers: { "Content-Type": audio.type || "application/octet-stream", "X-Apex-Sesion": this.s.sesion, "X-Apex-Secreto": this.s.secreto } })
         .then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || r.status), { status: r.status }); return d; }));
@@ -225,7 +250,7 @@
     /* 5. Se apaga y libera la mesa. */
     terminar(motivo = "terminó") {
       clearInterval(this.vigia); this._callar();
-      if (this.rec && this.rec.state !== "inactive") this.rec.stop();
+      if (this.proc) { this.proc.onaudioprocess = null; try { this.proc.disconnect(); } catch {} }
       if (this.mic) this.mic.getTracks().forEach((t) => t.stop());
       if (this.ctx) this.ctx.close().catch(() => {});
       if (this.s) {
@@ -233,7 +258,7 @@
         try { navigator.sendBeacon(this.api + "/v1/sesion/fin", new Blob([cuerpo], { type: "text/plain" })); } catch {}
         try { sessionStorage.removeItem(CLAVE(this.restaurante, this.mesa)); } catch {}
       }
-      Object.assign(this, { s: null, mic: null, ctx: null, rec: null, despedida: false, ocupado: false, base: undefined });
+      Object.assign(this, { s: null, mic: null, ctx: null, proc: null, pcm: null, despedida: false, ocupado: false, base: undefined });
       this.onnivel(0); this._estado("apagado");
     }
   }
