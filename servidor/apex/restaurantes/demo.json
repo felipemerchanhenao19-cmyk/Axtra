@@ -3,8 +3,8 @@
   "nombre": "Su restaurante",
   "moneda": "COP",
   "voz": {
-    "google": "es-US-Neural2-B",
-    "edge": "es-CO-GonzaloNeural",
+    "google": "es-US-Neural2-A",
+    "edge": "es-CO-SalomeNeural",
     "velocidad": 1.05
   },
   "dominios": [
@@ -113,15 +113,15 @@
     "es": {
       "nombre": "Español",
       "voz": {
-        "google": "es-US-Neural2-B",
-        "edge": "es-CO-GonzaloNeural"
+        "google": "es-US-Neural2-A",
+        "edge": "es-CO-SalomeNeural"
       }
     },
     "en": {
       "nombre": "English",
       "voz": {
-        "google": "en-US-Neural2-D",
-        "edge": "en-US-AndrewNeural"
+        "google": "en-US-Neural2-F",
+        "edge": "en-US-JennyNeural"
       },
       "grupos": {
         "Platos fuertes": "Main dishes",
@@ -168,8 +168,8 @@
     "pt": {
       "nombre": "Português",
       "voz": {
-        "google": "pt-BR-Neural2-B",
-        "edge": "pt-BR-AntonioNeural"
+        "google": "pt-BR-Neural2-A",
+        "edge": "pt-BR-FranciscaNeural"
       },
       "grupos": {
         "Platos fuertes": "Pratos principais",
@@ -216,8 +216,8 @@
     "de": {
       "nombre": "Deutsch",
       "voz": {
-        "google": "de-DE-Neural2-B",
-        "edge": "de-DE-ConradNeural"
+        "google": "de-DE-Neural2-G",
+        "edge": "de-DE-KatjaNeural"
       },
       "grupos": {
         "Platos fuertes": "Hauptgerichte",
@@ -264,8 +264,8 @@
     "ru": {
       "nombre": "Русский",
       "voz": {
-        "google": "ru-RU-Wavenet-D",
-        "edge": "ru-RU-DmitryNeural"
+        "google": "ru-RU-Wavenet-A",
+        "edge": "ru-RU-SvetlanaNeural"
       },
       "grupos": {
         "Platos fuertes": "Основные блюда",
@@ -298,11 +298,11 @@
         "saludo": "Добро пожаловать! Сегодня я вас обслуживаю. Нажмите на сферу, чтобы поговорить со мной, или заказывайте кнопками.",
         "eleccion": "Отличный выбор.",
         "sugerir": "Отличный выбор. Принести к нему холодный кокосовый лимонад?",
-        "quitado": "Готово, я убрал это из заказа.",
+        "quitado": "Готово, я убрала это из заказа.",
         "oferta": "Прежде чем отправить: сегодня шоколадный фондан со скидкой, всего 14 тысяч песо. Хотите заказать?",
         "enviado": "Готово! Ваш заказ уже на кассе. Приятного аппетита!",
         "despedida": "Готово! Ваш заказ уже на кассе. Приятного аппетита!",
-        "repetir": "Извините, я не расслышал. Повторите, пожалуйста.",
+        "repetir": "Извините, я не расслышала. Повторите, пожалуйста.",
         "vacio": "Вы ещё ничего не выбрали. Что вам принести?",
         "mesero": "Конечно, официант уже идёт.",
         "sin_voz": "Здравствуйте, голосовая система сейчас не работает. Пожалуйста, выберите, что хотите заказать."
@@ -312,8 +312,8 @@
     "ja": {
       "nombre": "日本語",
       "voz": {
-        "google": "ja-JP-Neural2-C",
-        "edge": "ja-JP-KeitaNeural"
+        "google": "ja-JP-Neural2-B",
+        "edge": "ja-JP-NanamiNeural"
       },
       "grupos": {
         "Platos fuertes": "メイン料理",
