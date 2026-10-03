@@ -114,7 +114,7 @@ HERRAMIENTAS = [
 
 def mesa_abierta(r: dict, mesa: str) -> bool:
     """Un restaurante de demostración tiene sus mesas siempre abiertas; los demás las abre el mesero en el panel."""
-    return bool(r.get("mesas_siempre_abiertas")) or db.mesa_abierta(r["id"], mesa)
+    return bool(r.get("ejemplo") or r.get("mesas_siempre_abiertas")) or db.mesa_abierta(r["id"], mesa)
 
 
 def precio(r: dict, valor: float) -> str:

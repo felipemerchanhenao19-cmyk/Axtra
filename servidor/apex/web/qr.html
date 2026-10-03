@@ -40,9 +40,9 @@ h1 { font: 400 34px/1.1 var(--f-titulo); margin: 0; }
   @page { size: letter; margin: 12mm; }
   body { background: #fff; color: #000; }
   main { display: none; }
-  #hoja { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; }
+  #hoja { display: grid; place-items: center; }
   .imp { border: 1px solid #ccc; border-radius: 6mm; padding: 6mm; text-align: center; break-inside: avoid; font-family: var(--f-cuerpo); }
-  .imp svg { width: 62mm; height: 62mm; }
+  .imp svg { width: 120mm; height: 120mm; }
   .imp b { display: block; font: 400 26pt/1 var(--f-titulo); margin-top: 2mm; }
   .imp span { font-size: 10pt; color: #333; }
 }
@@ -51,37 +51,21 @@ h1 { font: 400 34px/1.1 var(--f-titulo); margin: 0; }
 <body>
 <main>
   <div class="marca"><i></i>Apex Play</div>
-  <div><h1 id="titulo">Códigos QR</h1><p class="sub">Elija una mesa y que la otra persona escanee el código con la cámara del celular.</p></div>
-  <div class="mesas" id="mesas"></div>
-  <div class="tarjeta"><div class="qr" id="qr"></div><b id="mesa-titulo">Mesa 1</b><span>Escanee y pida desde su celular</span></div>
+  <div><h1>Pruébelo en su celular</h1><p class="sub">Abra la cámara y escanee el código.</p></div>
+  <div class="tarjeta"><div class="qr" id="qr"></div><b>Apex Play</b><span>Escanee y pida desde su celular</span></div>
   <div class="enlace"><code id="url"></code><button class="boton sec" id="copiar" style="padding:8px 12px">Copiar</button></div>
-  <div class="acciones"><a class="boton sec" id="abrir" href="#">Abrir aquí</a><button class="boton" id="imprimir">Imprimir todas</button></div>
-  <p class="nota">Cada mesa atiende una conversación a la vez: si usted ya está probando en la mesa 1, dele al gerente la mesa 2.</p>
+  <div class="acciones"><a class="boton sec" id="abrir" href="/demo">Abrir aquí</a><button class="boton" id="imprimir">Imprimir</button></div>
 </main>
 <div id="hoja"></div>
 <script>
-const q = new URLSearchParams(location.search), R = q.get("r") || "demo";
+const R = new URLSearchParams(location.search).get("r") || "demo";
 const $ = (s) => document.querySelector(s);
-const enlace = (m) => `${location.origin}/demo?r=${encodeURIComponent(R)}&mesa=${encodeURIComponent(m)}`;
+const url = location.origin + "/demo" + (R !== "demo" ? `?r=${encodeURIComponent(R)}` : "");
 function svgQR(texto) { const c = qrcode(0, "M"); c.addData(texto); c.make(); return c.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
-let mesas = [], actual = q.get("mesa") || "1";
-function elegir(m) {
-  actual = m;
-  $("#qr").innerHTML = svgQR(enlace(m)); $("#mesa-titulo").textContent = `Mesa ${m}`;
-  $("#url").textContent = enlace(m); $("#abrir").href = enlace(m);
-  document.querySelectorAll("#mesas button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.m === m));
-}
-$("#copiar").onclick = async () => { try { await navigator.clipboard.writeText(enlace(actual)); $("#copiar").textContent = "Copiado"; }
+$("#qr").innerHTML = svgQR(url); $("#url").textContent = url; $("#abrir").href = url;
+$("#copiar").onclick = async () => { try { await navigator.clipboard.writeText(url); $("#copiar").textContent = "Copiado"; }
   catch { getSelection().selectAllChildren($("#url")); } setTimeout(() => $("#copiar").textContent = "Copiar", 1800); };
-$("#imprimir").onclick = () => { $("#hoja").innerHTML = mesas.map((m) => `<div class="imp">${svgQR(enlace(m))}<b>Mesa ${m}</b><span>Escanee y pida desde su celular</span></div>`).join(""); print(); };
-(async () => {
-  try { const d = await (await fetch(`/v1/mesas/${encodeURIComponent(R)}`)).json(); mesas = d.mesas || []; $("#titulo").textContent = `Códigos QR · ${d.nombre}`; }
-  catch { mesas = ["1"]; }
-  if (!mesas.includes(actual)) actual = mesas[0] || "1";
-  $("#mesas").innerHTML = mesas.map((m) => `<button data-m="${m}">Mesa ${m}</button>`).join("");
-  document.querySelectorAll("#mesas button").forEach((b) => b.onclick = () => elegir(b.dataset.m));
-  elegir(actual);
-})();
+$("#imprimir").onclick = () => { $("#hoja").innerHTML = `<div class="imp">${svgQR(url)}<b>Apex Play</b><span>Escanee y pida desde su celular</span></div>`; print(); };
 </script>
 </body>
 </html>
