@@ -66,9 +66,6 @@
         // El audio se desbloquea dentro del toque (Android/iPhone lo exigen)
         this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.ctx.resume();
         this.altavoz = new Audio(); this.altavoz.playsInline = true;
-        this.anVoz = this.ctx.createAnalyser(); this.anVoz.fftSize = 512;
-        const fuente = this.ctx.createMediaElementSource(this.altavoz);
-        fuente.connect(this.anVoz); this.anVoz.connect(this.ctx.destination);
         await this._sesion();
         try {          // sin micrófono también sirve: el cliente pide con botones y el orbe le habla
           this.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
@@ -111,6 +108,7 @@
         this.altavoz.src = url; this.altavoz.play().catch(() => listo());
       });
       this.alTerminar = null;
+      this.silencioHasta = Date.now() + 700;
       if (temporal) URL.revokeObjectURL(url);
       if (res.sin_voz) this.onsinvoz();
     }
@@ -129,16 +127,18 @@
 
     /* Cada 60 ms: ¿el cliente empezó o terminó de hablar? ¿interrumpe al orbe? */
     _vigilar() {
-      if (!this.mic) { if (this.anVoz) this.onnivel(this.estado === "hablando" ? Math.min(1, this._nivel(this.anVoz) * 6) : 0); return; }
+      const habla = () => 0.35 + 0.3 * Math.abs(Math.sin(Date.now() / 90)) * Math.abs(Math.sin(Date.now() / 230));   // el orbe late mientras habla
+      if (!this.mic) { this.onnivel(this.estado === "hablando" ? habla() : 0); return; }
       const rms = this._nivel(this.anMic), ahora = Date.now();
       if (this.base === undefined) { this.base = 0.008; this.medidas = 0; }
       if (this.estado === "escuchando" && rms < this.base * 2.5) {           // aprende el ruido del lugar
         this.base = this.base * 0.95 + Math.max(0.004, rms) * 0.05;
       }
       const umbral = Math.max(0.015, this.base * 3);
-      this.onnivel(this.estado === "hablando" ? Math.min(1, this._nivel(this.anVoz) * 6) : Math.min(1, rms * 8));
+      this.onnivel(this.estado === "hablando" ? habla() : Math.min(1, rms * 8));
 
       if (this.estado === "escuchando") {
+        if (ahora < (this.silencioHasta || 0)) { this.voz = 0; return; }             // eco de lo que el orbe acaba de decir
         this.voz = rms > umbral ? this.voz + 60 : 0;
         if (this.voz >= 120) return this._grabar();
         const quieto = ahora - this.ultimaVoz;
@@ -147,9 +147,6 @@
       } else if (this.estado === "oyendo") {
         if (rms > umbral) this.ultimaVoz = ahora;
         if (ahora - this.ultimaVoz > 850 || ahora - this.inicioGrab > 15000) this._enviar();
-      } else if (this.estado === "hablando") {                                          // interrumpir al orbe
-        this.voz = rms > umbral * 2.5 ? this.voz + 60 : 0;
-        if (this.voz >= 300) { this._callar(); this._grabar(); }
       }
     }
 
@@ -184,13 +181,16 @@
         if (res.pedido) this.onpedido(res.pedido, res);
         await this._decir(res);
         if (res.despedida) this.despedida = true;
+        if (res.sin_voz) this.pausado = true;
         return res;
       } catch (e) {
         if (e.status === 409) this.onerror(e.message);
-        else this.onsinvoz();                                           // sin red o sin servidor: plan de respaldo
+        else { this.pausado = true; this.onsinvoz(); }                  // sin red o sin servidor: plan de respaldo
       } finally {
         this.ocupado = false;
-        if (this.s && this.estado !== "apagado") this._escuchar();
+        if (this.s && this.estado !== "apagado") {
+          if (this.pausado && this.mic) { this.pausado = false; this._estado("dormido"); } else this._escuchar();
+        }
       }
     }
 

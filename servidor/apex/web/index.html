@@ -305,7 +305,7 @@ orbe.onpedido = (p) => {
   pintar(); if ($(".hoja")) abrirPedido(hojaOferta);
 };
 orbe.onsinmic = () => aviso("Sin micrófono: pida con los botones, el orbe le sigue hablando.");
-orbe.onsinvoz = () => { $("#mesero").classList.add("on"); aviso("El orbe no puede hablar ahora. Toque «Mesero» y le atienden."); };
+orbe.onsinvoz = () => aviso("No pude escucharle bien. Toque el orbe para intentar otra vez, o pida con los botones.");
 orbe.onerror = (m) => aviso(/conversación activa/.test(m) ? "Esta mesa ya está en uso en otro celular. Escanee el QR de otra mesa." : m);
 
 function aviso(t) { const a = document.createElement("div"); a.className = "aviso"; a.textContent = t; document.body.append(a); setTimeout(() => a.remove(), 4500); }

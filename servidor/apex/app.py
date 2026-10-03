@@ -5,6 +5,7 @@ Para probar en tu PC:  APEX_MODO=desarrollo uvicorn servidor.apex.app:app --port
 """
 import asyncio
 import base64
+import logging
 import hmac
 import json
 import threading
@@ -21,6 +22,7 @@ from pydantic import BaseModel, Field
 from . import config, db, orbe
 
 WEB = config.BASE / "web"
+log = logging.getLogger("uvicorn.error")
 
 
 # ---------------- Vigilante: cierra conversaciones largas, quietas o de mesas cerradas ----------------
@@ -202,7 +204,8 @@ def _respuesta(r: dict, s, texto: str = "", frase: str = "", **extra) -> dict:
         return out
     try:
         out["audio"] = base64.b64encode(orbe.voz(r, texto, s["id"])).decode()
-    except orbe.SinRanura:
+    except orbe.SinRanura as e:
+        log.warning("voz falló: %s", e)
         out.update(frase=f"/v1/frase/{r['id']}/sin_voz", sin_voz=True, texto=r["frases"]["sin_voz"])
     return out
 
@@ -221,6 +224,7 @@ async def turno(request: Request):
     if not audio or len(audio) > 4_000_000:
         raise HTTPException(413, "audio vacío o demasiado largo")
     if not _puede_gastar(r, s):
+        log.warning("sin voz: tope del mes o de turnos (sesión %s, %s turnos)", s["id"][:8], s["turnos"])
         return _respuesta(r, s, frase="sin_voz", sin_voz=True)
     db.contar_turno(s["id"])
     try:
@@ -228,7 +232,8 @@ async def turno(request: Request):
         if len(texto.strip(" .,¿?¡!")) < 2:
             return _respuesta(r, s, frase="repetir")
         res = await asyncio.to_thread(orbe.conversar, r, s, {"role": "user", "content": texto[:600]})
-    except orbe.SinRanura:
+    except orbe.SinRanura as e:
+        log.warning("turno de voz falló: %s", e)
         return _respuesta(r, s, frase="sin_voz", sin_voz=True)
     return await asyncio.to_thread(_respuesta, r, s, res["texto"], "", despedida=bool(res["confirmado"]),
                                    pedido=res["pedido"] or res["confirmado"], oido=texto[:600])
@@ -320,7 +325,8 @@ def frase(rid: str, nombre: str, request: Request):
         raise HTTPException(404, "frase no existe")
     try:
         audio = orbe.voz(r, r["frases"][nombre])
-    except orbe.SinRanura:
+    except orbe.SinRanura as e:
+        log.warning("frase %s falló: %s", nombre, e)
         raise HTTPException(503, "voz no disponible")
     return Response(audio, media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=3600"})
 
