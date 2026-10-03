@@ -50,8 +50,10 @@
   const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
   class ApexVoz {
-    constructor({ api, restaurante, mesa }) {
-      Object.assign(this, { api: api.replace(/\/$/, ""), restaurante, mesa });
+    /* modo "tocar": el orbe escucha solo cuando el cliente lo toca (una frase), así no oye a la mesa de al lado.
+       modo "continuo": escucha todo el tiempo. */
+    constructor({ api, restaurante, mesa, idioma = "", modo = "tocar" }) {
+      Object.assign(this, { api: api.replace(/\/$/, ""), restaurante, mesa, idioma, modo });
       this.estado = "apagado"; this.frases = {}; this.ocupado = false; this.despedida = false;
       for (const k of ["onestado", "onnivel", "onerror", "onpedido", "onsinvoz", "ontexto", "onsinmic"]) this[k] = () => {};
       this.silencio = false;
@@ -72,7 +74,7 @@
     async _sesion() {
       let anterior = null;
       try { anterior = JSON.parse(sessionStorage.getItem(CLAVE(this.restaurante, this.mesa)) || "null"); } catch {}
-      this.s = await this._post("/v1/sesion", { restaurante: this.restaurante, mesa: this.mesa, anterior });
+      this.s = await this._post("/v1/sesion", { restaurante: this.restaurante, mesa: this.mesa, anterior, idioma: this.idioma });
       try { sessionStorage.setItem(CLAVE(this.restaurante, this.mesa), JSON.stringify(this._cred())); } catch {}
       if (this.s.sin_voz) this.onsinvoz();
     }
@@ -104,7 +106,7 @@
         this._precargar();
         this.vigia = setInterval(() => this._vigilar(), 60);
         if (saludo) await this._decir({ frase: this.s.frases.saludo, texto: this.s.saludo });
-        this._escuchar();
+        this._despues();
       } catch (e) {
         this.onerror(e.status === 403 ? "La mesa está cerrada. Pida al mesero que la abra."
                    : e.status === 409 ? "Ya hay una conversación activa en esta mesa."
@@ -146,8 +148,33 @@
 
     _escuchar() {
       if (!this.mic) { this._estado("listo"); return; }
-      this.ultimaVoz = Date.now(); this.voz = 0; this._estado("escuchando");
+      this.ultimaVoz = this.inicioEscucha = Date.now(); this.voz = 0; this._estado("escuchando");
     }
+
+    /* Después de hablar: en modo "tocar" queda listo (no escucha) hasta que lo vuelvan a tocar. */
+    _despues() {
+      if (this.quiereHablar) { this.quiereHablar = false; this.silencioHasta = 0; return this._escuchar(); }   // lo tocaron mientras hablaba
+      if (this.modo === "continuo") this._escuchar(); else this._estado("listo");
+    }
+
+    /* El cliente tocó el orbe: escucha una frase. Si el orbe estaba hablando, se calla y escucha. */
+    async hablar() {
+      if (!this.s) { await this.iniciar({ saludo: false }); if (!this.s) return; }
+      if (!this.mic) { this.onsinmic(); return; }
+      if (this.estado === "hablando" || this.ocupado) { this.quiereHablar = true; this._callar(); return; }   // escucha apenas se calle
+      if (["listo", "dormido"].includes(this.estado)) { this.silencioHasta = 0; this._escuchar(); }
+      else if (this.estado === "escuchando") this._estado("listo");             // tocar otra vez: deja de escuchar
+    }
+
+    /* Otro idioma: desde ahí el orbe habla, entiende y muestra la carta en ese idioma. */
+    async cambiarIdioma(idioma) {
+      this.idioma = idioma;
+      if (!this.s) return null;
+      const r = await this._post("/v1/idioma", { ...this._cred(), idioma });
+      Object.assign(this.s, { frases: r.frases, saludo: r.saludo }); this._precargar();
+      return r;
+    }
+    async saludar() { if (!this.s) return; this._callar(); await this._decir({ frase: this.s.frases.saludo, texto: this.s.saludo }); this._despues(); }
 
     _nivel(an) {
       const d = new Float32Array(an.fftSize); an.getFloatTimeDomainData(d);
@@ -163,19 +190,20 @@
       if (this.estado === "escuchando" && rms < this.base * 2.5) {           // aprende el ruido del lugar
         this.base = this.base * 0.95 + Math.max(0.004, rms) * 0.05;
       }
-      const umbral = Math.max(0.015, this.base * 3);
+      const umbral = Math.max(0.02, this.base * 3.5);          // voz cercana al teléfono, no la de la mesa de al lado
       this.onnivel(this.estado === "hablando" ? habla() : Math.min(1, rms * 8));
 
       if (this.estado === "escuchando") {
         if (ahora < (this.silencioHasta || 0)) { this.voz = 0; return; }             // eco de lo que el orbe acaba de decir
         this.voz = rms > umbral ? this.voz + 60 : 0;
-        if (this.voz >= 120) return this._grabar();
+        if (this.voz >= 180) return this._grabar();
+        if (this.modo !== "continuo") { if (ahora - this.inicioEscucha > 8000) this._estado("listo"); return; }   // tocó y no habló
         const quieto = ahora - this.ultimaVoz;
         if (this.despedida && quieto > 10000) return this.terminar("pedido enviado");   // 4. se apaga solo
         if (!this.despedida && quieto > 45000) { this._estado("dormido"); }              // toque el orbe para seguir
       } else if (this.estado === "oyendo") {
         if (rms > umbral) this.ultimaVoz = ahora;
-        if (ahora - this.ultimaVoz > 850 || ahora - this.inicioGrab > 15000) this._enviar();
+        if (ahora - this.ultimaVoz > 750 || ahora - this.inicioGrab > 12000) this._enviar();
       }
     }
 
@@ -214,7 +242,7 @@
       } finally {
         this.ocupado = false;
         if (this.s && this.estado !== "apagado") {
-          if (this.pausado && this.mic) { this.pausado = false; this._estado("dormido"); } else this._escuchar();
+          if (this.pausado && this.mic) { this.pausado = false; this._estado("listo"); } else this._despues();
         }
       }
     }

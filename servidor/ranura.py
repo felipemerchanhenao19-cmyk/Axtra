@@ -56,7 +56,9 @@ def verificar_pin(p: Pin):
 
 # ---------------- Oído: voz → texto ----------------
 @app.post("/oido")
-def escuchar(audio: bytes = Body(..., media_type="application/octet-stream"), idioma: str = "es", tipo: str = ""):
+def escuchar(audio: bytes = Body(..., media_type="application/octet-stream"), idioma: str = "es", tipo: str = "",
+             pista: str = ""):
+    """pista: palabras que probablemente dirá el cliente (los platos del menú). Whisper las reconoce mucho mejor."""
     if len(audio) > 6_000_000:
         raise HTTPException(413, "audio demasiado largo")
     fmt = oido.formato(audio, tipo)
@@ -67,8 +69,8 @@ def escuchar(audio: bytes = Body(..., media_type="application/octet-stream"), id
     try:
         r = requests.post(GROQ_OIDO, timeout=30, headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
                           files={"file": (f"voz.{fmt}", audio, oido._MIME[fmt])},
-                          data={"model": config.GROQ_MODELO_OIDO, "language": idioma, "temperature": "0",
-                                "response_format": "verbose_json"})
+                          data={"model": config.ORBE_MODELO_OIDO, "language": idioma[:5], "temperature": "0",
+                                "response_format": "verbose_json", **({"prompt": pista[:600]} if pista else {})})
     except requests.RequestException as e:
         raise HTTPException(502, f"Groq Whisper falló: {e}")
     if r.status_code >= 400:          # Groq explica por qué rechazó el audio: se guarda para poder corregirlo
@@ -147,7 +149,7 @@ def hablar(h: Hablar):
         except (requests.RequestException, RuntimeError, KeyError, ValueError):
             pass                                    # respaldo: la voz gratis de Axtra
     try:
-        audio = voz.sintetizar(texto, voz=h.voz_edge)
+        audio = voz.sintetizar(texto, voz=h.voz_edge, ritmo=f"{round((h.velocidad - 1) * 100):+d}%")
     except Exception as e:
         raise HTTPException(502, f"no hay voz disponible: {e}")
     return Response(audio, media_type="audio/mpeg", headers={"X-Proveedor": "edge", "X-Caracteres": str(len(texto))})

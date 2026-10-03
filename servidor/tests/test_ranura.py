@@ -88,3 +88,12 @@ def test_formatos_de_audio_de_cualquier_celular():
     assert oido.formato(b"\x00" * 30, "audio/webm;codecs=opus") == "webm"                     # lo dice el navegador
     assert oido.formato(b"\x00" * 30, "audio/mp4") == "mp4"
     assert oido.formato(b"\x00" * 30) == ""
+
+
+def test_voz_de_respaldo_respeta_la_velocidad(c, monkeypatch):
+    from servidor import voz
+    visto = {}
+    monkeypatch.setattr(voz, "sintetizar", lambda texto, **kw: (visto.update(kw), b"ID3")[1])
+    monkeypatch.setattr(ranura.config, "GOOGLE_TTS_API_KEY", "")
+    assert c.post("/voz", json={"texto": "hola", "velocidad": 1.15}).headers["x-proveedor"] == "edge"
+    assert visto["ritmo"] == "+15%"

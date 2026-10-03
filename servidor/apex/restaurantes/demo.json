@@ -5,7 +5,7 @@
   "voz": {
     "google": "es-US-Neural2-B",
     "edge": "es-CO-GonzaloNeural",
-    "velocidad": 1.05
+    "velocidad": 1.15
   },
   "dominios": [
     "https://api.axtra.chat"
@@ -87,13 +87,14 @@
   },
   "idioma": "es",
   "frases": {
-    "saludo": "¡Bienvenido! Yo lo atiendo hoy. Puede hablarme o pedir con los botones. Si se equivoca, lo puede quitar.",
+    "saludo": "¡Bienvenido! Yo lo atiendo hoy. Toque el orbe para hablarme, o pida con los botones.",
     "eleccion": "Muy buena elección.",
     "sugerir": "Buena elección. ¿Le traigo una limonada de coco bien fría para acompañar?",
     "quitado": "Listo, lo quité de su pedido.",
     "oferta": "Antes de enviarlo: hoy tenemos oferta en el volcán de chocolate, a 14 mil pesos. ¿Le gustaría pedirlo?",
     "enviado": "¡Listo! Su pedido ya está en la caja. Que lo disfrute.",
-    "despedida": "¡Listo! Su pedido ya está en la caja. Que lo disfrute."
+    "despedida": "¡Listo! Su pedido ya está en la caja. Que lo disfrute.",
+    "sin_voz": "Hola, el sistema de voz está fallando. Por favor, seleccione lo que quiere pedir."
   },
   "mesas_siempre_abiertas": true,
   "ventas": {
@@ -107,5 +108,254 @@
     },
     "oferta": "volcan"
   },
-  "ejemplo": true
+  "ejemplo": true,
+  "idiomas": {
+    "es": {
+      "nombre": "Español",
+      "voz": {
+        "google": "es-US-Neural2-B",
+        "edge": "es-CO-GonzaloNeural"
+      }
+    },
+    "en": {
+      "nombre": "English",
+      "voz": {
+        "google": "en-US-Neural2-D",
+        "edge": "en-US-AndrewNeural"
+      },
+      "grupos": {
+        "Platos fuertes": "Main dishes",
+        "Bebidas": "Drinks",
+        "Postre del día": "Dessert of the day"
+      },
+      "menu": {
+        "bandeja": {
+          "nombre": "Bandeja paisa",
+          "descripcion": "Beans, rice, pork crackling, ground beef, egg, sweet plantain, arepa and avocado."
+        },
+        "ajiaco": {
+          "nombre": "Ajiaco santafereño",
+          "descripcion": "Chicken and three-potato soup with guascas, cream, capers and avocado."
+        },
+        "omelet": {
+          "nombre": "Ranchero omelet",
+          "descripcion": "Three eggs with tomato, onion, bell pepper and ranchero sauce."
+        },
+        "limonada": {
+          "nombre": "Coconut lemonade",
+          "descripcion": "Creamy, ice cold, made to order."
+        },
+        "volcan": {
+          "nombre": "Chocolate lava cake",
+          "descripcion": "Warm inside, with vanilla ice cream. Today's offer: 14 thousand pesos (was 19 thousand)."
+        }
+      },
+      "frases": {
+        "saludo": "Welcome! I'll be your server today. Tap the orb to talk to me, or order with the buttons.",
+        "eleccion": "Great choice.",
+        "sugerir": "Great choice. Would you like an ice-cold coconut lemonade with it?",
+        "quitado": "Done, I removed it from your order.",
+        "oferta": "Before I send it: today the chocolate lava cake is on sale for 14 thousand pesos. Would you like it?",
+        "enviado": "All set! Your order is at the register. Enjoy!",
+        "despedida": "All set! Your order is at the register. Enjoy!",
+        "repetir": "Sorry, I didn't catch that. Could you say it again?",
+        "vacio": "You haven't picked anything yet. What would you like?",
+        "mesero": "Of course, a server is on the way.",
+        "sin_voz": "Hi, the voice system is having trouble. Please select what you'd like to order."
+      },
+      "restaurante": "Your restaurant"
+    },
+    "pt": {
+      "nombre": "Português",
+      "voz": {
+        "google": "pt-BR-Neural2-B",
+        "edge": "pt-BR-AntonioNeural"
+      },
+      "grupos": {
+        "Platos fuertes": "Pratos principais",
+        "Bebidas": "Bebidas",
+        "Postre del día": "Sobremesa do dia"
+      },
+      "menu": {
+        "bandeja": {
+          "nombre": "Bandeja paisa",
+          "descripcion": "Feijão, arroz, torresmo, carne moída, ovo, banana-da-terra, arepa e abacate."
+        },
+        "ajiaco": {
+          "nombre": "Ajiaco santafereño",
+          "descripcion": "Sopa de frango com três tipos de batata e guascas, com creme, alcaparras e abacate."
+        },
+        "omelet": {
+          "nombre": "Omelete ranchero",
+          "descripcion": "Três ovos com tomate, cebola, pimentão e molho ranchero."
+        },
+        "limonada": {
+          "nombre": "Limonada de coco",
+          "descripcion": "Cremosa, bem gelada, feita na hora."
+        },
+        "volcan": {
+          "nombre": "Vulcão de chocolate",
+          "descripcion": "Quente por dentro, com sorvete de baunilha. Oferta de hoje: 14 mil pesos (antes 19 mil)."
+        }
+      },
+      "frases": {
+        "saludo": "Bem-vindo! Hoje eu vou atender você. Toque no orbe para falar comigo ou peça pelos botões.",
+        "eleccion": "Ótima escolha.",
+        "sugerir": "Ótima escolha. Quer uma limonada de coco bem gelada para acompanhar?",
+        "quitado": "Pronto, tirei do seu pedido.",
+        "oferta": "Antes de enviar: hoje o vulcão de chocolate está em oferta, por 14 mil pesos. Gostaria de pedir?",
+        "enviado": "Pronto! Seu pedido já está no caixa. Bom apetite!",
+        "despedida": "Pronto! Seu pedido já está no caixa. Bom apetite!",
+        "repetir": "Desculpe, não ouvi bem. Pode repetir, por favor?",
+        "vacio": "Você ainda não escolheu nada. O que deseja?",
+        "mesero": "Claro, um garçom já está a caminho.",
+        "sin_voz": "Olá, o sistema de voz está com falha. Por favor, selecione o que deseja pedir."
+      },
+      "restaurante": "Seu restaurante"
+    },
+    "de": {
+      "nombre": "Deutsch",
+      "voz": {
+        "google": "de-DE-Neural2-B",
+        "edge": "de-DE-ConradNeural"
+      },
+      "grupos": {
+        "Platos fuertes": "Hauptgerichte",
+        "Bebidas": "Getränke",
+        "Postre del día": "Dessert des Tages"
+      },
+      "menu": {
+        "bandeja": {
+          "nombre": "Bandeja paisa",
+          "descripcion": "Bohnen, Reis, Schweinekruste, Hackfleisch, Ei, Kochbanane, Arepa und Avocado."
+        },
+        "ajiaco": {
+          "nombre": "Ajiaco santafereño",
+          "descripcion": "Hühnersuppe mit drei Kartoffelsorten und Guascas, mit Sahne, Kapern und Avocado."
+        },
+        "omelet": {
+          "nombre": "Ranchero-Omelett",
+          "descripcion": "Drei Eier mit Tomate, Zwiebel, Paprika und Ranchero-Soße."
+        },
+        "limonada": {
+          "nombre": "Kokos-Limonade",
+          "descripcion": "Cremig, eiskalt, frisch zubereitet."
+        },
+        "volcan": {
+          "nombre": "Schokoladen-Vulkan",
+          "descripcion": "Innen warm, mit Vanilleeis. Angebot des Tages: 14 Tausend Pesos (statt 19 Tausend)."
+        }
+      },
+      "frases": {
+        "saludo": "Willkommen! Ich bediene Sie heute. Tippen Sie auf die Kugel, um mit mir zu sprechen, oder bestellen Sie mit den Tasten.",
+        "eleccion": "Sehr gute Wahl.",
+        "sugerir": "Sehr gute Wahl. Möchten Sie dazu eine eiskalte Kokos-Limonade?",
+        "quitado": "Erledigt, ich habe es aus Ihrer Bestellung entfernt.",
+        "oferta": "Bevor ich sie abschicke: Heute ist der Schokoladen-Vulkan im Angebot, für 14 Tausend Pesos. Möchten Sie ihn?",
+        "enviado": "Fertig! Ihre Bestellung ist an der Kasse. Guten Appetit!",
+        "despedida": "Fertig! Ihre Bestellung ist an der Kasse. Guten Appetit!",
+        "repetir": "Entschuldigung, das habe ich nicht verstanden. Können Sie es wiederholen?",
+        "vacio": "Sie haben noch nichts ausgewählt. Was darf es sein?",
+        "mesero": "Gerne, ein Kellner ist unterwegs.",
+        "sin_voz": "Hallo, das Sprachsystem hat gerade eine Störung. Bitte wählen Sie aus, was Sie bestellen möchten."
+      },
+      "restaurante": "Ihr Restaurant"
+    },
+    "ru": {
+      "nombre": "Русский",
+      "voz": {
+        "google": "ru-RU-Wavenet-D",
+        "edge": "ru-RU-DmitryNeural"
+      },
+      "grupos": {
+        "Platos fuertes": "Основные блюда",
+        "Bebidas": "Напитки",
+        "Postre del día": "Десерт дня"
+      },
+      "menu": {
+        "bandeja": {
+          "nombre": "Бандеха пайса",
+          "descripcion": "Фасоль, рис, хрустящая свинина, фарш, яйцо, жареный плантан, арепа и авокадо."
+        },
+        "ajiaco": {
+          "nombre": "Ахиако",
+          "descripcion": "Куриный суп с тремя видами картофеля и гуаскас, со сливками, каперсами и авокадо."
+        },
+        "omelet": {
+          "nombre": "Омлет ранчеро",
+          "descripcion": "Три яйца с помидором, луком, перцем и соусом ранчеро."
+        },
+        "limonada": {
+          "nombre": "Кокосовый лимонад",
+          "descripcion": "Сливочный, ледяной, готовится при вас."
+        },
+        "volcan": {
+          "nombre": "Шоколадный фондан",
+          "descripcion": "Горячий внутри, с ванильным мороженым. Предложение дня: 14 тысяч песо (было 19 тысяч)."
+        }
+      },
+      "frases": {
+        "saludo": "Добро пожаловать! Сегодня я вас обслуживаю. Нажмите на сферу, чтобы поговорить со мной, или заказывайте кнопками.",
+        "eleccion": "Отличный выбор.",
+        "sugerir": "Отличный выбор. Принести к нему холодный кокосовый лимонад?",
+        "quitado": "Готово, я убрал это из заказа.",
+        "oferta": "Прежде чем отправить: сегодня шоколадный фондан со скидкой, всего 14 тысяч песо. Хотите заказать?",
+        "enviado": "Готово! Ваш заказ уже на кассе. Приятного аппетита!",
+        "despedida": "Готово! Ваш заказ уже на кассе. Приятного аппетита!",
+        "repetir": "Извините, я не расслышал. Повторите, пожалуйста.",
+        "vacio": "Вы ещё ничего не выбрали. Что вам принести?",
+        "mesero": "Конечно, официант уже идёт.",
+        "sin_voz": "Здравствуйте, голосовая система сейчас не работает. Пожалуйста, выберите, что хотите заказать."
+      },
+      "restaurante": "Ваш ресторан"
+    },
+    "ja": {
+      "nombre": "日本語",
+      "voz": {
+        "google": "ja-JP-Neural2-C",
+        "edge": "ja-JP-KeitaNeural"
+      },
+      "grupos": {
+        "Platos fuertes": "メイン料理",
+        "Bebidas": "ドリンク",
+        "Postre del día": "本日のデザート"
+      },
+      "menu": {
+        "bandeja": {
+          "nombre": "バンデハ・パイサ",
+          "descripcion": "豆、ご飯、豚皮の揚げ物、ひき肉、卵、焼きバナナ、アレパ、アボカド。"
+        },
+        "ajiaco": {
+          "nombre": "アヒアコ",
+          "descripcion": "3種類のじゃがいもとグアスカスの鶏肉スープ。クリーム、ケッパー、アボカド添え。"
+        },
+        "omelet": {
+          "nombre": "ランチェロ・オムレツ",
+          "descripcion": "卵3個にトマト、玉ねぎ、ピーマン、ランチェロソース。"
+        },
+        "limonada": {
+          "nombre": "ココナッツレモネード",
+          "descripcion": "クリーミーで冷たい、作りたて。"
+        },
+        "volcan": {
+          "nombre": "チョコレートボルケーノ",
+          "descripcion": "中はとろとろ、バニラアイス添え。本日の特別価格：1万4千ペソ（通常1万9千ペソ）。"
+        }
+      },
+      "frases": {
+        "saludo": "いらっしゃいませ！本日担当いたします。オーブをタップして話しかけるか、ボタンでご注文ください。",
+        "eleccion": "いい選択ですね。",
+        "sugerir": "いい選択ですね。一緒に冷たいココナッツレモネードはいかがですか？",
+        "quitado": "かしこまりました。ご注文から外しました。",
+        "oferta": "送信する前に：本日はチョコレートボルケーノが特別価格の1万4千ペソです。いかがですか？",
+        "enviado": "完了です！ご注文はレジに届きました。お楽しみください！",
+        "despedida": "完了です！ご注文はレジに届きました。お楽しみください！",
+        "repetir": "すみません、よく聞き取れませんでした。もう一度お願いします。",
+        "vacio": "まだ何も選ばれていません。何になさいますか？",
+        "mesero": "かしこまりました。すぐにスタッフが参ります。",
+        "sin_voz": "こんにちは、音声システムに不具合が発生しています。ご注文の品をお選びください。"
+      },
+      "restaurante": "あなたのレストラン"
+    }
+  }
 }

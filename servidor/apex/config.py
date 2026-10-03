@@ -17,7 +17,7 @@ COP_POR_USD = float(os.getenv("APEX_COP_POR_USD", "4000"))
 # Precios en dólares (revisarlos de vez en cuando). Se calculan a precio de lista, sin restar lo gratis:
 # el costo real suele ser menor (p. ej. Google regala 1 millón de caracteres de voz al mes).
 PRECIOS_USD = {
-    "oido_groq_hora": 0.04,          # Groq Whisper turbo, mínimo 10 s por audio
+    "oido_groq_hora": 0.111,         # Groq whisper-large-v3 (el más preciso), mínimo 10 s por audio
     "cerebro": {                      # por millón de tokens (entrada, salida)
         "groq": (0.075, 0.30),        # gpt-oss-20b
         "gemini": (0.30, 2.50),       # respaldo
@@ -36,7 +36,7 @@ FRASES_POR_DEFECTO = {
     "repetir": "Disculpe, no le escuché bien. ¿Me lo repite, por favor?",
     "vacio": "Aún no ha seleccionado ningún plato. ¿Qué le provoca?",
     "mesero": "Con gusto, enseguida va un mesero a su mesa.",
-    "sin_voz": "En este momento no puedo atenderle por voz. Toque «Llamar al mesero» y con gusto le atienden.",
+    "sin_voz": "Hola, el sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.",
 }
 
 
@@ -56,3 +56,17 @@ def restaurantes() -> dict:
 def restaurante(rid: str):
     return restaurantes().get(rid)
 
+
+
+def localizar(r: dict, idioma: str) -> dict:
+    """El restaurante visto en otro idioma: carta, frases y voz traducidas (los id de los platos no cambian)."""
+    base = r.get("idioma", "es")
+    t = (r.get("idiomas") or {}).get(idioma or base)
+    if not t:
+        return {**r, "idioma": base, "idioma_base": base, "idioma_nombre": "Español", "nombres_originales": {p["id"]: p["nombre"] for p in r["menu"]}}
+    menu = [{**p, **(t.get("menu") or {}).get(p["id"], {}),
+             "grupo": (t.get("grupos") or {}).get(p.get("grupo"), p.get("grupo"))} for p in r["menu"]]
+    return {**r, "idioma": idioma or base, "idioma_base": base, "idioma_nombre": t.get("nombre", idioma), "menu": menu,
+            "nombre": t.get("restaurante", r["nombre"]),
+            "frases": {**r["frases"], **(t.get("frases") or {})}, "voz": {**r["voz"], **(t.get("voz") or {})},
+            "nombres_originales": {p["id"]: p["nombre"] for p in r["menu"]}}

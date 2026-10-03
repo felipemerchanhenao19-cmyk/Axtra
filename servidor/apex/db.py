@@ -38,6 +38,9 @@ def conn() -> sqlite3.Connection:
             CREATE TABLE IF NOT EXISTS llamadas (id INTEGER PRIMARY KEY AUTOINCREMENT, restaurante TEXT, mesa TEXT,
                                                  motivo TEXT, atendida INTEGER DEFAULT 0, creada REAL);
         """)
+        if "idioma" not in {f["name"] for f in _conn.execute("PRAGMA table_info(sesiones)")}:
+            _conn.execute("ALTER TABLE sesiones ADD COLUMN idioma TEXT DEFAULT ''")       # bases de datos anteriores
+            _conn.commit()
     return _conn
 
 
@@ -78,11 +81,15 @@ def sesion_activa(rid: str, mesa: str):
                           "ORDER BY creada DESC LIMIT 1", (rid, mesa)).fetchone()
 
 
-def nueva_sesion(sid: str, rid: str, mesa: str) -> str:
+def nueva_sesion(sid: str, rid: str, mesa: str, idioma: str = "") -> str:
     secreto, ahora = secrets.token_urlsafe(24), time.time()
-    _ejecutar("INSERT INTO sesiones (id, secreto, restaurante, mesa, creada, actividad) VALUES (?,?,?,?,?,?)",
-              (sid, secreto, rid, mesa, ahora, ahora))
+    _ejecutar("INSERT INTO sesiones (id, secreto, restaurante, mesa, creada, actividad, idioma) VALUES (?,?,?,?,?,?,?)",
+              (sid, secreto, rid, mesa, ahora, ahora, idioma))
     return secreto
+
+
+def cambiar_idioma(sid: str, idioma: str):
+    _ejecutar("UPDATE sesiones SET idioma=? WHERE id=?", (idioma, sid))
 
 
 def sesion(sid: str):

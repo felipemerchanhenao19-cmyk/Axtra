@@ -204,7 +204,7 @@ def test_costo_en_pesos(c):
     s = sesion(c).json()
     turno(c, s)
     gasto = db.uso_mes("demo")["gasto_por_pieza"]
-    assert gasto["oido"] == pytest.approx(10 / 3600 * 0.04 * 4000, abs=0.01)          # mínimo 10 s
+    assert gasto["oido"] == pytest.approx(10 / 3600 * 0.111 * 4000, abs=0.01)         # mínimo 10 s (whisper-large-v3)
     assert gasto["cerebro"] == pytest.approx((3000 * 0.075 + 60 * 0.30) / 1e6 * 4000, abs=0.01)
     assert gasto["voz"] == pytest.approx(len("Con gusto.") * 16 / 1e6 * 4000, abs=0.01)   # voz Neural2
     assert db.gasto_mes("demo") < 5                    # un turno cuesta unos pocos pesos
@@ -334,3 +334,103 @@ def test_paginas_sin_cache_y_aguantan_peticiones_raras(c):
     assert c.get("/web/apex-voz.js").headers["cache-control"] == "no-cache"
     assert "apex-voz.js?v=" in r.text
     assert c.get("/qr", headers={"Range": "bytes=abc"}).status_code == 200
+
+
+def llamadas(*pares):
+    """Un mensaje del cerebro con varias herramientas a la vez."""
+    return {"role": "assistant", "content": "", "tool_calls": [
+        {"id": f"c{i}", "type": "function", "function": {"name": n, "arguments": json.dumps(a)}} for i, (n, a) in enumerate(pares)]}
+
+
+def _platos(c):
+    return {p["plato"]: p["cantidad"] for p in c}
+
+
+def test_el_orbe_no_agrega_lo_que_el_cliente_no_pidio(c, axtra):
+    s = sesion(c, "1").json()
+    axtra.oido = "quiero un ajiaco"
+    # El cerebro se equivoca: agrega el ajiaco dos veces, con cantidad 3, y una limonada que nadie pidió
+    axtra.guion = [llamadas(("agregar_plato", {"plato_id": "ajiaco", "cantidad": 3}), ("agregar_plato", {"plato_id": "ajiaco"}),
+                            ("agregar_plato", {"plato_id": "limonada"})), texto("Listo, un ajiaco.")]
+    r = turno(c, s).json()
+    assert _platos(r["pedido"]["platos"]) == {"Ajiaco santafereño": 1}
+
+
+def test_la_cantidad_es_la_que_dijo_el_cliente(c, axtra):
+    s = sesion(c, "1").json()
+    axtra.oido = "me trae dos ajiacos y una limonada de coco"
+    axtra.guion = [llamadas(("agregar_plato", {"plato_id": "ajiaco"}), ("agregar_plato", {"plato_id": "limonada", "cantidad": 2})),
+                   texto("Con gusto.")]
+    assert _platos(turno(c, s).json()["pedido"]["platos"]) == {"Ajiaco santafereño": 2, "Limonada de coco": 1}
+
+
+def test_si_a_la_sugerencia_si_agrega_y_no_no(c, axtra):
+    s = sesion(c, "1").json()
+    accion(c, s, "pedir", plato_id="bandeja")                       # el orbe sugirió la limonada
+    axtra.oido = "no gracias"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "limonada"}), texto("Listo.")]
+    assert _platos(turno(c, s).json()["pedido"]["platos"]) == {"Bandeja paisa": 1}
+    s2 = sesion(c, "2").json()
+    accion(c, s2, "pedir", plato_id="bandeja")
+    axtra.oido = "sí, por favor"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "limonada"}), texto("Listo.")]
+    assert _platos(turno(c, s2).json()["pedido"]["platos"]) == {"Bandeja paisa": 1, "Limonada de coco": 1}
+
+
+def test_confirmar_por_voz_trae_la_factura_completa(c, axtra):
+    s = sesion(c, "1").json()
+    accion(c, s, "pedir", plato_id="ajiaco")
+    accion(c, s, "pedir", plato_id="limonada")
+    axtra.oido = "sí, confírmelo"
+    # Tras confirmar, el cerebro mira el carrito (ya vacío): la factura debe ser la del pedido enviado
+    axtra.guion = [herramienta("confirmar_pedido"), herramienta("ver_pedido", i="2"), texto("¡Listo!")]
+    r = turno(c, s).json()
+    assert r["pedido"]["pedido_numero"] and r["pedido"]["total_numero"] == 44000
+    assert _platos(r["pedido"]["platos"]) == {"Ajiaco santafereño": 1, "Limonada de coco": 1}
+
+
+def test_carta_y_frases_en_otro_idioma(c):
+    m = c.get("/v1/menu/demo?idioma=en").json()
+    assert m["idioma"] == "en" and {i["codigo"] for i in m["idiomas"]} == {"es", "en", "pt", "de", "ru", "ja"}
+    assert next(p for p in m["menu"] if p["id"] == "limonada")["nombre"] == "Coconut lemonade"
+    s = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "1", "idioma": "ja"}, headers=ORIGEN).json()
+    assert s["frases"]["saludo"].endswith("?idioma=ja") and "オーブ" in s["saludo"]
+    r = accion(c, s, "pedir", plato_id="bandeja").json()
+    assert "ココナッツ" in r["texto"] and r["frase"].endswith("?idioma=ja")
+    assert "いらっしゃいませ".encode() in c.get(s["frases"]["saludo"]).content       # la voz falsa repite el texto
+
+
+def test_cambiar_idioma_en_la_conversacion(c, axtra):
+    s = sesion(c, "1").json()
+    r = c.post("/v1/idioma", json={**{k: s[k] for k in ("sesion", "secreto")}, "idioma": "en"}, headers=ORIGEN).json()
+    assert "Welcome" in r["saludo"]
+    axtra.oido = "two ajiacos please"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), texto("Two ajiacos.")]
+    t = turno(c, s).json()
+    assert _platos(t["pedido"]["platos"]) == {"Ajiaco santafereño": 2}
+    pensar = [j for ruta, j in axtra.llamadas if ruta == "/pensar"][-1]
+    assert "Habla SIEMPRE en English" in pensar["sistema"] and "Coconut lemonade (Limonada de coco)" in pensar["sistema"]
+    oido = [kw for ruta, kw in axtra.llamadas if ruta == "/oido"]
+    assert c.post("/v1/idioma", json={**{k: s[k] for k in ("sesion", "secreto")}, "idioma": "xx"}, headers=ORIGEN).status_code == 404
+
+
+def test_el_oido_recibe_idioma_y_nombres_de_los_platos(c, axtra, monkeypatch):
+    vistos = []
+    original = orbe._ranura
+    monkeypatch.setattr(orbe, "_ranura", lambda ruta, **kw: (vistos.append((ruta, kw.get("params"))), original(ruta, **kw))[1])
+    s = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "1", "idioma": "de"}, headers=ORIGEN).json()
+    turno(c, s)
+    params = next(p for ruta, p in vistos if ruta == "/oido")
+    assert params["idioma"] == "de" and "Kokos-Limonade" in params["pista"] and "Bandeja paisa" in params["pista"]
+
+
+def test_control_de_pedidos_en_japones_y_ruso(c, axtra):
+    s = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "1", "idioma": "ja"}, headers=ORIGEN).json()
+    axtra.oido = "アヒアコを二つください"
+    axtra.guion = [llamadas(("agregar_plato", {"plato_id": "ajiaco"}), ("agregar_plato", {"plato_id": "volcan"})), texto("はい")]
+    assert _platos(turno(c, s).json()["pedido"]["platos"]) == {"アヒアコ": 2}
+    s2 = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "2", "idioma": "ru"}, headers=ORIGEN).json()
+    accion(c, s2, "pedir", plato_id="omelet")                         # el orbe ofrece el лимонад
+    axtra.oido = "да, пожалуйста"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "limonada"}), texto("Хорошо.")]
+    assert _platos(turno(c, s2).json()["pedido"]["platos"]) == {"Омлет ранчеро": 1, "Кокосовый лимонад": 1}

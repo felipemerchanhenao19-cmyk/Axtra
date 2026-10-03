@@ -66,6 +66,7 @@ VOZ_TONO = os.getenv("VOZ_TONO", "-12Hz")
 # Voz natural de Google Cloud Text-to-Speech (1 millón de caracteres gratis al mes). Vacío = voz gratis de Axtra.
 GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY", "")
 ORBE_MODELO = os.getenv("ORBE_MODELO", "openai/gpt-oss-20b")        # cerebro de los orbes (Groq)
+ORBE_MODELO_OIDO = os.getenv("ORBE_MODELO_OIDO", "whisper-large-v3")   # oído de los orbes: el más preciso de Groq
 # Ranura privada: solo la usan los orbes desde dentro del servidor (nunca pasa por el túnel)
 RANURA_PUERTO = int(os.getenv("RANURA_PUERTO", "8090"))
 

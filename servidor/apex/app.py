@@ -134,11 +134,15 @@ def salud():
     return {"ok": True}
 
 
+def _idiomas(r: dict) -> list:
+    return [{"codigo": k, "nombre": v.get("nombre", k)} for k, v in (r.get("idiomas") or {}).items()]
+
+
 @app.get("/v1/menu/{rid}")
-def menu(rid: str, request: Request):
+def menu(rid: str, request: Request, idioma: str = ""):
     limitar(f"menu:{ip(request)}", 60, 60)
-    r = _restaurante(rid)
-    return {"id": r["id"], "nombre": r["nombre"], "moneda": r.get("moneda", "COP"),
+    r = config.localizar(_restaurante(rid), idioma[:5])
+    return {"id": r["id"], "nombre": r["nombre"], "moneda": r.get("moneda", "COP"), "idioma": r["idioma"], "idiomas": _idiomas(r),
             "menu": [{k: p.get(k) for k in ("id", "nombre", "precio", "descripcion", "alergenos", "modelo3d", "foto",
                                               "grupo", "antes", "oferta")}
                      for p in r["menu"]]}
@@ -148,10 +152,16 @@ class PedidoSesion(BaseModel):
     restaurante: str = Field(max_length=60)
     mesa: str = Field(max_length=20)
     anterior: dict | None = None          # {sesion, secreto} para retomar desde el mismo teléfono
+    idioma: str = Field("", max_length=5)
+
+
+def _url_frase(r: dict, k: str) -> str:
+    extra = f"?idioma={r['idioma']}" if r.get("idioma") and r["idioma"] != r.get("idioma_base", "es") else ""
+    return f"/v1/frase/{r['id']}/{k}{extra}"
 
 
 def _frases(r: dict) -> dict:
-    return {k: f"/v1/frase/{r['id']}/{k}" for k in r["frases"]}
+    return {k: _url_frase(r, k) for k in r["frases"]}
 
 
 @app.post("/v1/sesion")
@@ -159,10 +169,12 @@ def crear_sesion(p: PedidoSesion, request: Request):
     r = _restaurante(p.restaurante)
     exigir_origen(request, r)
     limitar(f"sesion:{ip(request)}", 6, 60)
+    idioma = p.idioma if p.idioma in (r.get("idiomas") or {}) else ""
+    r = config.localizar(r, idioma)
     if r.get("ejemplo"):
         # Modelo de ejemplo para mostrar la idea: sin mesas, cada persona que abre el link tiene su propia conversación.
         sid = uuid.uuid4().hex
-        secreto = db.nueva_sesion(sid, r["id"], "ejemplo")
+        secreto = db.nueva_sesion(sid, r["id"], "ejemplo", idioma)
         return {"sesion": sid, "secreto": secreto, "frases": _frases(r), "saludo": r["frases"]["saludo"], "ejemplo": True,
                 "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
     limitar(f"sesion-mesa:{r['id']}:{p.mesa}", 4, 60)
@@ -178,7 +190,7 @@ def crear_sesion(p: PedidoSesion, request: Request):
             raise HTTPException(409, "ya hay una conversación activa en esta mesa")
         db.terminar_sesion(activa["id"], "reemplazada")
     sid = uuid.uuid4().hex
-    secreto = db.nueva_sesion(sid, r["id"], p.mesa)
+    secreto = db.nueva_sesion(sid, r["id"], p.mesa, idioma)
     return {"sesion": sid, "secreto": secreto, "frases": _frases(r), "saludo": r["frases"]["saludo"],
             "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
 
@@ -196,20 +208,20 @@ def _sesion(sid: str, secreto: str, request: Request, abierta: bool = True):
     exigir_origen(request, r)
     if abierta and s["fin"]:
         raise HTTPException(410, f"la conversación terminó ({s['motivo_fin']})")
-    return s, r
+    return s, config.localizar(r, s["idioma"] if "idioma" in s.keys() else "")
 
 
 def _respuesta(r: dict, s, texto: str = "", frase: str = "", **extra) -> dict:
     """Lo que el orbe dirá: una frase grabada (gratis, por URL) o un audio nuevo (en base64)."""
     out = {"frase": None, "audio": None, "texto": r["frases"].get(frase, "") if frase else texto, **extra}
     if frase:
-        out["frase"] = f"/v1/frase/{r['id']}/{frase}"
+        out["frase"] = _url_frase(r, frase)
         return out
     try:
         out["audio"] = base64.b64encode(orbe.voz(r, texto, s["id"])).decode()
     except orbe.SinRanura as e:
         log.warning("voz falló: %s", e)
-        out.update(frase=f"/v1/frase/{r['id']}/sin_voz", sin_voz=True, texto=r["frases"]["sin_voz"])
+        out.update(frase=_url_frase(r, "sin_voz"), sin_voz=True, texto=r["frases"]["sin_voz"])
     return out
 
 
@@ -239,7 +251,7 @@ async def turno(request: Request):
         log.warning("turno de voz falló: %s", e)
         return _respuesta(r, s, frase="sin_voz", sin_voz=True)
     return await asyncio.to_thread(_respuesta, r, s, res["texto"], "", despedida=bool(res["confirmado"]),
-                                   pedido=res["pedido"] or res["confirmado"], oido=texto[:600])
+                                   pedido=res["confirmado"] or res["pedido"], oido=texto[:600])
 
 
 class Accion(Credencial):
@@ -319,10 +331,25 @@ def accion(a: Accion, request: Request):
     return _respuesta(r, s, res["texto"], pedido=res["pedido"] or pedido, despedida=bool(res["confirmado"]))
 
 
+class CambioIdioma(Credencial):
+    idioma: str = Field(max_length=5)
+
+
+@app.post("/v1/idioma")
+def idioma(c: CambioIdioma, request: Request):
+    """El cliente tocó otro idioma: desde ahí el orbe le habla, le entiende y le muestra la carta en ese idioma."""
+    s, r = _sesion(c.sesion, c.secreto, request)
+    if c.idioma not in (r.get("idiomas") or {}):
+        raise HTTPException(404, "idioma no disponible")
+    db.cambiar_idioma(s["id"], c.idioma)
+    r = config.localizar(_restaurante(s["restaurante"]), c.idioma)
+    return {"frases": _frases(r), "saludo": r["frases"]["saludo"]}
+
+
 @app.get("/v1/frase/{rid}/{nombre}")
-def frase(rid: str, nombre: str, request: Request):
+def frase(rid: str, nombre: str, request: Request, idioma: str = ""):
     """Frases fijas del restaurante: se generan una vez y quedan guardadas (no vuelven a costar)."""
-    r = _restaurante(rid)
+    r = config.localizar(_restaurante(rid), idioma[:5])
     limitar(f"frase:{ip(request)}", 120, 60)
     if nombre not in r["frases"]:
         raise HTTPException(404, "frase no existe")
@@ -433,7 +460,7 @@ def mesas_publicas(rid: str, request: Request):
     """Para la página de códigos QR: nombre y mesas del restaurante (nada privado)."""
     limitar(f"menu:{ip(request)}", 60, 60)
     r = _restaurante(rid)
-    return {"id": r["id"], "nombre": r["nombre"], "mesas": r.get("mesas", [])}
+    return {"id": r["id"], "nombre": r["nombre"], "mesas": r.get("mesas", []), "idiomas": _idiomas(r)}
 
 
 @app.get("/panel")
