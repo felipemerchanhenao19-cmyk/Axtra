@@ -1,4 +1,5 @@
-"""Base de datos de Apex Play (SQLite, separada de la de Axtra). Todo va por restaurante."""
+"""Base de datos de los orbes (SQLite). Todo va separado por restaurante.
+Axtra (la tarjeta madre) la lee para su pantalla «Negocios»."""
 import json
 import secrets
 import sqlite3
@@ -15,18 +16,22 @@ _conn = None
 def conn() -> sqlite3.Connection:
     global _conn
     if _conn is None:
-        _conn = sqlite3.connect(config.DATA_DIR / "apex.db", check_same_thread=False)
+        _conn = sqlite3.connect(config.DATA_DIR / "orbes.db", check_same_thread=False)
         _conn.row_factory = sqlite3.Row
         _conn.executescript("""
             PRAGMA journal_mode=WAL;
             CREATE TABLE IF NOT EXISTS mesas (restaurante TEXT, mesa TEXT, abierta INTEGER DEFAULT 0,
                                               cambiada REAL, PRIMARY KEY (restaurante, mesa));
             CREATE TABLE IF NOT EXISTS sesiones (id TEXT PRIMARY KEY, secreto TEXT, restaurante TEXT, mesa TEXT,
-                                                 modelo TEXT, creada REAL, call_id TEXT, fin REAL,
-                                                 motivo_fin TEXT, uso TEXT, usd REAL DEFAULT 0,
+                                                 creada REAL, actividad REAL, fin REAL, motivo_fin TEXT,
+                                                 turnos INTEGER DEFAULT 0, historial TEXT DEFAULT '[]',
                                                  carrito TEXT DEFAULT '[]');
             CREATE INDEX IF NOT EXISTS sesiones_mesa ON sesiones (restaurante, mesa, fin);
             CREATE INDEX IF NOT EXISTS sesiones_mes ON sesiones (restaurante, creada);
+            CREATE TABLE IF NOT EXISTS consumos (id INTEGER PRIMARY KEY AUTOINCREMENT, restaurante TEXT,
+                                                 sesion TEXT, pieza TEXT, proveedor TEXT, cantidad REAL,
+                                                 cop REAL, creado REAL);
+            CREATE INDEX IF NOT EXISTS consumos_mes ON consumos (restaurante, creado);
             CREATE TABLE IF NOT EXISTS pedidos (id INTEGER PRIMARY KEY AUTOINCREMENT, restaurante TEXT, mesa TEXT,
                                                 sesion TEXT, items TEXT, total REAL, estado TEXT DEFAULT 'nuevo',
                                                 creado REAL);
@@ -36,9 +41,16 @@ def conn() -> sqlite3.Connection:
     return _conn
 
 
-def _inicio_mes() -> float:
+def inicio_mes() -> float:
     hoy = datetime.now()
     return datetime(hoy.year, hoy.month, 1).timestamp()
+
+
+def _ejecutar(sql: str, args=()):
+    with _lock:
+        c = conn().execute(sql, args)
+        conn().commit()
+        return c
 
 
 # ---------------- Mesas ----------------
@@ -48,13 +60,11 @@ def mesa_abierta(rid: str, mesa: str) -> bool:
 
 
 def cambiar_mesa(rid: str, mesa: str, abierta: bool):
-    with _lock:
-        conn().execute("INSERT INTO mesas VALUES (?,?,?,?) ON CONFLICT(restaurante, mesa) DO UPDATE SET "
-                       "abierta=excluded.abierta, cambiada=excluded.cambiada", (rid, mesa, int(abierta), time.time()))
-        if not abierta:   # al cerrar la mesa se corta su sesión
-            conn().execute("UPDATE sesiones SET fin=?, motivo_fin='mesa cerrada' WHERE restaurante=? AND mesa=? "
-                           "AND fin IS NULL", (time.time(), rid, mesa))
-        conn().commit()
+    _ejecutar("INSERT INTO mesas VALUES (?,?,?,?) ON CONFLICT(restaurante, mesa) DO UPDATE SET "
+              "abierta=excluded.abierta, cambiada=excluded.cambiada", (rid, mesa, int(abierta), time.time()))
+    if not abierta:   # al cerrar la mesa se corta su conversación
+        _ejecutar("UPDATE sesiones SET fin=?, motivo_fin='mesa cerrada' WHERE restaurante=? AND mesa=? AND fin IS NULL",
+                  (time.time(), rid, mesa))
 
 
 def mesas(rid: str) -> dict:
@@ -68,12 +78,10 @@ def sesion_activa(rid: str, mesa: str):
                           "ORDER BY creada DESC LIMIT 1", (rid, mesa)).fetchone()
 
 
-def nueva_sesion(sid: str, rid: str, mesa: str, modelo: str) -> str:
-    secreto = secrets.token_urlsafe(24)
-    with _lock:
-        conn().execute("INSERT INTO sesiones (id, secreto, restaurante, mesa, modelo, creada) VALUES (?,?,?,?,?,?)",
-                       (sid, secreto, rid, mesa, modelo, time.time()))
-        conn().commit()
+def nueva_sesion(sid: str, rid: str, mesa: str) -> str:
+    secreto, ahora = secrets.token_urlsafe(24), time.time()
+    _ejecutar("INSERT INTO sesiones (id, secreto, restaurante, mesa, creada, actividad) VALUES (?,?,?,?,?,?)",
+              (sid, secreto, rid, mesa, ahora, ahora))
     return secreto
 
 
@@ -81,22 +89,31 @@ def sesion(sid: str):
     return conn().execute("SELECT * FROM sesiones WHERE id=?", (sid,)).fetchone()
 
 
-def poner_call_id(sid: str, call_id: str):
-    with _lock:
-        conn().execute("UPDATE sesiones SET call_id=? WHERE id=? AND call_id IS NULL", (call_id, sid))
-        conn().commit()
-
-
-def terminar_sesion(sid: str, motivo: str, uso: dict = None, usd: float = 0.0):
-    with _lock:
-        conn().execute("UPDATE sesiones SET fin=COALESCE(fin, ?), motivo_fin=COALESCE(motivo_fin, ?), "
-                       "uso=COALESCE(?, uso), usd=MAX(usd, ?) WHERE id=?",
-                       (time.time(), motivo, json.dumps(uso) if uso else None, usd, sid))
-        conn().commit()
+def terminar_sesion(sid: str, motivo: str):
+    _ejecutar("UPDATE sesiones SET fin=COALESCE(fin, ?), motivo_fin=COALESCE(motivo_fin, ?) WHERE id=?",
+              (time.time(), motivo, sid))
 
 
 def sesiones_abiertas():
     return conn().execute("SELECT * FROM sesiones WHERE fin IS NULL").fetchall()
+
+
+def contar_turno(sid: str):
+    _ejecutar("UPDATE sesiones SET turnos=turnos+1, actividad=? WHERE id=?", (time.time(), sid))
+
+
+def historial(sid: str) -> list:
+    f = sesion(sid)
+    return json.loads(f["historial"]) if f else []
+
+
+def guardar_historial(sid: str, mensajes: list):
+    # Se recorta empezando en un mensaje del cliente, para no partir una llamada a herramienta de su respuesta.
+    if len(mensajes) > 24:
+        corte = next((i for i in range(len(mensajes) - 24, len(mensajes)) if mensajes[i].get("role") == "user"), 0)
+        mensajes = mensajes[corte:]
+    _ejecutar("UPDATE sesiones SET historial=?, actividad=? WHERE id=?",
+              (json.dumps(mensajes, ensure_ascii=False), time.time(), sid))
 
 
 def carrito(sid: str) -> list:
@@ -105,26 +122,37 @@ def carrito(sid: str) -> list:
 
 
 def guardar_carrito(sid: str, items: list):
-    with _lock:
-        conn().execute("UPDATE sesiones SET carrito=? WHERE id=?", (json.dumps(items, ensure_ascii=False), sid))
-        conn().commit()
+    _ejecutar("UPDATE sesiones SET carrito=? WHERE id=?", (json.dumps(items, ensure_ascii=False), sid))
+
+
+# ---------------- Consumo y costo en pesos ----------------
+def consumo(rid: str, sid: str, pieza: str, proveedor: str, cantidad: float, cop: float):
+    _ejecutar("INSERT INTO consumos (restaurante, sesion, pieza, proveedor, cantidad, cop, creado) "
+              "VALUES (?,?,?,?,?,?,?)", (rid, sid, pieza, proveedor, cantidad, cop, time.time()))
+
+
+def gasto_mes(rid: str) -> float:
+    f = conn().execute("SELECT COALESCE(SUM(cop), 0) cop FROM consumos WHERE restaurante=? AND creado>=?",
+                       (rid, inicio_mes())).fetchone()
+    return round(f["cop"], 2)
 
 
 def uso_mes(rid: str) -> dict:
-    """Sesiones, minutos y dólares (estimados) del mes en curso para un restaurante."""
-    ahora, inicio = time.time(), _inicio_mes()
-    f = conn().execute("SELECT COUNT(*) n, COALESCE(SUM(COALESCE(fin, ?) - creada), 0) seg, COALESCE(SUM(usd), 0) usd "
-                       "FROM sesiones WHERE restaurante=? AND creada>=?", (ahora, rid, inicio)).fetchone()
-    return {"sesiones": f["n"], "minutos": round(f["seg"] / 60, 1), "usd": round(f["usd"], 4)}
+    ini = inicio_mes()
+    s = conn().execute("SELECT COUNT(*) n, COALESCE(SUM(turnos), 0) t FROM sesiones WHERE restaurante=? AND creada>=?",
+                       (rid, ini)).fetchone()
+    p = conn().execute("SELECT COUNT(*) n, COALESCE(SUM(total), 0) v FROM pedidos WHERE restaurante=? AND creado>=? "
+                       "AND estado!='cancelado'", (rid, ini)).fetchone()
+    piezas = {f["pieza"]: round(f["cop"], 2) for f in conn().execute(
+        "SELECT pieza, SUM(cop) cop FROM consumos WHERE restaurante=? AND creado>=? GROUP BY pieza", (rid, ini))}
+    return {"conversaciones": s["n"], "turnos": s["t"], "pedidos": p["n"], "ventas": p["v"],
+            "gasto_cop": gasto_mes(rid), "gasto_por_pieza": piezas}
 
 
 # ---------------- Pedidos y llamadas al mesero ----------------
 def nuevo_pedido(rid: str, mesa: str, sid: str, items: list, total: float) -> int:
-    with _lock:
-        c = conn().execute("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado) VALUES (?,?,?,?,?,?)",
-                           (rid, mesa, sid, json.dumps(items, ensure_ascii=False), total, time.time()))
-        conn().commit()
-        return c.lastrowid
+    return _ejecutar("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado) VALUES (?,?,?,?,?,?)",
+                     (rid, mesa, sid, json.dumps(items, ensure_ascii=False), total, time.time())).lastrowid
 
 
 def pedidos(rid: str, limite: int = 50) -> list:
@@ -133,16 +161,12 @@ def pedidos(rid: str, limite: int = 50) -> list:
 
 
 def cambiar_pedido(rid: str, pid: int, estado: str):
-    with _lock:
-        conn().execute("UPDATE pedidos SET estado=? WHERE restaurante=? AND id=?", (estado, rid, pid))
-        conn().commit()
+    _ejecutar("UPDATE pedidos SET estado=? WHERE restaurante=? AND id=?", (estado, rid, pid))
 
 
 def llamar_mesero(rid: str, mesa: str, motivo: str):
-    with _lock:
-        conn().execute("INSERT INTO llamadas (restaurante, mesa, motivo, creada) VALUES (?,?,?,?)",
-                       (rid, mesa, motivo, time.time()))
-        conn().commit()
+    _ejecutar("INSERT INTO llamadas (restaurante, mesa, motivo, creada) VALUES (?,?,?,?)",
+              (rid, mesa, motivo, time.time()))
 
 
 def llamadas(rid: str) -> list:
@@ -151,6 +175,4 @@ def llamadas(rid: str) -> list:
 
 
 def atender_llamada(rid: str, lid: int):
-    with _lock:
-        conn().execute("UPDATE llamadas SET atendida=1 WHERE restaurante=? AND id=?", (rid, lid))
-        conn().commit()
+    _ejecutar("UPDATE llamadas SET atendida=1 WHERE restaurante=? AND id=?", (rid, lid))

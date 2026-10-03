@@ -5,30 +5,34 @@ services:
     build:
       context: ../..
       dockerfile: servidor/Dockerfile
-    env_file: ../.env
+    env_file: ../.env              # TODAS las claves viven aquí: Axtra es la tarjeta madre
+    environment:
+      - APEX_DATOS=/apex_datos       # para la pantalla «Negocios»
     volumes:
       - axtra_datos:/datos
+      - apex_datos:/apex_datos
     restart: unless-stopped
     expose:
-      - "8080"
+      - "8080"                       # la app de Axtra (el túnel la publica en axtra.chat, con Access)
+      - "8090"                       # la ranura privada de los orbes (el túnel NO la publica)
 
-  # Apex Play: la puerta pública para los restaurantes (api.axtra.chat, SIN Cloudflare Access).
-  # Mismo código, otro proceso, otra base de datos y otras claves: no puede leer nada de Axtra.
+  # Puerta pública de los orbes de negocios (api.axtra.chat, SIN Cloudflare Access) y SIN claves:
+  # el oído, el cerebro, la voz y los PIN se los pide a Axtra por la ranura privada.
   apex:
     build:
       context: ../..
       dockerfile: servidor/Dockerfile
     command: ["uvicorn", "servidor.apex.app:app", "--host", "0.0.0.0", "--port", "8081", "--proxy-headers"]
-    env_file:
-      - path: ../apex.env
-        required: false
     environment:
       - APEX_DATOS=/apex_datos
+      - RANURA_URL=http://axtra:8090
     volumes:
       - apex_datos:/apex_datos
     restart: unless-stopped
     expose:
       - "8081"
+    depends_on:
+      - axtra
 
   tunel:
     image: cloudflare/cloudflared:latest

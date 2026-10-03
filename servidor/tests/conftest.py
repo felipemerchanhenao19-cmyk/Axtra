@@ -8,8 +8,8 @@ for k in ("GROQ_API_KEY", "CEREBRAS_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_
     os.environ[k] = ""
 os.environ["AXTRA_CORREO"] = "felipe@ejemplo.com"
 
-# Apex Play: base de datos temporal, sin llave real de OpenAI
+# Orbes de negocios: base de datos temporal; el PIN lo guarda Axtra (la ranura)
 os.environ["APEX_DATOS"] = tempfile.mkdtemp(prefix="apex_pruebas_")
-os.environ["OPENAI_API_KEY"] = "sk-prueba"
 os.environ["APEX_PIN_DEMO"] = "4321"
 os.environ["APEX_MODO"] = ""
+os.environ["GOOGLE_TTS_API_KEY"] = ""

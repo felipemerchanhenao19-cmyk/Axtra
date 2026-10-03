@@ -55,7 +55,7 @@ async function cargar() {
   const d = await api(""); moneda = d.moneda;
   $("#login").hidden = true; $("#app").hidden = false; $("#titulo").textContent = d.restaurante;
   const u = d.uso_mes, t = d.topes;
-  $("#uso").textContent = `Este mes: ${u.sesiones}/${t.sesiones_mes} conversaciones · ${u.minutos}/${t.minutos_mes} min · US$${u.usd.toFixed(2)}/${t.usd_mes}`;
+  $("#uso").textContent = `Este mes: ${u.conversaciones} conversaciones · ${u.pedidos} pedidos (${plata(u.ventas)}) · orbe ${plata(u.gasto_cop)} de ${plata(t.tope_cop_mes)}`;
   $("#mesas").innerHTML = d.mesas.map((m) => `<div class="mesa ${m.abierta ? "on" : ""}" data-m="${esc(m.mesa)}" data-a="${m.abierta ? 1 : 0}">
     <b>${esc(m.mesa)}</b><small>${m.abierta ? (m.hablando ? "abierta · hablando" : "abierta") : "cerrada"}</small></div>`).join("");
   document.querySelectorAll(".mesa").forEach((el) => el.onclick = async () => { await api("/mesa", { mesa: el.dataset.m, abierta: el.dataset.a !== "1" }); cargar(); });

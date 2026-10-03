@@ -234,6 +234,21 @@ def probar_push(u: str = Depends(usuario)):
     return {"enviadas": push.enviar("Axtra", "Las notificaciones funcionan, señor.")}
 
 
+# ---------------- Negocios: los orbes que mueve Axtra (tarjeta madre) ----------------
+@app.get("/api/negocios")
+def negocios(u: str = Depends(usuario)):
+    from .apex import config as apex_config, db as apex_db
+
+    out = []
+    for r in apex_config.restaurantes().values():
+        abiertas = apex_db.mesas(r["id"])
+        out.append({"id": r["id"], "nombre": r["nombre"], "uso": apex_db.uso_mes(r["id"]),
+                    "tope_cop": r["topes"]["tope_cop_mes"], "mesas": len(r.get("mesas", [])),
+                    "mesas_abiertas": sum(1 for m in r.get("mesas", []) if abiertas.get(m)),
+                    "llamadas": len(apex_db.llamadas(r["id"]))})
+    return out
+
+
 # ---------------- La app del celular ----------------
 APP_DIR = config.BASE / "app_movil"
 if APP_DIR.is_dir():

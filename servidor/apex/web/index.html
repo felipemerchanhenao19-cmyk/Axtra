@@ -10,7 +10,7 @@
 <style>
 :root { --bg:#07090f; --card:#0f141d; --line:#1d2533; --txt:#eef3fa; --muted:#8a97ab; --c1:#0b3d91; --c2:#3fd0ff; --c3:#8be9ff; --ok:#43d39e; --bad:#ff7a7a; }
 * { box-sizing:border-box; margin:0; }
-body { background:var(--bg); color:var(--txt); font:16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding-bottom:110px; }
+body { background:var(--bg); color:var(--txt); font:16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding-bottom:150px; }
 header { padding:22px 16px 6px; text-align:center; }
 header h1 { font-size:22px; letter-spacing:.02em; }
 header p { color:var(--muted); font-size:14px; }
@@ -33,6 +33,8 @@ button { font:inherit; border:0; border-radius:999px; padding:11px 18px; cursor:
 .barra { position:fixed; left:0; right:0; bottom:0; padding:14px 16px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(transparent, var(--bg) 35%); }
 .todo { width:100%; max-width:720px; display:block; margin:auto; background:linear-gradient(90deg, var(--c1), var(--c2)); color:#fff; font-weight:600; padding:15px; font-size:16px; }
 .todo:disabled { opacity:.45; }
+.mesero { display:block; margin:10px auto 0; background:transparent; color:var(--muted); border:1px solid var(--line); font-size:14px; padding:9px 16px; }
+.mesero.alerta { background:#ffb547; color:#1b1203; border:0; font-weight:700; font-size:16px; padding:13px 22px; }
 .inicio { position:fixed; inset:0; background:rgba(4,6,10,.92); display:grid; place-items:center; text-align:center; z-index:10; padding:24px; }
 .inicio button { background:var(--c2); color:#04121c; font-weight:700; font-size:18px; padding:16px 30px; margin-top:18px; }
 .inicio p { color:var(--muted); max-width:300px; margin:10px auto 0; font-size:14px; }
@@ -55,14 +57,17 @@ button { font:inherit; border:0; border-radius:999px; padding:11px 18px; cursor:
   <div class="estado" id="estado"></div>
 </header>
 <main class="platos" id="platos"></main>
-<div class="barra"><button class="todo" id="todo" disabled>Pedir todo lo seleccionado</button></div>
+<div class="barra">
+  <button class="todo" id="todo" disabled>Pedir todo lo seleccionado</button>
+  <button class="mesero" id="mesero">🙋 Llamar al mesero</button>
+</div>
 
 <script>
 const q = new URLSearchParams(location.search), R = q.get("r") || "demo", MESA = q.get("mesa") || "1";
 const API = q.get("api") || location.origin;
 const $ = (s) => document.querySelector(s);
 const ETIQ = { apagado: "Toque el orbe para hablar", conectando: "Conectando…", escuchando: "Le escucho",
-               pensando: "Un momento…", hablando: "" };
+               oyendo: "Le escucho…", pensando: "Un momento…", hablando: "", dormido: "Toque el orbe para seguir hablando" };
 let menu = null, cuentas = {};
 
 const orbe = new ApexVoz({ api: API, restaurante: R, mesa: MESA });
@@ -72,10 +77,11 @@ orbe.onnivel = (n) => { nivel = n; };
 orbe.onerror = (m) => { const a = document.createElement("div"); a.className = "aviso"; a.textContent = m;
   document.body.append(a); setTimeout(() => a.remove(), 6000); };
 orbe.onpedido = (r) => {
-  if (r.confirmado) { cuentas = {}; }
-  else if (r.platos) { cuentas = {}; for (const p of r.platos) cuentas[p.plato] = (cuentas[p.plato] || 0) + p.cantidad; }
+  cuentas = {};
+  if (!r.pedido_numero && r.platos) for (const p of r.platos) cuentas[p.plato] = (cuentas[p.plato] || 0) + p.cantidad;
   pintarCuentas();
 };
+orbe.onsinvoz = () => { $("#mesero").classList.add("alerta"); $("#mesero").hidden = false; };
 
 function pintarCuentas() {
   let total = 0;
@@ -110,13 +116,14 @@ async function cargar() {
 }
 
 $("#comenzar").onclick = async () => { $("#inicio").remove(); await orbe.iniciar(); };
-$("#orbe").onclick = () => { if (orbe.estado === "apagado") orbe.iniciar(); };
+$("#orbe").onclick = () => { if (["apagado", "dormido"].includes(orbe.estado)) orbe.iniciar(); };
+$("#mesero").onclick = () => orbe.llamarMesero().catch((e) => orbe.onerror(e.message));
 $("#todo").onclick = () => orbe.pedirTodo().catch((e) => orbe.onerror(e.message));
 
 /* Orbe: esfera azul hielo que respira en reposo y late con la voz real. */
 function dibujar(cv, t) {
   const g = cv.getContext("2d"), w = cv.width, c = w / 2, r = w * 0.3;
-  const habla = estado === "hablando" ? nivel : 0, oye = estado === "escuchando" ? 0.08 : 0;
+  const habla = estado === "hablando" ? nivel : 0, oye = ["escuchando", "oyendo"].includes(estado) ? 0.06 + nivel * 0.15 : 0;
   const k = 1 + 0.04 * Math.sin(t * 1.8) + habla * 0.25 + oye * Math.sin(t * 6);
   g.clearRect(0, 0, w, w);
   const halo = g.createRadialGradient(c, c, r * 0.6 * k, c, c, r * 1.6 * k);

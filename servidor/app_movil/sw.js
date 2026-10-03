@@ -1,5 +1,5 @@
 // Guarda la app (no las conversaciones) para que abra rápido y se vea aunque no haya señal.
-const CACHE = "axtra-v3";
+const CACHE = "axtra-v4";
 const APP = ["/", "/index.html", "/manifest.webmanifest", "/icono-192.png", "/icono-512.png",
   "/fonts/sora-latin-300-normal.woff2", "/fonts/sora-latin-400-normal.woff2", "/fonts/sora-latin-600-normal.woff2",
   "/fonts/inter-latin-400-normal.woff2", "/fonts/inter-latin-500-normal.woff2", "/fonts/inter-latin-600-normal.woff2",

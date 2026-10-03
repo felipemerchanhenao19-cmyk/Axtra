@@ -1,205 +1,220 @@
-/* Apex Play · voz del orbe con OpenAI Realtime (WebRTC, voz a voz).
+/* Apex Play · el orbe de voz (motor económico de Axtra).
+ *
+ * El teléfono escucha y, cuando el cliente termina de hablar, manda ese pedacito de audio a la puerta.
+ * Axtra lo entiende (Groq Whisper), piensa (Groq) y responde con voz (Google). Las frases fijas
+ * (saludo, «Muy buena elección», despedida…) ya están grabadas: suenan al instante y no cuestan.
+ * Nada de lo que dice el orbe se muestra escrito: solo se escucha.
  *
  * Uso en el menú de cualquier restaurante:
  *   <script src="https://api.axtra.chat/web/apex-voz.js"></script>
  *   const orbe = new ApexVoz({ api: "https://api.axtra.chat", restaurante: "demo", mesa: "1" });
- *   orbe.onestado = (e) => ...;          // "conectando" | "escuchando" | "pensando" | "hablando" | "apagado"
- *   orbe.onnivel = (n) => ...;           // 0..1, volumen de la voz del orbe (para animar)
+ *   orbe.onestado = (e) => ...;   // "conectando" | "escuchando" | "oyendo" | "pensando" | "hablando" | "dormido" | "apagado"
+ *   orbe.onnivel = (n) => ...;    // 0..1 para animar el orbe (voz del cliente o del orbe)
+ *   orbe.onpedido = (p) => ...;   // {platos, total, total_numero} cuando cambia el pedido
+ *   orbe.onsinvoz = () => ...;    // falló la voz o se acabó el saldo del mes: mostrar «Llamar al mesero»
  *   orbe.onerror = (msg) => ...;
- *   botonComenzar.onclick = () => orbe.iniciar();        // debe ser un toque (permiso de audio y micrófono)
+ *   botonComenzar.onclick = () => orbe.iniciar();     // debe ser un toque (permiso de audio y micrófono)
  *   botonPedir.onclick = () => orbe.pedirPlato("ajiaco");
  *   botonPedirTodo.onclick = () => orbe.pedirTodo();
- *
- * Nada de lo que dice el orbe se muestra escrito: solo se escucha.
- * La API key de OpenAI nunca llega al navegador: el servidor entrega un token efímero de 60 s.
+ *   botonMesero.onclick = () => orbe.llamarMesero();
  */
 (function () {
   "use strict";
   const CLAVE = (r, m) => `apex:${r}:${m}`;
+  const TIPO = ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/mp4", "audio/webm"]
+    .find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
+  const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
   class ApexVoz {
     constructor({ api, restaurante, mesa }) {
       Object.assign(this, { api: api.replace(/\/$/, ""), restaurante, mesa });
-      this.estado = "apagado"; this.uso = {}; this.cola = []; this.respondiendo = false;
-      this.pendientes = []; this.despedida = false; this.timerSilencio = null;
-      this.onestado = () => {}; this.onnivel = () => {}; this.onerror = () => {}; this.onpedido = () => {};
+      this.estado = "apagado"; this.frases = {}; this.ocupado = false; this.despedida = false;
+      for (const k of ["onestado", "onnivel", "onerror", "onpedido", "onsinvoz"]) this[k] = () => {};
     }
 
     _estado(e) { if (e !== this.estado) { this.estado = e; this.onestado(e); } }
 
-    async _post(ruta, cuerpo) {
-      const r = await fetch(this.api + ruta, { method: "POST", headers: { "Content-Type": "application/json" },
-                                               body: JSON.stringify(cuerpo) });
+    async _post(ruta, cuerpo, extra = {}) {
+      const r = await fetch(this.api + ruta, { method: "POST", ...extra,
+        headers: { "Content-Type": "application/json", ...(extra.headers || {}) },
+        body: extra.body !== undefined ? extra.body : JSON.stringify(cuerpo) });
       const datos = await r.json().catch(() => ({}));
       if (!r.ok) throw Object.assign(new Error(datos.error || `error ${r.status}`), { status: r.status });
       return datos;
     }
     _cred() { return { sesion: this.s.sesion, secreto: this.s.secreto }; }
 
-    /* 1. Toque para comenzar: pide sesión, abre el micrófono y conecta con OpenAI por WebRTC. */
+    async _sesion() {
+      let anterior = null;
+      try { anterior = JSON.parse(sessionStorage.getItem(CLAVE(this.restaurante, this.mesa)) || "null"); } catch {}
+      this.s = await this._post("/v1/sesion", { restaurante: this.restaurante, mesa: this.mesa, anterior });
+      try { sessionStorage.setItem(CLAVE(this.restaurante, this.mesa), JSON.stringify(this._cred())); } catch {}
+      if (this.s.sin_voz) this.onsinvoz();
+    }
+
+    /* 1. «Toque para comenzar»: sesión, micrófono, frases grabadas y saludo. */
     async iniciar() {
-      if (this.pc) return;
+      if (this.mic) { if (this.estado === "dormido") this._escuchar(); return; }
       this._estado("conectando");
       try {
-        let anterior = null;
-        try { anterior = JSON.parse(sessionStorage.getItem(CLAVE(this.restaurante, this.mesa)) || "null"); } catch {}
-        this.s = await this._post("/v1/sesion", { restaurante: this.restaurante, mesa: this.mesa, anterior });
-        try { sessionStorage.setItem(CLAVE(this.restaurante, this.mesa), JSON.stringify(this._cred())); } catch {}
-        this.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
-
-        const pc = this.pc = new RTCPeerConnection();
-        this.audio = new Audio(); this.audio.autoplay = true; this.audio.playsInline = true;
-        pc.ontrack = (e) => { this.audio.srcObject = e.streams[0]; this._medir(e.streams[0]); };
-        pc.addTrack(this.mic.getTracks()[0], this.mic);
-        pc.onconnectionstatechange = () => { if (["failed", "closed"].includes(pc.connectionState)) this.terminar("conexión perdida"); };
-        this.dc = pc.createDataChannel("oai-events");
-        this.dc.onmessage = (m) => { try { this._evento(JSON.parse(m.data)); } catch (e) { console.warn(e); } };
-        const abierto = new Promise((ok) => (this.dc.onopen = ok));
-
-        const oferta = await pc.createOffer(); await pc.setLocalDescription(oferta);
-        const r = await fetch("https://api.openai.com/v1/realtime/calls", {
-          method: "POST", body: oferta.sdp, headers: { Authorization: `Bearer ${this.s.token}`, "Content-Type": "application/sdp" } });
-        if (!r.ok) throw new Error(`OpenAI no aceptó la conexión (${r.status})`);
-        const callId = (r.headers.get("Location") || "").split("/").pop();
-        await pc.setRemoteDescription({ type: "answer", sdp: await r.text() });
-        if (callId) this._post("/v1/sesion/llamada", { ...this._cred(), call_id: callId }).catch(() => {});
-        await abierto;
-        this.inicio = Date.now();
-        this.limite = setTimeout(() => this.terminar("tope de tiempo"), this.s.max_segundos * 1000);
-        this._estado("escuchando");
-        this.decir(this.s.frases.saludo);
+        // El audio se desbloquea dentro del toque (Android/iPhone lo exigen)
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)(); this.ctx.resume();
+        this.altavoz = new Audio(); this.altavoz.playsInline = true;
+        await this._sesion();
+        this.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
+        this.anMic = this.ctx.createAnalyser(); this.anMic.fftSize = 1024;
+        this.ctx.createMediaStreamSource(this.mic).connect(this.anMic);
+        this.anVoz = this.ctx.createAnalyser(); this.anVoz.fftSize = 512;
+        const fuente = this.ctx.createMediaElementSource(this.altavoz);
+        fuente.connect(this.anVoz); this.anVoz.connect(this.ctx.destination);
+        this._precargar();
+        this.vigia = setInterval(() => this._vigilar(), 60);
+        await this._decir({ frase: this.s.frases.saludo });
+        this._escuchar();
       } catch (e) {
         this.onerror(e.status === 403 ? "La mesa está cerrada. Pida al mesero que la abra."
                    : e.status === 409 ? "Ya hay una conversación activa en esta mesa."
-                   : e.status === 429 ? "El orbe no está disponible ahora; un mesero lo atenderá."
-                   : (e.name === "NotAllowedError" ? "Permita el micrófono para hablar con el orbe." : e.message));
+                   : e.name === "NotAllowedError" ? "Permita el micrófono para hablar con el orbe." : "No pude iniciar el orbe: " + e.message);
         this.terminar("error al iniciar");
       }
     }
 
-    /* Volumen de la voz del orbe (para animarlo). */
-    _medir(stream) {
+    /* Descarga una vez las frases fijas: después suenan sin esperar. */
+    _precargar() {
+      for (const url of Object.values(this.s.frases)) {
+        if (this.frases[url]) continue;
+        this.frases[url] = fetch(this.api + url).then((r) => r.ok ? r.blob() : null)
+          .then((b) => b && URL.createObjectURL(b)).catch(() => null);
+      }
+    }
+
+    /* Reproduce lo que manda la puerta: una frase grabada (URL) o un audio nuevo (base64). */
+    async _decir(res) {
+      let url = null, temporal = false;
+      if (res.frase) url = await (this.frases[res.frase] || (this.frases[res.frase] = fetch(this.api + res.frase)
+        .then((r) => r.ok ? r.blob() : null).then((b) => b && URL.createObjectURL(b)).catch(() => null)));
+      else if (res.audio) { url = URL.createObjectURL(new Blob([Uint8Array.from(atob(res.audio), (c) => c.charCodeAt(0))], { type: "audio/mpeg" })); temporal = true; }
+      if (!url) { if (res.sin_voz) this.onsinvoz(); return; }
+      this._estado("hablando");
+      await new Promise((listo) => {
+        this.alTerminar = listo;
+        this.altavoz.onended = this.altavoz.onerror = () => listo();
+        this.altavoz.src = url; this.altavoz.play().catch(() => listo());
+      });
+      this.alTerminar = null;
+      if (temporal) URL.revokeObjectURL(url);
+      if (res.sin_voz) this.onsinvoz();
+    }
+
+    _callar() { if (this.altavoz) { this.altavoz.pause(); if (this.alTerminar) this.alTerminar(); } }
+
+    _escuchar() {
+      if (!this.mic) return;
+      this.ultimaVoz = Date.now(); this.voz = 0; this._estado("escuchando");
+    }
+
+    _nivel(an) {
+      const d = new Float32Array(an.fftSize); an.getFloatTimeDomainData(d);
+      let s = 0; for (const v of d) s += v * v; return Math.sqrt(s / d.length);
+    }
+
+    /* Cada 60 ms: ¿el cliente empezó o terminó de hablar? ¿interrumpe al orbe? */
+    _vigilar() {
+      if (!this.mic) return;
+      const rms = this._nivel(this.anMic), ahora = Date.now();
+      if (this.base === undefined) { this.base = 0.008; this.medidas = 0; }
+      if (this.estado === "escuchando" && rms < this.base * 2.5) {           // aprende el ruido del lugar
+        this.base = this.base * 0.95 + Math.max(0.004, rms) * 0.05;
+      }
+      const umbral = Math.max(0.015, this.base * 3);
+      this.onnivel(this.estado === "hablando" ? Math.min(1, this._nivel(this.anVoz) * 6) : Math.min(1, rms * 8));
+
+      if (this.estado === "escuchando") {
+        this.voz = rms > umbral ? this.voz + 60 : 0;
+        if (this.voz >= 120) return this._grabar();
+        const quieto = ahora - this.ultimaVoz;
+        if (this.despedida && quieto > 10000) return this.terminar("pedido enviado");   // 4. se apaga solo
+        if (!this.despedida && quieto > 45000) { this._estado("dormido"); }              // toque el orbe para seguir
+      } else if (this.estado === "oyendo") {
+        if (rms > umbral) this.ultimaVoz = ahora;
+        if (ahora - this.ultimaVoz > 850 || ahora - this.inicioGrab > 15000) this._enviar();
+      } else if (this.estado === "hablando") {                                          // interrumpir al orbe
+        this.voz = rms > umbral * 2.5 ? this.voz + 60 : 0;
+        if (this.voz >= 300) { this._callar(); this._grabar(); }
+      }
+    }
+
+    _grabar() {
+      if (!window.MediaRecorder) return;
+      this.trozos = []; this.inicioGrab = this.ultimaVoz = Date.now(); this.despedida = false;
+      this.rec = new MediaRecorder(this.mic, TIPO ? { mimeType: TIPO, audioBitsPerSecond: 32000 } : undefined);
+      this.rec.ondataavailable = (e) => e.data.size && this.trozos.push(e.data);
+      this.rec.start(200);
+      this._estado("oyendo");
+    }
+
+    async _enviar() {
+      const rec = this.rec; this.rec = null;
+      this._estado("pensando");
+      await new Promise((ok) => { rec.onstop = ok; rec.stop(); });
+      const audio = new Blob(this.trozos, { type: rec.mimeType || TIPO });
+      if (audio.size < 2500) return this._escuchar();                    // fue un ruido corto
+      await this._turno(() => fetch(this.api + "/v1/turno", { method: "POST", body: audio,
+        headers: { "Content-Type": audio.type || "application/octet-stream", "X-Apex-Sesion": this.s.sesion, "X-Apex-Secreto": this.s.secreto } })
+        .then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || r.status), { status: r.status }); return d; }));
+    }
+
+    /* Una vuelta: pide la respuesta, la dice y vuelve a escuchar. Si la sesión venció, la renueva. */
+    async _turno(pedir) {
+      if (this.ocupado) return; this.ocupado = true;
       try {
-        const ctx = this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const an = ctx.createAnalyser(); an.fftSize = 512; ctx.createMediaStreamSource(stream).connect(an);
-        const d = new Uint8Array(an.fftSize);
-        const paso = () => { if (!this.pc) return; an.getByteTimeDomainData(d); let s = 0;
-          for (const v of d) s += (v - 128) ** 2; this.onnivel(Math.min(1, Math.sqrt(s / d.length) / 40)); requestAnimationFrame(paso); };
-        paso();
-      } catch {}
-    }
-
-    _enviar(ev) { if (this.dc && this.dc.readyState === "open") this.dc.send(JSON.stringify(ev)); }
-
-    /* Pide una respuesta; si el orbe está hablando, espera su turno. */
-    _responder(response) {
-      if (this.respondiendo) { this.cola.push(response); return; }
-      this.respondiendo = true; this.ultima = response; this._enviar({ type: "response.create", response });
-    }
-
-    /* Frase fija del guion (saludo, «Muy buena elección», etc.). */
-    decir(frase) {
-      this._responder({ tool_choice: "none",
-        instructions: `Di exactamente esta frase, sin agregar nada más: «${frase}»` });
-    }
-
-    _nota(texto) {     // acción hecha en la pantalla, para que el orbe la tenga en cuenta
-      this._enviar({ type: "conversation.item.create",
-        item: { type: "message", role: "system", content: [{ type: "input_text", text: texto }] } });
-    }
-
-    _herramienta(nombre, argumentos = {}) {
-      return this._post("/v1/herramienta", { ...this._cred(), nombre, argumentos });
-    }
-
-    /* 2. Botón «Pedir» de un plato. */
-    async pedirPlato(platoId, cantidad = 1) {
-      if (!this.pc) await this.iniciar();
-      const r = await this._herramienta("agregar_plato", { plato_id: platoId, cantidad });
-      this.onpedido(r);
-      if (!r.ok) { this.decir("Lo siento, ese plato no está disponible ahora."); return r; }
-      this._nota(`El cliente tocó «Pedir» en: ${r.agregado}. Pedido actual: ${JSON.stringify(r.platos)}; total ${r.total}.`);
-      this.decir(this.s.frases.eleccion);
-      return r;
-    }
-
-    /* 3. Botón «Pedir todo lo seleccionado»: repite el pedido y pide confirmación por voz. */
-    async pedirTodo() {
-      if (!this.pc) await this.iniciar();
-      const r = await this._herramienta("ver_pedido");
-      if (!r.platos || !r.platos.length) { this.decir("Aún no ha seleccionado ningún plato. ¿Qué le provoca?"); return; }
-      this._nota(`El cliente tocó «Pedir todo lo seleccionado». Pedido: ${JSON.stringify(r.platos)}; total ${r.total}.`);
-      this._responder({ instructions: "Repite el pedido de forma breve (platos, cantidades y total) y pregunta si lo confirma. " +
-        "Si el cliente dice que sí, usa confirmar_pedido." });
-    }
-
-    /* Eventos de OpenAI Realtime. */
-    _evento(ev) {
-      switch (ev.type) {
-        case "input_audio_buffer.speech_started":
-          clearTimeout(this.timerSilencio); this._estado("escuchando"); break;
-        case "input_audio_buffer.speech_stopped": this._estado("pensando"); break;
-        case "output_audio_buffer.started": this._estado("hablando"); break;
-        case "output_audio_buffer.stopped":
-          this._estado("escuchando");
-          if (this.despedida) {      // 4. tras despedirse, escucha 10 s y si nadie habla, se apaga
-            clearTimeout(this.timerSilencio);
-            this.timerSilencio = setTimeout(() => this.terminar("pedido enviado"), 10000);
-          }
-          break;
-        case "response.function_call_arguments.done":
-          this.pendientes.push(this._ejecutar(ev.call_id, ev.name, ev.arguments)); break;
-        case "response.done": this._finRespuesta(ev.response || {}); break;
-        case "response.created": this.respondiendo = true; break;      // también las que el orbe inicia solo
-        case "error":
-          console.warn("Realtime:", ev.error);
-          if (/active response/i.test(ev.error?.message || "") && this.ultima) { this.cola.unshift(this.ultima); this.respondiendo = true; }
-          break;
+        let res;
+        try { res = await pedir(); }
+        catch (e) { if (e.status !== 410 && e.status !== 401) throw e; await this._sesion(); res = await pedir(); }
+        if (res.pedido) this.onpedido(res.pedido);
+        await this._decir(res);
+        if (res.despedida) this.despedida = true;
+      } catch (e) {
+        if (e.status === 409) this.onerror(e.message);
+        else this.onsinvoz();                                           // sin red o sin servidor: plan de respaldo
+      } finally {
+        this.ocupado = false;
+        if (this.mic && this.estado !== "apagado") this._escuchar();
       }
     }
 
-    async _ejecutar(callId, nombre, args) {
-      let salida;
-      try { salida = await this._herramienta(nombre, args); }
-      catch (e) { salida = { ok: false, error: e.message }; }
-      if (nombre === "confirmar_pedido" && salida.ok) { this.despedida = true; this.onpedido({ ...salida, confirmado: true }); }
-      else if (salida.platos) this.onpedido(salida);
-      this._enviar({ type: "conversation.item.create",
-        item: { type: "function_call_output", call_id: callId, output: JSON.stringify(salida) } });
+    async _accion(tipo, extra = {}) {
+      if (!this.mic) await this.iniciar();
+      if (!this.s) return;
+      this._callar();
+      this._estado("pensando");
+      await this._turno(() => this._post("/v1/accion", { ...this._cred(), tipo, ...extra }));
     }
 
-    async _finRespuesta(resp) {
-      const u = resp.usage;
-      if (u) {
-        const i = u.input_token_details || {}, o = u.output_token_details || {}, c = i.cached_tokens_details || {};
-        const suma = (k, v) => (this.uso[k] = (this.uso[k] || 0) + (v || 0));
-        suma("audio_in", (i.audio_tokens || 0) - (c.audio_tokens || 0)); suma("audio_in_cache", c.audio_tokens);
-        suma("texto_in", (i.text_tokens || 0) - (c.text_tokens || 0)); suma("texto_in_cache", c.text_tokens);
-        suma("audio_out", o.audio_tokens); suma("texto_out", o.text_tokens);
-      }
-      this.respondiendo = false;
-      if (this.pendientes.length) {       // hubo herramientas: el orbe debe responder con su resultado
-        const p = this.pendientes; this.pendientes = []; await Promise.all(p);
-        return this._responder({});
-      }
-      if (this.cola.length) this._responder(this.cola.shift());
+    /* 2. Botón «Pedir» de un plato → «Muy buena elección». */
+    pedirPlato(platoId, cantidad = 1) { return this._accion("pedir", { plato_id: platoId, cantidad }); }
+    /* 3. «Pedir todo lo seleccionado» → repite el pedido y pide confirmación por voz. */
+    pedirTodo() { return this._accion("pedir_todo"); }
+    /* Respaldo: siempre se puede llamar a un humano, aunque la voz o el micrófono no funcionen. */
+    async llamarMesero() {
+      if (this.mic) return this._accion("mesero");
+      if (!this.s) await this._sesion();
+      await this._post("/v1/accion", { ...this._cred(), tipo: "mesero" });
+      this.onerror("Listo: un mesero va en camino.");
     }
 
-    /* 5. Se apaga: cuelga y reporta el uso (para controlar el gasto por restaurante). */
-    async terminar(motivo = "terminó") {
-      clearTimeout(this.timerSilencio); clearTimeout(this.limite);
-      const pc = this.pc; this.pc = null;
-      if (pc) { try { pc.close(); } catch {} }
+    /* 5. Se apaga y libera la mesa. */
+    terminar(motivo = "terminó") {
+      clearInterval(this.vigia); this._callar();
+      if (this.rec && this.rec.state !== "inactive") this.rec.stop();
       if (this.mic) this.mic.getTracks().forEach((t) => t.stop());
       if (this.ctx) this.ctx.close().catch(() => {});
       if (this.s) {
-        const cuerpo = JSON.stringify({ ...this._cred(), uso: this.uso });
-        try { navigator.sendBeacon ? navigator.sendBeacon(this.api + "/v1/sesion/fin", new Blob([cuerpo], { type: "text/plain" }))
-                                   : await fetch(this.api + "/v1/sesion/fin", { method: "POST", body: cuerpo, keepalive: true }); } catch {}
+        const cuerpo = JSON.stringify({ ...this._cred(), motivo });
+        try { navigator.sendBeacon(this.api + "/v1/sesion/fin", new Blob([cuerpo], { type: "text/plain" })); } catch {}
         try { sessionStorage.removeItem(CLAVE(this.restaurante, this.mesa)); } catch {}
-        this.s = null;
       }
-      Object.assign(this, { dc: null, respondiendo: false, cola: [], pendientes: [], despedida: false, uso: {} });
+      Object.assign(this, { s: null, mic: null, ctx: null, rec: null, despedida: false, ocupado: false, base: undefined });
       this.onnivel(0); this._estado("apagado");
     }
   }

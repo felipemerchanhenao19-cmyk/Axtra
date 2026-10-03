@@ -1,105 +1,124 @@
-# Apex Play: el orbe de voz para restaurantes
+# Orbes de negocios (Apex Play), con Axtra como tarjeta madre
 
-El cliente escanea el QR de su mesa, toca **«Toque para comenzar»** y el orbe lo atiende **solo por voz** (OpenAI Realtime, voz a voz, como el modo de voz de ChatGPT). Los pedidos llegan al **panel del mesero**, que también abre y cierra las mesas.
+El cliente escanea el QR de su mesa, toca **«Toque para comenzar»** y el orbe lo atiende **solo por voz**. Los pedidos llegan al **panel del mesero**, que también abre y cierra las mesas. Tú ves cada negocio en la pantalla **«Negocios»** de tu app de Axtra.
 
 ## Cómo está armado
 
 ```
-Teléfono del cliente ──(menú: la página del restaurante)
-   │  1. POST /v1/sesion  {restaurante, mesa}          ┌──────────────────────────────┐
-   ├──────────────────────────────────────────────────▶│ api.axtra.chat (contenedor   │
-   │  ◀── token efímero de 60 s (ek_…)                 │ "apex", SIN Cloudflare Access)│
-   │                                                   │  · revisa que la mesa esté   │
-   │  2. WebRTC con el token ──▶ OpenAI Realtime       │    ABIERTA y el origen       │
-   │     (la voz va directo, sin pasar por el servidor)│  · pide el token a OpenAI    │
-   │                                                   │    con SU llave (nunca sale) │
-   │  3. herramientas: agregar_plato, ver_pedido,      │  · ejecuta las herramientas  │
-   │     confirmar_pedido, llamar_mesero ─────────────▶│  · guarda pedidos y uso      │
-   │                                                   │  · cuelga llamadas largas    │
-   └───────────────────────────────────────────────────└──────────────────────────────┘
-Panel del mesero: https://api.axtra.chat/panel?r=demo   (PIN)
+                 ┌──────────────── AXTRA (tarjeta madre) ────────────────┐
+                 │ Todas las claves (.env): Groq, Gemini, Google, Claude… │
+                 │ y los PIN de los paneles. Pantalla «Negocios».         │
+                 │   axtra.chat (8080, privado con Access)                │
+                 │   ranura privada (8090, el túnel NO la publica):       │
+                 │     /oido  Groq Whisper        voz → texto             │
+                 │     /pensar Groq gpt-oss → Gemini (respaldo)           │
+                 │     /voz   Google TTS → voz gratis de Axtra (respaldo) │
+                 └───────────────────────────┬────────────────────────────┘
+                                             │ (dentro del servidor)
+                 ┌───────────────────────────┴────────────────────────────┐
+                 │ PUERTA PÚBLICA api.axtra.chat (8081) · SIN claves       │
+                 │ mesas, conversaciones, herramientas, pedidos, costo $   │
+                 └───────────────────────────┬────────────────────────────┘
+                                             │
+                        Teléfono del cliente: menú + orbe (apex-voz.js)
 ```
 
-- **Axtra sigue privado.** La puerta corre en otro contenedor, con otra base de datos y otro archivo de claves (`apex.env`). Desde `api.axtra.chat` no se llega a nada de Axtra.
-- **La llave de OpenAI nunca llega al navegador.** El servidor entrega un token que solo sirve 60 segundos para conectarse.
-- **El orbe no muestra texto.** Solo se escucha.
+**Una vuelta de conversación:**
+1. El teléfono detecta cuándo el cliente termina de hablar y manda solo ese pedacito de audio.
+2. Axtra lo pasa a texto (oído).
+3. Lo responde con el menú, la personalidad del restaurante y las herramientas (cerebro).
+4. Convierte la respuesta en voz.
+5. El orbe la dice y vuelve a escuchar.
+
+Si el cliente habla mientras el orbe habla, el orbe se calla y lo escucha.
+
+**Frases fijas grabadas:** saludo, «Muy buena elección», despedida, «¿me repite?» y otras. Se generan **una sola vez** y quedan guardadas, así que suenan al instante y **no cuestan**. Los botones «Pedir» usan frases fijas, así que **no gastan cerebro**.
+
+## Costo real por pieza (medido)
+
+Precios en pesos, con el dólar a 4.000 COP:
+
+| Pieza | Servicio | Costo por respuesta del orbe |
+|---|---|---|
+| Oído | Groq Whisper turbo (mínimo 10 s) | ~0,4 COP |
+| Cerebro | Groq gpt-oss-20b (2 pasos con herramientas) | ~1,6 COP |
+| Voz | Google Neural2 (~80 caracteres) | ~5 COP |
+| **Total** | | **~7 COP por respuesta** |
+
+Una conversación típica tiene unas 3 respuestas habladas, unos **20–25 COP**. A eso se suman los botones y las frases fijas, que no cuestan.
+
+| Restaurante | Conversaciones al mes | Costo de API al mes |
+|---|---|---|
+| Pequeño | 450 | ~10.000 COP |
+| Mediano | 1.200 | ~26.000 COP |
+| Grande | 3.000 | ~65.000 COP |
+
+Además, **Google regala 1 millón de caracteres de voz al mes** (unas 12.000 respuestas), así que el costo real es menor. Ese regalo se comparte entre todos los negocios.
+
+**Tipo de voz**, en `restaurantes/<id>.json`, campo `"voz"`:
+- **Neural2** (por defecto): natural, 16 US$ por millón de caracteres.
+- **Chirp3-HD**: la más humana, 30 US$ por millón. Para un plan premium.
+- **Standard**: robótica, 4 US$ por millón.
 
 ## Seguridad y control de gasto
 
-| Riesgo | Qué hace la puerta |
+| Riesgo | Qué hace el sistema |
 |---|---|
-| Pedidos falsos con una foto del QR | Con la mesa **cerrada** no hay sesión ni pedidos. El mesero la abre desde el panel al sentar a los clientes. Al cerrarla, la conversación se corta. |
-| Dos teléfonos en la misma mesa | **Una conversación activa por mesa.** El mismo teléfono puede recargar la página sin quedar bloqueado. |
-| Otras páginas usando la puerta | Solo se aceptan peticiones de los **dominios del restaurante** (CORS y revisión del origen en el servidor). |
-| Abuso | **Límite de peticiones**: 6 sesiones por minuto por IP, 4 por mesa y 60 herramientas por minuto. Hay bloqueo tras 8 PIN incorrectos. |
-| Conversaciones eternas | **Tope de minutos por sesión** (8 por defecto). El servidor **cuelga la llamada** en OpenAI aunque el teléfono no colabore. También cierra las sesiones que no conectan. |
-| Gasto del mes | **Topes por restaurante**: conversaciones, minutos y US$ al mes. Al llegar al tope, el orbe dice que un mesero lo atenderá. El panel muestra el uso del mes. |
-
-El costo en US$ es una **estimación** con los tokens que reporta OpenAI y los precios de `config.py`. Revísalos en la página de precios de OpenAI. Pon además un **límite de gasto mensual en la cuenta de OpenAI** (Settings → Limits): ese es el tope duro.
-
-**Precios de referencia** (USD por millón de tokens de audio, a octubre de 2026; verifícalos):
-- `gpt-realtime-2.1-mini`: entrada 10, salida 20.
-- `gpt-realtime-2.1`: entrada 32, salida 64.
-
-En la práctica, el mini cuesta unos **US$0.02–0.15 por minuto** de conversación.
+| Robo de claves | La puerta pública **no tiene ninguna clave**. Todas, incluidos los PIN, viven en el `.env` de Axtra. La ranura no publica nada hacia internet y rechaza lo que llegue por Cloudflare. |
+| Pedidos falsos con una foto del QR | Con la mesa **cerrada** no hay conversación ni pedidos. Al cerrarla, se corta. |
+| Dos teléfonos en la misma mesa | **Una conversación activa por mesa.** El mismo teléfono puede recargar sin bloquearse. |
+| Otras páginas usando la puerta | Solo se aceptan los **dominios del restaurante** (CORS y revisión en el servidor). |
+| Abuso | Límite de peticiones por IP, por mesa y por conversación. Hay bloqueo tras 8 PIN incorrectos. |
+| Gasto | **Tope mensual en pesos por restaurante** (80.000 por defecto). Al llegar, el orbe solo usa frases grabadas y «Llamar al mesero». Además hay tope de minutos y de respuestas por conversación. |
+| Caídas | Groq → **Gemini**. Google → **voz gratis de Axtra**. Todo caído → **«Llamar al mesero»** resaltado, que siempre funciona. |
 
 ## Un restaurante = un archivo
 
 `servidor/apex/restaurantes/<id>.json` contiene:
-- nombre, personalidad del orbe, voz (`marin`, `cedar`, …) y modelo;
-- frases del guion (saludo, «Muy buena elección», despedida);
-- menú, mesas, dominios permitidos y topes.
+- nombre, personalidad, voz, frases fijas;
+- menú, mesas, dominios permitidos y tope mensual en pesos.
 
-Para cambiar al modelo completo: `"modelo": "gpt-realtime-2.1"`. El PIN del panel va en `apex.env` como `APEX_PIN_<ID>` y **nunca** en GitHub.
+Para agregar un restaurante, copia `demo.json`, cámbialo y agrega su PIN en el `.env` de Axtra como `APEX_PIN_<ID>`.
 
 ## Ponerlo en marcha (una vez)
 
-1. **Llave de OpenAI:**
-   - Entra a platform.openai.com → **API keys** → *Create new secret key*.
-   - Carga saldo en **Billing**.
-   - En **Limits**, pon un tope mensual (por ejemplo US$10).
-2. **Claves en el servidor.** Usa el mismo método del Bloc de notas: reemplaza lo que está en MAYÚSCULAS y pégalo en la terminal del servidor.
-   ```
-   cat > /opt/axtra/servidor/apex.env <<'FIN'
-   OPENAI_API_KEY=PEGA_AQUI_LA_LLAVE_DE_OPENAI
-   APEX_MODELO=gpt-realtime-2.1-mini
-   APEX_PIN_DEMO=ELIGE_UN_PIN_DE_4_A_6_NUMEROS
-   FIN
-   chmod 600 /opt/axtra/servidor/apex.env
-   cd /opt/axtra/servidor/despliegue && docker compose up -d --build
-   ```
-3. **Ruta pública en el túnel de Cloudflare:**
-   - Ve a Zero Trust → Networks → Tunnels → `axtra` → **Published application routes** (o *Public Hostname*) → **Add**.
+1. **Claves en el `.env` de Axtra**, todas en el mismo archivo:
+   - `GROQ_API_KEY`: ya la tienes; oído y cerebro.
+   - `GEMINI_API_KEY`: ya la tienes; respaldo del cerebro.
+   - `GOOGLE_TTS_API_KEY`: la voz natural. Créala en Google Cloud → APIs → *Cloud Text-to-Speech API* → Habilitar → Credenciales → Crear clave de API, y **restríngela** a esa API. Mientras no exista, el orbe usa la voz gratis de Axtra.
+   - `APEX_PIN_DEMO`: el PIN del panel, de 4 a 6 números.
+2. **Ruta pública en el túnel de Cloudflare:** Zero Trust → Networks → Tunnels → `axtra` → *Published application routes* → **Add**, con estos datos:
    - Subdomain: `api`
    - Domain: `axtra.chat`
    - Type: `HTTP`
    - URL: `apex:8081`
 
-   La aplicación de Access protege solo `axtra.chat`, así que `api.axtra.chat` queda **pública**. **No** crees una aplicación de Access para `api`.
-4. **Probar:**
-   - En el PC, abre `https://api.axtra.chat/panel?r=demo`, entra con el PIN y toca la **mesa 1** para abrirla.
-   - En el celular, abre `https://api.axtra.chat/demo?r=demo&mesa=1`, toca «Toque para comenzar» y habla.
-   - El pedido aparece en el panel.
+   **No** crees una aplicación de Access para `api`.
+3. **Probar:**
+   - En el PC, abre `https://api.axtra.chat/panel?r=demo`, entra con el PIN y abre la **mesa 1**.
+   - En el celular, abre `https://api.axtra.chat/demo?r=demo&mesa=1` y toca «Toque para comenzar».
+   - Mira el negocio en Axtra, pestaña **Negocios**.
 
 ## Integrarlo en el menú de cada restaurante
 
-En la página del menú (por ejemplo, la que está en Cloudflare Workers):
 ```html
 <script src="https://api.axtra.chat/web/apex-voz.js"></script>
 <script>
   const orbe = new ApexVoz({ api: "https://api.axtra.chat", restaurante: "demo", mesa: MESA_DEL_QR });
-  orbe.onestado = (e) => { /* animar el orbe: conectando, escuchando, pensando, hablando, apagado */ };
-  orbe.onnivel = (n) => { /* 0..1: volumen de la voz, para que el orbe palpite */ };
-  orbe.onerror = (msg) => { /* mostrar aviso */ };
+  orbe.onestado = (e) => {};   // conectando, escuchando, oyendo, pensando, hablando, dormido, apagado
+  orbe.onnivel = (n) => {};    // 0..1 para que el orbe palpite
+  orbe.onpedido = (p) => {};   // el pedido cambió
+  orbe.onsinvoz = () => {};    // resaltar «Llamar al mesero»
   botonComenzar.onclick = () => orbe.iniciar();
   botonPedir.onclick = () => orbe.pedirPlato("ajiaco");
   botonPedirTodo.onclick = () => orbe.pedirTodo();
+  botonMesero.onclick = () => orbe.llamarMesero();
 </script>
 ```
+
 Agrega el dominio de ese menú a `"dominios"` en el archivo del restaurante.
 
-## Siguiente fase: varios restaurantes con su propio dominio
-
-- Cada restaurante es un archivo JSON con sus datos separados por `restaurante` en la base de datos.
-- Su dominio (por ejemplo `menu.restaurante.com`) apunta al Worker del menú con **Cloudflare for SaaS (custom hostnames)**. El Worker llama a `api.axtra.chat`, y ese dominio se agrega a `"dominios"`.
-- Más adelante: un panel de administración para crear restaurantes sin editar archivos.
+## Siguiente fase
+- Dominio propio por restaurante con **Cloudflare for SaaS** (custom hostnames) apuntando al menú.
+- Un panel para crear restaurantes desde Axtra, sin editar archivos.
+- Plan premium opcional con voz Chirp3-HD o voz a voz de OpenAI.
