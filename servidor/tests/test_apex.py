@@ -115,7 +115,7 @@ def test_demo_tiene_mesas_siempre_abiertas(c):
 def test_sesion_trae_frases_grabadas(c):
     abrir(c)
     s = sesion(c).json()
-    assert s["frases"]["saludo"] == "/v1/frase/demo/saludo" and not s["sin_voz"]
+    assert s["frases"]["saludo"].startswith("/v1/frase/demo/saludo?") and not s["sin_voz"]
     assert "token" not in s and "clave" not in json.dumps(s)        # la puerta no tiene ninguna llave
 
 
@@ -162,7 +162,7 @@ def test_botones_pedir_y_confirmar_por_voz(c, axtra):
     abrir(c, "3")
     s = sesion(c, "3").json()
     r = accion(c, s, "pedir", plato_id="bandeja", cantidad=2).json()
-    assert r["frase"] == "/v1/frase/demo/sugerir" and r["sugerir"] == "limonada" and r["pedido"]["total_numero"] == 76000
+    assert r["frase"].startswith("/v1/frase/demo/sugerir?") and r["sugerir"] == "limonada" and r["pedido"]["total_numero"] == 76000
     assert "limonada" in r["texto"]
     assert not [x for x, _ in axtra.llamadas if x == "/pensar"]      # la sugerencia es una frase grabada: no gasta cerebro
     axtra.guion = [texto("Su pedido: dos bandejas paisas, 76 mil pesos. ¿Lo confirma?")]
@@ -180,7 +180,7 @@ def test_botones_pedir_y_confirmar_por_voz(c, axtra):
 def test_pedir_todo_vacio_y_plato_inexistente(c):
     abrir(c)
     s = sesion(c).json()
-    assert accion(c, s, "pedir_todo").json()["frase"] == "/v1/frase/demo/vacio"
+    assert accion(c, s, "pedir_todo").json()["frase"].startswith("/v1/frase/demo/vacio?")
     assert accion(c, s, "pedir", plato_id="pizza").status_code == 409
 
 
@@ -188,7 +188,7 @@ def test_no_entendio_pide_repetir_sin_gastar_cerebro(c, axtra):
     abrir(c)
     s = sesion(c).json()
     axtra.oido = " . "
-    assert turno(c, s).json()["frase"] == "/v1/frase/demo/repetir"
+    assert turno(c, s).json()["frase"].startswith("/v1/frase/demo/repetir?")
     assert "/pensar" not in [x for x, _ in axtra.llamadas]
 
 
@@ -216,9 +216,9 @@ def test_tope_del_mes_usa_solo_frases_y_mesero(c, axtra, monkeypatch):
     r = config.restaurante("demo")
     monkeypatch.setattr(config, "restaurante", lambda rid: {**r, "topes": {**r["topes"], "tope_cop_mes": 0}})
     res = turno(c, s).json()
-    assert res["sin_voz"] and res["frase"] == "/v1/frase/demo/sin_voz"
+    assert res["sin_voz"] and res["frase"].startswith("/v1/frase/demo/sin_voz?")
     assert "/oido" not in [x for x, _ in axtra.llamadas]   # no gasta nada más
-    assert accion(c, s, "mesero").json()["frase"] == "/v1/frase/demo/mesero"
+    assert accion(c, s, "mesero").json()["frase"].startswith("/v1/frase/demo/mesero?")
 
 
 def test_si_axtra_falla_respaldo_y_mesero(c, axtra):
@@ -296,13 +296,13 @@ def test_menu_y_paginas(c):
 def test_botones_quitar_oferta_y_enviar_sin_cerebro(c, axtra):
     s = sesion(c, "4").json()
     accion(c, s, "pedir", plato_id="ajiaco")                          # sugiere la limonada (una sola vez)
-    assert accion(c, s, "pedir", plato_id="omelet").json()["frase"] == "/v1/frase/demo/eleccion"
+    assert accion(c, s, "pedir", plato_id="omelet").json()["frase"].startswith("/v1/frase/demo/eleccion?")
     r = accion(c, s, "quitar", plato_id="omelet").json()               # se equivocó: lo quita
-    assert r["frase"] == "/v1/frase/demo/quitado" and [p["id"] for p in r["pedido"]["platos"]] == ["ajiaco"]
+    assert r["frase"].startswith("/v1/frase/demo/quitado?") and [p["id"] for p in r["pedido"]["platos"]] == ["ajiaco"]
     r = accion(c, s, "confirmar").json()                                # antes de enviar ofrece el postre
-    assert r["frase"] == "/v1/frase/demo/oferta" and r["oferta"] == "volcan" and not r.get("despedida")
+    assert r["frase"].startswith("/v1/frase/demo/oferta?") and r["oferta"] == "volcan" and not r.get("despedida")
     r = accion(c, s, "confirmar").json()                                # «No, enviar así»: no insiste
-    assert r["frase"] == "/v1/frase/demo/enviado" and r["despedida"] is True and r["pedido"]["pedido_numero"]
+    assert r["frase"].startswith("/v1/frase/demo/enviado?") and r["despedida"] is True and r["pedido"]["pedido_numero"]
     assert not [x for x, _ in axtra.llamadas if x == "/pensar"]
     assert c.get("/v1/panel/demo", headers=PIN).json()["pedidos"][0]["total"] == 32000
 
@@ -325,7 +325,7 @@ def test_modo_ejemplo_sin_mesas_y_muchas_personas_a_la_vez(axtra):
     accion(cli, a, "pedir", plato_id="omelet")
     accion(cli, a, "confirmar")
     assert accion(cli, a, "confirmar").json()["pedido"]["pedido_numero"]
-    assert accion(cli, b, "pedir_todo").json()["frase"] == "/v1/frase/demo/vacio"     # el pedido de A no se mezcla con B
+    assert accion(cli, b, "pedir_todo").json()["frase"].startswith("/v1/frase/demo/vacio?")     # el pedido de A no se mezcla con B
 
 
 def test_paginas_sin_cache_y_aguantan_peticiones_raras(c):
@@ -394,9 +394,9 @@ def test_carta_y_frases_en_otro_idioma(c):
     assert m["idioma"] == "en" and {i["codigo"] for i in m["idiomas"]} == {"es", "en", "pt", "de", "ru", "ja"}
     assert next(p for p in m["menu"] if p["id"] == "limonada")["nombre"] == "Coconut lemonade"
     s = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "1", "idioma": "ja"}, headers=ORIGEN).json()
-    assert s["frases"]["saludo"].endswith("?idioma=ja") and "オーブ" in s["saludo"]
+    assert s["frases"]["saludo"].endswith("&idioma=ja") and "オーブ" in s["saludo"]
     r = accion(c, s, "pedir", plato_id="bandeja").json()
-    assert "ココナッツ" in r["texto"] and r["frase"].endswith("?idioma=ja")
+    assert "ココナッツ" in r["texto"] and r["frase"].endswith("&idioma=ja")
     assert "いらっしゃいませ".encode() in c.get(s["frases"]["saludo"]).content       # la voz falsa repite el texto
 
 
@@ -445,3 +445,13 @@ def test_muestras_de_voz_para_escoger(c, axtra):
     assert pedido["voz_edge"] == "es-MX-DaliaNeural" and pedido["voz_google"] == "" and pedido["velocidad"] == 1.08
     assert c.get("/v1/muestra/demo?voz=cualquier-cosa").status_code == 404
     assert c.get("/voces").status_code == 200
+
+
+
+def test_la_frase_cambia_de_direccion_si_cambia_la_voz(c, monkeypatch):
+    antes = sesion(c, "1").json()["frases"]["saludo"]
+    original = config.restaurante
+    monkeypatch.setattr(config, "restaurante", lambda rid: {**original(rid), "voz": {"edge": "es-MX-DaliaNeural"}})
+    apex_app._cubos.clear()
+    despues = sesion(c, "2").json()["frases"]["saludo"]
+    assert antes != despues and despues.startswith("/v1/frase/demo/saludo?v=")

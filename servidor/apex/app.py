@@ -5,6 +5,7 @@ Para probar en tu PC:  APEX_MODO=desarrollo uvicorn servidor.apex.app:app --port
 """
 import asyncio
 import base64
+import hashlib
 import logging
 import hmac
 import json
@@ -156,8 +157,10 @@ class PedidoSesion(BaseModel):
 
 
 def _url_frase(r: dict, k: str) -> str:
-    extra = f"?idioma={r['idioma']}" if r.get("idioma") and r["idioma"] != r.get("idioma_base", "es") else ""
-    return f"/v1/frase/{r['id']}/{k}{extra}"
+    """La dirección cambia si cambia la voz o el texto: así el celular nunca usa un audio viejo de su caché."""
+    huella = hashlib.sha1(json.dumps([r.get("voz"), r["frases"].get(k)], sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:8]
+    extra = f"&idioma={r['idioma']}" if r.get("idioma") and r["idioma"] != r.get("idioma_base", "es") else ""
+    return f"/v1/frase/{r['id']}/{k}?v={huella}{extra}"
 
 
 def _frases(r: dict) -> dict:
