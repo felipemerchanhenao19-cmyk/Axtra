@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apex Play · Panel del mesero</title>
+<meta name="robots" content="noindex">
+<style>
+:root { --bg:#07090f; --card:#0f141d; --line:#1d2533; --txt:#eef3fa; --muted:#8a97ab; --c2:#3fd0ff; --ok:#43d39e; --warn:#ffb547; --bad:#ff7a7a; }
+* { box-sizing:border-box; margin:0; }
+body { background:var(--bg); color:var(--txt); font:15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding:16px; max-width:900px; margin:auto; }
+h1 { font-size:20px; } h2 { font-size:16px; margin:22px 0 10px; color:var(--muted); font-weight:600; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-bottom:10px; }
+.mesas { display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; }
+.mesa { text-align:center; padding:14px 8px; border-radius:14px; border:1px solid var(--line); background:var(--card); cursor:pointer; }
+.mesa b { display:block; font-size:22px; }
+.mesa.on { border-color:var(--ok); box-shadow:0 0 0 1px var(--ok) inset; }
+.mesa small { color:var(--muted); }
+.fila { display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap; }
+button, select, input { font:inherit; border-radius:10px; border:1px solid var(--line); background:#151c28; color:var(--txt); padding:8px 12px; }
+button.prim { background:var(--c2); color:#04121c; border:0; font-weight:600; }
+.muted { color:var(--muted); font-size:13px; }
+.llamada { border-color:var(--warn); }
+#login { max-width:320px; margin:20vh auto; text-align:center; }
+#login input { width:100%; text-align:center; font-size:22px; letter-spacing:.3em; margin:14px 0; }
+</style>
+</head>
+<body>
+<div id="login">
+  <h1>Panel del mesero</h1>
+  <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN">
+  <button class="prim" id="entrar" style="width:100%">Entrar</button>
+  <p class="muted" id="msg" style="margin-top:10px"></p>
+</div>
+<div id="app" hidden>
+  <div class="fila"><h1 id="titulo"></h1><span class="muted" id="uso"></span></div>
+  <h2>Mesas · toque para abrir o cerrar</h2>
+  <div class="mesas" id="mesas"></div>
+  <h2>Llamadas al mesero</h2><div id="llamadas"></div>
+  <h2>Pedidos para la caja</h2><div id="pedidos"></div>
+</div>
+<script>
+const R = new URLSearchParams(location.search).get("r") || "demo";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let PIN = sessionStorage.getItem("apex-pin:" + R) || "", moneda = "COP";
+async function api(ruta, cuerpo) {
+  const r = await fetch(`/v1/panel/${encodeURIComponent(R)}${ruta}`, { method: cuerpo ? "POST" : "GET",
+    headers: { "X-Apex-Pin": PIN, "Content-Type": "application/json" }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+  const d = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(d.error || r.status), { status: r.status }); return d;
+}
+const plata = (v) => new Intl.NumberFormat("es-CO", { style: "currency", currency: moneda, maximumFractionDigits: 0 }).format(v);
+const hora = (ts) => new Date(ts * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+async function cargar() {
+  const d = await api(""); moneda = d.moneda;
+  $("#login").hidden = true; $("#app").hidden = false; $("#titulo").textContent = d.restaurante;
+  const u = d.uso_mes, t = d.topes;
+  $("#uso").textContent = `Este mes: ${u.sesiones}/${t.sesiones_mes} conversaciones · ${u.minutos}/${t.minutos_mes} min · US$${u.usd.toFixed(2)}/${t.usd_mes}`;
+  $("#mesas").innerHTML = d.mesas.map((m) => `<div class="mesa ${m.abierta ? "on" : ""}" data-m="${esc(m.mesa)}" data-a="${m.abierta ? 1 : 0}">
+    <b>${esc(m.mesa)}</b><small>${m.abierta ? (m.hablando ? "abierta · hablando" : "abierta") : "cerrada"}</small></div>`).join("");
+  document.querySelectorAll(".mesa").forEach((el) => el.onclick = async () => { await api("/mesa", { mesa: el.dataset.m, abierta: el.dataset.a !== "1" }); cargar(); });
+  $("#llamadas").innerHTML = d.llamadas.length ? d.llamadas.map((l) => `<div class="card llamada fila"><span><b>Mesa ${esc(l.mesa)}</b> · ${hora(l.creada)} ${l.motivo ? "· " + esc(l.motivo) : ""}</span>
+    <button data-l="${l.id}">Atendida</button></div>`).join("") : `<p class="muted">Ninguna.</p>`;
+  document.querySelectorAll("[data-l]").forEach((b) => b.onclick = async () => { await api(`/llamada/${b.dataset.l}`, {}); cargar(); });
+  $("#pedidos").innerHTML = d.pedidos.length ? d.pedidos.map((p) => `<div class="card">
+    <div class="fila"><b>#${p.id} · Mesa ${esc(p.mesa)} · ${hora(p.creado)}</b><b>${plata(p.total)}</b></div>
+    <div class="muted">${p.items.map((i) => `${i.cantidad} × ${esc(i.nombre)}${i.nota ? " (" + esc(i.nota) + ")" : ""}`).join(" · ")}</div>
+    <div class="fila" style="margin-top:8px"><span></span><select data-p="${p.id}">${["nuevo", "preparando", "entregado", "cancelado"]
+      .map((e) => `<option ${e === p.estado ? "selected" : ""}>${e}</option>`).join("")}</select></div></div>`).join("") : `<p class="muted">Aún no hay pedidos.</p>`;
+  document.querySelectorAll("[data-p]").forEach((s) => s.onchange = () => api(`/pedido/${s.dataset.p}`, { estado: s.value }));
+}
+$("#entrar").onclick = async () => { PIN = $("#pin").value.trim();
+  try { await cargar(); sessionStorage.setItem("apex-pin:" + R, PIN); setInterval(() => cargar().catch(() => {}), 5000); }
+  catch (e) { $("#msg").textContent = e.status === 401 ? "PIN incorrecto." : e.message; } };
+$("#pin").onkeydown = (e) => { if (e.key === "Enter") $("#entrar").click(); };
+if (PIN) $("#entrar").click();
+</script>
+</body>
+</html>

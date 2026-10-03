@@ -4,3 +4,5 @@
 servidor/.env
 servidor/datos/
 **/__pycache__
+servidor/apex.env
+servidor/apex/datos/

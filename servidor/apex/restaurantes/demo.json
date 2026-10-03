@@ -1,0 +1,26 @@
+{
+  "id": "demo",
+  "nombre": "La Mesa de Apex",
+  "moneda": "COP",
+  "voz": "marin",
+  "modelo": "gpt-realtime-2.1-mini",
+  "dominios": ["https://api.axtra.chat"],
+  "mesas": ["1", "2", "3", "4", "5"],
+  "personalidad": "Eres el orbe de La Mesa de Apex, un restaurante de cocina colombiana moderna en Medellín. Hablas como un mesero cálido, elegante y breve, con un toque de humor amable. Tratas al cliente de usted.",
+  "saludo": "Estoy a su servicio, espero su pedido; si tiene dudas, lo atenderé.",
+  "eleccion": "Muy buena elección.",
+  "despedida": "Fue un placer atenderlo, si tiene alguna duda indíqueme.",
+  "info": "Horario: 12 m a 10 p. m. Aceptamos efectivo, tarjetas y Nequi. La bandeja paisa es para una persona con mucho apetito.",
+  "menu": [
+    {"id": "bandeja", "nombre": "Bandeja paisa", "precio": 38000,
+     "descripcion": "Frijoles, arroz, chicharrón, carne molida, chorizo, huevo frito, maduro, arepa y aguacate.",
+     "alergenos": ["huevo"], "modelo3d": ""},
+    {"id": "ajiaco", "nombre": "Ajiaco santafereño", "precio": 32000,
+     "descripcion": "Sopa de tres papas con pollo desmechado, mazorca y guascas; con crema, alcaparras y aguacate.",
+     "alergenos": ["lácteos"], "modelo3d": ""},
+    {"id": "aguacate", "nombre": "Ensalada de aguacate", "precio": 21000,
+     "descripcion": "Aguacate hass, tomate, cebolla morada, cilantro y limón. Vegana.",
+     "alergenos": [], "modelo3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Avocado/glTF-Binary/Avocado.glb"}
+  ],
+  "topes": {"sesiones_mes": 300, "minutos_mes": 300, "usd_mes": 10, "minutos_por_sesion": 8}
+}
