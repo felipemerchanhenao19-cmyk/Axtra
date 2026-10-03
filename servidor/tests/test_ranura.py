@@ -78,3 +78,13 @@ def test_negocios_en_axtra(monkeypatch):
     demo = next(n for n in lista if n["id"] == "demo")
     assert demo["nombre"] == "Su restaurante" and demo["tope_cop"] == 80000 and demo["mesas"] == 10
     assert {"conversaciones", "pedidos", "ventas", "gasto_cop"} <= set(demo["uso"])
+
+
+def test_formatos_de_audio_de_cualquier_celular():
+    from servidor import oido
+    assert oido.formato(b"\x00\x00\x00\x00" + b"\x1aE\xdf\xa3" + b"\x00" * 50) == "webm"     # cabecera un poco corrida
+    assert oido.formato(b"\x00\x00\x00\x1cftypM4A " + b"\x00" * 20) == "mp4"
+    assert oido.formato(b"ID3\x04" + b"\x00" * 20) == "mp3"
+    assert oido.formato(b"\x00" * 30, "audio/webm;codecs=opus") == "webm"                     # lo dice el navegador
+    assert oido.formato(b"\x00" * 30, "audio/mp4") == "mp4"
+    assert oido.formato(b"\x00" * 30) == ""
