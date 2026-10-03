@@ -34,7 +34,7 @@ def revisar_sesiones():
             motivo = "sin actividad"
         elif ahora - s["creada"] > max_seg:
             motivo = "tope de minutos por sesión"
-        elif not db.mesa_abierta(s["restaurante"], s["mesa"]):
+        elif not (orbe.mesa_abierta(r, s["mesa"]) if r else db.mesa_abierta(s["restaurante"], s["mesa"])):
             motivo = "mesa cerrada"
         if motivo:
             db.terminar_sesion(s["id"], motivo)
@@ -134,7 +134,8 @@ def menu(rid: str, request: Request):
     limitar(f"menu:{ip(request)}", 60, 60)
     r = _restaurante(rid)
     return {"id": r["id"], "nombre": r["nombre"], "moneda": r.get("moneda", "COP"),
-            "menu": [{k: p.get(k) for k in ("id", "nombre", "precio", "descripcion", "alergenos", "modelo3d", "foto")}
+            "menu": [{k: p.get(k) for k in ("id", "nombre", "precio", "descripcion", "alergenos", "modelo3d", "foto",
+                                              "grupo", "antes", "oferta")}
                      for p in r["menu"]]}
 
 
@@ -156,7 +157,7 @@ def crear_sesion(p: PedidoSesion, request: Request):
     limitar(f"sesion-mesa:{r['id']}:{p.mesa}", 4, 60)
     if p.mesa not in r.get("mesas", []):
         raise HTTPException(404, "mesa no existe")
-    if not db.mesa_abierta(r["id"], p.mesa):
+    if not orbe.mesa_abierta(r, p.mesa):
         raise HTTPException(403, "mesa cerrada: pida al mesero que la abra")
     activa = db.sesion_activa(r["id"], p.mesa)
     if activa:
@@ -167,7 +168,7 @@ def crear_sesion(p: PedidoSesion, request: Request):
         db.terminar_sesion(activa["id"], "reemplazada")
     sid = uuid.uuid4().hex
     secreto = db.nueva_sesion(sid, r["id"], p.mesa)
-    return {"sesion": sid, "secreto": secreto, "frases": _frases(r),
+    return {"sesion": sid, "secreto": secreto, "frases": _frases(r), "saludo": r["frases"]["saludo"],
             "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
 
 
@@ -189,14 +190,14 @@ def _sesion(sid: str, secreto: str, request: Request, abierta: bool = True):
 
 def _respuesta(r: dict, s, texto: str = "", frase: str = "", **extra) -> dict:
     """Lo que el orbe dirá: una frase grabada (gratis, por URL) o un audio nuevo (en base64)."""
-    out = {"frase": None, "audio": None, **extra}
+    out = {"frase": None, "audio": None, "texto": r["frases"].get(frase, "") if frase else texto, **extra}
     if frase:
         out["frase"] = f"/v1/frase/{r['id']}/{frase}"
         return out
     try:
         out["audio"] = base64.b64encode(orbe.voz(r, texto, s["id"])).decode()
     except orbe.SinRanura:
-        out.update(frase=f"/v1/frase/{r['id']}/sin_voz", sin_voz=True)
+        out.update(frase=f"/v1/frase/{r['id']}/sin_voz", sin_voz=True, texto=r["frases"]["sin_voz"])
     return out
 
 
@@ -224,20 +225,34 @@ async def turno(request: Request):
     except orbe.SinRanura:
         return _respuesta(r, s, frase="sin_voz", sin_voz=True)
     return await asyncio.to_thread(_respuesta, r, s, res["texto"], "", despedida=bool(res["confirmado"]),
-                                   pedido=res["pedido"] or res["confirmado"])
+                                   pedido=res["pedido"] or res["confirmado"], oido=texto[:600])
 
 
 class Accion(Credencial):
-    tipo: str = Field(pattern="^(pedir|pedir_todo|mesero)$")
+    tipo: str = Field(pattern="^(pedir|quitar|confirmar|pedir_todo|mesero)$")
     plato_id: str = Field("", max_length=60)
     cantidad: int = Field(1, ge=1, le=20)
 
 
+def _anotar(r: dict, s, accion: str, frase: str):
+    """Deja en la conversación lo que pasó en la pantalla, para que el cerebro lo sepa si el cliente luego habla."""
+    db.guardar_historial(s["id"], db.historial(s["id"]) + [
+        {"role": "user", "content": f"[Acción en la pantalla] {accion}"},
+        {"role": "assistant", "content": r["frases"][frase]}])
+
+
+def _ya_dijo(r: dict, s, frase: str) -> bool:
+    texto = r["frases"].get(frase)
+    return bool(texto) and any(m.get("role") == "assistant" and m.get("content") == texto for m in db.historial(s["id"]))
+
+
 @app.post("/v1/accion")
 def accion(a: Accion, request: Request):
-    """Botones del menú: «Pedir», «Pedir todo lo seleccionado» y «Llamar al mesero»."""
+    """Botones del menú: «Pedir», «Quitar», «Confirmar pedido», «Pedir todo» y «Llamar al mesero».
+    Responden con frases grabadas: no gastan cerebro ni voz nueva."""
     s, r = _sesion(a.sesion, a.secreto, request)
-    limitar(f"accion:{s['id']}", 30, 60)
+    limitar(f"accion:{s['id']}", 40, 60)
+    ventas = r.get("ventas") or {}
     if a.tipo == "mesero":
         orbe.ejecutar(r, s, "llamar_mesero", {"motivo": "tocó «Llamar al mesero»"})
         return _respuesta(r, s, frase="mesero")
@@ -245,11 +260,36 @@ def accion(a: Accion, request: Request):
         res = orbe.ejecutar(r, s, "agregar_plato", {"plato_id": a.plato_id, "cantidad": a.cantidad})
         if not res.get("ok"):
             raise HTTPException(409, res.get("error", "no se pudo agregar"))
-        h = db.historial(s["id"]) + [
-            {"role": "user", "content": f"[Acción en la pantalla] Tocó «Pedir» en {res['agregado']}."},
-            {"role": "assistant", "content": r["frases"]["eleccion"]}]
-        db.guardar_historial(s["id"], h)
-        return _respuesta(r, s, frase="eleccion", pedido=res)
+        sug, ids = ventas.get("sugerir") or {}, {p["id"] for p in res["platos"]}
+        frase = "eleccion"
+        if a.plato_id in sug.get("si_pide", []) and sug.get("ofrecer") not in ids and "sugerir" in r["frases"] \
+                and not _ya_dijo(r, s, "sugerir"):
+            frase = "sugerir"
+        _anotar(r, s, f"Tocó «Pedir» en {res['agregado']}.", frase)
+        return _respuesta(r, s, frase=frase, pedido=res, sugerir=sug.get("ofrecer") if frase == "sugerir" else None)
+    if a.tipo == "quitar":
+        res = orbe.ejecutar(r, s, "quitar_plato", {"plato_id": a.plato_id, "cantidad": a.cantidad})
+        frase = "quitado" if "quitado" in r["frases"] else "eleccion"
+        _anotar(r, s, f"Quitó {a.plato_id} de su pedido.", frase)
+        return _respuesta(r, s, frase=frase, pedido=res)
+    if a.tipo == "confirmar":
+        # «Confirmar pedido»: si no lleva la oferta del día, el orbe la ofrece una vez; después envía a la caja.
+        if a.plato_id:                                   # «Sí, agregarlo» en la oferta
+            orbe.ejecutar(r, s, "agregar_plato", {"plato_id": a.plato_id, "cantidad": 1})
+        pedido = orbe.ejecutar(r, s, "ver_pedido", {})
+        if not pedido["platos"]:
+            return _respuesta(r, s, frase="vacio", pedido=pedido)
+        oferta = ventas.get("oferta")
+        if oferta and "oferta" in r["frases"] and oferta not in {p["id"] for p in pedido["platos"]} \
+                and not _ya_dijo(r, s, "oferta"):
+            _anotar(r, s, "Tocó «Confirmar pedido».", "oferta")
+            return _respuesta(r, s, frase="oferta", pedido=pedido, oferta=oferta)
+        res = orbe.ejecutar(r, s, "confirmar_pedido", {})
+        if not res.get("ok"):
+            raise HTTPException(409, res.get("error", "no se pudo enviar"))
+        frase = "enviado" if "enviado" in r["frases"] else "despedida"
+        _anotar(r, s, "Confirmó el pedido.", frase)
+        return _respuesta(r, s, frase=frase, pedido=res, despedida=True)
     # pedir_todo: repetir el pedido y pedir confirmación por voz
     pedido = orbe.ejecutar(r, s, "ver_pedido", {})
     if not pedido["platos"]:
@@ -362,6 +402,19 @@ def inicio():
 @app.get("/demo")
 def demo():
     return FileResponse(WEB / "index.html")
+
+
+@app.get("/qr")
+def qr():
+    return FileResponse(WEB / "qr.html")
+
+
+@app.get("/v1/mesas/{rid}")
+def mesas_publicas(rid: str, request: Request):
+    """Para la página de códigos QR: nombre y mesas del restaurante (nada privado)."""
+    limitar(f"menu:{ip(request)}", 60, 60)
+    r = _restaurante(rid)
+    return {"id": r["id"], "nombre": r["nombre"], "mesas": r.get("mesas", [])}
 
 
 @app.get("/panel")

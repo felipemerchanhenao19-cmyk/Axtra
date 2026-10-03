@@ -95,9 +95,16 @@ Para agregar un restaurante, copia `demo.json`, cámbialo y agrega su PIN en el 
 
    **No** crees una aplicación de Access para `api`.
 3. **Probar:**
-   - En el PC, abre `https://api.axtra.chat/panel?r=demo`, entra con el PIN y abre la **mesa 1**.
-   - En el celular, abre `https://api.axtra.chat/demo?r=demo&mesa=1` y toca «Toque para comenzar».
+   - En el celular, abre `https://api.axtra.chat/demo?r=demo&mesa=1` y toca el orbe. El demo tiene las mesas siempre abiertas (`"mesas_siempre_abiertas": true`).
+   - **Códigos QR:** `https://api.axtra.chat/qr` muestra el QR de cada mesa para que otra persona (el gerente) lo escanee, y «Imprimir todas» saca una hoja con todos. Cada mesa atiende una conversación a la vez: si tú estás en la mesa 1, dale la 2.
+   - La caja: `https://api.axtra.chat/panel?r=demo` con el PIN.
    - Mira el negocio en Axtra, pestaña **Negocios**.
+
+### Cómo funciona el modelo de demostración
+- Tocar el orbe abre la carta. El cliente puede **hablarle** o solo **tocar botones** (si no da permiso del micrófono, igual funciona y el orbe le habla).
+- «Pedir», «−», «Quitar», «Confirmar pedido» y la oferta responden con **frases grabadas**: no gastan cerebro ni voz nueva.
+- Al pedir un plato fuerte sin bebida, sugiere la bebida una vez (`ventas.sugerir`). Al confirmar sin el postre del día, lo ofrece una vez (`ventas.oferta`); «No, enviar así» lo manda a la caja.
+- Solo cuando el cliente **habla** se usa el oído y el cerebro de Axtra.
 
 ## Integrarlo en el menú de cada restaurante
 
@@ -111,7 +118,8 @@ Para agregar un restaurante, copia `demo.json`, cámbialo y agrega su PIN en el 
   orbe.onsinvoz = () => {};    // resaltar «Llamar al mesero»
   botonComenzar.onclick = () => orbe.iniciar();
   botonPedir.onclick = () => orbe.pedirPlato("ajiaco");
-  botonPedirTodo.onclick = () => orbe.pedirTodo();
+  botonQuitar.onclick = () => orbe.quitarPlato("ajiaco");
+  botonConfirmar.onclick = async () => { const r = await orbe.confirmar(); /* r.oferta: ofrecer; r.despedida: enviado */ };
   botonMesero.onclick = () => orbe.llamarMesero();
 </script>
 ```
