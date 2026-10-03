@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0b1626">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;500;600;700;800&display=swap">
-<script src="/web/apex-voz.js?v=4"></script>
+<script src="/web/apex-voz.js?v=5"></script>
 <script src="/web/qrcode.js?v=2"></script>
 <style>
 /* Layout: una app de celular (máx. 460 px) centrada; tres pantallas: orbe de entrada, carta, pedido enviado. Más la vista de la caja. */
@@ -233,7 +233,7 @@ const TEXTOS = {
         pedido_n: "Pedido", mas: "Pedir algo más", si_agregar: "Sí, agregar", no_gracias: "No, gracias", listo_ver: "Listo. Cuando termine, toque «Ver pedido».",
         que_mas: "¿Qué más le traigo?", usted: "Usted", momento: "Un momento…", mesa: "Mesa",
         estados: { conectando: "Conectando…", escuchando: "🎙 Hable ahora", oyendo: "🎙 Le escucho…", pensando: "Pensando…", hablando: "", listo: "Toque el orbe para hablar", dormido: "Toque el orbe para hablar" },
-        sin_mic: "Sin micrófono: pida con los botones, el orbe le sigue hablando.", sin_voz: "No le escuché bien. Toque el orbe e intente otra vez, o pida con los botones.",
+        sin_mic: "Sin micrófono: pida con los botones, el orbe le sigue hablando.", sin_voz: "El sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.",
         mesero_ok: "🙋 Listo, el mesero ya viene.", carga: "No se pudo cargar la carta. Revise la conexión." },
   en: { locale: "en-US", ejemplo: "Demo", toque: "Tap the orb", sub: "to see the menu. Talk to it or order with the buttons.", qr: "Show QR code",
         escanee: "Scan to try it", cerrar: "Close", mesero: "🙋 Server", ver: "View order", pedir: "Order", oferta_tag: "TODAY'S DEAL",
@@ -243,7 +243,7 @@ const TEXTOS = {
         pedido_n: "Order", mas: "Order something else", si_agregar: "Yes, add it", no_gracias: "No, thanks", listo_ver: "Okay. When you're done, tap «View order».",
         que_mas: "What else can I get you?", usted: "You", momento: "One moment…", mesa: "Table",
         estados: { conectando: "Connecting…", escuchando: "🎙 Speak now", oyendo: "🎙 Listening…", pensando: "Thinking…", hablando: "", listo: "Tap the orb to talk", dormido: "Tap the orb to talk" },
-        sin_mic: "No microphone: order with the buttons, the orb will keep talking to you.", sin_voz: "I didn't catch that. Tap the orb and try again, or use the buttons.",
+        sin_mic: "No microphone: order with the buttons, the orb will keep talking to you.", sin_voz: "The voice system is having trouble. Please select what you'd like to order.",
         mesero_ok: "🙋 A server is on the way.", carga: "Couldn't load the menu. Check your connection." },
   pt: { locale: "pt-BR", ejemplo: "Exemplo", toque: "Toque no orbe", sub: "e veja o cardápio. Fale com ele ou peça pelos botões.", qr: "Mostrar código QR",
         escanee: "Escaneie e experimente", cerrar: "Fechar", mesero: "🙋 Garçom", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DO DIA",
@@ -253,7 +253,7 @@ const TEXTOS = {
         pedido_n: "Pedido", mas: "Pedir mais alguma coisa", si_agregar: "Sim, adicionar", no_gracias: "Não, obrigado", listo_ver: "Pronto. Quando terminar, toque em «Ver pedido».",
         que_mas: "O que mais posso trazer?", usted: "Você", momento: "Um momento…", mesa: "Mesa",
         estados: { conectando: "Conectando…", escuchando: "🎙 Fale agora", oyendo: "🎙 Ouvindo…", pensando: "Pensando…", hablando: "", listo: "Toque no orbe para falar", dormido: "Toque no orbe para falar" },
-        sin_mic: "Sem microfone: peça pelos botões, o orbe continua falando com você.", sin_voz: "Não ouvi bem. Toque no orbe e tente de novo, ou use os botões.",
+        sin_mic: "Sem microfone: peça pelos botões, o orbe continua falando com você.", sin_voz: "O sistema de voz está com falha. Por favor, selecione o que deseja pedir.",
         mesero_ok: "🙋 Pronto, o garçom já vem.", carga: "Não foi possível carregar o cardápio. Verifique a conexão." },
   de: { locale: "de-DE", ejemplo: "Beispiel", toque: "Tippen Sie auf die Kugel", sub: "und sehen Sie die Karte. Sprechen Sie oder bestellen Sie mit Tasten.", qr: "QR-Code zeigen",
         escanee: "Scannen und ausprobieren", cerrar: "Schließen", mesero: "🙋 Kellner", ver: "Bestellung", pedir: "Bestellen", oferta_tag: "ANGEBOT DES TAGES",
@@ -263,7 +263,7 @@ const TEXTOS = {
         pedido_n: "Bestellung", mas: "Noch etwas bestellen", si_agregar: "Ja, hinzufügen", no_gracias: "Nein, danke", listo_ver: "Gut. Wenn Sie fertig sind, tippen Sie auf «Bestellung».",
         que_mas: "Was darf ich Ihnen noch bringen?", usted: "Sie", momento: "Einen Moment…", mesa: "Tisch",
         estados: { conectando: "Verbinde…", escuchando: "🎙 Jetzt sprechen", oyendo: "🎙 Ich höre…", pensando: "Einen Moment…", hablando: "", listo: "Zum Sprechen auf die Kugel tippen", dormido: "Zum Sprechen auf die Kugel tippen" },
-        sin_mic: "Kein Mikrofon: Bestellen Sie mit den Tasten, die Kugel spricht weiter mit Ihnen.", sin_voz: "Nicht verstanden. Tippen Sie auf die Kugel und versuchen Sie es erneut, oder nutzen Sie die Tasten.",
+        sin_mic: "Kein Mikrofon: Bestellen Sie mit den Tasten, die Kugel spricht weiter mit Ihnen.", sin_voz: "Das Sprachsystem hat eine Störung. Bitte wählen Sie aus, was Sie bestellen möchten.",
         mesero_ok: "🙋 Ein Kellner kommt.", carga: "Die Karte konnte nicht geladen werden. Prüfen Sie die Verbindung." },
   ru: { locale: "ru-RU", ejemplo: "Пример", toque: "Нажмите на сферу", sub: "и откройте меню. Говорите или заказывайте кнопками.", qr: "Показать QR-код",
         escanee: "Отсканируйте и попробуйте", cerrar: "Закрыть", mesero: "🙋 Официант", ver: "Мой заказ", pedir: "Заказать", oferta_tag: "АКЦИЯ ДНЯ",
@@ -273,7 +273,7 @@ const TEXTOS = {
         pedido_n: "Заказ", mas: "Заказать ещё", si_agregar: "Да, добавить", no_gracias: "Нет, спасибо", listo_ver: "Хорошо. Когда закончите, нажмите «Мой заказ».",
         que_mas: "Что ещё вам принести?", usted: "Вы", momento: "Минутку…", mesa: "Стол",
         estados: { conectando: "Подключение…", escuchando: "🎙 Говорите", oyendo: "🎙 Слушаю…", pensando: "Думаю…", hablando: "", listo: "Нажмите на сферу, чтобы говорить", dormido: "Нажмите на сферу, чтобы говорить" },
-        sin_mic: "Нет микрофона: заказывайте кнопками, сфера продолжит говорить с вами.", sin_voz: "Я не расслышал. Нажмите на сферу и повторите или используйте кнопки.",
+        sin_mic: "Нет микрофона: заказывайте кнопками, сфера продолжит говорить с вами.", sin_voz: "Голосовая система не работает. Пожалуйста, выберите, что хотите заказать.",
         mesero_ok: "🙋 Официант уже идёт.", carga: "Не удалось загрузить меню. Проверьте соединение." },
   ja: { locale: "ja-JP", ejemplo: "デモ", toque: "オーブをタップ", sub: "してメニューを表示。話しかけるか、ボタンで注文できます。", qr: "QRコードを表示",
         escanee: "スキャンしてお試しください", cerrar: "閉じる", mesero: "🙋 スタッフ", ver: "注文を見る", pedir: "注文", oferta_tag: "本日の特別価格",
@@ -283,7 +283,7 @@ const TEXTOS = {
         pedido_n: "注文", mas: "追加で注文する", si_agregar: "はい、追加", no_gracias: "いいえ、結構です", listo_ver: "かしこまりました。終わったら「注文を見る」をタップしてください。",
         que_mas: "他に何かお持ちしましょうか？", usted: "あなた", momento: "少々お待ちください…", mesa: "テーブル",
         estados: { conectando: "接続中…", escuchando: "🎙 お話しください", oyendo: "🎙 聞いています…", pensando: "考え中…", hablando: "", listo: "オーブをタップして話す", dormido: "オーブをタップして話す" },
-        sin_mic: "マイクなし：ボタンでご注文ください。オーブは話し続けます。", sin_voz: "よく聞き取れませんでした。オーブをタップしてもう一度、またはボタンをお使いください。",
+        sin_mic: "マイクなし：ボタンでご注文ください。オーブは話し続けます。", sin_voz: "音声システムに不具合が発生しています。ご注文の品をお選びください。",
         mesero_ok: "🙋 スタッフが参ります。", carga: "メニューを読み込めませんでした。接続をご確認ください。" },
 };
 const NOMBRES_IDIOMA = { es: "Español", en: "English", pt: "Português", de: "Deutsch", ru: "Русский", ja: "日本語" };

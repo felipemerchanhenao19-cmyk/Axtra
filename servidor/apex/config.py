@@ -36,7 +36,7 @@ FRASES_POR_DEFECTO = {
     "repetir": "Disculpe, no le escuché bien. ¿Me lo repite, por favor?",
     "vacio": "Aún no ha seleccionado ningún plato. ¿Qué le provoca?",
     "mesero": "Con gusto, enseguida va un mesero a su mesa.",
-    "sin_voz": "En este momento no puedo atenderle por voz. Toque «Llamar al mesero» y con gusto le atienden.",
+    "sin_voz": "Hola, el sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.",
 }
 
 

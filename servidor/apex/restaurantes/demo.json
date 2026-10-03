@@ -94,7 +94,7 @@
     "oferta": "Antes de enviarlo: hoy tenemos oferta en el volcán de chocolate, a 14 mil pesos. ¿Le gustaría pedirlo?",
     "enviado": "¡Listo! Su pedido ya está en la caja. Que lo disfrute.",
     "despedida": "¡Listo! Su pedido ya está en la caja. Que lo disfrute.",
-    "sin_voz": "En este momento no le escucho bien. Pida con los botones, por favor."
+    "sin_voz": "Hola, el sistema de voz está fallando. Por favor, seleccione lo que quiere pedir."
   },
   "mesas_siempre_abiertas": true,
   "ventas": {
@@ -161,7 +161,7 @@
         "repetir": "Sorry, I didn't catch that. Could you say it again?",
         "vacio": "You haven't picked anything yet. What would you like?",
         "mesero": "Of course, a server is on the way.",
-        "sin_voz": "I can't hear you well right now. Please order with the buttons."
+        "sin_voz": "Hi, the voice system is having trouble. Please select what you'd like to order."
       },
       "restaurante": "Your restaurant"
     },
@@ -209,7 +209,7 @@
         "repetir": "Desculpe, não ouvi bem. Pode repetir, por favor?",
         "vacio": "Você ainda não escolheu nada. O que deseja?",
         "mesero": "Claro, um garçom já está a caminho.",
-        "sin_voz": "No momento não consigo ouvir bem. Por favor, peça pelos botões."
+        "sin_voz": "Olá, o sistema de voz está com falha. Por favor, selecione o que deseja pedir."
       },
       "restaurante": "Seu restaurante"
     },
@@ -257,7 +257,7 @@
         "repetir": "Entschuldigung, das habe ich nicht verstanden. Können Sie es wiederholen?",
         "vacio": "Sie haben noch nichts ausgewählt. Was darf es sein?",
         "mesero": "Gerne, ein Kellner ist unterwegs.",
-        "sin_voz": "Ich kann Sie gerade nicht gut hören. Bitte bestellen Sie mit den Tasten."
+        "sin_voz": "Hallo, das Sprachsystem hat gerade eine Störung. Bitte wählen Sie aus, was Sie bestellen möchten."
       },
       "restaurante": "Ihr Restaurant"
     },
@@ -305,7 +305,7 @@
         "repetir": "Извините, я не расслышал. Повторите, пожалуйста.",
         "vacio": "Вы ещё ничего не выбрали. Что вам принести?",
         "mesero": "Конечно, официант уже идёт.",
-        "sin_voz": "Сейчас я вас плохо слышу. Пожалуйста, заказывайте кнопками."
+        "sin_voz": "Здравствуйте, голосовая система сейчас не работает. Пожалуйста, выберите, что хотите заказать."
       },
       "restaurante": "Ваш ресторан"
     },
@@ -353,7 +353,7 @@
         "repetir": "すみません、よく聞き取れませんでした。もう一度お願いします。",
         "vacio": "まだ何も選ばれていません。何になさいますか？",
         "mesero": "かしこまりました。すぐにスタッフが参ります。",
-        "sin_voz": "ただいまよく聞き取れません。ボタンでご注文ください。"
+        "sin_voz": "こんにちは、音声システムに不具合が発生しています。ご注文の品をお選びください。"
       },
       "restaurante": "あなたのレストラン"
     }
