@@ -270,6 +270,6 @@ def test_historial_no_parte_herramientas():
 
 def test_menu_y_paginas(c):
     m = c.get("/v1/menu/demo").json()
-    assert m["nombre"] == "La Mesa de Apex" and len(m["menu"]) == 3 and "personalidad" not in m
+    assert m["nombre"] == "Su restaurante" and len(m["menu"]) == 3 and "personalidad" not in m
     assert c.get("/demo").status_code == 200 and c.get("/panel").status_code == 200
     assert c.get("/web/apex-voz.js").status_code == 200

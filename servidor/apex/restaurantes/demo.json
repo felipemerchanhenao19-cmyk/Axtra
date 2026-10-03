@@ -1,6 +1,6 @@
 {
   "id": "demo",
-  "nombre": "La Mesa de Apex",
+  "nombre": "Su restaurante",
   "moneda": "COP",
   "voz": {
     "google": "es-US-Neural2-B",
@@ -17,7 +17,7 @@
     "4",
     "5"
   ],
-  "personalidad": "Eres el orbe de La Mesa de Apex, un restaurante de cocina colombiana moderna en Medellín. Hablas como un mesero cálido, elegante y breve, con un toque de humor amable. Tratas al cliente de usted.",
+  "personalidad": "Eres el orbe de un restaurante de cocina colombiana moderna en Medellín. Hablas como un mesero cálido, elegante y breve, con un toque de humor amable. Tratas al cliente de usted.",
   "info": "Horario: 12 m a 10 p. m. Aceptamos efectivo, tarjetas y Nequi. La bandeja paisa es para una persona con mucho apetito.",
   "menu": [
     {
