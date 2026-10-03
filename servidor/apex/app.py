@@ -228,7 +228,7 @@ async def turno(request: Request):
         return _respuesta(r, s, frase="sin_voz", sin_voz=True)
     db.contar_turno(s["id"])
     try:
-        texto = await asyncio.to_thread(orbe.oir, r, s["id"], audio)
+        texto = await asyncio.to_thread(orbe.oir, r, s["id"], audio, request.headers.get("content-type", ""))
         if len(texto.strip(" .,¿?¡!")) < 2:
             return _respuesta(r, s, frase="repetir")
         res = await asyncio.to_thread(orbe.conversar, r, s, {"role": "user", "content": texto[:600]})

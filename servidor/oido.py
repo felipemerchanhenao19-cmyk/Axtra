@@ -8,19 +8,28 @@ from . import config
 
 
 # Formatos que manda el celular: WAV (antiguo) o audio comprimido de MediaRecorder
-def formato(audio: bytes) -> str:
+def formato(audio: bytes, tipo: str = "") -> str:
+    """Reconoce el audio por su contenido y, si no, por el tipo que dice el navegador (p. ej. «audio/webm;codecs=opus»)."""
+    inicio = audio[:64]
     if audio[:4] == b"RIFF" and audio[8:12] == b"WAVE":
         return "wav"
-    if audio[:4] == b"\x1aE\xdf\xa3":
+    if b"\x1aE\xdf\xa3" in inicio:
         return "webm"
     if audio[:4] == b"OggS":
         return "ogg"
-    if audio[4:8] == b"ftyp":
+    if b"ftyp" in audio[:16]:
         return "mp4"
+    if audio[:3] == b"ID3" or (len(audio) > 1 and audio[0] == 0xFF and audio[1] & 0xE0 == 0xE0):
+        return "mp3"
+    tipo = (tipo or "").lower()
+    for clave, fmt in (("webm", "webm"), ("ogg", "ogg"), ("opus", "ogg"), ("mp4", "mp4"), ("m4a", "mp4"),
+                       ("aac", "mp4"), ("mpeg", "mp3"), ("mp3", "mp3"), ("wav", "wav")):
+        if clave in tipo:
+            return fmt
     return ""
 
 
-_MIME = {"wav": "audio/wav", "webm": "audio/webm", "ogg": "audio/ogg", "mp4": "audio/mp4"}
+_MIME = {"wav": "audio/wav", "webm": "audio/webm", "ogg": "audio/ogg", "mp4": "audio/mp4", "mp3": "audio/mpeg"}
 
 
 def _groq(audio: bytes, idioma: str, fmt: str = "wav") -> str:

@@ -56,12 +56,12 @@ def verificar_pin(p: Pin):
 
 # ---------------- Oído: voz → texto ----------------
 @app.post("/oido")
-def escuchar(audio: bytes = Body(..., media_type="application/octet-stream"), idioma: str = "es"):
+def escuchar(audio: bytes = Body(..., media_type="application/octet-stream"), idioma: str = "es", tipo: str = ""):
     if len(audio) > 6_000_000:
         raise HTTPException(413, "audio demasiado largo")
-    fmt = oido.formato(audio)
+    fmt = oido.formato(audio, tipo)
     if not fmt:
-        raise HTTPException(422, "formato de audio desconocido")
+        raise HTTPException(422, f"formato de audio desconocido (tipo «{tipo[:60]}», empieza {audio[:16].hex()}, {len(audio)} bytes)")
     if not config.GROQ_API_KEY:
         raise HTTPException(503, "falta GROQ_API_KEY")
     try:

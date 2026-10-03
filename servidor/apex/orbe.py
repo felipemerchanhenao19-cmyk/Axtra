@@ -38,8 +38,8 @@ def _cop(usd: float) -> float:
     return round(usd * config.COP_POR_USD, 4)
 
 
-def oir(r: dict, sid: str, audio: bytes) -> str:
-    d = _ranura("/oido", params={"idioma": r.get("idioma", "es")}, data=audio,
+def oir(r: dict, sid: str, audio: bytes, tipo: str = "") -> str:
+    d = _ranura("/oido", params={"idioma": r.get("idioma", "es"), "tipo": tipo[:80]}, data=audio,
                 headers={"Content-Type": "application/octet-stream"}).json()
     seg = max(10.0, float(d.get("segundos") or 0))          # Groq cobra mínimo 10 s por audio
     db.consumo(r["id"], sid, "oido", d.get("proveedor", "groq"), seg,
