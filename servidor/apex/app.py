@@ -1,9 +1,12 @@
-"""Puerta pública de Apex Play (api.axtra.chat). Contenedor aparte de Axtra, sin Cloudflare Access.
+"""Puerta pública de los orbes de negocios (api.axtra.chat). Contenedor aparte, sin Cloudflare Access y SIN
+claves: el oído, el cerebro, la voz y los PIN los tiene Axtra (la tarjeta madre) y los presta por su ranura.
 
 Para probar en tu PC:  APEX_MODO=desarrollo uvicorn servidor.apex.app:app --port 8081
 """
+import asyncio
+import base64
 import hmac
-import re
+import json
 import threading
 import time
 import uuid
@@ -20,22 +23,20 @@ from . import config, db, orbe
 WEB = config.BASE / "web"
 
 
-# ---------------- Vigilante: corta sesiones largas, abandonadas o de mesas cerradas ----------------
+# ---------------- Vigilante: cierra conversaciones largas, quietas o de mesas cerradas ----------------
 def revisar_sesiones():
     ahora = time.time()
     for s in db.sesiones_abiertas():
         r = config.restaurante(s["restaurante"])
-        max_seg = (r["topes"]["minutos_por_sesion"] if r else 8) * 60
+        max_seg = (r["topes"]["minutos_por_sesion"] if r else 15) * 60
         motivo = None
-        if not s["call_id"] and ahora - s["creada"] > 90:
-            motivo = "no conectó"
+        if ahora - (s["actividad"] or s["creada"]) > 300:
+            motivo = "sin actividad"
         elif ahora - s["creada"] > max_seg:
             motivo = "tope de minutos por sesión"
         elif not db.mesa_abierta(s["restaurante"], s["mesa"]):
             motivo = "mesa cerrada"
         if motivo:
-            if s["call_id"]:
-                orbe.colgar(s["call_id"])
             db.terminar_sesion(s["id"], motivo)
 
 
@@ -83,7 +84,7 @@ async def cors(request: Request, call_next):
     if permitido:
         resp.headers["Access-Control-Allow-Origin"] = origen
         resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-        resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        resp.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Apex-Sesion, X-Apex-Secreto"
         resp.headers["Access-Control-Max-Age"] = "600"
     resp.headers["Vary"] = "Origin"
     return resp
@@ -143,6 +144,10 @@ class PedidoSesion(BaseModel):
     anterior: dict | None = None          # {sesion, secreto} para retomar desde el mismo teléfono
 
 
+def _frases(r: dict) -> dict:
+    return {k: f"/v1/frase/{r['id']}/{k}" for k in r["frases"]}
+
+
 @app.post("/v1/sesion")
 def crear_sesion(p: PedidoSesion, request: Request):
     r = _restaurante(p.restaurante)
@@ -159,21 +164,11 @@ def crear_sesion(p: PedidoSesion, request: Request):
             hmac.compare_digest(str(p.anterior.get("secreto", "")), activa["secreto"])
         if not propia:
             raise HTTPException(409, "ya hay una conversación activa en esta mesa")
-        if activa["call_id"]:
-            orbe.colgar(activa["call_id"])
         db.terminar_sesion(activa["id"], "reemplazada")
-    uso, topes = db.uso_mes(r["id"]), r["topes"]
-    if uso["sesiones"] >= topes["sesiones_mes"] or uso["minutos"] >= topes["minutos_mes"] or uso["usd"] >= topes["usd_mes"]:
-        raise HTTPException(429, "el orbe alcanzó su límite del mes; un mesero lo atenderá")
-    try:
-        t = orbe.crear_token(r, p.mesa)
-    except Exception as e:
-        raise HTTPException(502, f"no se pudo iniciar la voz ({e})")
     sid = uuid.uuid4().hex
-    secreto = db.nueva_sesion(sid, r["id"], p.mesa, r["modelo"])
-    return {"sesion": sid, "secreto": secreto, "token": t["token"], "expira": t["expira"], "modelo": r["modelo"],
-            "max_segundos": topes["minutos_por_sesion"] * 60,
-            "frases": {k: r[k] for k in ("saludo", "eleccion", "despedida")}}
+    secreto = db.nueva_sesion(sid, r["id"], p.mesa)
+    return {"sesion": sid, "secreto": secreto, "frases": _frases(r),
+            "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
 
 
 class Credencial(BaseModel):
@@ -181,9 +176,9 @@ class Credencial(BaseModel):
     secreto: str = Field(max_length=64)
 
 
-def _sesion(c: Credencial, request: Request, abierta: bool = True):
-    s = db.sesion(c.sesion)
-    if not s or not hmac.compare_digest(c.secreto, s["secreto"]):
+def _sesion(sid: str, secreto: str, request: Request, abierta: bool = True):
+    s = db.sesion(sid or "")
+    if not s or not hmac.compare_digest(str(secreto or ""), s["secreto"]):
         raise HTTPException(401, "sesión inválida")
     r = _restaurante(s["restaurante"])
     exigir_origen(request, r)
@@ -192,51 +187,108 @@ def _sesion(c: Credencial, request: Request, abierta: bool = True):
     return s, r
 
 
-class Llamada(Credencial):
-    call_id: str = Field(max_length=120)
+def _respuesta(r: dict, s, texto: str = "", frase: str = "", **extra) -> dict:
+    """Lo que el orbe dirá: una frase grabada (gratis, por URL) o un audio nuevo (en base64)."""
+    out = {"frase": None, "audio": None, **extra}
+    if frase:
+        out["frase"] = f"/v1/frase/{r['id']}/{frase}"
+        return out
+    try:
+        out["audio"] = base64.b64encode(orbe.voz(r, texto, s["id"])).decode()
+    except orbe.SinRanura:
+        out.update(frase=f"/v1/frase/{r['id']}/sin_voz", sin_voz=True)
+    return out
 
 
-@app.post("/v1/sesion/llamada")
-def registrar_llamada(c: Llamada, request: Request):
-    s, _ = _sesion(c, request)
-    if not re.fullmatch(r"[A-Za-z0-9_\-]{4,120}", c.call_id):
-        raise HTTPException(400, "call_id inválido")
-    db.poner_call_id(s["id"], c.call_id)
-    return {"ok": True}
+def _puede_gastar(r: dict, s) -> bool:
+    return db.gasto_mes(r["id"]) < r["topes"]["tope_cop_mes"] and s["turnos"] < r["topes"]["turnos_por_sesion"]
 
 
-class Herramienta(Credencial):
-    nombre: str = Field(max_length=40)
-    argumentos: dict | str | None = None
+@app.post("/v1/turno")
+async def turno(request: Request):
+    """El cliente habló: oído → cerebro (con herramientas) → voz. Llega el audio crudo del teléfono."""
+    s, r = _sesion(request.headers.get("x-apex-sesion"), request.headers.get("x-apex-secreto"), request)
+    limitar(f"turno:{s['id']}", 20, 60)
+    limitar(f"turno-ip:{ip(request)}", 40, 60)
+    audio = await request.body()
+    if not audio or len(audio) > 4_000_000:
+        raise HTTPException(413, "audio vacío o demasiado largo")
+    if not _puede_gastar(r, s):
+        return _respuesta(r, s, frase="sin_voz", sin_voz=True)
+    db.contar_turno(s["id"])
+    try:
+        texto = await asyncio.to_thread(orbe.oir, r, s["id"], audio)
+        if len(texto.strip(" .,¿?¡!")) < 2:
+            return _respuesta(r, s, frase="repetir")
+        res = await asyncio.to_thread(orbe.conversar, r, s, {"role": "user", "content": texto[:600]})
+    except orbe.SinRanura:
+        return _respuesta(r, s, frase="sin_voz", sin_voz=True)
+    return await asyncio.to_thread(_respuesta, r, s, res["texto"], "", despedida=bool(res["confirmado"]),
+                                   pedido=res["pedido"] or res["confirmado"])
 
 
-@app.post("/v1/herramienta")
-def herramienta(h: Herramienta, request: Request):
-    limitar(f"herr:{ip(request)}", 60, 60)
-    s, r = _sesion(h, request)
-    return orbe.ejecutar(r, s, h.nombre, orbe.argumentos(h.argumentos))
+class Accion(Credencial):
+    tipo: str = Field(pattern="^(pedir|pedir_todo|mesero)$")
+    plato_id: str = Field("", max_length=60)
+    cantidad: int = Field(1, ge=1, le=20)
 
 
-TOPE_TOKENS = 2_000_000
+@app.post("/v1/accion")
+def accion(a: Accion, request: Request):
+    """Botones del menú: «Pedir», «Pedir todo lo seleccionado» y «Llamar al mesero»."""
+    s, r = _sesion(a.sesion, a.secreto, request)
+    limitar(f"accion:{s['id']}", 30, 60)
+    if a.tipo == "mesero":
+        orbe.ejecutar(r, s, "llamar_mesero", {"motivo": "tocó «Llamar al mesero»"})
+        return _respuesta(r, s, frase="mesero")
+    if a.tipo == "pedir":
+        res = orbe.ejecutar(r, s, "agregar_plato", {"plato_id": a.plato_id, "cantidad": a.cantidad})
+        if not res.get("ok"):
+            raise HTTPException(409, res.get("error", "no se pudo agregar"))
+        h = db.historial(s["id"]) + [
+            {"role": "user", "content": f"[Acción en la pantalla] Tocó «Pedir» en {res['agregado']}."},
+            {"role": "assistant", "content": r["frases"]["eleccion"]}]
+        db.guardar_historial(s["id"], h)
+        return _respuesta(r, s, frase="eleccion", pedido=res)
+    # pedir_todo: repetir el pedido y pedir confirmación por voz
+    pedido = orbe.ejecutar(r, s, "ver_pedido", {})
+    if not pedido["platos"]:
+        return _respuesta(r, s, frase="vacio", pedido=pedido)
+    if not _puede_gastar(r, s):
+        return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=pedido)
+    db.contar_turno(s["id"])
+    try:
+        res = orbe.conversar(r, s, {"role": "user", "content": "[Acción en la pantalla] Tocó «Pedir todo lo seleccionado». "
+                                    "Repite el pedido de forma breve (platos, cantidades y total) y pregunta si lo confirma."})
+    except orbe.SinRanura:
+        return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=pedido)
+    return _respuesta(r, s, res["texto"], pedido=res["pedido"] or pedido, despedida=bool(res["confirmado"]))
+
+
+@app.get("/v1/frase/{rid}/{nombre}")
+def frase(rid: str, nombre: str, request: Request):
+    """Frases fijas del restaurante: se generan una vez y quedan guardadas (no vuelven a costar)."""
+    r = _restaurante(rid)
+    limitar(f"frase:{ip(request)}", 120, 60)
+    if nombre not in r["frases"]:
+        raise HTTPException(404, "frase no existe")
+    try:
+        audio = orbe.voz(r, r["frases"][nombre])
+    except orbe.SinRanura:
+        raise HTTPException(503, "voz no disponible")
+    return Response(audio, media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.post("/v1/sesion/fin")
 async def terminar(request: Request):
     """Llega con sendBeacon (texto plano), por eso se lee el cuerpo a mano."""
-    import json
-
     try:
         datos = json.loads(await request.body())
         c = Credencial(sesion=datos["sesion"], secreto=datos["secreto"])
     except Exception:
         raise HTTPException(400, "cuerpo inválido")
-    s, _ = _sesion(c, request, abierta=False)
-    bruto = datos.get("uso") if isinstance(datos.get("uso"), dict) else {}
-    uso = {k: max(0, min(TOPE_TOKENS, int(bruto.get(k, 0) or 0))) for k in
-           ("audio_in", "audio_in_cache", "audio_out", "texto_in", "texto_in_cache", "texto_out")}
-    if s["call_id"] and not s["fin"]:
-        orbe.colgar(s["call_id"])
-    db.terminar_sesion(s["id"], "terminó", uso, orbe.costo(s["modelo"], uso))
+    s, _ = _sesion(c.sesion, c.secreto, request, abierta=False)
+    db.terminar_sesion(s["id"], str(datos.get("motivo") or "terminó")[:40])
     return {"ok": True}
 
 
@@ -244,11 +296,15 @@ async def terminar(request: Request):
 def _panel(request: Request, rid: str) -> dict:
     r = _restaurante(rid)
     limitar(f"panel:{ip(request)}", 120, 60)
-    esperado = config.pin(r)
-    dado = request.headers.get("x-apex-pin", "")
-    if len(esperado) < 4:
-        raise HTTPException(503, "panel sin PIN configurado (APEX_PIN_... en apex.env)")
-    if not hmac.compare_digest(dado.encode(), esperado.encode()):
+    dado = request.headers.get("x-apex-pin", "")[:20]
+    fallos = _cubos[f"pin-mal:{ip(request)}"]
+    if len([t for t in fallos if time.time() - t < 600]) >= 8:      # bloqueado ANTES de probar otro PIN
+        raise HTTPException(429, "demasiados intentos, espere 10 minutos")
+    try:
+        bien = len(dado) >= 4 and orbe.pin_correcto(r["id"], dado)
+    except orbe.SinRanura:
+        raise HTTPException(503, "Axtra no responde o el restaurante no tiene PIN (APEX_PIN_... en el .env de Axtra)")
+    if not bien:
         limitar(f"pin-mal:{ip(request)}", 8, 600)
         raise HTTPException(401, "PIN incorrecto")
     return r
@@ -275,10 +331,6 @@ def panel_mesa(rid: str, c: CambioMesa, request: Request):
     r = _panel(request, rid)
     if c.mesa not in r["mesas"]:
         raise HTTPException(404, "mesa no existe")
-    if not c.abierta:
-        s = db.sesion_activa(rid, c.mesa)
-        if s and s["call_id"]:
-            orbe.colgar(s["call_id"])
     db.cambiar_mesa(rid, c.mesa, c.abierta)
     return {"ok": True}
 

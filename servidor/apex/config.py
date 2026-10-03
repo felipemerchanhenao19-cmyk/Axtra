@@ -1,31 +1,43 @@
-"""Configuración de Apex Play (claves en apex.env, datos de cada restaurante en restaurantes/*.json)."""
+"""Configuración de Apex Play. Aquí NO hay claves: el oído, el cerebro y la voz los presta Axtra (la tarjeta
+madre) por su ranura privada. Los datos de cada restaurante están en restaurantes/*.json."""
 import json
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 BASE = Path(__file__).resolve().parent
-load_dotenv(BASE.parent / "apex.env")
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-OPENAI_URL = os.getenv("OPENAI_URL", "https://api.openai.com/v1")
-MODELO = os.getenv("APEX_MODELO", "gpt-realtime-2.1-mini")       # cada restaurante puede usar otro
 DATA_DIR = Path(os.getenv("APEX_DATOS", BASE / "datos"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+AUDIO_DIR = DATA_DIR / "audio"
+AUDIO_DIR.mkdir(exist_ok=True)
+RANURA_URL = os.getenv("RANURA_URL", "http://axtra:8090").rstrip("/")
+RANURA_CLAVE = os.getenv("RANURA_CLAVE", "")
 MODO_DESARROLLO = os.getenv("APEX_MODO", "") == "desarrollo"     # permite http://localhost como origen
+COP_POR_USD = float(os.getenv("APEX_COP_POR_USD", "4000"))
 
-# USD por millón de tokens. Revísalos en la página de precios de OpenAI y ajústalos en apex.env si cambian.
-PRECIOS = {
-    "gpt-realtime-2.1-mini": {"audio_in": 10.0, "audio_in_cache": 0.30, "audio_out": 20.0,
-                              "texto_in": 0.60, "texto_in_cache": 0.06, "texto_out": 2.40},
-    "gpt-realtime-2.1": {"audio_in": 32.0, "audio_in_cache": 0.40, "audio_out": 64.0,
-                         "texto_in": 4.0, "texto_in_cache": 0.40, "texto_out": 16.0},
+# Precios en dólares (revisarlos de vez en cuando). Se calculan a precio de lista, sin restar lo gratis:
+# el costo real suele ser menor (p. ej. Google regala 1 millón de caracteres de voz al mes).
+PRECIOS_USD = {
+    "oido_groq_hora": 0.04,          # Groq Whisper turbo, mínimo 10 s por audio
+    "cerebro": {                      # por millón de tokens (entrada, salida)
+        "groq": (0.075, 0.30),        # gpt-oss-20b
+        "gemini": (0.30, 2.50),       # respaldo
+    },
+    # Google cobra según el tipo de voz (por millón de caracteres). edge = la voz gratis de Axtra.
+    "voz_millon_caracteres": {"Chirp3-HD": 30.0, "Studio": 30.0, "Neural2": 16.0, "Wavenet": 16.0,
+                              "Standard": 4.0, "edge": 0.0},
 }
-if os.getenv("APEX_PRECIOS"):
-    PRECIOS.update(json.loads(os.environ["APEX_PRECIOS"]))
 
-TOPES_POR_DEFECTO = {"sesiones_mes": 1500, "minutos_mes": 1500, "usd_mes": 40, "minutos_por_sesion": 8}
+TOPES_POR_DEFECTO = {"tope_cop_mes": 80000, "minutos_por_sesion": 15, "turnos_por_sesion": 60}
+
+FRASES_POR_DEFECTO = {
+    "saludo": "Estoy a su servicio, espero su pedido; si tiene dudas, lo atenderé.",
+    "eleccion": "Muy buena elección.",
+    "despedida": "Fue un placer atenderlo, si tiene alguna duda indíqueme.",
+    "repetir": "Disculpe, no le escuché bien. ¿Me lo repite, por favor?",
+    "vacio": "Aún no ha seleccionado ningún plato. ¿Qué le provoca?",
+    "mesero": "Con gusto, enseguida va un mesero a su mesa.",
+    "sin_voz": "En este momento no puedo atenderle por voz. Toque «Llamar al mesero» y con gusto le atienden.",
+}
 
 
 def restaurantes() -> dict:
@@ -35,7 +47,8 @@ def restaurantes() -> dict:
         r = json.loads(f.read_text(encoding="utf-8"))
         r.setdefault("id", f.stem)
         r["topes"] = {**TOPES_POR_DEFECTO, **r.get("topes", {})}
-        r.setdefault("modelo", MODELO)
+        r["frases"] = {**FRASES_POR_DEFECTO, **r.get("frases", {})}
+        r.setdefault("voz", {})
         out[r["id"]] = r
     return out
 
@@ -43,7 +56,3 @@ def restaurantes() -> dict:
 def restaurante(rid: str):
     return restaurantes().get(rid)
 
-
-def pin(r: dict) -> str:
-    """El PIN del panel del mesero vive en apex.env (APEX_PIN_<ID>), nunca en GitHub."""
-    return os.getenv(r.get("pin_env") or f"APEX_PIN_{r['id'].upper()}", "")

@@ -30,14 +30,17 @@ def limpiar(texto: str) -> str:
     return re.sub(r"\s+", " ", texto).strip()
 
 
-def sintetizar(texto: str, idioma: str = None, lento: bool = False) -> bytes:
-    """Audio MP3. Sin idioma: voz de Axtra en español. Con idioma: voz nativa (más despacio si lento)."""
+def sintetizar(texto: str, idioma: str = None, lento: bool = False, voz: str = None) -> bytes:
+    """Audio MP3. Sin idioma: voz de Axtra en español. Con idioma: voz nativa (más despacio si lento).
+    voz: otra voz de edge-tts (la usan los orbes de los negocios como respaldo)."""
     import edge_tts
 
     texto = limpiar(texto)[:2500]
     if not texto:
         raise ValueError("texto vacío")
-    if idioma in IDIOMAS:
+    if voz:
+        velocidad, tono = "+0%", "+0Hz"
+    elif idioma in IDIOMAS:
         voz, velocidad, tono = IDIOMAS[idioma][1], ("-35%" if lento else "-10%"), "+0Hz"
     else:
         voz, velocidad, tono = config.VOZ_AXTRA, ("-25%" if lento else config.VOZ_VELOCIDAD), config.VOZ_TONO

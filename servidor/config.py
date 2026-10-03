@@ -62,6 +62,13 @@ VOZ_AXTRA = os.getenv("VOZ_AXTRA", "es-ES-AlvaroNeural")
 VOZ_VELOCIDAD = os.getenv("VOZ_VELOCIDAD", "+4%")
 VOZ_TONO = os.getenv("VOZ_TONO", "-12Hz")
 
+# ---------- Orbes de los negocios (Apex Play): Axtra es su tarjeta madre ----------
+# Voz natural de Google Cloud Text-to-Speech (1 millón de caracteres gratis al mes). Vacío = voz gratis de Axtra.
+GOOGLE_TTS_API_KEY = os.getenv("GOOGLE_TTS_API_KEY", "")
+ORBE_MODELO = os.getenv("ORBE_MODELO", "openai/gpt-oss-20b")        # cerebro de los orbes (Groq)
+# Ranura privada: solo la usan los orbes desde dentro del servidor (nunca pasa por el túnel)
+RANURA_PUERTO = int(os.getenv("RANURA_PUERTO", "8090"))
+
 # ---------- Acceso (Cloudflare Access: solo tu cuenta de Google entra) ----------
 CF_ACCESS_EQUIPO = os.getenv("CF_ACCESS_EQUIPO", "")   # ej: axtra  (de axtra.cloudflareaccess.com)
 CF_ACCESS_AUD = os.getenv("CF_ACCESS_AUD", "")

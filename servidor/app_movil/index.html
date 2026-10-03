@@ -187,6 +187,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   <symbol id="plus" viewBox="0 0 24 24"><path d="M11 5h2v14h-2zM5 11h14v2H5z"/></symbol>
   <symbol id="home" viewBox="0 0 24 24"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></symbol>
   <symbol id="learn" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.9V17h2V9L12 3zm-6 9.7V17l6 3.3 6-3.3v-4.3L12 16l-6-3.3z"/></symbol>
+  <symbol id="biz" viewBox="0 0 24 24"><path d="M4 4h16l1 5a3 3 0 0 1-2 2.83V20H5v-8.17A3 3 0 0 1 3 9l1-5zm2 9v5h4v-4h4v4h4v-5a3 3 0 0 1-3-1.2A3 3 0 0 1 12 13a3 3 0 0 1-3-1.2A3 3 0 0 1 6 13z"/></symbol>
   <symbol id="me" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.7-8 5v1h16v-1c0-3.3-4.7-5-8-5z"/></symbol>
   <symbol id="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
   <symbol id="vol" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06a7 7 0 0 1 0 13.42v2.06A9 9 0 0 0 14 3.23z"/></symbol>
@@ -226,6 +227,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     <div class="chips" id="aprender-ideas" style="justify-content:flex-start"></div>
   </main>
 
+  <main class="view" id="v-negocios" hidden>
+    <h2 class="section-title">Negocios</h2>
+    <p class="muted" style="margin:-4px 0 12px;font-size:13px">Los orbes que Axtra mueve en cada negocio, este mes.</p>
+    <div class="list" id="negocios-lista"></div>
+  </main>
+
   <main class="view" id="v-yo" hidden>
     <h2 class="section-title">Yo</h2>
     <div class="list">
@@ -254,6 +261,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   <nav class="nav">
     <button class="on" data-v="inicio"><svg class="ic"><use href="#home"/></svg>Inicio</button>
     <button data-v="aprender"><svg class="ic"><use href="#learn"/></svg>Aprender</button>
+    <button data-v="negocios"><svg class="ic"><use href="#biz"/></svg>Negocios</button>
     <button data-v="yo"><svg class="ic"><use href="#me"/></svg>Yo</button>
   </nav>
 </div>
@@ -595,9 +603,9 @@ function cerrarMenu() { $("#drawer").hidden = true; }
 // ---------------- Vistas ----------------
 function vista(v) {
   $("#tools").hidden = true;
-  for (const n of ["inicio", "aprender", "yo"]) $("#v-" + n).hidden = n !== v;
+  for (const n of ["inicio", "aprender", "negocios", "yo"]) $("#v-" + n).hidden = n !== v;
   document.querySelectorAll(".nav button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
-  if (v === "aprender") cargarAprender(); if (v === "yo") cargarYo();
+  if (v === "aprender") cargarAprender(); if (v === "yo") cargarYo(); if (v === "negocios") cargarNegocios();
 }
 function haceCuanto(ts) {
   if (!ts) return "nunca"; const m = Math.round((Date.now() / 1000 - ts) / 60);
@@ -651,6 +659,20 @@ async function cargarRecordatorios() {
       <button class="icon-btn" data-id="${r.id}" aria-label="Borrar">${svg("del")}</button></div>`).join("") : `<span class="muted">Ninguno pendiente.</span>`;
     $("#recordatorios").querySelectorAll("button").forEach((b) => b.onclick = async () => { await api("/api/recordatorios/" + b.dataset.id, { method: "DELETE" }); cargarRecordatorios(); });
   } catch {}
+}
+const pesos = (v) => new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(v || 0);
+async function cargarNegocios() {
+  const box = $("#negocios-lista");
+  try {
+    const lista = await (await api("/api/negocios")).json();
+    box.innerHTML = lista.length ? lista.map((n) => { const pct = 100 * n.uso.gasto_cop / Math.max(1, n.tope_cop);
+      return `<div class="card">
+      <div class="row"><div class="k">${esc(n.nombre)}</div><div class="k">${n.mesas_abiertas}/${n.mesas} mesas abiertas</div></div>
+      <div class="v" style="font-size:20px">${pesos(n.uso.ventas)} <span class="muted" style="font-size:13px">en ${n.uso.pedidos} pedidos</span></div>
+      <div class="muted" style="font-size:13px;margin:6px 0 4px">Orbe: ${n.uso.conversaciones} conversaciones · gasto ${pesos(n.uso.gasto_cop)} de ${pesos(n.tope_cop)}</div>
+      ${barra(pct)}${n.llamadas ? `<div class="tip">${n.llamadas} mesa(s) llamando al mesero ahora.</div>` : ""}</div>`; }).join("")
+      : `<div class="card"><div class="k">Aún no hay negocios conectados.</div></div>`;
+  } catch { box.innerHTML = `<div class="card"><div class="k">No pude leer los negocios.</div></div>`; }
 }
 async function cargarYo() {
   $("#t-voz").classList.toggle("on", S.voz);
