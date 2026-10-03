@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0b1626">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;500;600;700;800&display=swap">
-<script src="/web/apex-voz.js?v=wav2"></script>
+<script src="/web/apex-voz.js?v=3"></script>
 <script src="/web/qrcode.js?v=2"></script>
 <style>
 /* Layout: una app de celular (máx. 460 px) centrada; tres pantallas: orbe de entrada, carta, pedido enviado. Más la vista de la caja. */
@@ -300,7 +300,7 @@ orbe.ontexto = (t, quien) => {
   decir(t);
 };
 orbe.onpedido = (p) => {
-  if (p.pedido_numero) { ultimoPedido = p; return; }
+  if (p.pedido_numero) { ultimoPedido = p; return enviado(p); }        // confirmado (por voz o por botón): sale el recibo
   pedido = {}; for (const x of p.platos || []) if (x.id) pedido[x.id] = (pedido[x.id] || 0) + x.cantidad;
   pintar(); if ($(".hoja")) abrirPedido(hojaOferta);
 };

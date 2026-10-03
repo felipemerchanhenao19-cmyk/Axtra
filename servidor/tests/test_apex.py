@@ -334,3 +334,56 @@ def test_paginas_sin_cache_y_aguantan_peticiones_raras(c):
     assert c.get("/web/apex-voz.js").headers["cache-control"] == "no-cache"
     assert "apex-voz.js?v=" in r.text
     assert c.get("/qr", headers={"Range": "bytes=abc"}).status_code == 200
+
+
+def llamadas(*pares):
+    """Un mensaje del cerebro con varias herramientas a la vez."""
+    return {"role": "assistant", "content": "", "tool_calls": [
+        {"id": f"c{i}", "type": "function", "function": {"name": n, "arguments": json.dumps(a)}} for i, (n, a) in enumerate(pares)]}
+
+
+def _platos(c):
+    return {p["plato"]: p["cantidad"] for p in c}
+
+
+def test_el_orbe_no_agrega_lo_que_el_cliente_no_pidio(c, axtra):
+    s = sesion(c, "1").json()
+    axtra.oido = "quiero un ajiaco"
+    # El cerebro se equivoca: agrega el ajiaco dos veces, con cantidad 3, y una limonada que nadie pidió
+    axtra.guion = [llamadas(("agregar_plato", {"plato_id": "ajiaco", "cantidad": 3}), ("agregar_plato", {"plato_id": "ajiaco"}),
+                            ("agregar_plato", {"plato_id": "limonada"})), texto("Listo, un ajiaco.")]
+    r = turno(c, s).json()
+    assert _platos(r["pedido"]["platos"]) == {"Ajiaco santafereño": 1}
+
+
+def test_la_cantidad_es_la_que_dijo_el_cliente(c, axtra):
+    s = sesion(c, "1").json()
+    axtra.oido = "me trae dos ajiacos y una limonada de coco"
+    axtra.guion = [llamadas(("agregar_plato", {"plato_id": "ajiaco"}), ("agregar_plato", {"plato_id": "limonada", "cantidad": 2})),
+                   texto("Con gusto.")]
+    assert _platos(turno(c, s).json()["pedido"]["platos"]) == {"Ajiaco santafereño": 2, "Limonada de coco": 1}
+
+
+def test_si_a_la_sugerencia_si_agrega_y_no_no(c, axtra):
+    s = sesion(c, "1").json()
+    accion(c, s, "pedir", plato_id="bandeja")                       # el orbe sugirió la limonada
+    axtra.oido = "no gracias"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "limonada"}), texto("Listo.")]
+    assert _platos(turno(c, s).json()["pedido"]["platos"]) == {"Bandeja paisa": 1}
+    s2 = sesion(c, "2").json()
+    accion(c, s2, "pedir", plato_id="bandeja")
+    axtra.oido = "sí, por favor"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "limonada"}), texto("Listo.")]
+    assert _platos(turno(c, s2).json()["pedido"]["platos"]) == {"Bandeja paisa": 1, "Limonada de coco": 1}
+
+
+def test_confirmar_por_voz_trae_la_factura_completa(c, axtra):
+    s = sesion(c, "1").json()
+    accion(c, s, "pedir", plato_id="ajiaco")
+    accion(c, s, "pedir", plato_id="limonada")
+    axtra.oido = "sí, confírmelo"
+    # Tras confirmar, el cerebro mira el carrito (ya vacío): la factura debe ser la del pedido enviado
+    axtra.guion = [herramienta("confirmar_pedido"), herramienta("ver_pedido", i="2"), texto("¡Listo!")]
+    r = turno(c, s).json()
+    assert r["pedido"]["pedido_numero"] and r["pedido"]["total_numero"] == 44000
+    assert _platos(r["pedido"]["platos"]) == {"Ajiaco santafereño": 1, "Limonada de coco": 1}

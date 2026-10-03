@@ -239,7 +239,7 @@ async def turno(request: Request):
         log.warning("turno de voz falló: %s", e)
         return _respuesta(r, s, frase="sin_voz", sin_voz=True)
     return await asyncio.to_thread(_respuesta, r, s, res["texto"], "", despedida=bool(res["confirmado"]),
-                                   pedido=res["pedido"] or res["confirmado"], oido=texto[:600])
+                                   pedido=res["confirmado"] or res["pedido"], oido=texto[:600])
 
 
 class Accion(Credencial):
