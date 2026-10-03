@@ -142,7 +142,7 @@ def _google(h: Hablar) -> bytes:
 @app.post("/voz")
 def hablar(h: Hablar):
     texto = voz.limpiar(h.texto)
-    if config.GOOGLE_TTS_API_KEY:
+    if config.GOOGLE_TTS_API_KEY and h.voz_google:          # voz_google vacía = usar directo la voz gratis
         try:
             return Response(_google(h), media_type="audio/mpeg",
                             headers={"X-Proveedor": "google", "X-Caracteres": str(len(texto))})
