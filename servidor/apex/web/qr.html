@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Play · Códigos QR</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1626">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;600;800&display=swap">
+<script src="/web/qrcode.js"></script>
+<style>
+/* Una tarjeta grande para mostrar en pantalla (el gerente la escanea) y una hoja para imprimir todas las mesas. */
+:root { --noche:#0b1626; --tarjeta:#121e30; --tinta:#eef3fa; --suave:#93a4bb; --hielo:#3fd0ff; --linea:rgba(139,233,255,.14);
+        --f-titulo:"Italiana", Georgia, serif; --f-cuerpo:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(120% 40% at 50% 0%, #143a66 0%, var(--noche) 70%) no-repeat, var(--noche); color: var(--tinta); font: 16px/1.45 var(--f-cuerpo); }
+main { max-width: 520px; margin: 0 auto; padding: 22px 16px 40px; display: grid; gap: 18px; }
+h1 { font: 400 34px/1.1 var(--f-titulo); margin: 0; }
+.marca { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; color: var(--suave); }
+.marca i { width: 18px; height: 18px; border-radius: 5px; background: var(--hielo); display: grid; place-items: center; }
+.marca i::after { content: ""; margin-left: 2px; border-left: 7px solid var(--noche); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
+.sub { color: var(--suave); margin: 4px 0 0; }
+.mesas { display: flex; flex-wrap: wrap; gap: 8px; }
+.mesas button { font: inherit; font-weight: 700; color: var(--tinta); background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 99px; padding: 9px 15px; cursor: pointer; }
+.mesas button[aria-pressed="true"] { background: var(--hielo); color: #04121c; border-color: var(--hielo); }
+.tarjeta { background: #fff; color: #0b1626; border-radius: 28px; padding: 24px; display: grid; justify-items: center; gap: 10px; text-align: center; }
+.tarjeta .qr { width: min(100%, 340px); aspect-ratio: 1; max-width: 100%; }
+.tarjeta .qr svg { width: 100%; height: 100%; display: block; }
+.tarjeta b { font: 400 34px/1 var(--f-titulo); }
+.tarjeta span { font-size: 14px; color: #4a586b; }
+.enlace { display: flex; gap: 8px; align-items: center; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 10px 12px; }
+.enlace code { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 13px; color: var(--suave); }
+.boton { font: inherit; font-weight: 800; border: 0; border-radius: 99px; padding: 13px 18px; cursor: pointer; background: var(--hielo); color: #04121c; text-decoration: none; text-align: center; }
+.boton.sec { background: transparent; color: var(--tinta); border: 1px solid var(--linea); font-weight: 600; }
+.acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.nota { color: var(--suave); font-size: 13px; }
+#hoja { display: none; }
+@media print {
+  @page { size: letter; margin: 12mm; }
+  body { background: #fff; color: #000; }
+  main { display: none; }
+  #hoja { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; }
+  .imp { border: 1px solid #ccc; border-radius: 6mm; padding: 6mm; text-align: center; break-inside: avoid; font-family: var(--f-cuerpo); }
+  .imp svg { width: 62mm; height: 62mm; }
+  .imp b { display: block; font: 400 26pt/1 var(--f-titulo); margin-top: 2mm; }
+  .imp span { font-size: 10pt; color: #333; }
+}
+</style>
+</head>
+<body>
+<main>
+  <div class="marca"><i></i>Apex Play</div>
+  <div><h1 id="titulo">Códigos QR</h1><p class="sub">Elija una mesa y que la otra persona escanee el código con la cámara del celular.</p></div>
+  <div class="mesas" id="mesas"></div>
+  <div class="tarjeta"><div class="qr" id="qr"></div><b id="mesa-titulo">Mesa 1</b><span>Escanee y pida desde su celular</span></div>
+  <div class="enlace"><code id="url"></code><button class="boton sec" id="copiar" style="padding:8px 12px">Copiar</button></div>
+  <div class="acciones"><a class="boton sec" id="abrir" href="#">Abrir aquí</a><button class="boton" id="imprimir">Imprimir todas</button></div>
+  <p class="nota">Cada mesa atiende una conversación a la vez: si usted ya está probando en la mesa 1, dele al gerente la mesa 2.</p>
+</main>
+<div id="hoja"></div>
+<script>
+const q = new URLSearchParams(location.search), R = q.get("r") || "demo";
+const $ = (s) => document.querySelector(s);
+const enlace = (m) => `${location.origin}/demo?r=${encodeURIComponent(R)}&mesa=${encodeURIComponent(m)}`;
+function svgQR(texto) { const c = qrcode(0, "M"); c.addData(texto); c.make(); return c.createSvgTag({ cellSize: 8, margin: 2, scalable: true }); }
+let mesas = [], actual = q.get("mesa") || "1";
+function elegir(m) {
+  actual = m;
+  $("#qr").innerHTML = svgQR(enlace(m)); $("#mesa-titulo").textContent = `Mesa ${m}`;
+  $("#url").textContent = enlace(m); $("#abrir").href = enlace(m);
+  document.querySelectorAll("#mesas button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.m === m));
+}
+$("#copiar").onclick = async () => { try { await navigator.clipboard.writeText(enlace(actual)); $("#copiar").textContent = "Copiado"; }
+  catch { getSelection().selectAllChildren($("#url")); } setTimeout(() => $("#copiar").textContent = "Copiar", 1800); };
+$("#imprimir").onclick = () => { $("#hoja").innerHTML = mesas.map((m) => `<div class="imp">${svgQR(enlace(m))}<b>Mesa ${m}</b><span>Escanee y pida desde su celular</span></div>`).join(""); print(); };
+(async () => {
+  try { const d = await (await fetch(`/v1/mesas/${encodeURIComponent(R)}`)).json(); mesas = d.mesas || []; $("#titulo").textContent = `Códigos QR · ${d.nombre}`; }
+  catch { mesas = ["1"]; }
+  if (!mesas.includes(actual)) actual = mesas[0] || "1";
+  $("#mesas").innerHTML = mesas.map((m) => `<button data-m="${m}">Mesa ${m}</button>`).join("");
+  document.querySelectorAll("#mesas button").forEach((b) => b.onclick = () => elegir(b.dataset.m));
+  elegir(actual);
+})();
+</script>
+</body>
+</html>

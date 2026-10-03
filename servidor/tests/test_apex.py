@@ -94,9 +94,20 @@ def accion(c, s, tipo, **extra):
     return c.post("/v1/accion", json={"sesion": s["sesion"], "secreto": s["secreto"], "tipo": tipo, **extra}, headers=ORIGEN)
 
 
-def test_mesa_cerrada_no_da_sesion(c):
+@pytest.fixture
+def mesas_con_llave(monkeypatch):
+    """Un restaurante normal: las mesas las abre el mesero (el demo las tiene siempre abiertas)."""
+    original = config.restaurante
+    monkeypatch.setattr(config, "restaurante", lambda rid: {**original(rid), "mesas_siempre_abiertas": False} if original(rid) else None)
+
+
+def test_mesa_cerrada_no_da_sesion(c, mesas_con_llave):
     r = sesion(c)
     assert r.status_code == 403 and "cerrada" in r.json()["error"]
+
+
+def test_demo_tiene_mesas_siempre_abiertas(c):
+    assert sesion(c, "7").status_code == 200
 
 
 def test_sesion_trae_frases_grabadas(c):
@@ -137,7 +148,7 @@ def test_turno_completo_con_herramientas(c, axtra):
     axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), texto("Excelente, un ajiaco santafereño.")]
     r = turno(c, s).json()
     assert base64.b64decode(r["audio"]) == "ID3Excelente, un ajiaco santafereño.".encode()
-    assert r["pedido"]["platos"] == [{"plato": "Ajiaco santafereño", "cantidad": 1}]
+    assert r["pedido"]["platos"] == [{"id": "ajiaco", "plato": "Ajiaco santafereño", "cantidad": 1}]
     # El cerebro recibió el menú, las reglas y las herramientas; y la respuesta de la herramienta
     pensar = [j for ruta, j in axtra.llamadas if ruta == "/pensar"]
     assert "Bandeja paisa" in pensar[0]["sistema"] and "38 mil pesos" in pensar[0]["sistema"]
@@ -149,8 +160,9 @@ def test_botones_pedir_y_confirmar_por_voz(c, axtra):
     abrir(c, "3")
     s = sesion(c, "3").json()
     r = accion(c, s, "pedir", plato_id="bandeja", cantidad=2).json()
-    assert r["frase"] == "/v1/frase/demo/eleccion" and r["pedido"]["total_numero"] == 76000
-    assert not [x for x, _ in axtra.llamadas if x == "/pensar"]      # «Muy buena elección» no gasta cerebro
+    assert r["frase"] == "/v1/frase/demo/sugerir" and r["sugerir"] == "limonada" and r["pedido"]["total_numero"] == 76000
+    assert "limonada" in r["texto"]
+    assert not [x for x, _ in axtra.llamadas if x == "/pensar"]      # la sugerencia es una frase grabada: no gasta cerebro
     axtra.guion = [texto("Su pedido: dos bandejas paisas, 76 mil pesos. ¿Lo confirma?")]
     r = accion(c, s, "pedir_todo").json()
     assert b"Lo confirma" in base64.b64decode(r["audio"])
@@ -270,6 +282,31 @@ def test_historial_no_parte_herramientas():
 
 def test_menu_y_paginas(c):
     m = c.get("/v1/menu/demo").json()
-    assert m["nombre"] == "La Mesa de Apex" and len(m["menu"]) == 3 and "personalidad" not in m
+    assert m["nombre"] == "Su restaurante" and len(m["menu"]) == 5 and "personalidad" not in m
+    assert next(p for p in m["menu"] if p["id"] == "volcan")["antes"] == 19000
     assert c.get("/demo").status_code == 200 and c.get("/panel").status_code == 200
     assert c.get("/web/apex-voz.js").status_code == 200
+    assert c.get("/qr").status_code == 200 and c.get("/web/qrcode.js").status_code == 200
+    assert c.get("/v1/mesas/demo").json()["mesas"][0] == "1"
+
+
+def test_botones_quitar_oferta_y_enviar_sin_cerebro(c, axtra):
+    s = sesion(c, "4").json()
+    accion(c, s, "pedir", plato_id="ajiaco")                          # sugiere la limonada (una sola vez)
+    assert accion(c, s, "pedir", plato_id="omelet").json()["frase"] == "/v1/frase/demo/eleccion"
+    r = accion(c, s, "quitar", plato_id="omelet").json()               # se equivocó: lo quita
+    assert r["frase"] == "/v1/frase/demo/quitado" and [p["id"] for p in r["pedido"]["platos"]] == ["ajiaco"]
+    r = accion(c, s, "confirmar").json()                                # antes de enviar ofrece el postre
+    assert r["frase"] == "/v1/frase/demo/oferta" and r["oferta"] == "volcan" and not r.get("despedida")
+    r = accion(c, s, "confirmar").json()                                # «No, enviar así»: no insiste
+    assert r["frase"] == "/v1/frase/demo/enviado" and r["despedida"] is True and r["pedido"]["pedido_numero"]
+    assert not [x for x, _ in axtra.llamadas if x == "/pensar"]
+    assert c.get("/v1/panel/demo", headers=PIN).json()["pedidos"][0]["total"] == 32000
+
+
+def test_oferta_aceptada_se_suma_al_pedido(c):
+    s = sesion(c, "5").json()
+    accion(c, s, "pedir", plato_id="limonada")
+    assert accion(c, s, "confirmar").json()["oferta"] == "volcan"
+    r = accion(c, s, "confirmar", plato_id="volcan").json()             # «Sí, agregarlo»
+    assert r["despedida"] and r["pedido"]["total_numero"] == 12000 + 14000

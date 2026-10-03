@@ -112,6 +112,11 @@ HERRAMIENTAS = [
 ]
 
 
+def mesa_abierta(r: dict, mesa: str) -> bool:
+    """Un restaurante de demostración tiene sus mesas siempre abiertas; los demás las abre el mesero en el panel."""
+    return bool(r.get("mesas_siempre_abiertas")) or db.mesa_abierta(r["id"], mesa)
+
+
 def precio(r: dict, valor: float) -> str:
     return f"{valor:,.0f} {r.get('moneda', 'COP')}".replace(",", ".")
 
@@ -121,6 +126,18 @@ def precio_hablado(valor: float) -> str:
     if valor >= 1000 and valor % 1000 == 0:
         return f"{int(valor // 1000)} mil pesos"
     return f"{valor:,.0f} pesos".replace(",", ".")
+
+
+def _ventas(r: dict) -> str:
+    """Sugerencias que el orbe hace por su cuenta (una sola vez cada una), para vender más."""
+    v, nombres = r.get("ventas") or {}, {p["id"]: p["nombre"] for p in r["menu"]}
+    out = []
+    if (s := v.get("sugerir")) and s.get("ofrecer") in nombres:
+        out.append(f"- Si pide un plato fuerte y no tiene bebida, sugiere una vez {nombres[s['ofrecer']]}.")
+    if v.get("oferta") in nombres:
+        out.append(f"- Antes de confirmar un pedido que no tenga {nombres[v['oferta']]}, ofrécelo una vez (está en oferta hoy). "
+                   "Si dice que no, confirma sin insistir.")
+    return ("VENTAS:\n" + "\n".join(out) + "\n") if out else ""
 
 
 def instrucciones(r: dict, mesa: str) -> str:
@@ -138,7 +155,7 @@ MENÚ (no existe nada más):
 {menu}
 
 INFORMACIÓN DEL RESTAURANTE: {r.get('info', '')}
-
+{_ventas(r)}
 REGLAS:
 1. Habla solo del menú, el restaurante y el pedido. Si preguntan otra cosa, di con amabilidad que solo puedes
    ayudar con el menú y el pedido.
@@ -172,14 +189,14 @@ def _plato(r: dict, ref: str):
 
 def resumen(r: dict, items: list) -> dict:
     total = sum(i["precio"] * i["cantidad"] for i in items)
-    return {"platos": [{"plato": i["nombre"], "cantidad": i["cantidad"], **({"nota": i["nota"]} if i.get("nota") else {})}
+    return {"platos": [{"id": i["id"], "plato": i["nombre"], "cantidad": i["cantidad"], **({"nota": i["nota"]} if i.get("nota") else {})}
                        for i in items], "total": precio_hablado(total), "total_numero": total}
 
 
 def ejecutar(r: dict, s, nombre: str, args: dict) -> dict:
     sid, mesa = s["id"], s["mesa"]
     items = db.carrito(sid)
-    if nombre in ("agregar_plato", "quitar_plato", "confirmar_pedido") and not db.mesa_abierta(r["id"], mesa):
+    if nombre in ("agregar_plato", "quitar_plato", "confirmar_pedido") and not mesa_abierta(r, mesa):
         return {"ok": False, "error": "La mesa está cerrada. Pide al cliente que llame a un mesero."}
     if nombre == "agregar_plato":
         p = _plato(r, args.get("plato_id", ""))

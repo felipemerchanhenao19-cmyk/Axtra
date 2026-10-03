@@ -76,5 +76,5 @@ def test_negocios_en_axtra(monkeypatch):
     monkeypatch.setattr(config, "MODO_DESARROLLO", True)
     lista = TestClient(app_mod.app).get("/api/negocios").json()
     demo = next(n for n in lista if n["id"] == "demo")
-    assert demo["nombre"] == "La Mesa de Apex" and demo["tope_cop"] == 80000 and demo["mesas"] == 5
+    assert demo["nombre"] == "Su restaurante" and demo["tope_cop"] == 80000 and demo["mesas"] == 10
     assert {"conversaciones", "pedidos", "ventas", "gasto_cop"} <= set(demo["uso"])

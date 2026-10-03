@@ -1,6 +1,6 @@
 {
   "id": "demo",
-  "nombre": "La Mesa de Apex",
+  "nombre": "Su restaurante",
   "moneda": "COP",
   "voz": {
     "google": "es-US-Neural2-B",
@@ -15,38 +15,69 @@
     "2",
     "3",
     "4",
-    "5"
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10"
   ],
-  "personalidad": "Eres el orbe de La Mesa de Apex, un restaurante de cocina colombiana moderna en Medellín. Hablas como un mesero cálido, elegante y breve, con un toque de humor amable. Tratas al cliente de usted.",
+  "personalidad": "Eres el orbe de un restaurante de cocina colombiana. Hablas como un mesero cálido, alegre y breve, con un toque de humor amable. Tratas al cliente de usted.",
   "info": "Horario: 12 m a 10 p. m. Aceptamos efectivo, tarjetas y Nequi. La bandeja paisa es para una persona con mucho apetito.",
   "menu": [
     {
       "id": "bandeja",
       "nombre": "Bandeja paisa",
       "precio": 38000,
-      "descripcion": "Frijoles, arroz, chicharrón, carne molida, chorizo, huevo frito, maduro, arepa y aguacate.",
+      "grupo": "Platos fuertes",
+      "descripcion": "Frijoles, arroz, chicharrón, carne molida, huevo, maduro, arepa y aguacate.",
       "alergenos": [
         "huevo"
-      ],
-      "modelo3d": ""
+      ]
     },
     {
       "id": "ajiaco",
       "nombre": "Ajiaco santafereño",
       "precio": 32000,
-      "descripcion": "Sopa de tres papas con pollo desmechado, mazorca y guascas; con crema, alcaparras y aguacate.",
+      "grupo": "Platos fuertes",
+      "descripcion": "Pollo, tres papas y guascas, con crema, alcaparras y aguacate.",
       "alergenos": [
         "lácteos"
-      ],
-      "modelo3d": ""
+      ]
     },
     {
-      "id": "aguacate",
-      "nombre": "Ensalada de aguacate",
-      "precio": 21000,
-      "descripcion": "Aguacate hass, tomate, cebolla morada, cilantro y limón. Vegana.",
-      "alergenos": [],
-      "modelo3d": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/Avocado/glTF-Binary/Avocado.glb"
+      "id": "omelet",
+      "nombre": "Omelet ranchero",
+      "precio": 24000,
+      "grupo": "Platos fuertes",
+      "descripcion": "Tres huevos con tomate, cebolla, pimentón y salsa ranchera.",
+      "alergenos": [
+        "huevo"
+      ]
+    },
+    {
+      "id": "limonada",
+      "nombre": "Limonada de coco",
+      "precio": 12000,
+      "grupo": "Bebidas",
+      "descripcion": "Cremosa, bien fría, hecha al momento.",
+      "alergenos": [
+        "lácteos"
+      ]
+    },
+    {
+      "id": "volcan",
+      "nombre": "Volcán de chocolate",
+      "precio": 14000,
+      "antes": 19000,
+      "oferta": true,
+      "grupo": "Postre del día",
+      "descripcion": "Caliente por dentro, con helado de vainilla. Oferta de hoy: 14 mil pesos (antes 19 mil).",
+      "alergenos": [
+        "lácteos",
+        "huevo",
+        "gluten"
+      ]
     }
   ],
   "topes": {
@@ -56,8 +87,24 @@
   },
   "idioma": "es",
   "frases": {
-    "saludo": "Estoy a su servicio, espero su pedido; si tiene dudas, lo atenderé.",
+    "saludo": "¡Bienvenido! Yo lo atiendo hoy. Puede hablarme o pedir con los botones. Si se equivoca, lo puede quitar.",
     "eleccion": "Muy buena elección.",
-    "despedida": "Fue un placer atenderlo, si tiene alguna duda indíqueme."
+    "sugerir": "Buena elección. ¿Le traigo una limonada de coco bien fría para acompañar?",
+    "quitado": "Listo, lo quité de su pedido.",
+    "oferta": "Antes de enviarlo: hoy tenemos oferta en el volcán de chocolate, a 14 mil pesos. ¿Le gustaría pedirlo?",
+    "enviado": "¡Listo! Su pedido ya está en la caja. Que lo disfrute.",
+    "despedida": "¡Listo! Su pedido ya está en la caja. Que lo disfrute."
+  },
+  "mesas_siempre_abiertas": true,
+  "ventas": {
+    "sugerir": {
+      "si_pide": [
+        "bandeja",
+        "ajiaco",
+        "omelet"
+      ],
+      "ofrecer": "limonada"
+    },
+    "oferta": "volcan"
   }
 }
