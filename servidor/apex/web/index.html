@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Play · Menú</title>
+<meta name="theme-color" content="#07090f">
+<script type="module" src="https://unpkg.com/@google/model-viewer@4/dist/model-viewer.min.js"></script>
+<script src="/web/apex-voz.js"></script>
+<style>
+:root { --bg:#07090f; --card:#0f141d; --line:#1d2533; --txt:#eef3fa; --muted:#8a97ab; --c1:#0b3d91; --c2:#3fd0ff; --c3:#8be9ff; --ok:#43d39e; --bad:#ff7a7a; }
+* { box-sizing:border-box; margin:0; }
+body { background:var(--bg); color:var(--txt); font:16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding-bottom:110px; }
+header { padding:22px 16px 6px; text-align:center; }
+header h1 { font-size:22px; letter-spacing:.02em; }
+header p { color:var(--muted); font-size:14px; }
+.orbe { width:150px; height:150px; margin:14px auto 4px; position:relative; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.orbe canvas { width:100%; height:100%; }
+.estado { text-align:center; color:var(--muted); font-size:14px; min-height:20px; }
+.platos { display:grid; gap:14px; padding:16px; max-width:720px; margin:auto; }
+.plato { background:var(--card); border:1px solid var(--line); border-radius:18px; overflow:hidden; }
+.plato model-viewer { width:100%; height:220px; background:radial-gradient(circle at 50% 40%, #16202f, #0b0f16); }
+.plato .sin3d { height:120px; display:grid; place-items:center; background:radial-gradient(circle at 50% 40%, #16202f, #0b0f16); font-size:44px; }
+.plato .info { padding:14px 16px 16px; }
+.plato h2 { font-size:18px; display:flex; justify-content:space-between; gap:12px; }
+.plato h2 span { color:var(--c2); white-space:nowrap; }
+.plato p { color:var(--muted); font-size:14px; margin-top:4px; }
+.acciones { display:flex; gap:10px; margin-top:12px; }
+button { font:inherit; border:0; border-radius:999px; padding:11px 18px; cursor:pointer; }
+.pedir { background:var(--c2); color:#04121c; font-weight:600; flex:1; }
+.ar { background:transparent; color:var(--txt); border:1px solid var(--line); }
+.cuenta { color:var(--ok); font-size:13px; margin-top:8px; min-height:18px; }
+.barra { position:fixed; left:0; right:0; bottom:0; padding:14px 16px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(transparent, var(--bg) 35%); }
+.todo { width:100%; max-width:720px; display:block; margin:auto; background:linear-gradient(90deg, var(--c1), var(--c2)); color:#fff; font-weight:600; padding:15px; font-size:16px; }
+.todo:disabled { opacity:.45; }
+.inicio { position:fixed; inset:0; background:rgba(4,6,10,.92); display:grid; place-items:center; text-align:center; z-index:10; padding:24px; }
+.inicio button { background:var(--c2); color:#04121c; font-weight:700; font-size:18px; padding:16px 30px; margin-top:18px; }
+.inicio p { color:var(--muted); max-width:300px; margin:10px auto 0; font-size:14px; }
+.aviso { position:fixed; left:16px; right:16px; top:16px; background:#2a1416; border:1px solid #5b2a2e; color:#ffd5d5; padding:12px 14px; border-radius:14px; z-index:20; font-size:14px; }
+</style>
+</head>
+<body>
+<div class="inicio" id="inicio">
+  <div>
+    <div class="orbe" style="pointer-events:none"><canvas id="orbe0" width="300" height="300"></canvas></div>
+    <h1 id="titulo-inicio">Bienvenido</h1>
+    <button id="comenzar">Toque para comenzar</button>
+    <p>El orbe le atenderá por voz. Necesita permiso para usar el micrófono.</p>
+  </div>
+</div>
+<header>
+  <h1 id="nombre">Menú</h1>
+  <p id="mesa"></p>
+  <div class="orbe" id="orbe" title="Toque el orbe para hablar"><canvas id="orbe1" width="300" height="300"></canvas></div>
+  <div class="estado" id="estado"></div>
+</header>
+<main class="platos" id="platos"></main>
+<div class="barra"><button class="todo" id="todo" disabled>Pedir todo lo seleccionado</button></div>
+
+<script>
+const q = new URLSearchParams(location.search), R = q.get("r") || "demo", MESA = q.get("mesa") || "1";
+const API = q.get("api") || location.origin;
+const $ = (s) => document.querySelector(s);
+const ETIQ = { apagado: "Toque el orbe para hablar", conectando: "Conectando…", escuchando: "Le escucho",
+               pensando: "Un momento…", hablando: "" };
+let menu = null, cuentas = {};
+
+const orbe = new ApexVoz({ api: API, restaurante: R, mesa: MESA });
+let nivel = 0, estado = "apagado";
+orbe.onestado = (e) => { estado = e; $("#estado").textContent = ETIQ[e] ?? ""; };
+orbe.onnivel = (n) => { nivel = n; };
+orbe.onerror = (m) => { const a = document.createElement("div"); a.className = "aviso"; a.textContent = m;
+  document.body.append(a); setTimeout(() => a.remove(), 6000); };
+orbe.onpedido = (r) => {
+  if (r.confirmado) { cuentas = {}; }
+  else if (r.platos) { cuentas = {}; for (const p of r.platos) cuentas[p.plato] = (cuentas[p.plato] || 0) + p.cantidad; }
+  pintarCuentas();
+};
+
+function pintarCuentas() {
+  let total = 0;
+  for (const p of menu.menu) { const n = cuentas[p.nombre] || 0; total += n;
+    $(`#c-${p.id}`).textContent = n ? `${n} en su pedido` : ""; }
+  $("#todo").disabled = !total;
+}
+
+const plata = (v) => new Intl.NumberFormat("es-CO", { style: "currency", currency: menu.moneda, maximumFractionDigits: 0 }).format(v);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+async function cargar() {
+  menu = await (await fetch(`${API}/v1/menu/${encodeURIComponent(R)}`)).json();
+  document.title = `${menu.nombre} · Menú`;
+  $("#nombre").textContent = menu.nombre; $("#titulo-inicio").textContent = menu.nombre; $("#mesa").textContent = `Mesa ${MESA}`;
+  $("#platos").innerHTML = menu.menu.map((p) => `
+    <article class="plato">
+      ${p.modelo3d ? `<model-viewer id="mv-${esc(p.id)}" src="${esc(p.modelo3d)}" alt="${esc(p.nombre)}" ar ar-modes="webxr scene-viewer quick-look"
+          camera-controls auto-rotate shadow-intensity="1" touch-action="pan-y"></model-viewer>` : `<div class="sin3d">🍽️</div>`}
+      <div class="info">
+        <h2>${esc(p.nombre)} <span>${plata(p.precio)}</span></h2>
+        <p>${esc(p.descripcion)}</p>
+        <div class="acciones">
+          <button class="pedir" data-id="${esc(p.id)}">Pedir</button>
+          ${p.modelo3d ? `<button class="ar" data-ar="${esc(p.id)}">Ver en su mesa</button>` : ""}
+        </div>
+        <div class="cuenta" id="c-${esc(p.id)}"></div>
+      </div>
+    </article>`).join("");
+  document.querySelectorAll(".pedir").forEach((b) => b.onclick = () => orbe.pedirPlato(b.dataset.id).catch((e) => orbe.onerror(e.message)));
+  document.querySelectorAll("[data-ar]").forEach((b) => b.onclick = () => $(`#mv-${b.dataset.ar}`).activateAR());
+}
+
+$("#comenzar").onclick = async () => { $("#inicio").remove(); await orbe.iniciar(); };
+$("#orbe").onclick = () => { if (orbe.estado === "apagado") orbe.iniciar(); };
+$("#todo").onclick = () => orbe.pedirTodo().catch((e) => orbe.onerror(e.message));
+
+/* Orbe: esfera azul hielo que respira en reposo y late con la voz real. */
+function dibujar(cv, t) {
+  const g = cv.getContext("2d"), w = cv.width, c = w / 2, r = w * 0.3;
+  const habla = estado === "hablando" ? nivel : 0, oye = estado === "escuchando" ? 0.08 : 0;
+  const k = 1 + 0.04 * Math.sin(t * 1.8) + habla * 0.25 + oye * Math.sin(t * 6);
+  g.clearRect(0, 0, w, w);
+  const halo = g.createRadialGradient(c, c, r * 0.6 * k, c, c, r * 1.6 * k);
+  halo.addColorStop(0, `rgba(63,208,255,${0.35 + habla * 0.4})`); halo.addColorStop(1, "rgba(63,208,255,0)");
+  g.fillStyle = halo; g.fillRect(0, 0, w, w);
+  const cuerpo = g.createRadialGradient(c - r * 0.3, c - r * 0.35, r * 0.1, c, c, r * k);
+  cuerpo.addColorStop(0, "#d9f7ff"); cuerpo.addColorStop(0.35, "#3fd0ff"); cuerpo.addColorStop(0.8, "#0b3d91"); cuerpo.addColorStop(1, "#061a3d");
+  g.beginPath(); g.arc(c, c, r * k, 0, Math.PI * 2); g.fillStyle = cuerpo; g.fill();
+  g.save(); g.translate(c, c); g.rotate(t * (estado === "pensando" ? 2.2 : 0.6));
+  g.strokeStyle = "rgba(139,233,255,.55)"; g.lineWidth = w * 0.012;
+  g.beginPath(); g.ellipse(0, 0, r * 1.18 * k, r * 0.32 * k, 0, 0, Math.PI * 2); g.stroke(); g.restore();
+}
+(function animar(now) { const t = now / 1000; for (const id of ["orbe0", "orbe1"]) { const cv = document.getElementById(id); if (cv) dibujar(cv, t); }
+  requestAnimationFrame(animar); })(0);
+
+addEventListener("pagehide", () => orbe.terminar("salió de la página"));
+cargar().catch(() => orbe.onerror("No se pudo cargar el menú."));
+</script>
+</body>
+</html>

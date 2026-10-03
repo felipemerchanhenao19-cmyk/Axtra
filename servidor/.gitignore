@@ -1,3 +1,5 @@
 .env
 datos/
 __pycache__/
+apex.env
+apex/datos/

@@ -12,6 +12,24 @@ services:
     expose:
       - "8080"
 
+  # Apex Play: la puerta pública para los restaurantes (api.axtra.chat, SIN Cloudflare Access).
+  # Mismo código, otro proceso, otra base de datos y otras claves: no puede leer nada de Axtra.
+  apex:
+    build:
+      context: ../..
+      dockerfile: servidor/Dockerfile
+    command: ["uvicorn", "servidor.apex.app:app", "--host", "0.0.0.0", "--port", "8081", "--proxy-headers"]
+    env_file:
+      - path: ../apex.env
+        required: false
+    environment:
+      - APEX_DATOS=/apex_datos
+    volumes:
+      - apex_datos:/apex_datos
+    restart: unless-stopped
+    expose:
+      - "8081"
+
   tunel:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run
@@ -22,3 +40,4 @@ services:
 
 volumes:
   axtra_datos:
+  apex_datos:
