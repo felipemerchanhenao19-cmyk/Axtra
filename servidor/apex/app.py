@@ -15,7 +15,7 @@ from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -89,6 +89,9 @@ async def cors(request: Request, call_next):
         resp.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Apex-Sesion, X-Apex-Secreto"
         resp.headers["Access-Control-Max-Age"] = "600"
     resp.headers["Vary"] = "Origin"
+    if not request.url.path.startswith("/v1/"):
+        # Páginas y scripts: el celular siempre pregunta si hay versión nueva (si no cambió, no la vuelve a bajar)
+        resp.headers["Cache-Control"] = "no-cache"
     return resp
 
 
@@ -411,14 +414,18 @@ def inicio():
     return RedirectResponse("/demo")
 
 
+def _pagina(nombre: str) -> HTMLResponse:
+    return HTMLResponse((WEB / nombre).read_text(encoding="utf-8"))
+
+
 @app.get("/demo")
 def demo():
-    return FileResponse(WEB / "index.html")
+    return _pagina("index.html")
 
 
 @app.get("/qr")
 def qr():
-    return FileResponse(WEB / "qr.html")
+    return _pagina("qr.html")
 
 
 @app.get("/v1/mesas/{rid}")
@@ -431,7 +438,7 @@ def mesas_publicas(rid: str, request: Request):
 
 @app.get("/panel")
 def panel():
-    return FileResponse(WEB / "panel.html")
+    return _pagina("panel.html")
 
 
 app.mount("/web", StaticFiles(directory=WEB), name="web")

@@ -326,3 +326,11 @@ def test_modo_ejemplo_sin_mesas_y_muchas_personas_a_la_vez(axtra):
     accion(cli, a, "confirmar")
     assert accion(cli, a, "confirmar").json()["pedido"]["pedido_numero"]
     assert accion(cli, b, "pedir_todo").json()["frase"] == "/v1/frase/demo/vacio"     # el pedido de A no se mezcla con B
+
+
+def test_paginas_sin_cache_y_aguantan_peticiones_raras(c):
+    r = c.get("/demo", headers={"Range": "bytes=abc"})                   # una vista previa de enlace rara
+    assert r.status_code == 200 and r.headers["cache-control"] == "no-cache"
+    assert c.get("/web/apex-voz.js").headers["cache-control"] == "no-cache"
+    assert "apex-voz.js?v=" in r.text
+    assert c.get("/qr", headers={"Range": "bytes=abc"}).status_code == 200
