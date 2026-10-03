@@ -66,7 +66,9 @@ def axtra(monkeypatch):
 
 
 @pytest.fixture
-def c(axtra):
+def c(axtra, monkeypatch):
+    original = config.restaurante
+    monkeypatch.setattr(config, "restaurante", lambda rid: {**original(rid), "ejemplo": False} if original(rid) else None)
     con = db.conn()
     for t in ("mesas", "sesiones", "pedidos", "llamadas", "consumos"):
         con.execute(f"DELETE FROM {t}")
@@ -288,6 +290,7 @@ def test_menu_y_paginas(c):
     assert c.get("/web/apex-voz.js").status_code == 200
     assert c.get("/qr").status_code == 200 and c.get("/web/qrcode.js").status_code == 200
     assert c.get("/v1/mesas/demo").json()["mesas"][0] == "1"
+    assert c.get("/", follow_redirects=False).headers["location"] == "/demo"
 
 
 def test_botones_quitar_oferta_y_enviar_sin_cerebro(c, axtra):
@@ -310,3 +313,16 @@ def test_oferta_aceptada_se_suma_al_pedido(c):
     assert accion(c, s, "confirmar").json()["oferta"] == "volcan"
     r = accion(c, s, "confirmar", plato_id="volcan").json()             # «Sí, agregarlo»
     assert r["despedida"] and r["pedido"]["total_numero"] == 12000 + 14000
+
+
+def test_modo_ejemplo_sin_mesas_y_muchas_personas_a_la_vez(axtra):
+    """El modelo de ejemplo: un solo link, sin mesas; cada persona tiene su conversación."""
+    apex_app._cubos.clear()
+    cli = TestClient(apex_app.app)
+    a = cli.post("/v1/sesion", json={"restaurante": "demo", "mesa": "ejemplo"}, headers=ORIGEN).json()
+    b = cli.post("/v1/sesion", json={"restaurante": "demo", "mesa": "ejemplo"}, headers=ORIGEN).json()
+    assert a["ejemplo"] and a["sesion"] != b["sesion"]
+    accion(cli, a, "pedir", plato_id="omelet")
+    accion(cli, a, "confirmar")
+    assert accion(cli, a, "confirmar").json()["pedido"]["pedido_numero"]
+    assert accion(cli, b, "pedir_todo").json()["frase"] == "/v1/frase/demo/vacio"     # el pedido de A no se mezcla con B

@@ -154,6 +154,12 @@ def crear_sesion(p: PedidoSesion, request: Request):
     r = _restaurante(p.restaurante)
     exigir_origen(request, r)
     limitar(f"sesion:{ip(request)}", 6, 60)
+    if r.get("ejemplo"):
+        # Modelo de ejemplo para mostrar la idea: sin mesas, cada persona que abre el link tiene su propia conversación.
+        sid = uuid.uuid4().hex
+        secreto = db.nueva_sesion(sid, r["id"], "ejemplo")
+        return {"sesion": sid, "secreto": secreto, "frases": _frases(r), "saludo": r["frases"]["saludo"], "ejemplo": True,
+                "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
     limitar(f"sesion-mesa:{r['id']}:{p.mesa}", 4, 60)
     if p.mesa not in r.get("mesas", []):
         raise HTTPException(404, "mesa no existe")
@@ -396,7 +402,7 @@ def panel_llamada(rid: str, lid: int, request: Request):
 # ---------------- Páginas: demo del menú y panel ----------------
 @app.get("/")
 def inicio():
-    return RedirectResponse("/demo?r=demo&mesa=1")
+    return RedirectResponse("/demo")
 
 
 @app.get("/demo")

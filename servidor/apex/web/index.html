@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;500;600;700;800&display=swap">
 <script src="/web/apex-voz.js"></script>
+<script src="/web/qrcode.js"></script>
 <style>
 /* Layout: una app de celular (máx. 460 px) centrada; tres pantallas: orbe de entrada, carta, pedido enviado. Más la vista de la caja. */
 :root {
@@ -151,7 +152,12 @@ canvas { display: block; width: 100%; height: 100%; }
 .dijo { font-size: 12.5px; color: var(--suave); font-style: italic; }
 .dijo:empty { display: none; }
 .caja-link { text-decoration: none; display: block; text-align: center; color: var(--tinta); }
-.qr-link { color: var(--suave); font-size: 12px; margin-top: 14px; display: inline-block; }
+.qr-boton { color: var(--tinta); font-size: 14px; font-weight: 700; margin-top: 18px; padding: 10px 18px; border: 1px solid var(--linea); }
+.qr-velo { position: fixed; inset: 0; z-index: 30; background: rgba(2,6,12,.85); display: grid; place-items: center; padding: 20px; }
+.qr-caja { background: #fff; color: #0b1626; border-radius: 28px; padding: 24px; width: min(100%, 360px); display: grid; gap: 10px; justify-items: center; text-align: center; }
+.qr-caja .qr { width: 100%; aspect-ratio: 1; max-width: 100%; } .qr-caja .qr svg { width: 100%; height: 100%; display: block; }
+.qr-caja b { font: 400 30px/1 var(--f-titulo); } .qr-caja span { font-size: 13px; color: #4a586b; overflow-wrap: anywhere; }
+.qr-caja button { background: #0b1626; color: #fff; font-weight: 700; padding: 11px 22px; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -159,13 +165,13 @@ canvas { display: block; width: 100%; height: 100%; }
   <!-- 1. Entrada: solo el orbe -->
   <section class="pantalla entrada" id="p-entrada">
     <div>
-      <small id="mesa-chip">Mesa</small>
+      <small id="mesa-chip">Ejemplo</small>
       <h1 class="nombre-rest">Su restaurante</h1>
       <button class="orbe-entrada" id="entrar" aria-label="Tocar el orbe para entrar a la carta"><canvas width="520" height="520"></canvas></button>
       <p class="toque">Toque el orbe</p>
       <p>y vea la carta. Puede hablarle o pedir con botones.</p>
       <div class="marca"><i></i>Apex Play</div><br>
-      <a class="qr-link" href="/qr" id="qr-link">Códigos QR de las mesas</a>
+      <button class="qr-boton" id="ver-qr">Mostrar código QR</button>
     </div>
   </section>
 
@@ -173,7 +179,7 @@ canvas { display: block; width: 100%; height: 100%; }
   <section class="pantalla" id="p-carta" hidden>
     <div class="cabeza">
       <div class="fila-cabeza">
-        <div><div class="mesa" id="mesa-cab">Mesa</div><div class="rest nombre-rest">Su restaurante</div></div>
+        <div><div class="mesa" id="mesa-cab">Ejemplo</div><div class="rest nombre-rest">Su restaurante</div></div>
         <div style="display:flex;gap:6px">
           <button class="chip on" id="sonido" aria-pressed="true" aria-label="Voz del orbe">🔊</button>
           <button class="chip" id="mesero">🙋 Mesero</button>
@@ -198,21 +204,29 @@ canvas { display: block; width: 100%; height: 100%; }
     <div class="recibo" id="recibo"></div>
     <div class="botones-fin">
       <button class="principal" id="otra-vez">Pedir algo más</button>
-      <a class="secundario caja-link" href="/panel" target="_blank" rel="noopener">Ver cómo le llega a la caja →</a>
     </div>
   </section>
 </div>
 
 <script>
-const q = new URLSearchParams(location.search), R = q.get("r") || "demo", MESA = q.get("mesa") || "1";
+const q = new URLSearchParams(location.search), R = q.get("r") || "demo", MESA = q.get("mesa") || "";
 const API = location.origin;
 const $ = (s) => document.querySelector(s);
 const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let menu = null, plata = (v) => "$ " + Number(v).toLocaleString("es-CO");
 let pedido = {}, ultimoPedido = null, nivel = 0, estado = "apagado";
 const pensando = () => estado === "pensando" || estado === "conectando";
-$("#qr-link").href = `/qr?r=${encodeURIComponent(R)}`;
-$("#mesa-chip").textContent = $("#mesa-cab").textContent = `Mesa ${MESA}`;
+if (MESA) $("#mesa-chip").textContent = $("#mesa-cab").textContent = `Mesa ${MESA}`;
+// QR para que otra persona abra este mismo ejemplo en su celular
+$("#ver-qr").onclick = () => {
+  const url = location.origin + "/demo" + (R !== "demo" ? `?r=${encodeURIComponent(R)}` : "");
+  const c = qrcode(0, "M"); c.addData(url); c.make();
+  const v = document.createElement("div"); v.className = "qr-velo";
+  v.innerHTML = `<div class="qr-caja"><div class="qr">${c.createSvgTag({ cellSize: 8, margin: 2, scalable: true })}</div>
+    <b>Escanee y pruébelo</b><span>${url}</span><button>Cerrar</button></div>`;
+  v.onclick = (e) => { if (e.target === v || e.target.tagName === "BUTTON") v.remove(); };
+  document.body.append(v);
+};
 
 /* ---------- Dibujos de los platos (si el restaurante no tiene foto) ---------- */
 const DIBUJO = {
@@ -276,7 +290,7 @@ function dibujarOrbe(cv, t, extra) {
 })(0);
 
 /* ---------- Conexión con Axtra ---------- */
-const orbe = new ApexVoz({ api: API, restaurante: R, mesa: MESA });
+const orbe = new ApexVoz({ api: API, restaurante: R, mesa: MESA || "ejemplo" });
 const ETIQ = { conectando: "Conectando…", escuchando: "Le escucho", oyendo: "Le escucho…", pensando: "Pensando…",
                hablando: "", dormido: "Toque para hablar", listo: "", apagado: "" };
 orbe.onestado = (e) => { estado = e; $("#estado").textContent = ETIQ[e] ?? ""; };
@@ -344,7 +358,7 @@ function abrirPedido(oferta) {
   const velo = document.createElement("div"); velo.className = "velo"; velo.onclick = cerrarHoja;
   const hoja = document.createElement("div"); hoja.className = "hoja"; hoja.setAttribute("role", "dialog"); hoja.setAttribute("aria-label", "Su pedido");
   const ids = Object.keys(pedido);
-  let html = `<div class="agarre"></div><h2>Su pedido</h2><p class="sub">Mesa ${esc(MESA)} · Revise antes de enviar. ¿Se equivocó? Quítelo aquí.</p><div class="lineas">`;
+  let html = `<div class="agarre"></div><h2>Su pedido</h2><p class="sub">${MESA ? `Mesa ${esc(MESA)} · ` : ""}Revise antes de enviar. ¿Se equivocó? Quítelo aquí.</p><div class="lineas">`;
   html += ids.length ? ids.map((id) => { const p = menu.menu.find((x) => x.id === id), n = pedido[id];
     return `<div class="linea"><b>${esc(p?.nombre || id)}</b><div class="ctrl"><div class="contador"><button data-menos="${id}" aria-label="Quitar uno">−</button><b>${n}</b><button class="mas" data-mas="${id}" aria-label="Agregar uno">+</button></div>
       <button class="quitar" data-quitar="${id}">Quitar</button></div><span class="sub-l">${plata(n * PRECIO(id))}</span></div>`; }).join("")
@@ -377,7 +391,7 @@ function enviado(p) {
   cerrarHoja();
   if (!p || !p.pedido_numero) return;
   const hora = new Date().toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" });
-  $("#recibo").innerHTML = `<h3><span>Pedido #${p.pedido_numero} · Mesa ${esc(MESA)}</span><span>${hora}</span></h3>` +
+  $("#recibo").innerHTML = `<h3><span>Pedido #${p.pedido_numero}${MESA ? ` · Mesa ${esc(MESA)}` : ""}</span><span>${hora}</span></h3>` +
     p.platos.map((l) => `<div class="r-linea"><span>${l.cantidad} × ${esc(l.plato)}</span><span>${plata(l.cantidad * PRECIO(l.id))}</span></div>`).join("") +
     `<div class="r-total"><span>Total</span><span>${plata(p.total_numero)}</span></div>`;
   pedido = {}; pintar(); mostrar("p-enviado");

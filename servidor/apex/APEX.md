@@ -94,11 +94,10 @@ Para agregar un restaurante, copia `demo.json`, cámbialo y agrega su PIN en el 
    - URL: `apex:8081`
 
    **No** crees una aplicación de Access para `api`.
-3. **Probar:**
-   - En el celular, abre `https://api.axtra.chat/demo?r=demo&mesa=1` y toca el orbe. El demo tiene las mesas siempre abiertas (`"mesas_siempre_abiertas": true`).
-   - **Códigos QR:** `https://api.axtra.chat/qr` muestra el QR de cada mesa para que otra persona (el gerente) lo escanee, y «Imprimir todas» saca una hoja con todos. Cada mesa atiende una conversación a la vez: si tú estás en la mesa 1, dale la 2.
-   - La caja: `https://api.axtra.chat/panel?r=demo` con el PIN.
-   - Mira el negocio en Axtra, pestaña **Negocios**.
+3. **Probar:** abre `https://api.axtra.chat` en el celular. Es el **modelo de ejemplo** para mostrar la idea a los clientes
+   (`"ejemplo": true` en `demo.json`): sin mesas, sin caja y sin PIN; cada persona que abre el link tiene su propia
+   conversación. El botón «Mostrar código QR» de la entrada (o `https://api.axtra.chat/qr`) da el QR para que otra persona
+   lo pruebe en su celular.
 
 ### Cómo funciona el modelo de demostración
 - Tocar el orbe abre la carta. El cliente puede **hablarle** o solo **tocar botones** (si no da permiso del micrófono, igual funciona y el orbe le habla).
