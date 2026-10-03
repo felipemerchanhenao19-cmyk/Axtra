@@ -5,7 +5,7 @@
   "voz": {
     "google": "es-US-Neural2-B",
     "edge": "es-CO-GonzaloNeural",
-    "velocidad": 1.15
+    "velocidad": 1.05
   },
   "dominios": [
     "https://api.axtra.chat"

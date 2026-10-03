@@ -450,6 +450,44 @@ def demo():
     return _pagina("index.html")
 
 
+# ---------------- Muestras de voz: para escoger cómo suena el orbe ----------------
+VOCES_MUESTRA = {   # voces gratis (edge). Las «Multilingual» son las más naturales y hablan varios idiomas.
+    "es-CO-SalomeNeural": "Salomé · Colombia · mujer", "es-CO-GonzaloNeural": "Gonzalo · Colombia · hombre (la actual)",
+    "es-MX-DaliaNeural": "Dalia · México · mujer", "es-MX-JorgeNeural": "Jorge · México · hombre",
+    "es-US-PalomaNeural": "Paloma · Latina (EE. UU.) · mujer", "es-US-AlonsoNeural": "Alonso · Latino (EE. UU.) · hombre",
+    "es-AR-ElenaNeural": "Elena · Argentina · mujer", "es-ES-ElviraNeural": "Elvira · España · mujer",
+    "es-ES-AlvaroNeural": "Álvaro · España · hombre",
+    "en-US-AvaMultilingualNeural": "Ava · multilingüe · mujer", "en-US-EmmaMultilingualNeural": "Emma · multilingüe · mujer",
+    "en-US-AndrewMultilingualNeural": "Andrew · multilingüe · hombre", "en-US-BrianMultilingualNeural": "Brian · multilingüe · hombre",
+}
+
+
+@app.get("/v1/voces")
+def voces():
+    return [{"voz": k, "nombre": v} for k, v in VOCES_MUESTRA.items()]
+
+
+@app.get("/v1/muestra/{rid}")
+def muestra(rid: str, voz: str, request: Request, velocidad: float = 1.0):
+    """La frase de bienvenida dicha por otra voz (gratis; queda guardada 1 hora)."""
+    r = _restaurante(rid)
+    limitar(f"muestra:{ip(request)}", 40, 60)
+    if voz not in VOCES_MUESTRA:
+        raise HTTPException(404, "voz no disponible")
+    prueba = {**r, "voz": {"google": "", "edge": voz, "velocidad": min(1.3, max(0.8, velocidad))}}
+    try:
+        audio = orbe.voz(prueba, r["frases"]["saludo"])
+    except orbe.SinRanura as e:
+        log.warning("muestra %s falló: %s", voz, e)
+        raise HTTPException(503, "esta voz no está disponible")
+    return Response(audio, media_type="audio/mpeg")
+
+
+@app.get("/voces")
+def pagina_voces():
+    return _pagina("voces.html")
+
+
 @app.get("/qr")
 def qr():
     return _pagina("qr.html")

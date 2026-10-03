@@ -434,3 +434,14 @@ def test_control_de_pedidos_en_japones_y_ruso(c, axtra):
     axtra.oido = "да, пожалуйста"
     axtra.guion = [herramienta("agregar_plato", {"plato_id": "limonada"}), texto("Хорошо.")]
     assert _platos(turno(c, s2).json()["pedido"]["platos"]) == {"Омлет ранчеро": 1, "Кокосовый лимонад": 1}
+
+
+def test_muestras_de_voz_para_escoger(c, axtra):
+    voces = c.get("/v1/voces").json()
+    assert any(v["voz"] == "es-CO-SalomeNeural" for v in voces)
+    a = c.get("/v1/muestra/demo?voz=es-MX-DaliaNeural&velocidad=1.08")
+    assert a.status_code == 200 and a.content.startswith(b"ID3")
+    pedido = [kw for ruta, kw in axtra.llamadas if ruta == "/voz"][-1]
+    assert pedido["voz_edge"] == "es-MX-DaliaNeural" and pedido["voz_google"] == "" and pedido["velocidad"] == 1.08
+    assert c.get("/v1/muestra/demo?voz=cualquier-cosa").status_code == 404
+    assert c.get("/voces").status_code == 200

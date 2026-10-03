@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Play · Voces</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1626">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;600;800&display=swap">
+<style>
+/* Una lista de voces: tocar escucha la bienvenida del orbe con esa voz. */
+:root { --noche:#0b1626; --tarjeta:#121e30; --tinta:#eef3fa; --suave:#93a4bb; --hielo:#3fd0ff; --linea:rgba(139,233,255,.14);
+        --f-titulo:"Italiana", Georgia, serif; --f-cuerpo:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--noche); color: var(--tinta); font: 16px/1.45 var(--f-cuerpo); }
+main { max-width: 520px; margin: 0 auto; padding: 22px 16px 40px; display: grid; gap: 14px; }
+h1 { font: 400 34px/1.1 var(--f-titulo); margin: 0; }
+p { margin: 0; color: var(--suave); }
+.vel { display: flex; gap: 8px; }
+.vel button, .voz { font: inherit; color: var(--tinta); background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 16px; cursor: pointer; }
+.vel button { padding: 8px 14px; border-radius: 99px; font-weight: 600; }
+.vel button[aria-pressed="true"] { background: var(--tinta); color: var(--noche); }
+.voz { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; text-align: left; width: 100%; }
+.voz b { display: block; } .voz small { color: var(--suave); font-size: 12px; }
+.voz span.play { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--hielo); color: #04121c; display: grid; place-items: center; font-weight: 800; }
+.voz.sonando { border-color: var(--hielo); }
+.voz.mal { opacity: .45; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Voces del orbe</h1>
+  <p>Toque una voz para escuchar la bienvenida. Cuando escoja una, dígame su nombre.</p>
+  <div class="vel" role="group" aria-label="Velocidad">
+    <button data-v="1" aria-pressed="true">Normal</button><button data-v="1.08" aria-pressed="false">Un poco más rápida</button>
+  </div>
+  <div id="lista" style="display:grid;gap:10px"></div>
+</main>
+<script>
+const R = new URLSearchParams(location.search).get("r") || "demo";
+let vel = 1, audio = new Audio();
+document.querySelectorAll(".vel button").forEach((b) => b.onclick = () => {
+  vel = +b.dataset.v; document.querySelectorAll(".vel button").forEach((x) => x.setAttribute("aria-pressed", x === b)); });
+(async () => {
+  const voces = await (await fetch("/v1/voces")).json();
+  const lista = document.getElementById("lista");
+  for (const v of voces) {
+    const [nombre, ...resto] = v.nombre.split(" · ");
+    const b = document.createElement("button"); b.className = "voz";
+    b.innerHTML = `<div><b>${nombre}</b><small>${resto.join(" · ")} — ${v.voz}</small></div><span class="play">▶</span>`;
+    b.onclick = async () => {
+      document.querySelectorAll(".voz").forEach((x) => x.classList.remove("sonando")); b.classList.add("sonando");
+      b.querySelector(".play").textContent = "…";
+      try {
+        const r = await fetch(`/v1/muestra/${encodeURIComponent(R)}?voz=${encodeURIComponent(v.voz)}&velocidad=${vel}`);
+        if (!r.ok) throw new Error();
+        audio.pause(); audio.src = URL.createObjectURL(await r.blob()); await audio.play();
+        b.querySelector(".play").textContent = "▶";
+      } catch { b.classList.add("mal"); b.querySelector(".play").textContent = "✕"; }
+    };
+    lista.append(b);
+  }
+})();
+</script>
+</body>
+</html>
