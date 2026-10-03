@@ -69,9 +69,11 @@ def escuchar(audio: bytes = Body(..., media_type="application/octet-stream"), id
                           files={"file": (f"voz.{fmt}", audio, oido._MIME[fmt])},
                           data={"model": config.GROQ_MODELO_OIDO, "language": idioma, "temperature": "0",
                                 "response_format": "verbose_json"})
-        r.raise_for_status()
     except requests.RequestException as e:
         raise HTTPException(502, f"Groq Whisper falló: {e}")
+    if r.status_code >= 400:          # Groq explica por qué rechazó el audio: se guarda para poder corregirlo
+        raise HTTPException(502, f"Groq Whisper falló: {r.status_code} {r.text[:200]} "
+                                 f"(audio {fmt}, {len(audio)} bytes, empieza {audio[:12].hex()})")
     d = r.json()
     return {"texto": (d.get("text") or "").strip(), "segundos": float(d.get("duration") or 0), "proveedor": "groq"}
 
