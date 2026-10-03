@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0b1626">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;500;600;700;800&display=swap">
-<script src="/web/apex-voz.js?v=3"></script>
+<script src="/web/apex-voz.js?v=4"></script>
 <script src="/web/qrcode.js?v=2"></script>
 <style>
 /* Layout: una app de celular (máx. 460 px) centrada; tres pantallas: orbe de entrada, carta, pedido enviado. Más la vista de la caja. */
@@ -152,6 +152,14 @@ canvas { display: block; width: 100%; height: 100%; }
 .dijo { font-size: 12.5px; color: var(--suave); font-style: italic; }
 .dijo:empty { display: none; }
 .caja-link { text-decoration: none; display: block; text-align: center; color: var(--tinta); }
+.idiomas { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.idiomas::-webkit-scrollbar { display: none; }
+.idiomas button { flex: none; font-size: 13px; font-weight: 600; color: var(--suave); border: 1px solid var(--linea); padding: 6px 11px; }
+.idiomas button[aria-pressed="true"] { background: var(--tinta); color: var(--noche); border-color: var(--tinta); }
+.entrada .idiomas { justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+.cabeza .idiomas { margin-top: 8px; }
+.orbe-arriba { padding: 0; display: block; }
+.orbe-arriba.escucha { filter: drop-shadow(0 0 14px rgba(63,208,255,.9)); }
 .qr-boton { color: var(--tinta); font-size: 14px; font-weight: 700; margin-top: 18px; padding: 10px 18px; border: 1px solid var(--linea); }
 .qr-velo { position: fixed; inset: 0; z-index: 30; background: rgba(2,6,12,.85); display: grid; place-items: center; padding: 20px; }
 .qr-caja { background: #fff; color: #0b1626; border-radius: 28px; padding: 24px; width: min(100%, 360px); display: grid; gap: 10px; justify-items: center; text-align: center; }
@@ -165,13 +173,14 @@ canvas { display: block; width: 100%; height: 100%; }
   <!-- 1. Entrada: solo el orbe -->
   <section class="pantalla entrada" id="p-entrada">
     <div>
-      <small id="mesa-chip">Ejemplo</small>
+      <small id="mesa-chip" data-t="ejemplo">Ejemplo</small>
       <h1 class="nombre-rest">Su restaurante</h1>
       <button class="orbe-entrada" id="entrar" aria-label="Tocar el orbe para entrar a la carta"><canvas width="520" height="520"></canvas></button>
-      <p class="toque">Toque el orbe</p>
-      <p>y vea la carta. Puede hablarle o pedir con botones.</p>
+      <p class="toque" data-t="toque">Toque el orbe</p>
+      <p data-t="sub">y vea la carta. Puede hablarle o pedir con botones.</p>
+      <div class="idiomas" id="idiomas-entrada" aria-label="Idioma"></div>
       <div class="marca"><i></i>Apex Play</div><br>
-      <button class="qr-boton" id="ver-qr">Mostrar código QR</button>
+      <button class="qr-boton" id="ver-qr" data-t="qr">Mostrar código QR</button>
     </div>
   </section>
 
@@ -179,31 +188,32 @@ canvas { display: block; width: 100%; height: 100%; }
   <section class="pantalla" id="p-carta" hidden>
     <div class="cabeza">
       <div class="fila-cabeza">
-        <div><div class="mesa" id="mesa-cab">Ejemplo</div><div class="rest nombre-rest">Su restaurante</div></div>
+        <div><div class="mesa" id="mesa-cab" data-t="ejemplo">Ejemplo</div><div class="rest nombre-rest">Su restaurante</div></div>
         <div style="display:flex;gap:6px">
           <button class="chip on" id="sonido" aria-pressed="true" aria-label="Voz del orbe">🔊</button>
-          <button class="chip" id="mesero">🙋 Mesero</button>
+          <button class="chip" id="mesero" data-t="mesero">🙋 Mesero</button>
         </div>
       </div>
       <div class="orbe-zona">
-        <div><div class="orbe-arriba" id="orbe-arriba" title="Toque para pausar o seguir escuchando"><canvas width="200" height="200"></canvas></div>
+        <div><button class="orbe-arriba" id="orbe-arriba" aria-label="Hablar con el orbe"><canvas width="200" height="200"></canvas></button>
           <div class="estado-orbe" id="estado"></div></div>
-        <div class="globo" id="globo" aria-live="polite"><div>Un momento…</div></div>
+        <div class="globo" id="globo" aria-live="polite"><div data-t="momento">Un momento…</div></div>
       </div>
+      <div class="idiomas" id="idiomas-carta" aria-label="Idioma"></div>
     </div>
     <div class="carta" id="carta"></div>
     <div class="barra">
-      <button class="ver-pedido" id="ver-pedido" disabled><span>Ver pedido <span class="cuantos" id="cuantos">0</span></span><span id="total-barra">$ 0</span></button>
+      <button class="ver-pedido" id="ver-pedido" disabled><span><span data-t="ver">Ver pedido</span> <span class="cuantos" id="cuantos">0</span></span><span id="total-barra">$ 0</span></button>
     </div>
   </section>
 
   <!-- 3. Enviado -->
   <section class="pantalla enviado" id="p-enviado" hidden>
     <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-    <div><h2>¡Pedido enviado a la caja!</h2><p class="sub">Su mesero se lo trae en unos minutos.</p></div>
+    <div><h2 data-t="enviado">¡Pedido enviado a la caja!</h2><p class="sub" data-t="enviado_sub">Su mesero se lo trae en unos minutos.</p></div>
     <div class="recibo" id="recibo"></div>
     <div class="botones-fin">
-      <button class="principal" id="otra-vez">Pedir algo más</button>
+      <button class="principal" id="otra-vez" data-t="mas">Pedir algo más</button>
     </div>
   </section>
 </div>
@@ -213,17 +223,97 @@ const q = new URLSearchParams(location.search), R = q.get("r") || "demo", MESA =
 const API = location.origin;
 const $ = (s) => document.querySelector(s);
 const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* ---------- Idiomas: textos de la pantalla (la carta y la voz del orbe vienen del servidor) ---------- */
+const TEXTOS = {
+  es: { locale: "es-CO", ejemplo: "Ejemplo", toque: "Toque el orbe", sub: "y vea la carta. Puede hablarle o pedir con botones.", qr: "Mostrar código QR",
+        escanee: "Escanee y pruébelo", cerrar: "Cerrar", mesero: "🙋 Mesero", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DE HOY",
+        su_pedido: "Su pedido", revise: "Revise antes de enviar. ¿Se equivocó? Quítelo aquí.", vacio: "Su pedido está vacío.", total: "Total",
+        quitar: "Quitar", confirmar: "Confirmar pedido", seguir: "Seguir mirando la carta", oferta: (n, a, b) => `Hoy tenemos <b>oferta en ${n}</b>${a ? `: de ${a} a <b>${b}</b>` : ""}. ¿Le gustaría pedirlo?`,
+        si_agregarlo: "Sí, agregarlo", no_enviar: "No, enviar así", enviado: "¡Pedido enviado a la caja!", enviado_sub: "Su mesero se lo trae en unos minutos.",
+        pedido_n: "Pedido", mas: "Pedir algo más", si_agregar: "Sí, agregar", no_gracias: "No, gracias", listo_ver: "Listo. Cuando termine, toque «Ver pedido».",
+        que_mas: "¿Qué más le traigo?", usted: "Usted", momento: "Un momento…", mesa: "Mesa",
+        estados: { conectando: "Conectando…", escuchando: "🎙 Hable ahora", oyendo: "🎙 Le escucho…", pensando: "Pensando…", hablando: "", listo: "Toque el orbe para hablar", dormido: "Toque el orbe para hablar" },
+        sin_mic: "Sin micrófono: pida con los botones, el orbe le sigue hablando.", sin_voz: "No le escuché bien. Toque el orbe e intente otra vez, o pida con los botones.",
+        mesero_ok: "🙋 Listo, el mesero ya viene.", carga: "No se pudo cargar la carta. Revise la conexión." },
+  en: { locale: "en-US", ejemplo: "Demo", toque: "Tap the orb", sub: "to see the menu. Talk to it or order with the buttons.", qr: "Show QR code",
+        escanee: "Scan to try it", cerrar: "Close", mesero: "🙋 Server", ver: "View order", pedir: "Order", oferta_tag: "TODAY'S DEAL",
+        su_pedido: "Your order", revise: "Check before sending. Made a mistake? Remove it here.", vacio: "Your order is empty.", total: "Total",
+        quitar: "Remove", confirmar: "Confirm order", seguir: "Keep browsing the menu", oferta: (n, a, b) => `Today's deal: <b>${n}</b>${a ? `, from ${a} to <b>${b}</b>` : ""}. Would you like it?`,
+        si_agregarlo: "Yes, add it", no_enviar: "No, send as is", enviado: "Order sent to the register!", enviado_sub: "Your server will bring it in a few minutes.",
+        pedido_n: "Order", mas: "Order something else", si_agregar: "Yes, add it", no_gracias: "No, thanks", listo_ver: "Okay. When you're done, tap «View order».",
+        que_mas: "What else can I get you?", usted: "You", momento: "One moment…", mesa: "Table",
+        estados: { conectando: "Connecting…", escuchando: "🎙 Speak now", oyendo: "🎙 Listening…", pensando: "Thinking…", hablando: "", listo: "Tap the orb to talk", dormido: "Tap the orb to talk" },
+        sin_mic: "No microphone: order with the buttons, the orb will keep talking to you.", sin_voz: "I didn't catch that. Tap the orb and try again, or use the buttons.",
+        mesero_ok: "🙋 A server is on the way.", carga: "Couldn't load the menu. Check your connection." },
+  pt: { locale: "pt-BR", ejemplo: "Exemplo", toque: "Toque no orbe", sub: "e veja o cardápio. Fale com ele ou peça pelos botões.", qr: "Mostrar código QR",
+        escanee: "Escaneie e experimente", cerrar: "Fechar", mesero: "🙋 Garçom", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DO DIA",
+        su_pedido: "Seu pedido", revise: "Confira antes de enviar. Errou? Tire aqui.", vacio: "Seu pedido está vazio.", total: "Total",
+        quitar: "Tirar", confirmar: "Confirmar pedido", seguir: "Continuar vendo o cardápio", oferta: (n, a, b) => `Hoje temos <b>oferta em ${n}</b>${a ? `: de ${a} por <b>${b}</b>` : ""}. Gostaria de pedir?`,
+        si_agregarlo: "Sim, adicionar", no_enviar: "Não, enviar assim", enviado: "Pedido enviado ao caixa!", enviado_sub: "Seu garçom traz em alguns minutos.",
+        pedido_n: "Pedido", mas: "Pedir mais alguma coisa", si_agregar: "Sim, adicionar", no_gracias: "Não, obrigado", listo_ver: "Pronto. Quando terminar, toque em «Ver pedido».",
+        que_mas: "O que mais posso trazer?", usted: "Você", momento: "Um momento…", mesa: "Mesa",
+        estados: { conectando: "Conectando…", escuchando: "🎙 Fale agora", oyendo: "🎙 Ouvindo…", pensando: "Pensando…", hablando: "", listo: "Toque no orbe para falar", dormido: "Toque no orbe para falar" },
+        sin_mic: "Sem microfone: peça pelos botões, o orbe continua falando com você.", sin_voz: "Não ouvi bem. Toque no orbe e tente de novo, ou use os botões.",
+        mesero_ok: "🙋 Pronto, o garçom já vem.", carga: "Não foi possível carregar o cardápio. Verifique a conexão." },
+  de: { locale: "de-DE", ejemplo: "Beispiel", toque: "Tippen Sie auf die Kugel", sub: "und sehen Sie die Karte. Sprechen Sie oder bestellen Sie mit Tasten.", qr: "QR-Code zeigen",
+        escanee: "Scannen und ausprobieren", cerrar: "Schließen", mesero: "🙋 Kellner", ver: "Bestellung", pedir: "Bestellen", oferta_tag: "ANGEBOT DES TAGES",
+        su_pedido: "Ihre Bestellung", revise: "Vor dem Senden prüfen. Vertan? Hier entfernen.", vacio: "Ihre Bestellung ist leer.", total: "Summe",
+        quitar: "Entfernen", confirmar: "Bestellung bestätigen", seguir: "Weiter in der Karte", oferta: (n, a, b) => `Heute im Angebot: <b>${n}</b>${a ? `, statt ${a} nur <b>${b}</b>` : ""}. Möchten Sie es?`,
+        si_agregarlo: "Ja, hinzufügen", no_enviar: "Nein, so senden", enviado: "Bestellung an die Kasse gesendet!", enviado_sub: "Ihr Kellner bringt sie in wenigen Minuten.",
+        pedido_n: "Bestellung", mas: "Noch etwas bestellen", si_agregar: "Ja, hinzufügen", no_gracias: "Nein, danke", listo_ver: "Gut. Wenn Sie fertig sind, tippen Sie auf «Bestellung».",
+        que_mas: "Was darf ich Ihnen noch bringen?", usted: "Sie", momento: "Einen Moment…", mesa: "Tisch",
+        estados: { conectando: "Verbinde…", escuchando: "🎙 Jetzt sprechen", oyendo: "🎙 Ich höre…", pensando: "Einen Moment…", hablando: "", listo: "Zum Sprechen auf die Kugel tippen", dormido: "Zum Sprechen auf die Kugel tippen" },
+        sin_mic: "Kein Mikrofon: Bestellen Sie mit den Tasten, die Kugel spricht weiter mit Ihnen.", sin_voz: "Nicht verstanden. Tippen Sie auf die Kugel und versuchen Sie es erneut, oder nutzen Sie die Tasten.",
+        mesero_ok: "🙋 Ein Kellner kommt.", carga: "Die Karte konnte nicht geladen werden. Prüfen Sie die Verbindung." },
+  ru: { locale: "ru-RU", ejemplo: "Пример", toque: "Нажмите на сферу", sub: "и откройте меню. Говорите или заказывайте кнопками.", qr: "Показать QR-код",
+        escanee: "Отсканируйте и попробуйте", cerrar: "Закрыть", mesero: "🙋 Официант", ver: "Мой заказ", pedir: "Заказать", oferta_tag: "АКЦИЯ ДНЯ",
+        su_pedido: "Ваш заказ", revise: "Проверьте перед отправкой. Ошиблись? Уберите здесь.", vacio: "Ваш заказ пуст.", total: "Итого",
+        quitar: "Убрать", confirmar: "Подтвердить заказ", seguir: "Вернуться к меню", oferta: (n, a, b) => `Сегодня акция: <b>${n}</b>${a ? ` — ${b} вместо ${a}` : ""}. Хотите заказать?`,
+        si_agregarlo: "Да, добавить", no_enviar: "Нет, отправить так", enviado: "Заказ отправлен на кассу!", enviado_sub: "Официант принесёт его через несколько минут.",
+        pedido_n: "Заказ", mas: "Заказать ещё", si_agregar: "Да, добавить", no_gracias: "Нет, спасибо", listo_ver: "Хорошо. Когда закончите, нажмите «Мой заказ».",
+        que_mas: "Что ещё вам принести?", usted: "Вы", momento: "Минутку…", mesa: "Стол",
+        estados: { conectando: "Подключение…", escuchando: "🎙 Говорите", oyendo: "🎙 Слушаю…", pensando: "Думаю…", hablando: "", listo: "Нажмите на сферу, чтобы говорить", dormido: "Нажмите на сферу, чтобы говорить" },
+        sin_mic: "Нет микрофона: заказывайте кнопками, сфера продолжит говорить с вами.", sin_voz: "Я не расслышал. Нажмите на сферу и повторите или используйте кнопки.",
+        mesero_ok: "🙋 Официант уже идёт.", carga: "Не удалось загрузить меню. Проверьте соединение." },
+  ja: { locale: "ja-JP", ejemplo: "デモ", toque: "オーブをタップ", sub: "してメニューを表示。話しかけるか、ボタンで注文できます。", qr: "QRコードを表示",
+        escanee: "スキャンしてお試しください", cerrar: "閉じる", mesero: "🙋 スタッフ", ver: "注文を見る", pedir: "注文", oferta_tag: "本日の特別価格",
+        su_pedido: "ご注文", revise: "送信前にご確認ください。間違えたらここで削除できます。", vacio: "ご注文はまだありません。", total: "合計",
+        quitar: "削除", confirmar: "注文を確定", seguir: "メニューに戻る", oferta: (n, a, b) => `本日は<b>${n}</b>が特別価格${a ? `：${a} → <b>${b}</b>` : ""}。いかがですか？`,
+        si_agregarlo: "はい、追加", no_enviar: "いいえ、このまま送信", enviado: "ご注文をレジに送信しました！", enviado_sub: "まもなくスタッフがお持ちします。",
+        pedido_n: "注文", mas: "追加で注文する", si_agregar: "はい、追加", no_gracias: "いいえ、結構です", listo_ver: "かしこまりました。終わったら「注文を見る」をタップしてください。",
+        que_mas: "他に何かお持ちしましょうか？", usted: "あなた", momento: "少々お待ちください…", mesa: "テーブル",
+        estados: { conectando: "接続中…", escuchando: "🎙 お話しください", oyendo: "🎙 聞いています…", pensando: "考え中…", hablando: "", listo: "オーブをタップして話す", dormido: "オーブをタップして話す" },
+        sin_mic: "マイクなし：ボタンでご注文ください。オーブは話し続けます。", sin_voz: "よく聞き取れませんでした。オーブをタップしてもう一度、またはボタンをお使いください。",
+        mesero_ok: "🙋 スタッフが参ります。", carga: "メニューを読み込めませんでした。接続をご確認ください。" },
+};
+const NOMBRES_IDIOMA = { es: "Español", en: "English", pt: "Português", de: "Deutsch", ru: "Русский", ja: "日本語" };
+let IDIOMA = (() => { const n = (navigator.language || "es").slice(0, 2).toLowerCase(); return TEXTOS[n] ? n : "es"; })();
+const T = () => TEXTOS[IDIOMA] || TEXTOS.es;
 let menu = null, plata = (v) => "$ " + Number(v).toLocaleString("es-CO");
 let pedido = {}, ultimoPedido = null, nivel = 0, estado = "apagado";
 const pensando = () => estado === "pensando" || estado === "conectando";
-if (MESA) $("#mesa-chip").textContent = $("#mesa-cab").textContent = `Mesa ${MESA}`;
+function aplicarTextos() {
+  document.documentElement.lang = IDIOMA;
+  document.querySelectorAll("[data-t]").forEach((e) => { const v = T()[e.dataset.t]; if (typeof v === "string") e.textContent = v; });
+  if (MESA) $("#mesa-chip").textContent = $("#mesa-cab").textContent = `${T().mesa} ${MESA}`;
+  const botones = Object.entries(NOMBRES_IDIOMA).map(([c, n]) => `<button data-idioma="${c}" aria-pressed="${c === IDIOMA}" lang="${c}">${n}</button>`).join("");
+  $("#idiomas-entrada").innerHTML = $("#idiomas-carta").innerHTML = botones;
+  $("#estado").textContent = T().estados[estado] ?? "";
+}
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-idioma]"); if (b && b.dataset.idioma !== IDIOMA) cambiarIdioma(b.dataset.idioma); });
+async function cambiarIdioma(codigo) {
+  IDIOMA = codigo; aplicarTextos();
+  await cargarMenu(); if ($(".hoja")) abrirPedido(hojaOferta);
+  const r = await orbe.cambiarIdioma(codigo).catch(() => null);
+  if (r && !$("#p-carta").hidden) orbe.saludar();
+}
 // QR para que otra persona abra este mismo ejemplo en su celular
 $("#ver-qr").onclick = () => {
   const url = location.origin + "/demo" + (R !== "demo" ? `?r=${encodeURIComponent(R)}` : "");
   const c = qrcode(0, "M"); c.addData(url); c.make();
   const v = document.createElement("div"); v.className = "qr-velo";
   v.innerHTML = `<div class="qr-caja"><div class="qr">${c.createSvgTag({ cellSize: 8, margin: 2, scalable: true })}</div>
-    <b>Escanee y pruébelo</b><span>${url}</span><button>Cerrar</button></div>`;
+    <b>${T().escanee}</b><span>${url}</span><button>${T().cerrar}</button></div>`;
   v.onclick = (e) => { if (e.target === v || e.target.tagName === "BUTTON") v.remove(); };
   document.body.append(v);
 };
@@ -290,13 +380,12 @@ function dibujarOrbe(cv, t, extra) {
 })(0);
 
 /* ---------- Conexión con Axtra ---------- */
-const orbe = new ApexVoz({ api: API, restaurante: R, mesa: MESA || "ejemplo" });
-const ETIQ = { conectando: "Conectando…", escuchando: "Le escucho", oyendo: "Le escucho…", pensando: "Pensando…",
-               hablando: "", dormido: "Toque para hablar", listo: "", apagado: "" };
-orbe.onestado = (e) => { estado = e; $("#estado").textContent = ETIQ[e] ?? ""; };
+const orbe = new ApexVoz({ api: API, restaurante: R, mesa: MESA || "ejemplo", idioma: IDIOMA });
+orbe.onestado = (e) => { estado = e; $("#estado").textContent = T().estados[e] ?? "";
+  $("#orbe-arriba").classList.toggle("escucha", ["escuchando", "oyendo"].includes(e)); };
 orbe.onnivel = (n) => { nivel = n; };
 orbe.ontexto = (t, quien) => {
-  if (quien === "cliente") { const d = $("#globo .dijo"); if (d) d.textContent = `Usted: «${t}»`; return; }
+  if (quien === "cliente") { const d = $("#globo .dijo"); if (d) d.textContent = `${T().usted}: «${t}»`; return; }
   decir(t);
 };
 orbe.onpedido = (p) => {
@@ -304,8 +393,8 @@ orbe.onpedido = (p) => {
   pedido = {}; for (const x of p.platos || []) if (x.id) pedido[x.id] = (pedido[x.id] || 0) + x.cantidad;
   pintar(); if ($(".hoja")) abrirPedido(hojaOferta);
 };
-orbe.onsinmic = () => aviso("Sin micrófono: pida con los botones, el orbe le sigue hablando.");
-orbe.onsinvoz = () => aviso("No pude escucharle bien. Toque el orbe para intentar otra vez, o pida con los botones.");
+orbe.onsinmic = () => aviso(T().sin_mic);
+orbe.onsinvoz = () => aviso(T().sin_voz);
 orbe.onerror = (m) => aviso(/conversación activa/.test(m) ? "Esta mesa ya está en uso en otro celular. Escanee el QR de otra mesa." : m);
 
 function aviso(t) { const a = document.createElement("div"); a.className = "aviso"; a.textContent = t; document.body.append(a); setTimeout(() => a.remove(), 4500); }
@@ -321,11 +410,11 @@ const PRECIO = (id) => menu.menu.find((p) => p.id === id)?.precio || 0;
 function tarjeta(p) {
   const n = pedido[p.id] || 0;
   const precio = p.antes ? `<span class="precio"><s>${plata(p.antes)}</s>${plata(p.precio)}</span>` : `<span class="precio">${plata(p.precio)}</span>`;
-  const ctrl = n ? `<div class="contador"><button data-menos="${p.id}" aria-label="Quitar uno">−</button><b>${n}</b><button class="mas" data-mas="${p.id}" aria-label="Agregar uno">+</button></div>`
-                 : `<button class="pedir" data-mas="${p.id}">Pedir</button>`;
+  const ctrl = n ? `<div class="contador"><button data-menos="${p.id}" aria-label="−1">−</button><b>${n}</b><button class="mas" data-mas="${p.id}" aria-label="+1">+</button></div>`
+                 : `<button class="pedir" data-mas="${p.id}">${T().pedir}</button>`;
   const foto = p.foto ? `<img src="${p.foto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:16px">` : (DIBUJO[p.id] || PLATO_GENERICO);
   return `<article class="plato ${n ? "elegido" : ""}"><div class="foto">${foto}</div>
-    <div class="info">${p.oferta ? '<span class="oferta-tag">OFERTA DE HOY</span>' : ""}<h3>${esc(p.nombre)}</h3><p>${esc(p.descripcion)}</p><div class="pie-plato">${precio}${ctrl}</div></div></article>`;
+    <div class="info">${p.oferta ? `<span class="oferta-tag">${T().oferta_tag}</span>` : ""}<h3>${esc(p.nombre)}</h3><p>${esc(p.descripcion)}</p><div class="pie-plato">${precio}${ctrl}</div></div></article>`;
 }
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 function pintar() {
@@ -340,7 +429,7 @@ async function pedir(id) {
   pedido[id] = (pedido[id] || 0) + 1; pintar(); if ($(".hoja")) abrirPedido(hojaOferta);      // se ve al instante
   const r = await orbe.pedirPlato(id);
   if (r.sugerir) { const sug = menu.menu.find((p) => p.id === r.sugerir);
-    decir(r.texto, [["Sí, agregar", () => pedir(r.sugerir)], ["No, gracias", () => decir("Listo. Cuando termine, toque «Ver pedido»."), "no"]]); }
+    decir(r.texto, [[T().si_agregar, () => pedir(r.sugerir)], [T().no_gracias, () => decir(T().listo_ver), "no"]]); }
 }
 async function quitar(id, todo) {
   const n = todo ? pedido[id] : 1; pedido[id] = Math.max(0, (pedido[id] || 0) - n); if (!pedido[id]) delete pedido[id];
@@ -356,21 +445,21 @@ function cerrarHoja() { $(".hoja")?.remove(); $(".velo")?.remove(); hojaOferta =
 function abrirPedido(oferta) {
   $(".hoja")?.remove(); $(".velo")?.remove(); hojaOferta = oferta || null;
   const velo = document.createElement("div"); velo.className = "velo"; velo.onclick = cerrarHoja;
-  const hoja = document.createElement("div"); hoja.className = "hoja"; hoja.setAttribute("role", "dialog"); hoja.setAttribute("aria-label", "Su pedido");
+  const hoja = document.createElement("div"); hoja.className = "hoja"; hoja.setAttribute("role", "dialog"); hoja.setAttribute("aria-label", T().su_pedido);
   const ids = Object.keys(pedido);
-  let html = `<div class="agarre"></div><h2>Su pedido</h2><p class="sub">${MESA ? `Mesa ${esc(MESA)} · ` : ""}Revise antes de enviar. ¿Se equivocó? Quítelo aquí.</p><div class="lineas">`;
+  let html = `<div class="agarre"></div><h2>${T().su_pedido}</h2><p class="sub">${MESA ? `${T().mesa} ${esc(MESA)} · ` : ""}${T().revise}</p><div class="lineas">`;
   html += ids.length ? ids.map((id) => { const p = menu.menu.find((x) => x.id === id), n = pedido[id];
-    return `<div class="linea"><b>${esc(p?.nombre || id)}</b><div class="ctrl"><div class="contador"><button data-menos="${id}" aria-label="Quitar uno">−</button><b>${n}</b><button class="mas" data-mas="${id}" aria-label="Agregar uno">+</button></div>
-      <button class="quitar" data-quitar="${id}">Quitar</button></div><span class="sub-l">${plata(n * PRECIO(id))}</span></div>`; }).join("")
-    : `<p class="vacio">Su pedido está vacío.</p>`;
+    return `<div class="linea"><b>${esc(p?.nombre || id)}</b><div class="ctrl"><div class="contador"><button data-menos="${id}" aria-label="−1">−</button><b>${n}</b><button class="mas" data-mas="${id}" aria-label="+1">+</button></div>
+      <button class="quitar" data-quitar="${id}">${T().quitar}</button></div><span class="sub-l">${plata(n * PRECIO(id))}</span></div>`; }).join("")
+    : `<p class="vacio">${T().vacio}</p>`;
   html += `</div>`;
-  if (ids.length) html += `<div class="total"><span>Total</span><span>${plata(total())}</span></div>`;
+  if (ids.length) html += `<div class="total"><span>${T().total}</span><span>${plata(total())}</span></div>`;
   const of = oferta && menu.menu.find((p) => p.id === oferta);
   if (of && ids.length) html += `<div class="oferta"><div class="mini-orbe"><canvas width="140" height="140"></canvas></div>
-      <div><p>Hoy tenemos <b>oferta en ${esc(of.nombre.toLowerCase())}</b>${of.antes ? `: de ${plata(of.antes)} a <b>${plata(of.precio)}</b>` : ""}. ¿Le gustaría pedirlo?</p>
-      <div class="botones"><button class="si" id="oferta-si">Sí, agregarlo</button><button class="no" id="oferta-no">No, enviar así</button></div></div></div>`;
-  else if (ids.length) html += `<button class="confirmar" id="confirmar">Confirmar pedido</button>`;
-  html += `<button class="seguir" id="seguir">Seguir mirando la carta</button>`;
+      <div><p>${T().oferta(esc(of.nombre), of.antes ? plata(of.antes) : "", plata(of.precio))}</p>
+      <div class="botones"><button class="si" id="oferta-si">${T().si_agregarlo}</button><button class="no" id="oferta-no">${T().no_enviar}</button></div></div></div>`;
+  else if (ids.length) html += `<button class="confirmar" id="confirmar">${T().confirmar}</button>`;
+  html += `<button class="seguir" id="seguir">${T().seguir}</button>`;
   hoja.innerHTML = html; document.body.append(velo, hoja);
   hoja.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return;
     if (b.dataset.mas) pedir(b.dataset.mas); else if (b.dataset.menos) quitar(b.dataset.menos); else if (b.dataset.quitar) quitar(b.dataset.quitar, true); });
@@ -390,30 +479,31 @@ async function confirmar(agregar = "") {
 function enviado(p) {
   cerrarHoja();
   if (!p || !p.pedido_numero) return;
-  const hora = new Date().toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" });
-  $("#recibo").innerHTML = `<h3><span>Pedido #${p.pedido_numero}${MESA ? ` · Mesa ${esc(MESA)}` : ""}</span><span>${hora}</span></h3>` +
+  const hora = new Date().toLocaleTimeString(T().locale, { hour: "numeric", minute: "2-digit" });
+  $("#recibo").innerHTML = `<h3><span>${T().pedido_n} #${p.pedido_numero}${MESA ? ` · ${T().mesa} ${esc(MESA)}` : ""}</span><span>${hora}</span></h3>` +
     p.platos.map((l) => `<div class="r-linea"><span>${l.cantidad} × ${esc(l.plato)}</span><span>${plata(l.cantidad * PRECIO(l.id))}</span></div>`).join("") +
-    `<div class="r-total"><span>Total</span><span>${plata(p.total_numero)}</span></div>`;
+    `<div class="r-total"><span>${T().total}</span><span>${plata(p.total_numero)}</span></div>`;
   pedido = {}; pintar(); mostrar("p-enviado");
 }
 
 /* ---------- Pantallas ---------- */
 function mostrar(id) { document.querySelectorAll(".pantalla").forEach((s) => s.hidden = s.id !== id); scrollTo(0, 0); }
 $("#entrar").onclick = () => { mostrar("p-carta"); orbe.iniciar(); };     // el toque abre audio y micrófono
-$("#orbe-arriba").onclick = () => orbe.estado === "apagado" ? orbe.iniciar({ saludo: false }) : orbe.alternarEscucha();
+$("#orbe-arriba").onclick = () => orbe.hablar();                       // toque y hable: escucha solo esa frase
 $("#sonido").onclick = () => { orbe.silencio = !orbe.silencio; const on = !orbe.silencio;
   $("#sonido").textContent = on ? "🔊" : "🔇"; $("#sonido").setAttribute("aria-pressed", on); $("#sonido").classList.toggle("on", on); };
-$("#mesero").onclick = async () => { await orbe.llamarMesero().catch((e) => aviso(e.message)); aviso("🙋 Listo, el mesero ya viene a su mesa."); };
-$("#otra-vez").onclick = () => { mostrar("p-carta"); decir("¿Qué más le traigo?"); };
+$("#mesero").onclick = async () => { await orbe.llamarMesero().catch((e) => aviso(e.message)); aviso(T().mesero_ok); };
+$("#otra-vez").onclick = () => { mostrar("p-carta"); decir(T().que_mas); };
 addEventListener("pagehide", () => orbe.terminar("salió de la página"));
 
-(async () => {
-  try { menu = await (await fetch(`${API}/v1/menu/${encodeURIComponent(R)}`)).json(); }
-  catch { aviso("No se pudo cargar la carta. Revise la conexión."); return; }
-  plata = (v) => new Intl.NumberFormat("es-CO", { style: "currency", currency: menu.moneda || "COP", maximumFractionDigits: 0 }).format(v);
-  document.title = `${menu.nombre} · Menú`; document.querySelectorAll(".nombre-rest").forEach((e) => e.textContent = menu.nombre);
+async function cargarMenu() {
+  try { menu = await (await fetch(`${API}/v1/menu/${encodeURIComponent(R)}?idioma=${IDIOMA}`)).json(); }
+  catch { aviso(T().carga); return; }
+  plata = (v) => new Intl.NumberFormat(T().locale, { style: "currency", currency: menu.moneda || "COP", maximumFractionDigits: 0 }).format(v);
+  document.title = menu.nombre; document.querySelectorAll(".nombre-rest").forEach((e) => e.textContent = menu.nombre);
   pintar();
-})();
+}
+aplicarTextos(); cargarMenu();
 </script>
 </body>
 </html>
