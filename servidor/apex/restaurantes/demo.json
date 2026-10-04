@@ -73,7 +73,7 @@
       "antes": 19000,
       "oferta": true,
       "grupo": "Postre del día",
-      "descripcion": "Caliente por dentro, con helado de vainilla. Oferta de hoy: 14 mil pesos (antes 19 mil).",
+      "descripcion": "Caliente por dentro, con helado de vainilla. Está en oferta hoy.",
       "alergenos": [
         "lácteos",
         "huevo",
@@ -92,7 +92,7 @@
     "eleccion": "¡Excelente elección! ¡Le va a encantar!",
     "sugerir": "¡Buenísima elección! ¿Y si la acompañamos con una limonada de coco bien fría?",
     "quitado": "¡Listo! Ya lo quité de su pedido.",
-    "oferta": "¡Espere, antes de enviarlo! Hoy el volcán de chocolate está en oferta, ¡a solo 14 mil pesos! ¿Se le antoja?",
+    "oferta": "¡Espere, antes de enviarlo! Hoy el volcán de chocolate está en oferta. ¿Se le antoja?",
     "enviado": "¡Perfecto! Su pedido ya va para la caja. ¡Que lo disfrute muchísimo!",
     "despedida": "¡Perfecto! Su pedido ya va para la caja. ¡Que lo disfrute muchísimo!",
     "sin_voz": "Hola, el sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.",
@@ -151,7 +151,7 @@
         },
         "volcan": {
           "nombre": "Chocolate lava cake",
-          "descripcion": "Warm inside, with vanilla ice cream. Today's offer: 14 thousand pesos (was 19 thousand)."
+          "descripcion": "Warm inside, with vanilla ice cream. On special today."
         }
       },
       "frases": {
@@ -159,7 +159,7 @@
         "eleccion": "Excellent choice! You're going to love it!",
         "sugerir": "Great pick! How about an ice-cold coconut lemonade with it?",
         "quitado": "Done! I took it off your order.",
-        "oferta": "Wait, before I send it! Today the chocolate lava cake is on sale, just 14 thousand pesos! Want one?",
+        "oferta": "Wait, before I send it! Today the chocolate lava cake is on special. Would you like one?",
         "enviado": "Perfect! Your order is on its way to the register. Enjoy every bite!",
         "despedida": "Perfect! Your order is on its way to the register. Enjoy every bite!",
         "repetir": "Oops, I didn't quite catch that! Could you say it again?",
@@ -199,7 +199,7 @@
         },
         "volcan": {
           "nombre": "Vulcão de chocolate",
-          "descripcion": "Quente por dentro, com sorvete de baunilha. Oferta de hoje: 14 mil pesos (antes 19 mil)."
+          "descripcion": "Quente por dentro, com sorvete de baunilha. Em oferta hoje."
         }
       },
       "frases": {
@@ -207,7 +207,7 @@
         "eleccion": "Excelente escolha! Você vai adorar!",
         "sugerir": "Ótima escolha! Que tal uma limonada de coco bem gelada para acompanhar?",
         "quitado": "Pronto! Já tirei do seu pedido.",
-        "oferta": "Espere, antes de enviar! Hoje o vulcão de chocolate está em oferta, só 14 mil pesos! Vai querer?",
+        "oferta": "Espere, antes de enviar! Hoje o vulcão de chocolate está em oferta. Vai querer?",
         "enviado": "Perfeito! Seu pedido já está indo para o caixa. Aproveite muito!",
         "despedida": "Perfeito! Seu pedido já está indo para o caixa. Aproveite muito!",
         "repetir": "Opa, não consegui ouvir! Pode repetir, por favor?",
@@ -247,7 +247,7 @@
         },
         "volcan": {
           "nombre": "Schokoladen-Vulkan",
-          "descripcion": "Innen warm, mit Vanilleeis. Angebot des Tages: 14 Tausend Pesos (statt 19 Tausend)."
+          "descripcion": "Innen warm, mit Vanilleeis. Heute im Angebot."
         }
       },
       "frases": {
@@ -255,7 +255,7 @@
         "eleccion": "Ausgezeichnete Wahl! Das wird Ihnen schmecken!",
         "sugerir": "Super Wahl! Wie wäre es dazu mit einer eiskalten Kokos-Limonade?",
         "quitado": "Erledigt! Ich habe es aus Ihrer Bestellung genommen.",
-        "oferta": "Moment, bevor ich abschicke! Heute ist der Schokoladen-Vulkan im Angebot, nur 14 Tausend Pesos! Lust darauf?",
+        "oferta": "Moment, bevor ich abschicke! Heute ist der Schokoladen-Vulkan im Angebot. Lust darauf?",
         "enviado": "Perfekt! Ihre Bestellung ist unterwegs zur Kasse. Lassen Sie es sich schmecken!",
         "despedida": "Perfekt! Ihre Bestellung ist unterwegs zur Kasse. Lassen Sie es sich schmecken!",
         "repetir": "Oh, das habe ich nicht ganz verstanden! Sagen Sie es bitte noch einmal?",
@@ -295,7 +295,7 @@
         },
         "volcan": {
           "nombre": "Шоколадный фондан",
-          "descripcion": "Горячий внутри, с ванильным мороженым. Предложение дня: 14 тысяч песо (было 19 тысяч)."
+          "descripcion": "Горячий внутри, с ванильным мороженым. Сегодня по акции."
         }
       },
       "frases": {
@@ -303,7 +303,7 @@
         "eleccion": "Отличный выбор! Вам понравится!",
         "sugerir": "Прекрасный выбор! А может, добавим холодный кокосовый лимонад?",
         "quitado": "Готово! Я убрала это из заказа.",
-        "oferta": "Подождите, пока я не отправила! Сегодня шоколадный фондан со скидкой, всего 14 тысяч песо! Хотите?",
+        "oferta": "Подождите, пока я не отправила! Сегодня шоколадный фондан по акции. Хотите?",
         "enviado": "Отлично! Ваш заказ уже на кассе. Приятного аппетита!",
         "despedida": "Отлично! Ваш заказ уже на кассе. Приятного аппетита!",
         "repetir": "Ой, я не расслышала! Повторите, пожалуйста?",
@@ -343,7 +343,7 @@
         },
         "volcan": {
           "nombre": "チョコレートボルケーノ",
-          "descripcion": "中はとろとろ、バニラアイス添え。本日の特別価格：1万4千ペソ（通常1万9千ペソ）。"
+          "descripcion": "中はとろとろ、バニラアイス添え。本日の特別価格。"
         }
       },
       "frases": {
@@ -351,7 +351,7 @@
         "eleccion": "素晴らしい選択です！きっと気に入りますよ！",
         "sugerir": "いいですね！一緒に冷たいココナッツレモネードはいかがですか？",
         "quitado": "かしこまりました！ご注文から外しました。",
-        "oferta": "送信する前にちょっと待ってください！本日はチョコレートボルケーノが特別価格、たった1万4千ペソです！いかがですか？",
+        "oferta": "送信する前にちょっと待ってください！本日はチョコレートボルケーノが特別価格です。いかがですか？",
         "enviado": "完璧です！ご注文はレジに届きました。どうぞお楽しみください！",
         "despedida": "完璧です！ご注文はレジに届きました。どうぞお楽しみください！",
         "repetir": "あっ、聞き取れませんでした！もう一度お願いできますか？",

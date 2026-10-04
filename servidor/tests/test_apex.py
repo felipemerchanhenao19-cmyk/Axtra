@@ -487,3 +487,13 @@ def test_voz_alegre_tono_y_velocidad_llegan_a_la_voz(c, axtra):
     assert pedido["tono"] == "+10Hz" and pedido["velocidad"] == 1.08 and pedido["voz_edge"] == "es-CO-SalomeNeural"
     c.get("/v1/muestra/demo?voz=es-MX-DaliaNeural&tono=18")
     assert [kw for ruta, kw in axtra.llamadas if ruta == "/voz"][-1]["tono"] == "+18Hz"
+
+
+def test_el_orbe_no_dice_precios(c, axtra):
+    s = sesion(c, "1").json()
+    turno(c, s)
+    sistema = [j for ruta, j in axtra.llamadas if ruta == "/pensar"][0]["sistema"]
+    assert "NO digas precios ni totales" in sistema and "sin precios" in sistema
+    r = accion(c, s, "pedir", plato_id="ajiaco")
+    o = accion(c, s, "confirmar").json()
+    assert o["oferta"] == "volcan" and not any(ch.isdigit() for ch in o["texto"])

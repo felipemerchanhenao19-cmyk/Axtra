@@ -26,7 +26,10 @@
 (function () {
   "use strict";
   const CLAVE = (r, m) => `apex:${r}:${m}`;
-  const HZ = 16000;                                    // lo que necesita el oído: 16 kHz, mono
+  const HZ = 16000;
+  // ¿Lo que dijo el orbe termina en pregunta? (¿…?, ？ en japonés) Entonces espera la respuesta sin que lo toquen.
+  const esPregunta = (t) => /[?？]["»”)\s]*$/.test(String(t || "").trim());
+  const ESPERA_RESPUESTA = 5000, ESPERA_TOQUE = 8000;                                    // lo que necesita el oído: 16 kHz, mono
 
   /* Junta los pedacitos del micrófono y arma un WAV (16 kHz, 16 bits). El WAV lo entiende cualquier
      servidor y no depende del grabador del navegador (MediaRecorder), que en algunos celulares deja el audio incompleto. */
@@ -146,15 +149,18 @@
 
     _callar() { if (this.altavoz) { this.altavoz.pause(); if (this.alTerminar) this.alTerminar(); } }
 
-    _escuchar() {
+    _escuchar(ventana = ESPERA_TOQUE) {
       if (!this.mic) { this._estado("listo"); return; }
+      this.ventana = ventana;
       this.ultimaVoz = this.inicioEscucha = Date.now(); this.voz = 0; this._estado("escuchando");
     }
 
     /* Después de hablar: en modo "tocar" queda listo (no escucha) hasta que lo vuelvan a tocar. */
     _despues() {
       if (this.quiereHablar) { this.quiereHablar = false; this.silencioHasta = 0; return this._escuchar(); }   // lo tocaron mientras hablaba
-      if (this.modo === "continuo") this._escuchar(); else this._estado("listo");
+      if (this.modo === "continuo") return this._escuchar();
+      if (this.esperaRespuesta) { this.esperaRespuesta = false; return this._escuchar(ESPERA_RESPUESTA); }  // hizo una pregunta
+      this._estado("listo");
     }
 
     /* El cliente tocó el orbe: escucha una frase. Si el orbe estaba hablando, se calla y escucha. */
@@ -197,7 +203,7 @@
         if (ahora < (this.silencioHasta || 0)) { this.voz = 0; return; }             // eco de lo que el orbe acaba de decir
         this.voz = rms > umbral ? this.voz + 60 : 0;
         if (this.voz >= 180) return this._grabar();
-        if (this.modo !== "continuo") { if (ahora - this.inicioEscucha > 8000) this._estado("listo"); return; }   // tocó y no habló
+        if (this.modo !== "continuo") { if (ahora - this.inicioEscucha > (this.ventana || ESPERA_TOQUE)) this._estado("listo"); return; }   // no habló
         const quieto = ahora - this.ultimaVoz;
         if (this.despedida && quieto > 10000) return this.terminar("pedido enviado");   // 4. se apaga solo
         if (!this.despedida && quieto > 45000) { this._estado("dormido"); }              // toque el orbe para seguir
@@ -232,6 +238,7 @@
         catch (e) { if (e.status !== 410 && e.status !== 401) throw e; await this._sesion(); res = await pedir(); }
         if (res.oido) this.ontexto(res.oido, "cliente");
         if (res.pedido) this.onpedido(res.pedido, res);
+        this.esperaRespuesta = !res.despedida && esPregunta(res.texto);
         await this._decir(res);
         if (res.despedida) this.despedida = true;
         if (res.sin_voz) this.pausado = true;
