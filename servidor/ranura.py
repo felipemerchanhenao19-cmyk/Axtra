@@ -131,13 +131,15 @@ class Hablar(BaseModel):
     voz_google: str = "es-US-Neural2-B"
     voz_edge: str = "es-CO-GonzaloNeural"
     velocidad: float = Field(1.0, ge=0.5, le=1.6)
+    tono: str = Field("+0Hz", pattern=r"^[+-]\d{1,2}Hz$")      # más agudo = más alegre
 
 
 def _google(h: Hablar) -> bytes:
     idioma = "-".join(h.voz_google.split("-")[:2])
     r = requests.post(GOOGLE_TTS, params={"key": config.GOOGLE_TTS_API_KEY}, timeout=20,
                       json={"input": {"text": h.texto}, "voice": {"languageCode": idioma, "name": h.voz_google},
-                            "audioConfig": {"audioEncoding": "MP3", "speakingRate": h.velocidad}})
+                            "audioConfig": {"audioEncoding": "MP3", "speakingRate": h.velocidad,
+                                            "pitch": round(int(h.tono[:-2]) / 12, 1)}})
     if r.status_code >= 400:
         raise RuntimeError(f"{r.status_code}: {r.text[:200]}")
     return base64.b64decode(r.json()["audioContent"])
@@ -153,7 +155,7 @@ def hablar(h: Hablar):
         except (requests.RequestException, RuntimeError, KeyError, ValueError):
             pass                                    # respaldo: la voz gratis de Axtra
     try:
-        audio = voz.sintetizar(texto, voz=h.voz_edge, ritmo=f"{round((h.velocidad - 1) * 100):+d}%")
+        audio = voz.sintetizar(texto, voz=h.voz_edge, ritmo=f"{round((h.velocidad - 1) * 100):+d}%", tono=h.tono)
     except Exception as e:
         raise HTTPException(502, f"no hay voz disponible: {e}")
     return Response(audio, media_type="audio/mpeg", headers={"X-Proveedor": "edge", "X-Caracteres": str(len(texto))})

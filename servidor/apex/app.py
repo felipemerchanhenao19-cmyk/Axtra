@@ -476,13 +476,14 @@ def voces():
 
 
 @app.get("/v1/muestra/{rid}")
-def muestra(rid: str, voz: str, request: Request, velocidad: float = 1.0):
+def muestra(rid: str, voz: str, request: Request, velocidad: float = 1.0, tono: int = 0):
     """La frase de bienvenida dicha por otra voz (gratis; queda guardada 1 hora)."""
     r = _restaurante(rid)
     limitar(f"muestra:{ip(request)}", 40, 60)
     if voz not in VOCES_MUESTRA:
         raise HTTPException(404, "voz no disponible")
-    prueba = {**r, "voz": {"google": "", "edge": voz, "velocidad": min(1.3, max(0.8, velocidad))}}
+    prueba = {**r, "voz": {"google": "", "edge": voz, "velocidad": min(1.3, max(0.8, velocidad)),
+                           "tono": f"{max(-20, min(20, tono)):+d}Hz"}}
     try:
         audio = orbe.voz(prueba, r["frases"]["saludo"])
     except orbe.SinRanura as e:

@@ -33,15 +33,20 @@ p { margin: 0; color: var(--suave); }
   <h1>Voces del orbe</h1>
   <p>Toque una voz para escuchar la bienvenida. Cuando escoja una, dígame su nombre.</p>
   <div class="vel" role="group" aria-label="Velocidad">
-    <button data-v="1" aria-pressed="true">Normal</button><button data-v="1.08" aria-pressed="false">Un poco más rápida</button>
+    <button data-v="1" aria-pressed="false">Normal</button><button data-v="1.08" aria-pressed="true">Un poco más rápida</button>
+  </div>
+  <div class="vel" role="group" aria-label="Tono" id="tonos">
+    <button data-t="0" aria-pressed="false">Tono normal</button><button data-t="10" aria-pressed="true">Alegre</button><button data-t="18" aria-pressed="false">Muy alegre</button>
   </div>
   <div id="lista" style="display:grid;gap:10px"></div>
 </main>
 <script>
 const R = new URLSearchParams(location.search).get("r") || "demo";
-let vel = 1, audio = new Audio();
-document.querySelectorAll(".vel button").forEach((b) => b.onclick = () => {
-  vel = +b.dataset.v; document.querySelectorAll(".vel button").forEach((x) => x.setAttribute("aria-pressed", x === b)); });
+let vel = 1.08, tono = 10, audio = new Audio();
+document.querySelectorAll("[data-v]").forEach((b) => b.onclick = () => {
+  vel = +b.dataset.v; document.querySelectorAll("[data-v]").forEach((x) => x.setAttribute("aria-pressed", x === b)); });
+document.querySelectorAll("[data-t]").forEach((b) => b.onclick = () => {
+  tono = +b.dataset.t; document.querySelectorAll("[data-t]").forEach((x) => x.setAttribute("aria-pressed", x === b)); });
 (async () => {
   const voces = await (await fetch("/v1/voces")).json();
   const lista = document.getElementById("lista");
@@ -53,7 +58,7 @@ document.querySelectorAll(".vel button").forEach((b) => b.onclick = () => {
       document.querySelectorAll(".voz").forEach((x) => x.classList.remove("sonando")); b.classList.add("sonando");
       b.querySelector(".play").textContent = "…";
       try {
-        const r = await fetch(`/v1/muestra/${encodeURIComponent(R)}?voz=${encodeURIComponent(v.voz)}&velocidad=${vel}`);
+        const r = await fetch(`/v1/muestra/${encodeURIComponent(R)}?voz=${encodeURIComponent(v.voz)}&velocidad=${vel}&tono=${tono}`);
         if (!r.ok) throw new Error();
         audio.pause(); audio.src = URL.createObjectURL(await r.blob()); await audio.play();
         b.querySelector(".play").textContent = "▶";
