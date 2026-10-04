@@ -124,7 +124,7 @@ def test_sesion_trae_frases_grabadas(c):
 def test_frase_fija_se_genera_una_vez(c, axtra):
     a = c.get("/v1/frase/demo/eleccion")
     b = c.get("/v1/frase/demo/eleccion")
-    assert a.content == b.content == "ID3Muy buena elección.".encode()
+    assert a.content == b.content == "ID3¡Excelente elección! ¡Le va a encantar!".encode()
     assert [x for x, _ in axtra.llamadas].count("/voz") == 1        # la segunda vez sale del caché: gratis
     assert c.get("/v1/frase/demo/inventada").status_code == 404
 
@@ -405,7 +405,7 @@ def test_carta_y_frases_en_otro_idioma(c):
 def test_cambiar_idioma_en_la_conversacion(c, axtra):
     s = sesion(c, "1").json()
     r = c.post("/v1/idioma", json={**{k: s[k] for k in ("sesion", "secreto")}, "idioma": "en"}, headers=ORIGEN).json()
-    assert "Welcome" in r["saludo"]
+    assert "welcome" in r["saludo"]
     axtra.oido = "two ajiacos please"
     axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), texto("Two ajiacos.")]
     t = turno(c, s).json()
@@ -478,3 +478,12 @@ def test_si_falla_todo_igual_manda_el_pedido_real(c, axtra):
     assert r["sin_voz"] and _platos(r["pedido"]["platos"]) == {"Omelet ranchero": 1}
     v = accion(c, s, "ver").json()
     assert v["audio"] is None and v["frase"] is None and _platos(v["pedido"]["platos"]) == {"Omelet ranchero": 1}
+
+
+
+def test_voz_alegre_tono_y_velocidad_llegan_a_la_voz(c, axtra):
+    c.get("/v1/frase/demo/saludo")
+    pedido = [kw for ruta, kw in axtra.llamadas if ruta == "/voz"][-1]
+    assert pedido["tono"] == "+10Hz" and pedido["velocidad"] == 1.08 and pedido["voz_edge"] == "es-CO-SalomeNeural"
+    c.get("/v1/muestra/demo?voz=es-MX-DaliaNeural&tono=18")
+    assert [kw for ruta, kw in axtra.llamadas if ruta == "/voz"][-1]["tono"] == "+18Hz"

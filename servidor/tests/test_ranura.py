@@ -115,3 +115,14 @@ def test_groq_rechaza_una_vez_y_el_reintento_funciona(c, monkeypatch):
     monkeypatch.setattr(ranura.requests, "post", post)
     r = c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}]}).json()
     assert r["proveedor"] == "groq" and r["mensaje"]["content"] == "Listo" and len(veces) == 2
+
+
+
+def test_voz_gratis_recibe_el_tono(c, monkeypatch):
+    from servidor import voz
+    visto = {}
+    monkeypatch.setattr(voz, "sintetizar", lambda texto, **kw: (visto.update(kw), b"ID3")[1])
+    monkeypatch.setattr(ranura.config, "GOOGLE_TTS_API_KEY", "")
+    c.post("/voz", json={"texto": "hola", "tono": "+10Hz"})
+    assert visto["tono"] == "+10Hz"
+    assert c.post("/voz", json={"texto": "hola", "tono": "fuerte"}).status_code == 422

@@ -5,7 +5,8 @@
   "voz": {
     "google": "es-US-Neural2-A",
     "edge": "es-CO-SalomeNeural",
-    "velocidad": 1.05
+    "velocidad": 1.08,
+    "tono": "+10Hz"
   },
   "dominios": [
     "https://api.axtra.chat"
@@ -22,7 +23,7 @@
     "9",
     "10"
   ],
-  "personalidad": "Eres el orbe de un restaurante de cocina colombiana. Hablas como un mesero cálido, alegre y breve, con un toque de humor amable. Tratas al cliente de usted.",
+  "personalidad": "Eres el orbe de un restaurante de cocina colombiana. Eres alegre, carismático y entusiasta, como el mejor mesero de la ciudad: hablas con energía y buena vibra, celebras lo que pide el cliente y lo haces sentir bienvenido, con un toque de humor amable. Frases cortas y con chispa. Tratas al cliente de usted.",
   "info": "Horario: 12 m a 10 p. m. Aceptamos efectivo, tarjetas y Nequi. La bandeja paisa es para una persona con mucho apetito.",
   "menu": [
     {
@@ -87,14 +88,17 @@
   },
   "idioma": "es",
   "frases": {
-    "saludo": "¡Bienvenido! Yo lo atiendo hoy. Toque el orbe para hablarme, o pida con los botones.",
-    "eleccion": "Muy buena elección.",
-    "sugerir": "Buena elección. ¿Le traigo una limonada de coco bien fría para acompañar?",
-    "quitado": "Listo, lo quité de su pedido.",
-    "oferta": "Antes de enviarlo: hoy tenemos oferta en el volcán de chocolate, a 14 mil pesos. ¿Le gustaría pedirlo?",
-    "enviado": "¡Listo! Su pedido ya está en la caja. Que lo disfrute.",
-    "despedida": "¡Listo! Su pedido ya está en la caja. Que lo disfrute.",
-    "sin_voz": "Hola, el sistema de voz está fallando. Por favor, seleccione lo que quiere pedir."
+    "saludo": "¡Hola, bienvenido! ¡Qué alegría tenerlo aquí! Toque el orbe y dígame qué se le antoja, o pida con los botones.",
+    "eleccion": "¡Excelente elección! ¡Le va a encantar!",
+    "sugerir": "¡Buenísima elección! ¿Y si la acompañamos con una limonada de coco bien fría?",
+    "quitado": "¡Listo! Ya lo quité de su pedido.",
+    "oferta": "¡Espere, antes de enviarlo! Hoy el volcán de chocolate está en oferta, ¡a solo 14 mil pesos! ¿Se le antoja?",
+    "enviado": "¡Perfecto! Su pedido ya va para la caja. ¡Que lo disfrute muchísimo!",
+    "despedida": "¡Perfecto! Su pedido ya va para la caja. ¡Que lo disfrute muchísimo!",
+    "sin_voz": "Hola, el sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.",
+    "repetir": "¡Uy, no le alcancé a escuchar! ¿Me lo repite, por favor?",
+    "vacio": "¡Todavía no ha elegido nada! ¿Qué se le antoja hoy?",
+    "mesero": "¡Claro que sí! Ya mismo va alguien a su mesa."
   },
   "mesas_siempre_abiertas": true,
   "ventas": {
@@ -151,16 +155,16 @@
         }
       },
       "frases": {
-        "saludo": "Welcome! I'll be your server today. Tap the orb to talk to me, or order with the buttons.",
-        "eleccion": "Great choice.",
-        "sugerir": "Great choice. Would you like an ice-cold coconut lemonade with it?",
-        "quitado": "Done, I removed it from your order.",
-        "oferta": "Before I send it: today the chocolate lava cake is on sale for 14 thousand pesos. Would you like it?",
-        "enviado": "All set! Your order is at the register. Enjoy!",
-        "despedida": "All set! Your order is at the register. Enjoy!",
-        "repetir": "Sorry, I didn't catch that. Could you say it again?",
-        "vacio": "You haven't picked anything yet. What would you like?",
-        "mesero": "Of course, a server is on the way.",
+        "saludo": "Hi, welcome! So glad you're here! Tap the orb and tell me what you're craving, or order with the buttons.",
+        "eleccion": "Excellent choice! You're going to love it!",
+        "sugerir": "Great pick! How about an ice-cold coconut lemonade with it?",
+        "quitado": "Done! I took it off your order.",
+        "oferta": "Wait, before I send it! Today the chocolate lava cake is on sale, just 14 thousand pesos! Want one?",
+        "enviado": "Perfect! Your order is on its way to the register. Enjoy every bite!",
+        "despedida": "Perfect! Your order is on its way to the register. Enjoy every bite!",
+        "repetir": "Oops, I didn't quite catch that! Could you say it again?",
+        "vacio": "You haven't picked anything yet! What are you in the mood for?",
+        "mesero": "Absolutely! Someone is on the way to your table.",
         "sin_voz": "Hi, the voice system is having trouble. Please select what you'd like to order."
       },
       "restaurante": "Your restaurant"
@@ -199,16 +203,16 @@
         }
       },
       "frases": {
-        "saludo": "Bem-vindo! Hoje eu vou atender você. Toque no orbe para falar comigo ou peça pelos botões.",
-        "eleccion": "Ótima escolha.",
-        "sugerir": "Ótima escolha. Quer uma limonada de coco bem gelada para acompanhar?",
-        "quitado": "Pronto, tirei do seu pedido.",
-        "oferta": "Antes de enviar: hoje o vulcão de chocolate está em oferta, por 14 mil pesos. Gostaria de pedir?",
-        "enviado": "Pronto! Seu pedido já está no caixa. Bom apetite!",
-        "despedida": "Pronto! Seu pedido já está no caixa. Bom apetite!",
-        "repetir": "Desculpe, não ouvi bem. Pode repetir, por favor?",
-        "vacio": "Você ainda não escolheu nada. O que deseja?",
-        "mesero": "Claro, um garçom já está a caminho.",
+        "saludo": "Oi, seja bem-vindo! Que alegria ter você aqui! Toque no orbe e me diga o que deseja, ou peça pelos botões.",
+        "eleccion": "Excelente escolha! Você vai adorar!",
+        "sugerir": "Ótima escolha! Que tal uma limonada de coco bem gelada para acompanhar?",
+        "quitado": "Pronto! Já tirei do seu pedido.",
+        "oferta": "Espere, antes de enviar! Hoje o vulcão de chocolate está em oferta, só 14 mil pesos! Vai querer?",
+        "enviado": "Perfeito! Seu pedido já está indo para o caixa. Aproveite muito!",
+        "despedida": "Perfeito! Seu pedido já está indo para o caixa. Aproveite muito!",
+        "repetir": "Opa, não consegui ouvir! Pode repetir, por favor?",
+        "vacio": "Você ainda não escolheu nada! O que está com vontade hoje?",
+        "mesero": "Claro! Já tem alguém indo até a sua mesa.",
         "sin_voz": "Olá, o sistema de voz está com falha. Por favor, selecione o que deseja pedir."
       },
       "restaurante": "Seu restaurante"
@@ -247,16 +251,16 @@
         }
       },
       "frases": {
-        "saludo": "Willkommen! Ich bediene Sie heute. Tippen Sie auf die Kugel, um mit mir zu sprechen, oder bestellen Sie mit den Tasten.",
-        "eleccion": "Sehr gute Wahl.",
-        "sugerir": "Sehr gute Wahl. Möchten Sie dazu eine eiskalte Kokos-Limonade?",
-        "quitado": "Erledigt, ich habe es aus Ihrer Bestellung entfernt.",
-        "oferta": "Bevor ich sie abschicke: Heute ist der Schokoladen-Vulkan im Angebot, für 14 Tausend Pesos. Möchten Sie ihn?",
-        "enviado": "Fertig! Ihre Bestellung ist an der Kasse. Guten Appetit!",
-        "despedida": "Fertig! Ihre Bestellung ist an der Kasse. Guten Appetit!",
-        "repetir": "Entschuldigung, das habe ich nicht verstanden. Können Sie es wiederholen?",
-        "vacio": "Sie haben noch nichts ausgewählt. Was darf es sein?",
-        "mesero": "Gerne, ein Kellner ist unterwegs.",
+        "saludo": "Hallo und herzlich willkommen! Schön, dass Sie da sind! Tippen Sie auf die Kugel und sagen Sie mir, worauf Sie Lust haben, oder bestellen Sie mit den Tasten.",
+        "eleccion": "Ausgezeichnete Wahl! Das wird Ihnen schmecken!",
+        "sugerir": "Super Wahl! Wie wäre es dazu mit einer eiskalten Kokos-Limonade?",
+        "quitado": "Erledigt! Ich habe es aus Ihrer Bestellung genommen.",
+        "oferta": "Moment, bevor ich abschicke! Heute ist der Schokoladen-Vulkan im Angebot, nur 14 Tausend Pesos! Lust darauf?",
+        "enviado": "Perfekt! Ihre Bestellung ist unterwegs zur Kasse. Lassen Sie es sich schmecken!",
+        "despedida": "Perfekt! Ihre Bestellung ist unterwegs zur Kasse. Lassen Sie es sich schmecken!",
+        "repetir": "Oh, das habe ich nicht ganz verstanden! Sagen Sie es bitte noch einmal?",
+        "vacio": "Sie haben noch nichts gewählt! Worauf haben Sie heute Lust?",
+        "mesero": "Aber gerne! Gleich kommt jemand an Ihren Tisch.",
         "sin_voz": "Hallo, das Sprachsystem hat gerade eine Störung. Bitte wählen Sie aus, was Sie bestellen möchten."
       },
       "restaurante": "Ihr Restaurant"
@@ -295,16 +299,16 @@
         }
       },
       "frases": {
-        "saludo": "Добро пожаловать! Сегодня я вас обслуживаю. Нажмите на сферу, чтобы поговорить со мной, или заказывайте кнопками.",
-        "eleccion": "Отличный выбор.",
-        "sugerir": "Отличный выбор. Принести к нему холодный кокосовый лимонад?",
-        "quitado": "Готово, я убрала это из заказа.",
-        "oferta": "Прежде чем отправить: сегодня шоколадный фондан со скидкой, всего 14 тысяч песо. Хотите заказать?",
-        "enviado": "Готово! Ваш заказ уже на кассе. Приятного аппетита!",
-        "despedida": "Готово! Ваш заказ уже на кассе. Приятного аппетита!",
-        "repetir": "Извините, я не расслышала. Повторите, пожалуйста.",
-        "vacio": "Вы ещё ничего не выбрали. Что вам принести?",
-        "mesero": "Конечно, официант уже идёт.",
+        "saludo": "Здравствуйте, добро пожаловать! Как здорово, что вы здесь! Нажмите на сферу и скажите, чего вам хочется, или заказывайте кнопками.",
+        "eleccion": "Отличный выбор! Вам понравится!",
+        "sugerir": "Прекрасный выбор! А может, добавим холодный кокосовый лимонад?",
+        "quitado": "Готово! Я убрала это из заказа.",
+        "oferta": "Подождите, пока я не отправила! Сегодня шоколадный фондан со скидкой, всего 14 тысяч песо! Хотите?",
+        "enviado": "Отлично! Ваш заказ уже на кассе. Приятного аппетита!",
+        "despedida": "Отлично! Ваш заказ уже на кассе. Приятного аппетита!",
+        "repetir": "Ой, я не расслышала! Повторите, пожалуйста?",
+        "vacio": "Вы ещё ничего не выбрали! Чего вам хочется сегодня?",
+        "mesero": "Конечно! К вашему столу уже идут.",
         "sin_voz": "Здравствуйте, голосовая система сейчас не работает. Пожалуйста, выберите, что хотите заказать."
       },
       "restaurante": "Ваш ресторан"
@@ -343,16 +347,16 @@
         }
       },
       "frases": {
-        "saludo": "いらっしゃいませ！本日担当いたします。オーブをタップして話しかけるか、ボタンでご注文ください。",
-        "eleccion": "いい選択ですね。",
-        "sugerir": "いい選択ですね。一緒に冷たいココナッツレモネードはいかがですか？",
-        "quitado": "かしこまりました。ご注文から外しました。",
-        "oferta": "送信する前に：本日はチョコレートボルケーノが特別価格の1万4千ペソです。いかがですか？",
-        "enviado": "完了です！ご注文はレジに届きました。お楽しみください！",
-        "despedida": "完了です！ご注文はレジに届きました。お楽しみください！",
-        "repetir": "すみません、よく聞き取れませんでした。もう一度お願いします。",
-        "vacio": "まだ何も選ばれていません。何になさいますか？",
-        "mesero": "かしこまりました。すぐにスタッフが参ります。",
+        "saludo": "いらっしゃいませ！ようこそ！オーブをタップして食べたいものを教えてください。ボタンでもご注文いただけます！",
+        "eleccion": "素晴らしい選択です！きっと気に入りますよ！",
+        "sugerir": "いいですね！一緒に冷たいココナッツレモネードはいかがですか？",
+        "quitado": "かしこまりました！ご注文から外しました。",
+        "oferta": "送信する前にちょっと待ってください！本日はチョコレートボルケーノが特別価格、たった1万4千ペソです！いかがですか？",
+        "enviado": "完璧です！ご注文はレジに届きました。どうぞお楽しみください！",
+        "despedida": "完璧です！ご注文はレジに届きました。どうぞお楽しみください！",
+        "repetir": "あっ、聞き取れませんでした！もう一度お願いできますか？",
+        "vacio": "まだ何も選ばれていません！今日は何が食べたいですか？",
+        "mesero": "かしこまりました！すぐにスタッフが参ります。",
         "sin_voz": "こんにちは、音声システムに不具合が発生しています。ご注文の品をお選びください。"
       },
       "restaurante": "あなたのレストラン"
