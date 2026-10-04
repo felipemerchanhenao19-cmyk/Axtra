@@ -241,9 +241,10 @@ async def turno(request: Request):
     audio = await request.body()
     if not audio or len(audio) > 4_000_000:
         raise HTTPException(413, "audio vacío o demasiado largo")
+    actual = lambda: orbe.ejecutar(r, s, "ver_pedido", {})          # el pedido real, para que la pantalla no se desfase
     if not _puede_gastar(r, s):
         log.warning("sin voz: tope del mes o de turnos (sesión %s, %s turnos)", s["id"][:8], s["turnos"])
-        return _respuesta(r, s, frase="sin_voz", sin_voz=True)
+        return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=actual())
     db.contar_turno(s["id"])
     try:
         texto = await asyncio.to_thread(orbe.oir, r, s["id"], audio, request.headers.get("content-type", ""))
@@ -252,13 +253,15 @@ async def turno(request: Request):
         res = await asyncio.to_thread(orbe.conversar, r, s, {"role": "user", "content": texto[:600]})
     except orbe.SinRanura as e:
         log.warning("turno de voz falló: %s", e)
-        return _respuesta(r, s, frase="sin_voz", sin_voz=True)
-    return await asyncio.to_thread(_respuesta, r, s, res["texto"], "", despedida=bool(res["confirmado"]),
-                                   pedido=res["confirmado"] or res["pedido"], oido=texto[:600])
+        return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=actual())
+    if res.get("frase"):
+        log.warning("el cerebro falló a mitad del turno; lo hecho se guardó (sesión %s)", s["id"][:8])
+    return await asyncio.to_thread(_respuesta, r, s, res["texto"], res.get("frase", ""), despedida=bool(res["confirmado"]),
+                                   pedido=res["confirmado"] or res["pedido"] or actual(), oido=texto[:600])
 
 
 class Accion(Credencial):
-    tipo: str = Field(pattern="^(pedir|quitar|confirmar|pedir_todo|mesero)$")
+    tipo: str = Field(pattern="^(pedir|quitar|confirmar|pedir_todo|mesero|ver)$")
     plato_id: str = Field("", max_length=60)
     cantidad: int = Field(1, ge=1, le=20)
 
@@ -282,6 +285,8 @@ def accion(a: Accion, request: Request):
     s, r = _sesion(a.sesion, a.secreto, request)
     limitar(f"accion:{s['id']}", 40, 60)
     ventas = r.get("ventas") or {}
+    if a.tipo == "ver":                                  # solo el pedido real (para resincronizar la pantalla)
+        return {"frase": None, "audio": None, "texto": "", "pedido": orbe.ejecutar(r, s, "ver_pedido", {})}
     if a.tipo == "mesero":
         orbe.ejecutar(r, s, "llamar_mesero", {"motivo": "tocó «Llamar al mesero»"})
         return _respuesta(r, s, frase="mesero")

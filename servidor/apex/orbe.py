@@ -347,11 +347,20 @@ def conversar(r: dict, s, entrada: dict) -> dict:
     anterior = next((m.get("content") or "" for m in reversed(historial) if m.get("role") == "assistant"), "")
     mensajes = historial + [entrada]
     sistema = instrucciones(r, s["mesa"])
-    hechos = {"confirmado": None, "pedido": None}
+    hechos = {"confirmado": None, "pedido": None, "frase": ""}
     agregados = set()
     texto = ""
     for _ in range(4):                       # pensar → herramientas → pensar (máximo 4 vueltas)
-        m = _pensar(r, s["id"], sistema, mensajes)
+        try:
+            m = _pensar(r, s["id"], sistema, mensajes)
+        except SinRanura:
+            if not (hechos["pedido"] or hechos["confirmado"]):
+                raise                         # no alcanzó a hacer nada: falla de verdad
+            # Ya agregó, quitó o confirmó: lo hecho vale. Responde con una frase grabada (sin cerebro ni voz nueva)
+            hechos["frase"] = "despedida" if hechos["confirmado"] else "eleccion"
+            texto = r["frases"][hechos["frase"]]
+            mensajes.append({"role": "assistant", "content": texto})
+            break
         llamadas = m.get("tool_calls") or []
         if not llamadas:
             texto = (m.get("content") or "").strip()

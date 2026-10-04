@@ -238,7 +238,7 @@
         return res;
       } catch (e) {
         if (e.status === 409) this.onerror(e.message);
-        else { this.pausado = true; this.onsinvoz(); }                  // sin red o sin servidor: plan de respaldo
+        else { this.pausado = true; this.onsinvoz(); this.verPedido(); }   // sin red o sin servidor: resincroniza el pedido
       } finally {
         this.ocupado = false;
         if (this.s && this.estado !== "apagado") {
@@ -258,6 +258,11 @@
 
     /* 2. Botón «Pedir» de un plato → «Muy buena elección». */
     pedirPlato(platoId, cantidad = 1) { return this._accion("pedir", { plato_id: platoId, cantidad }); }
+    /* Pide el pedido real al servidor (por si una respuesta se perdió en el camino). */
+    async verPedido() {
+      if (!this.s) return;
+      try { const r = await this._post("/v1/accion", { ...this._cred(), tipo: "ver" }); if (r.pedido) this.onpedido(r.pedido, r); } catch {}
+    }
     /* «Quitar»: el cliente se equivocó. */
     quitarPlato(platoId, cantidad = 1) { return this._accion("quitar", { plato_id: platoId, cantidad }); }
     /* «Confirmar pedido»: la primera vez puede volver con {oferta: id} (el orbe ofrece el postre del día).

@@ -42,6 +42,8 @@ class AxtraFalso:
             return Resp({"texto": self.oido, "segundos": 2.5, "proveedor": "groq"})
         if ruta == "/pensar":
             m = self.guion.pop(0) if self.guion else {"role": "assistant", "content": "Con gusto.", "tool_calls": []}
+            if m == "falla":
+                raise orbe.SinRanura("el cerebro no respondió")
             return Resp({"mensaje": m, "uso": {"entrada": 3000, "salida": 60}, "proveedor": "groq"})
         if ruta == "/voz":
             return Resp(contenido=b"ID3" + kw["json"]["texto"].encode(), headers={"X-Proveedor": "google",
@@ -455,3 +457,24 @@ def test_la_frase_cambia_de_direccion_si_cambia_la_voz(c, monkeypatch):
     apex_app._cubos.clear()
     despues = sesion(c, "2").json()["frases"]["saludo"]
     assert antes != despues and despues.startswith("/v1/frase/demo/saludo?v=")
+
+
+
+def test_si_el_cerebro_falla_despues_de_agregar_no_dice_que_fallo(c, axtra):
+    """Lo que vio Felipe: «el sistema de voz está fallando», pero los platos sí quedaban agregados."""
+    s = sesion(c, "1").json()
+    axtra.oido = "dos ajiacos"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), "falla"]
+    r = turno(c, s).json()
+    assert not r.get("sin_voz") and r["frase"].startswith("/v1/frase/demo/eleccion?")
+    assert _platos(r["pedido"]["platos"]) == {"Ajiaco santafereño": 2}        # la pantalla ve lo que de verdad se agregó
+
+
+def test_si_falla_todo_igual_manda_el_pedido_real(c, axtra):
+    s = sesion(c, "1").json()
+    accion(c, s, "pedir", plato_id="omelet")
+    axtra.guion = ["falla"]
+    r = turno(c, s).json()
+    assert r["sin_voz"] and _platos(r["pedido"]["platos"]) == {"Omelet ranchero": 1}
+    v = accion(c, s, "ver").json()
+    assert v["audio"] is None and v["frase"] is None and _platos(v["pedido"]["platos"]) == {"Omelet ranchero": 1}
