@@ -7,6 +7,7 @@ Cada respuesta trae lo que costó, para llevar la cuenta por negocio.
 import base64
 import hmac
 import os
+import time
 
 import requests
 from fastapi import Body, FastAPI, HTTPException, Request
@@ -114,10 +115,13 @@ def pensar(p: Pensar):
     for nombre, url, clave, modelo in opciones:
         if not clave:
             continue
-        try:
-            return {**_chat(url, clave, modelo, p), "proveedor": nombre}
-        except (requests.RequestException, RuntimeError, KeyError, IndexError, ValueError) as e:
-            errores.append(f"{nombre}: {e}")
+        for intento in range(2 if nombre == "groq" else 1):     # Groq a veces rechaza una llamada suelta: un reintento
+            try:
+                return {**_chat(url, clave, modelo, p), "proveedor": nombre}
+            except (requests.RequestException, RuntimeError, KeyError, IndexError, ValueError) as e:
+                errores.append(f"{nombre}: {e}")
+                if intento == 0 and nombre == "groq":
+                    time.sleep(0.4)
     raise HTTPException(502, "ningún cerebro respondió (" + "; ".join(errores) + ")")
 
 

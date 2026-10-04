@@ -45,7 +45,7 @@ def test_cerebro_groq_y_respaldo_gemini(c, monkeypatch):
     r = c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}],
                                 "herramientas": [{"type": "function", "function": {"name": "x"}}]}).json()
     assert r["proveedor"] == "gemini" and r["mensaje"]["content"] == "Hola" and r["uso"]["entrada"] == 100
-    assert "groq" in urls[0] and "generativelanguage" in urls[1]
+    assert "groq" in urls[0] and "groq" in urls[1] and "generativelanguage" in urls[2]     # un reintento a Groq
 
 
 def test_voz_google_y_respaldo_gratis(c, monkeypatch):
@@ -97,3 +97,21 @@ def test_voz_de_respaldo_respeta_la_velocidad(c, monkeypatch):
     monkeypatch.setattr(ranura.config, "GOOGLE_TTS_API_KEY", "")
     assert c.post("/voz", json={"texto": "hola", "velocidad": 1.15}).headers["x-proveedor"] == "edge"
     assert visto["ritmo"] == "+15%"
+
+
+
+def test_groq_rechaza_una_vez_y_el_reintento_funciona(c, monkeypatch):
+    monkeypatch.setattr(config, "GROQ_API_KEY", "g")
+    monkeypatch.setattr(config, "GEMINI_API_KEY", "")
+    monkeypatch.setattr(ranura.time, "sleep", lambda s: None)
+    veces = []
+
+    def post(url, json=None, headers=None, timeout=None, **kw):
+        veces.append(url)
+        if len(veces) == 1:
+            return R({"error": {"code": "tool_use_failed"}}, 400)
+        return R({"choices": [{"message": {"content": "Listo", "tool_calls": None}}], "usage": {}})
+
+    monkeypatch.setattr(ranura.requests, "post", post)
+    r = c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}]}).json()
+    assert r["proveedor"] == "groq" and r["mensaje"]["content"] == "Listo" and len(veces) == 2
