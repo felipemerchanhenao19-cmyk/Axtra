@@ -333,7 +333,7 @@ def accion(a: Accion, request: Request):
     db.contar_turno(s["id"])
     try:
         res = orbe.conversar(r, s, {"role": "user", "content": "[Acción en la pantalla] Tocó «Pedir todo lo seleccionado». "
-                                    "Repite el pedido de forma breve (platos, cantidades y total) y pregunta si lo confirma."})
+                                    "Repite el pedido de forma breve (platos y cantidades, sin precios) y pregunta si lo confirma."})
     except orbe.SinRanura:
         return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=pedido)
     return _respuesta(r, s, res["texto"], pedido=res["pedido"] or pedido, despedida=bool(res["confirmado"]))
