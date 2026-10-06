@@ -147,7 +147,7 @@ def menu(rid: str, request: Request, idioma: str = ""):
     r = config.localizar(_restaurante(rid), idioma[:5])
     return {"id": r["id"], "nombre": r["nombre"], "moneda": r.get("moneda", "COP"), "idioma": r["idioma"], "idiomas": _idiomas(r),
             "menu": [{k: p.get(k) for k in ("id", "nombre", "precio", "descripcion", "alergenos", "modelo3d", "foto",
-                                              "grupo", "antes", "oferta")}
+                                              "grupo", "antes", "oferta", "foto_completa")}
                      for p in r["menu"]]}
 
 
