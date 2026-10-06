@@ -132,6 +132,8 @@ class Hablar(BaseModel):
     voz_edge: str = "es-CO-GonzaloNeural"
     velocidad: float = Field(1.0, ge=0.5, le=1.6)
     tono: str = Field("+0Hz", pattern=r"^[+-]\d{1,2}Hz$")      # más agudo = más alegre
+    axtra: bool = False          # usar la misma voz de Axtra (la de su .env: VOZ_AXTRA, VOZ_VELOCIDAD y VOZ_TONO)
+    idioma: str = Field("", max_length=5)
 
 
 def _google(h: Hablar) -> bytes:
@@ -148,6 +150,13 @@ def _google(h: Hablar) -> bytes:
 @app.post("/voz")
 def hablar(h: Hablar):
     texto = voz.limpiar(h.texto)
+    if h.axtra:                  # la voz de Axtra: en español la suya; en otro idioma, la voz que Axtra usa en ese idioma
+        nativa = next((v[1] for v in voz.IDIOMAS.values() if v[0] == h.idioma), None)
+        try:
+            audio = voz.sintetizar(texto, voz=nativa or config.VOZ_AXTRA, ritmo=config.VOZ_VELOCIDAD, tono=config.VOZ_TONO)
+        except Exception as e:
+            raise HTTPException(502, f"no hay voz disponible: {e}")
+        return Response(audio, media_type="audio/mpeg", headers={"X-Proveedor": "edge", "X-Caracteres": str(len(texto))})
     if config.GOOGLE_TTS_API_KEY and h.voz_google:          # voz_google vacía = usar directo la voz gratis
         try:
             return Response(_google(h), media_type="audio/mpeg",

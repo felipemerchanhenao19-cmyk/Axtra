@@ -46,7 +46,8 @@ class AxtraFalso:
                 raise orbe.SinRanura("el cerebro no respondió")
             return Resp({"mensaje": m, "uso": {"entrada": 3000, "salida": 60}, "proveedor": "groq"})
         if ruta == "/voz":
-            return Resp(contenido=b"ID3" + kw["json"]["texto"].encode(), headers={"X-Proveedor": "google",
+            prov = "edge" if kw["json"].get("axtra") else "google"            # la voz de Axtra es la gratis
+            return Resp(contenido=b"ID3" + kw["json"]["texto"].encode(), headers={"X-Proveedor": prov,
                                                                                "X-Caracteres": str(len(kw["json"]["texto"]))})
         raise AssertionError(ruta)
 
@@ -208,7 +209,7 @@ def test_costo_en_pesos(c):
     gasto = db.uso_mes("demo")["gasto_por_pieza"]
     assert gasto["oido"] == pytest.approx(10 / 3600 * 0.111 * 4000, abs=0.01)         # mínimo 10 s (whisper-large-v3)
     assert gasto["cerebro"] == pytest.approx((3000 * 0.075 + 60 * 0.30) / 1e6 * 4000, abs=0.01)
-    assert gasto["voz"] == pytest.approx(len("Con gusto.") * 16 / 1e6 * 4000, abs=0.01)   # voz Neural2
+    assert gasto["voz"] == 0                                             # la voz de Axtra no cuesta
     assert db.gasto_mes("demo") < 5                    # un turno cuesta unos pocos pesos
 
 
@@ -287,7 +288,7 @@ def test_historial_no_parte_herramientas():
 def test_menu_y_paginas(c):
     m = c.get("/v1/menu/demo").json()
     assert m["nombre"] == "Su restaurante" and len(m["menu"]) == 5 and "personalidad" not in m
-    assert next(p for p in m["menu"] if p["id"] == "volcan")["antes"] == 19000
+    assert next(p for p in m["menu"] if p["id"] == "torta")["antes"] == 19000
     assert c.get("/demo").status_code == 200 and c.get("/panel").status_code == 200
     assert c.get("/web/apex-voz.js").status_code == 200
     assert c.get("/qr").status_code == 200 and c.get("/web/qrcode.js").status_code == 200
@@ -302,7 +303,7 @@ def test_botones_quitar_oferta_y_enviar_sin_cerebro(c, axtra):
     r = accion(c, s, "quitar", plato_id="omelet").json()               # se equivocó: lo quita
     assert r["frase"].startswith("/v1/frase/demo/quitado?") and [p["id"] for p in r["pedido"]["platos"]] == ["ajiaco"]
     r = accion(c, s, "confirmar").json()                                # antes de enviar ofrece el postre
-    assert r["frase"].startswith("/v1/frase/demo/oferta?") and r["oferta"] == "volcan" and not r.get("despedida")
+    assert r["frase"].startswith("/v1/frase/demo/oferta?") and r["oferta"] == "torta" and not r.get("despedida")
     r = accion(c, s, "confirmar").json()                                # «No, enviar así»: no insiste
     assert r["frase"].startswith("/v1/frase/demo/enviado?") and r["despedida"] is True and r["pedido"]["pedido_numero"]
     assert not [x for x, _ in axtra.llamadas if x == "/pensar"]
@@ -312,8 +313,8 @@ def test_botones_quitar_oferta_y_enviar_sin_cerebro(c, axtra):
 def test_oferta_aceptada_se_suma_al_pedido(c):
     s = sesion(c, "5").json()
     accion(c, s, "pedir", plato_id="limonada")
-    assert accion(c, s, "confirmar").json()["oferta"] == "volcan"
-    r = accion(c, s, "confirmar", plato_id="volcan").json()             # «Sí, agregarlo»
+    assert accion(c, s, "confirmar").json()["oferta"] == "torta"
+    r = accion(c, s, "confirmar", plato_id="torta").json()             # «Sí, agregarlo»
     assert r["despedida"] and r["pedido"]["total_numero"] == 12000 + 14000
 
 
@@ -429,7 +430,7 @@ def test_el_oido_recibe_idioma_y_nombres_de_los_platos(c, axtra, monkeypatch):
 def test_control_de_pedidos_en_japones_y_ruso(c, axtra):
     s = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "1", "idioma": "ja"}, headers=ORIGEN).json()
     axtra.oido = "アヒアコを二つください"
-    axtra.guion = [llamadas(("agregar_plato", {"plato_id": "ajiaco"}), ("agregar_plato", {"plato_id": "volcan"})), texto("はい")]
+    axtra.guion = [llamadas(("agregar_plato", {"plato_id": "ajiaco"}), ("agregar_plato", {"plato_id": "torta"})), texto("はい")]
     assert _platos(turno(c, s).json()["pedido"]["platos"]) == {"アヒアコ": 2}
     s2 = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "2", "idioma": "ru"}, headers=ORIGEN).json()
     accion(c, s2, "pedir", plato_id="omelet")                         # el orbe ofrece el лимонад
@@ -481,10 +482,10 @@ def test_si_falla_todo_igual_manda_el_pedido_real(c, axtra):
 
 
 
-def test_voz_alegre_tono_y_velocidad_llegan_a_la_voz(c, axtra):
+def test_el_orbe_usa_la_voz_de_axtra(c, axtra):
     c.get("/v1/frase/demo/saludo")
     pedido = [kw for ruta, kw in axtra.llamadas if ruta == "/voz"][-1]
-    assert pedido["tono"] == "+10Hz" and pedido["velocidad"] == 1.08 and pedido["voz_edge"] == "es-CO-SalomeNeural"
+    assert pedido["axtra"] is True and pedido["idioma"] == "es"         # la misma voz de Axtra
     c.get("/v1/muestra/demo?voz=es-MX-DaliaNeural&tono=18")
     assert [kw for ruta, kw in axtra.llamadas if ruta == "/voz"][-1]["tono"] == "+18Hz"
 
@@ -496,4 +497,13 @@ def test_el_orbe_no_dice_precios(c, axtra):
     assert "NO digas precios ni totales" in sistema and "sin precios" in sistema
     r = accion(c, s, "pedir", plato_id="ajiaco")
     o = accion(c, s, "confirmar").json()
-    assert o["oferta"] == "volcan" and not any(ch.isdigit() for ch in o["texto"])
+    assert o["oferta"] == "torta" and not any(ch.isdigit() for ch in o["texto"])
+
+
+
+def test_la_carta_trae_fotos_y_la_torta_en_3d(c):
+    m = c.get("/v1/menu/demo").json()
+    torta = next(p for p in m["menu"] if p["id"] == "torta")
+    assert torta["nombre"] == "Torta de chocolate" and torta["modelo3d"] == "/web/modelos/torta.glb" and torta["foto"].startswith("https://")
+    g = c.get("/web/modelos/torta.glb")
+    assert g.status_code == 200 and g.content[:4] == b"glTF" and g.headers["content-type"] == "model/gltf-binary"
