@@ -1,5 +1,5 @@
 """Genera web/modelos/torta.glb: una torta de chocolate en 3D a tamaño real (unos 20 cm), para verla en
-realidad aumentada sobre la mesa. Capas de bizcocho y crema, cubierta de chocolate, fresas y una porción cortada.
+realidad aumentada sobre la mesa. Capas de bizcocho y crema de chocolate, cubierta de chocolate con cacao y una porción cortada.
 
 Uso: python -m servidor.apex.herramientas.torta_3d   (requiere: pip install trimesh shapely)"""
 import math
@@ -33,7 +33,7 @@ def sector(r_ext, desde, hasta, alto, z, r_int=0.0, pasos=72):
     return m
 
 
-BIZCOCHO, CREMA, COBERTURA, PLATO, FRESA, HOJA = (74, 38, 22), (238, 222, 196), (52, 26, 14), (244, 243, 240), (200, 30, 42), (60, 130, 50)
+BIZCOCHO, CREMA, COBERTURA, PLATO, CACAO = (78, 40, 26), (126, 72, 50), (66, 34, 22), (232, 222, 206), (72, 38, 25)
 CAPAS = [(BIZCOCHO, 0.022), (CREMA, 0.007), (BIZCOCHO, 0.022), (CREMA, 0.007), (BIZCOCHO, 0.02)]
 R, CORTE = 0.09, 42           # radio de la torta (m) y ángulo de la porción que se sacó
 
@@ -50,13 +50,12 @@ def torta(desde, hasta, desplazar=(0, 0)):
     return partes, z + 0.006
 
 
-def fresa(x, y, z):
-    f = trimesh.creation.icosphere(subdivisions=2, radius=0.011)
-    f.apply_scale([1, 1, 1.25])
-    f.apply_translation([x, y, z + 0.011])
-    h = trimesh.creation.cone(radius=0.008, height=0.006, sections=12)
-    h.apply_translation([x, y, z + 0.024])
-    return [pintar(f, FRESA, 0.4), pintar(h, HOJA, 0.7)]
+def remolino(x, y, z, r=0.016):
+    """Ondas de crema de chocolate encima, espolvoreadas con cacao (mate)."""
+    m = trimesh.creation.icosphere(subdivisions=2, radius=r)
+    m.apply_scale([1.5, 1.0, 0.3])
+    m.apply_translation([x, y, z])
+    return [pintar(m, CACAO, 0.95)]
 
 
 def construir() -> trimesh.Scene:
@@ -67,12 +66,11 @@ def construir() -> trimesh.Scene:
     cuerpo, tope = torta(CORTE, 360)
     for p in cuerpo:
         escena.add_geometry(p)
-    for i in range(7):                                          # fresas alrededor del borde, fuera del corte
-        a = math.radians(CORTE + 22 + i * (360 - CORTE - 30) / 6)
-        for p in fresa(0.066 * math.cos(a), 0.066 * math.sin(a), tope):
-            escena.add_geometry(p)
-    for p in fresa(0, 0, tope):
-        escena.add_geometry(p)
+    for i in range(14):                                         # ondas de crema sobre la cubierta, fuera del corte
+        a = math.radians(CORTE + 14 + i * (360 - CORTE - 24) / 13)
+        for rad in (0.022, 0.048, 0.072):
+            for p in remolino(rad * math.cos(a + rad * 4), rad * math.sin(a + rad * 4), tope):
+                escena.add_geometry(p)
     mitad = math.radians(CORTE / 2)                             # la porción, servida al lado
     porcion, tope_p = torta(0, CORTE, desplazar=(0.045 * math.cos(mitad), 0.045 * math.sin(mitad)))
     for p in porcion:

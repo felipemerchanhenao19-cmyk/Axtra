@@ -504,6 +504,7 @@ def test_el_orbe_no_dice_precios(c, axtra):
 def test_la_carta_trae_fotos_y_la_torta_en_3d(c):
     m = c.get("/v1/menu/demo").json()
     torta = next(p for p in m["menu"] if p["id"] == "torta")
-    assert torta["nombre"] == "Torta de chocolate" and torta["modelo3d"] == "/web/modelos/torta.glb" and torta["foto"].startswith("https://")
+    assert torta["nombre"] == "Torta de chocolate" and torta["modelo3d"] == "/web/modelos/torta.glb" and torta["foto"] == "/web/fotos/torta.jpg"
+    assert all(c.get(p["foto"]).status_code == 200 for p in m["menu"])                # las 5 fotos están en el servidor
     g = c.get("/web/modelos/torta.glb")
     assert g.status_code == 200 and g.content[:4] == b"glTF" and g.headers["content-type"] == "model/gltf-binary"

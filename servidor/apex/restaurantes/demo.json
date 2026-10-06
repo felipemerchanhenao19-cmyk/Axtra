@@ -34,7 +34,9 @@
       "descripcion": "Frijoles, arroz, chicharrón, carne molida, huevo, maduro, arepa y aguacate.",
       "alergenos": [
         "huevo"
-      ]
+      ],
+      "foto": "/web/fotos/bandeja.jpg",
+      "foto_completa": true
     },
     {
       "id": "ajiaco",
@@ -44,7 +46,8 @@
       "descripcion": "Pollo, tres papas y guascas, con crema, alcaparras y aguacate.",
       "alergenos": [
         "lácteos"
-      ]
+      ],
+      "foto": "/web/fotos/ajiaco.jpg"
     },
     {
       "id": "omelet",
@@ -55,7 +58,7 @@
       "alergenos": [
         "huevo"
       ],
-      "foto": "https://images.pexels.com/photos/1437268/pexels-photo-1437268.jpeg?auto=compress&cs=tinysrgb&w=600"
+      "foto": "/web/fotos/omelet.jpg"
     },
     {
       "id": "limonada",
@@ -65,7 +68,8 @@
       "descripcion": "Cremosa, bien fría, hecha al momento.",
       "alergenos": [
         "lácteos"
-      ]
+      ],
+      "foto": "/web/fotos/limonada.jpg"
     },
     {
       "id": "torta",
@@ -74,13 +78,13 @@
       "antes": 19000,
       "oferta": true,
       "grupo": "Postre del día",
-      "descripcion": "Húmeda, con capas de crema y fresas. Está en oferta hoy.",
+      "descripcion": "Húmeda, en capas, con crema de chocolate y cacao. Está en oferta hoy.",
       "alergenos": [
         "lácteos",
         "huevo",
         "gluten"
       ],
-      "foto": "https://images.pexels.com/photos/30128890/pexels-photo-30128890.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "foto": "/web/fotos/torta.jpg",
       "modelo3d": "/web/modelos/torta.glb"
     }
   ],
@@ -146,7 +150,7 @@
         },
         "torta": {
           "nombre": "Chocolate cake",
-          "descripcion": "Moist, layered with cream and strawberries. On special today."
+          "descripcion": "Moist and layered, with chocolate cream and cocoa. On special today."
         }
       },
       "frases": {
@@ -190,7 +194,7 @@
         },
         "torta": {
           "nombre": "Bolo de chocolate",
-          "descripcion": "Úmido, com camadas de creme e morangos. Em oferta hoje."
+          "descripcion": "Úmido, em camadas, com creme de chocolate e cacau. Em oferta hoje."
         }
       },
       "frases": {
@@ -234,7 +238,7 @@
         },
         "torta": {
           "nombre": "Schokoladentorte",
-          "descripcion": "Saftig, mit Sahneschichten und Erdbeeren. Heute im Angebot."
+          "descripcion": "Saftig, in Schichten, mit Schokoladencreme und Kakao. Heute im Angebot."
         }
       },
       "frases": {
@@ -278,7 +282,7 @@
         },
         "torta": {
           "nombre": "Шоколадный торт",
-          "descripcion": "Нежный, со слоями крема и клубникой. Сегодня по акции."
+          "descripcion": "Нежный, многослойный, с шоколадным кремом и какао. Сегодня по акции."
         }
       },
       "frases": {
@@ -322,7 +326,7 @@
         },
         "torta": {
           "nombre": "チョコレートケーキ",
-          "descripcion": "しっとり、クリームの層といちご添え。本日の特別価格。"
+          "descripcion": "しっとりした層にチョコレートクリームとココア。本日の特別価格。"
         }
       },
       "frases": {

@@ -420,7 +420,7 @@ function tarjeta(p) {
   const precio = p.antes ? `<span class="precio"><s>${plata(p.antes)}</s>${plata(p.precio)}</span>` : `<span class="precio">${plata(p.precio)}</span>`;
   const ctrl = n ? `<div class="contador"><button data-menos="${p.id}" aria-label="−1">−</button><b>${n}</b><button class="mas" data-mas="${p.id}" aria-label="+1">+</button></div>`
                  : `<button class="pedir" data-mas="${p.id}">${T().pedir}</button>`;
-  const foto = p.foto ? `<img src="${esc(p.foto)}" alt="${esc(p.nombre)}" data-respaldo="${p.id}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`
+  const foto = p.foto ? `<img src="${esc(p.foto)}" alt="${esc(p.nombre)}" data-respaldo="${p.id}" loading="lazy" style="width:100%;height:100%;object-fit:${p.foto_completa ? "contain" : "cover"};border-radius:16px">`
                      : (DIBUJO[p.id] || PLATO_GENERICO);
   const tres = p.modelo3d ? `<button class="boton-3d" data-3d="${p.id}">${T().ver3d}</button>` : "";
   return `<article class="plato ${n ? "elegido" : ""}"><div class="foto">${foto}</div>
