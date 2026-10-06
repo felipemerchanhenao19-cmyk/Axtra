@@ -7,8 +7,9 @@
 <meta name="theme-color" content="#0b1626">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;500;600;700;800&display=swap">
-<script src="/web/apex-voz.js?v=9"></script>
+<script src="/web/apex-voz.js?v=10"></script>
 <script src="/web/qrcode.js?v=2"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
 <style>
 /* Layout: una app de celular (máx. 460 px) centrada; tres pantallas: orbe de entrada, carta, pedido enviado. Más la vista de la caja. */
 :root {
@@ -160,6 +161,12 @@ canvas { display: block; width: 100%; height: 100%; }
 .cabeza .idiomas { margin-top: 8px; }
 .orbe-arriba { padding: 0; display: block; }
 .orbe-arriba.escucha { filter: drop-shadow(0 0 14px rgba(63,208,255,.9)); }
+.boton-3d { background: transparent; border: 1px solid var(--linea); color: var(--hielo-claro); font-weight: 700; font-size: 13px; padding: 8px 12px; }
+.ar-velo { position: fixed; inset: 0; z-index: 30; background: var(--noche); display: grid; grid-template-rows: auto 1fr auto; padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); gap: 12px; }
+.ar-velo h3 { font: 400 28px/1.1 var(--f-titulo); margin: 0; }
+.ar-velo model-viewer { width: 100%; height: 100%; min-height: 300px; border-radius: 24px; background: radial-gradient(circle at 50% 40%, #22406a, #0b1626 75%); }
+.ar-velo .fila { display: grid; gap: 10px; }
+.ar-velo .principal { padding: 15px; }
 .qr-boton { color: var(--tinta); font-size: 14px; font-weight: 700; margin-top: 18px; padding: 10px 18px; border: 1px solid var(--linea); }
 .qr-velo { position: fixed; inset: 0; z-index: 30; background: rgba(2,6,12,.85); display: grid; place-items: center; padding: 20px; }
 .qr-caja { background: #fff; color: #0b1626; border-radius: 28px; padding: 24px; width: min(100%, 360px); display: grid; gap: 10px; justify-items: center; text-align: center; }
@@ -225,7 +232,7 @@ const $ = (s) => document.querySelector(s);
 const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* ---------- Idiomas: textos de la pantalla (la carta y la voz del orbe vienen del servidor) ---------- */
 const TEXTOS = {
-  es: { locale: "es-CO", ejemplo: "Ejemplo", toque: "Toque el orbe", sub: "y vea la carta. Puede hablarle o pedir con botones.", qr: "Mostrar código QR",
+  es: { locale: "es-CO", ver3d: "Ver en 3D", en_mesa: "Ver en su mesa", ejemplo: "Ejemplo", toque: "Toque el orbe", sub: "y vea la carta. Puede hablarle o pedir con botones.", qr: "Mostrar código QR",
         escanee: "Escanee y pruébelo", cerrar: "Cerrar", mesero: "🙋 Mesero", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DE HOY",
         su_pedido: "Su pedido", revise: "Revise antes de enviar. ¿Se equivocó? Quítelo aquí.", vacio: "Su pedido está vacío.", total: "Total",
         quitar: "Quitar", confirmar: "Confirmar pedido", seguir: "Seguir mirando la carta", oferta: (n, a, b) => `Hoy tenemos <b>oferta en ${n}</b>${a ? `: de ${a} a <b>${b}</b>` : ""}. ¿Le gustaría pedirlo?`,
@@ -235,7 +242,7 @@ const TEXTOS = {
         estados: { conectando: "Conectando…", escuchando: "🎙 Hable ahora", oyendo: "🎙 Le escucho…", pensando: "Pensando…", hablando: "", listo: "Toque el orbe para hablar", dormido: "Toque el orbe para hablar" },
         sin_mic: "Sin micrófono: pida con los botones, el orbe le sigue hablando.", sin_voz: "El sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.",
         mesero_ok: "🙋 Listo, el mesero ya viene.", carga: "No se pudo cargar la carta. Revise la conexión." },
-  en: { locale: "en-US", ejemplo: "Demo", toque: "Tap the orb", sub: "to see the menu. Talk to it or order with the buttons.", qr: "Show QR code",
+  en: { locale: "en-US", ver3d: "View in 3D", en_mesa: "See it on your table", ejemplo: "Demo", toque: "Tap the orb", sub: "to see the menu. Talk to it or order with the buttons.", qr: "Show QR code",
         escanee: "Scan to try it", cerrar: "Close", mesero: "🙋 Server", ver: "View order", pedir: "Order", oferta_tag: "TODAY'S DEAL",
         su_pedido: "Your order", revise: "Check before sending. Made a mistake? Remove it here.", vacio: "Your order is empty.", total: "Total",
         quitar: "Remove", confirmar: "Confirm order", seguir: "Keep browsing the menu", oferta: (n, a, b) => `Today's deal: <b>${n}</b>${a ? `, from ${a} to <b>${b}</b>` : ""}. Would you like it?`,
@@ -245,7 +252,7 @@ const TEXTOS = {
         estados: { conectando: "Connecting…", escuchando: "🎙 Speak now", oyendo: "🎙 Listening…", pensando: "Thinking…", hablando: "", listo: "Tap the orb to talk", dormido: "Tap the orb to talk" },
         sin_mic: "No microphone: order with the buttons, the orb will keep talking to you.", sin_voz: "The voice system is having trouble. Please select what you'd like to order.",
         mesero_ok: "🙋 A server is on the way.", carga: "Couldn't load the menu. Check your connection." },
-  pt: { locale: "pt-BR", ejemplo: "Exemplo", toque: "Toque no orbe", sub: "e veja o cardápio. Fale com ele ou peça pelos botões.", qr: "Mostrar código QR",
+  pt: { locale: "pt-BR", ver3d: "Ver em 3D", en_mesa: "Ver na sua mesa", ejemplo: "Exemplo", toque: "Toque no orbe", sub: "e veja o cardápio. Fale com ele ou peça pelos botões.", qr: "Mostrar código QR",
         escanee: "Escaneie e experimente", cerrar: "Fechar", mesero: "🙋 Garçom", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DO DIA",
         su_pedido: "Seu pedido", revise: "Confira antes de enviar. Errou? Tire aqui.", vacio: "Seu pedido está vazio.", total: "Total",
         quitar: "Tirar", confirmar: "Confirmar pedido", seguir: "Continuar vendo o cardápio", oferta: (n, a, b) => `Hoje temos <b>oferta em ${n}</b>${a ? `: de ${a} por <b>${b}</b>` : ""}. Gostaria de pedir?`,
@@ -255,7 +262,7 @@ const TEXTOS = {
         estados: { conectando: "Conectando…", escuchando: "🎙 Fale agora", oyendo: "🎙 Ouvindo…", pensando: "Pensando…", hablando: "", listo: "Toque no orbe para falar", dormido: "Toque no orbe para falar" },
         sin_mic: "Sem microfone: peça pelos botões, o orbe continua falando com você.", sin_voz: "O sistema de voz está com falha. Por favor, selecione o que deseja pedir.",
         mesero_ok: "🙋 Pronto, o garçom já vem.", carga: "Não foi possível carregar o cardápio. Verifique a conexão." },
-  de: { locale: "de-DE", ejemplo: "Beispiel", toque: "Tippen Sie auf die Kugel", sub: "und sehen Sie die Karte. Sprechen Sie oder bestellen Sie mit Tasten.", qr: "QR-Code zeigen",
+  de: { locale: "de-DE", ver3d: "In 3D ansehen", en_mesa: "Auf Ihrem Tisch ansehen", ejemplo: "Beispiel", toque: "Tippen Sie auf die Kugel", sub: "und sehen Sie die Karte. Sprechen Sie oder bestellen Sie mit Tasten.", qr: "QR-Code zeigen",
         escanee: "Scannen und ausprobieren", cerrar: "Schließen", mesero: "🙋 Kellner", ver: "Bestellung", pedir: "Bestellen", oferta_tag: "ANGEBOT DES TAGES",
         su_pedido: "Ihre Bestellung", revise: "Vor dem Senden prüfen. Vertan? Hier entfernen.", vacio: "Ihre Bestellung ist leer.", total: "Summe",
         quitar: "Entfernen", confirmar: "Bestellung bestätigen", seguir: "Weiter in der Karte", oferta: (n, a, b) => `Heute im Angebot: <b>${n}</b>${a ? `, statt ${a} nur <b>${b}</b>` : ""}. Möchten Sie es?`,
@@ -265,7 +272,7 @@ const TEXTOS = {
         estados: { conectando: "Verbinde…", escuchando: "🎙 Jetzt sprechen", oyendo: "🎙 Ich höre…", pensando: "Einen Moment…", hablando: "", listo: "Zum Sprechen auf die Kugel tippen", dormido: "Zum Sprechen auf die Kugel tippen" },
         sin_mic: "Kein Mikrofon: Bestellen Sie mit den Tasten, die Kugel spricht weiter mit Ihnen.", sin_voz: "Das Sprachsystem hat eine Störung. Bitte wählen Sie aus, was Sie bestellen möchten.",
         mesero_ok: "🙋 Ein Kellner kommt.", carga: "Die Karte konnte nicht geladen werden. Prüfen Sie die Verbindung." },
-  ru: { locale: "ru-RU", ejemplo: "Пример", toque: "Нажмите на сферу", sub: "и откройте меню. Говорите или заказывайте кнопками.", qr: "Показать QR-код",
+  ru: { locale: "ru-RU", ver3d: "Смотреть в 3D", en_mesa: "Посмотреть на столе", ejemplo: "Пример", toque: "Нажмите на сферу", sub: "и откройте меню. Говорите или заказывайте кнопками.", qr: "Показать QR-код",
         escanee: "Отсканируйте и попробуйте", cerrar: "Закрыть", mesero: "🙋 Официант", ver: "Мой заказ", pedir: "Заказать", oferta_tag: "АКЦИЯ ДНЯ",
         su_pedido: "Ваш заказ", revise: "Проверьте перед отправкой. Ошиблись? Уберите здесь.", vacio: "Ваш заказ пуст.", total: "Итого",
         quitar: "Убрать", confirmar: "Подтвердить заказ", seguir: "Вернуться к меню", oferta: (n, a, b) => `Сегодня акция: <b>${n}</b>${a ? ` — ${b} вместо ${a}` : ""}. Хотите заказать?`,
@@ -275,7 +282,7 @@ const TEXTOS = {
         estados: { conectando: "Подключение…", escuchando: "🎙 Говорите", oyendo: "🎙 Слушаю…", pensando: "Думаю…", hablando: "", listo: "Нажмите на сферу, чтобы говорить", dormido: "Нажмите на сферу, чтобы говорить" },
         sin_mic: "Нет микрофона: заказывайте кнопками, сфера продолжит говорить с вами.", sin_voz: "Голосовая система не работает. Пожалуйста, выберите, что хотите заказать.",
         mesero_ok: "🙋 Официант уже идёт.", carga: "Не удалось загрузить меню. Проверьте соединение." },
-  ja: { locale: "ja-JP", ejemplo: "デモ", toque: "オーブをタップ", sub: "してメニューを表示。話しかけるか、ボタンで注文できます。", qr: "QRコードを表示",
+  ja: { locale: "ja-JP", ver3d: "3Dで見る", en_mesa: "テーブルで見る", ejemplo: "デモ", toque: "オーブをタップ", sub: "してメニューを表示。話しかけるか、ボタンで注文できます。", qr: "QRコードを表示",
         escanee: "スキャンしてお試しください", cerrar: "閉じる", mesero: "🙋 スタッフ", ver: "注文を見る", pedir: "注文", oferta_tag: "本日の特別価格",
         su_pedido: "ご注文", revise: "送信前にご確認ください。間違えたらここで削除できます。", vacio: "ご注文はまだありません。", total: "合計",
         quitar: "削除", confirmar: "注文を確定", seguir: "メニューに戻る", oferta: (n, a, b) => `本日は<b>${n}</b>が特別価格${a ? `：${a} → <b>${b}</b>` : ""}。いかがですか？`,
@@ -342,9 +349,10 @@ const DIBUJO = {
     <path d="M33 34h34l-.8 8H33.8z" fill="#ffffff"/><circle cx="44" cy="54" r="3" fill="#fff" opacity=".7"/><circle cx="56" cy="64" r="2.4" fill="#fff" opacity=".7"/>
     <rect x="55" y="8" width="4" height="40" rx="2" fill="#3fd0ff" transform="rotate(12 57 28)"/>
     <circle cx="68" cy="26" r="11" fill="#7cb342"/><circle cx="68" cy="26" r="8.5" fill="#d4e157"/><path d="M68 18v16M60 26h16M62.5 20.5l11 11M73.5 20.5l-11 11" stroke="#9ccc65" stroke-width="1"/></svg>`,
-  volcan: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="66" rx="40" ry="18" fill="#e9eef3"/><path d="M28 64c0-18 10-30 22-30s22 12 22 30z" fill="#4e2a1a"/>
-    <path d="M32 50c4 4 6 10 4 16M66 52c-3 4-4 9-2 14M50 44c2 6 2 14 0 22" stroke="#2d160c" stroke-width="3" stroke-linecap="round" fill="none"/>
-    <circle cx="50" cy="33" r="11" fill="#fff6e8"/><circle cx="46" cy="30" r="3" fill="#fff"/><path d="M58 30c3 1 5 4 4 7" stroke="#e53935" stroke-width="3" stroke-linecap="round" fill="none"/></svg>`,
+  torta: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="70" rx="42" ry="16" fill="#e9eef3"/>
+    <path d="M22 66V40l50-14v26z" fill="#4a2616"/><path d="M22 40l50-14 8 6-50 14z" fill="#2b140b"/><path d="M72 26l8 6v26l-8-6z" fill="#3a1d10"/>
+    <path d="M22 50l50-14v4L22 54zM22 58l50-14v4L22 62z" fill="#eedcc0"/>
+    <circle cx="52" cy="29" r="5" fill="#d32f2f"/><path d="M50 24l2-3 2 3" stroke="#388e3c" stroke-width="2" fill="none"/></svg>`,
 };
 const PLATO_GENERICO = `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="54" rx="44" ry="34" fill="#e9eef3"/><ellipse cx="50" cy="54" rx="37" ry="27" fill="#f8fafc"/><ellipse cx="50" cy="50" rx="20" ry="12" fill="#d9a35a"/></svg>`;
 
@@ -412,15 +420,20 @@ function tarjeta(p) {
   const precio = p.antes ? `<span class="precio"><s>${plata(p.antes)}</s>${plata(p.precio)}</span>` : `<span class="precio">${plata(p.precio)}</span>`;
   const ctrl = n ? `<div class="contador"><button data-menos="${p.id}" aria-label="−1">−</button><b>${n}</b><button class="mas" data-mas="${p.id}" aria-label="+1">+</button></div>`
                  : `<button class="pedir" data-mas="${p.id}">${T().pedir}</button>`;
-  const foto = p.foto ? `<img src="${p.foto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:16px">` : (DIBUJO[p.id] || PLATO_GENERICO);
+  const foto = p.foto ? `<img src="${esc(p.foto)}" alt="${esc(p.nombre)}" data-respaldo="${p.id}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:16px">`
+                     : (DIBUJO[p.id] || PLATO_GENERICO);
+  const tres = p.modelo3d ? `<button class="boton-3d" data-3d="${p.id}">${T().ver3d}</button>` : "";
   return `<article class="plato ${n ? "elegido" : ""}"><div class="foto">${foto}</div>
-    <div class="info">${p.oferta ? `<span class="oferta-tag">${T().oferta_tag}</span>` : ""}<h3>${esc(p.nombre)}</h3><p>${esc(p.descripcion)}</p><div class="pie-plato">${precio}${ctrl}</div></div></article>`;
+    <div class="info">${p.oferta ? `<span class="oferta-tag">${T().oferta_tag}</span>` : ""}<h3>${esc(p.nombre)}</h3><p>${esc(p.descripcion)}</p><div class="pie-plato">${precio}${tres}${ctrl}</div></div></article>`;
 }
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 function pintar() {
   let html = "", grupo = null;
   for (const p of menu.menu) { if ((p.grupo || "") !== grupo) { grupo = p.grupo || ""; if (grupo) html += `<div class="seccion-titulo">${esc(grupo)}</div>`; } html += tarjeta(p); }
   $("#carta").innerHTML = html;
+  // Si una foto no carga, queda el dibujo del plato
+  $("#carta").querySelectorAll("img[data-respaldo]").forEach((img) => img.addEventListener("error", () => {
+    img.outerHTML = DIBUJO[img.dataset.respaldo] || PLATO_GENERICO; }, { once: true }));
   const cant = Object.values(pedido).reduce((a, b) => a + b, 0);
   $("#cuantos").textContent = cant; $("#total-barra").textContent = plata(total()); $("#ver-pedido").disabled = !cant;
 }
@@ -436,7 +449,20 @@ async function quitar(id, todo) {
   pintar(); if ($(".hoja")) abrirPedido(hojaOferta);
   await orbe.quitarPlato(id, n);
 }
+function ver3d(id) {
+  const p = menu.menu.find((x) => x.id === id); if (!p) return;
+  const v = document.createElement("div"); v.className = "ar-velo"; v.setAttribute("role", "dialog");
+  v.innerHTML = `<h3>${esc(p.nombre)}</h3>
+    <model-viewer src="${esc(p.modelo3d)}" alt="${esc(p.nombre)}" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed"
+      camera-controls auto-rotate shadow-intensity="1" exposure="1.1" touch-action="pan-y"></model-viewer>
+    <div class="fila"><button class="principal" id="ar-mesa">📱 ${T().en_mesa}</button><button class="secundario" id="ar-cerrar">${T().cerrar}</button></div>`;
+  document.body.append(v);
+  const mv = v.querySelector("model-viewer");
+  v.querySelector("#ar-mesa").onclick = () => { try { mv.activateAR(); } catch {} };
+  v.querySelector("#ar-cerrar").onclick = () => v.remove();
+}
 $("#carta").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset["3d"]) return ver3d(b.dataset["3d"]);
   if (b.dataset.mas) pedir(b.dataset.mas); if (b.dataset.menos) quitar(b.dataset.menos); });
 
 /* ---------- Ver pedido, quitar, confirmar (con la oferta del día) ---------- */

@@ -5,6 +5,7 @@ Para probar en tu PC:  APEX_MODO=desarrollo uvicorn servidor.apex.app:app --port
 """
 import asyncio
 import base64
+import mimetypes
 import hashlib
 import logging
 import hmac
@@ -23,6 +24,7 @@ from pydantic import BaseModel, Field
 from . import config, db, orbe
 
 WEB = config.BASE / "web"
+mimetypes.add_type("model/gltf-binary", ".glb")          # modelos 3D para la realidad aumentada
 log = logging.getLogger("uvicorn.error")
 
 

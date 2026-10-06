@@ -75,7 +75,8 @@ def voz(r: dict, texto: str, sid: str = "") -> bytes:
     v = r.get("voz", {})
     pedido = {"texto": texto, "voz_google": v.get("google", "es-US-Neural2-B"),
               "voz_edge": v.get("edge", "es-CO-GonzaloNeural"), "velocidad": v.get("velocidad", 1.0),
-              "tono": v.get("tono", "+0Hz")}
+              "tono": v.get("tono", "+0Hz"),
+              **({"axtra": True, "idioma": r.get("idioma", "es")} if v.get("axtra") else {})}
     clave = hashlib.sha256(json.dumps(pedido, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:32]
     for prov, vida in (("google", None), ("edge", 3600)):     # la voz gratis de respaldo solo se guarda 1 hora
         f = config.AUDIO_DIR / f"{clave}.{prov}.mp3"

@@ -126,3 +126,16 @@ def test_voz_gratis_recibe_el_tono(c, monkeypatch):
     c.post("/voz", json={"texto": "hola", "tono": "+10Hz"})
     assert visto["tono"] == "+10Hz"
     assert c.post("/voz", json={"texto": "hola", "tono": "fuerte"}).status_code == 422
+
+
+
+def test_voz_de_axtra_en_cada_idioma(c, monkeypatch):
+    from servidor import voz
+    vistos = []
+    monkeypatch.setattr(voz, "sintetizar", lambda texto, **kw: (vistos.append(kw), b"ID3")[1])
+    monkeypatch.setattr(ranura.config, "GOOGLE_TTS_API_KEY", "k")          # aunque haya Google, usa la de Axtra
+    monkeypatch.setattr(ranura.config, "VOZ_AXTRA", "es-ES-AlvaroNeural")
+    c.post("/voz", json={"texto": "hola", "axtra": True, "idioma": "es"})
+    c.post("/voz", json={"texto": "hello", "axtra": True, "idioma": "en"})
+    assert vistos[0]["voz"] == "es-ES-AlvaroNeural" and vistos[0]["tono"] == ranura.config.VOZ_TONO
+    assert vistos[1]["voz"] == "en-US-AndrewNeural" and vistos[1]["ritmo"] == ranura.config.VOZ_VELOCIDAD
