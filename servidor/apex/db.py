@@ -41,6 +41,9 @@ def conn() -> sqlite3.Connection:
         if "idioma" not in {f["name"] for f in _conn.execute("PRAGMA table_info(sesiones)")}:
             _conn.execute("ALTER TABLE sesiones ADD COLUMN idioma TEXT DEFAULT ''")       # bases de datos anteriores
             _conn.commit()
+        if "entrega" not in {f["name"] for f in _conn.execute("PRAGMA table_info(pedidos)")}:
+            _conn.execute("ALTER TABLE pedidos ADD COLUMN entrega TEXT DEFAULT ''")      # datos del domicilio
+            _conn.commit()
     return _conn
 
 
@@ -157,14 +160,29 @@ def uso_mes(rid: str) -> dict:
 
 
 # ---------------- Pedidos y llamadas al mesero ----------------
-def nuevo_pedido(rid: str, mesa: str, sid: str, items: list, total: float) -> int:
-    return _ejecutar("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado) VALUES (?,?,?,?,?,?)",
-                     (rid, mesa, sid, json.dumps(items, ensure_ascii=False), total, time.time())).lastrowid
+def nuevo_pedido(rid: str, mesa: str, sid: str, items: list, total: float, entrega: dict | None = None) -> int:
+    return _ejecutar("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado, entrega) VALUES (?,?,?,?,?,?,?)",
+                     (rid, mesa, sid, json.dumps(items, ensure_ascii=False), total, time.time(),
+                      json.dumps(entrega, ensure_ascii=False) if entrega else "")).lastrowid
+
+
+def _pedido_dict(f) -> dict:
+    return dict(f) | {"items": json.loads(f["items"]), "entrega": json.loads(f["entrega"]) if f["entrega"] else None}
 
 
 def pedidos(rid: str, limite: int = 50) -> list:
-    return [dict(f) | {"items": json.loads(f["items"])} for f in conn().execute(
+    return [_pedido_dict(f) for f in conn().execute(
         "SELECT * FROM pedidos WHERE restaurante=? ORDER BY id DESC LIMIT ?", (rid, limite))]
+
+
+def pedido(rid: str, pid: int):
+    f = conn().execute("SELECT * FROM pedidos WHERE restaurante=? AND id=?", (rid, pid)).fetchone()
+    return _pedido_dict(f) if f else None
+
+
+def borrar_pedidos_viejos(rid: str, segundos: float):
+    """Los ejemplos no guardan datos de la gente: nombres, teléfonos y direcciones se borran solos."""
+    _ejecutar("DELETE FROM pedidos WHERE restaurante=? AND creado<?", (rid, time.time() - segundos))
 
 
 def cambiar_pedido(rid: str, pid: int, estado: str):

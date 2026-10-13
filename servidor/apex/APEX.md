@@ -80,6 +80,34 @@ Además, **Google regala 1 millón de caracteres de voz al mes** (unas 12.000 re
 
 Para agregar un restaurante, copia `demo.json`, cámbialo y agrega su PIN en el `.env` de Axtra como `APEX_PIN_<ID>`.
 
+## Apex Domicilios
+
+Es el mismo orbe y la misma carta, pero para pedidos **a domicilio** desde un link (Instagram, WhatsApp, Google Maps).
+- **Página del cliente:** `https://api.axtra.chat/domicilios`.
+- **Caja:** `https://api.axtra.chat/panel?r=domicilios`.
+
+**Lo que hace:**
+1. El cliente elige con el orbe o con botones.
+2. Toca «Continuar». El orbe ofrece la oferta del día si no la lleva.
+3. Pone nombre, celular, dirección, barrio, zona y notas, elige cómo paga y acepta el uso de sus datos.
+4. El pedido llega a la caja con todos los datos y botones de **WhatsApp** y **Llamar**.
+5. La caja cambia el estado: Nuevo → En preparación → En camino → Entregado.
+6. El cliente lo ve en su celular.
+
+**Lo que NO hace el orbe de domicilios:** no envía el pedido ni llama al mesero. Lo envía el cliente con sus datos.
+
+**Archivo:** `restaurantes/domicilios.json`.
+- `"base": "demo"` hereda la carta, las fotos y la voz del demo.
+- `"pin_de": "demo"` usa el mismo PIN del panel del demo.
+- En `"domicilio"` van:
+  - `horario`, `tiempo`, `minimo`, `direccion`;
+  - `whatsapp`: con indicativo, por ejemplo `573001234567`;
+  - `nequi`: el número o la llave Bre-B;
+  - `zonas`: cada una con nombre y costo;
+  - `pagos`: `contra_entrega`, `nequi` y, cuando se conecte Wompi, `pse`.
+
+En el ejemplo (`"ejemplo": true`) la página avisa que los pedidos no se entregan. Los datos de la gente se borran solos a las 6 horas.
+
 ## Ponerlo en marcha (una vez)
 
 1. **Claves en el `.env` de Axtra**, todas en el mismo archivo:

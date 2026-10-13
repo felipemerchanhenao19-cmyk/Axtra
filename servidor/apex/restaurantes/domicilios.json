@@ -1,0 +1,50 @@
+{
+  "id": "domicilios",
+  "base": "demo",
+  "nombre": "Su restaurante",
+  "mesas": [],
+  "idiomas": {},
+  "pin_de": "demo",
+  "personalidad": "Eres el orbe de domicilios de un restaurante de cocina colombiana. Eres alegre, carismático y entusiasta, como el mejor mesero de la ciudad: hablas con energía y buena vibra, celebras lo que pide el cliente y lo haces sentir bienvenido, con un toque de humor amable. Frases cortas y con chispa. Tratas al cliente de usted.",
+  "topes": {
+    "minutos_por_sesion": 40
+  },
+  "info": "Horario de domicilios: todos los días de 12 m a 10 p. m. El pedido llega en 35 a 50 minutos. Se paga contra entrega (efectivo o datáfono) o por Nequi. La bandeja paisa es para una persona con mucho apetito.",
+  "domicilio": {
+    "horario": "Todos los días · 12 m a 10 p. m.",
+    "tiempo": "35–50 min",
+    "minimo": 20000,
+    "direccion": "Dirección del restaurante",
+    "whatsapp": "",
+    "nequi": "",
+    "zonas": [
+      {
+        "id": "z1",
+        "nombre": "Cerca · hasta 2 km",
+        "costo": 3000
+      },
+      {
+        "id": "z2",
+        "nombre": "Media · de 2 a 4 km",
+        "costo": 5000
+      },
+      {
+        "id": "z3",
+        "nombre": "Lejos · de 4 a 6 km",
+        "costo": 7000
+      }
+    ],
+    "pagos": [
+      "contra_entrega",
+      "nequi"
+    ]
+  },
+  "frases": {
+    "saludo": "¡Hola, bienvenido a nuestros domicilios! Toque el orbe y dígame qué se le antoja, o pida con los botones.",
+    "oferta": "¡Espere, antes de continuar! Hoy la torta de chocolate está en oferta. ¿Se le antoja?",
+    "datos": "¡Perfecto! Ahora déjeme sus datos de entrega y listo.",
+    "enviado": "¡Listo! Su pedido ya está en la cocina y sale para su casa. ¡Que lo disfrute muchísimo!",
+    "despedida": "¡Listo! Su pedido ya está en la cocina y sale para su casa. ¡Que lo disfrute muchísimo!",
+    "mesero": "Para cualquier duda, escríbanos por WhatsApp."
+  }
+}

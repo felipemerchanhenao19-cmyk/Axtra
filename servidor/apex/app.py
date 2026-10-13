@@ -10,6 +10,7 @@ import hashlib
 import logging
 import hmac
 import json
+import secrets
 import threading
 import time
 import uuid
@@ -35,7 +36,7 @@ def revisar_sesiones():
         r = config.restaurante(s["restaurante"])
         max_seg = (r["topes"]["minutos_por_sesion"] if r else 15) * 60
         motivo = None
-        if ahora - (s["actividad"] or s["creada"]) > 300:
+        if ahora - (s["actividad"] or s["creada"]) > (1800 if r and r.get("domicilio") else 300):   # llenar la dirección toma tiempo
             motivo = "sin actividad"
         elif ahora - s["creada"] > max_seg:
             motivo = "tope de minutos por sesión"
@@ -49,6 +50,9 @@ def _vigilante():
     while True:
         try:
             revisar_sesiones()
+            for r in config.restaurantes().values():
+                if r.get("ejemplo") and r.get("domicilio"):
+                    db.borrar_pedidos_viejos(r["id"], 6 * 3600)
         except Exception:
             pass
         time.sleep(15)
@@ -146,9 +150,17 @@ def menu(rid: str, request: Request, idioma: str = ""):
     limitar(f"menu:{ip(request)}", 60, 60)
     r = config.localizar(_restaurante(rid), idioma[:5])
     return {"id": r["id"], "nombre": r["nombre"], "moneda": r.get("moneda", "COP"), "idioma": r["idioma"], "idiomas": _idiomas(r),
+            "ejemplo": bool(r.get("ejemplo")), "domicilio": _domicilio_publico(r),
             "menu": [{k: p.get(k) for k in ("id", "nombre", "precio", "descripcion", "alergenos", "modelo3d", "foto",
                                               "grupo", "antes", "oferta", "foto_completa")}
                      for p in r["menu"]]}
+
+
+def _domicilio_publico(r: dict):
+    d = r.get("domicilio")
+    if not d:
+        return None
+    return {k: d.get(k) for k in ("horario", "tiempo", "minimo", "direccion", "whatsapp", "nequi", "zonas", "pagos")}
 
 
 class PedidoSesion(BaseModel):
@@ -176,10 +188,10 @@ def crear_sesion(p: PedidoSesion, request: Request):
     limitar(f"sesion:{ip(request)}", 6, 60)
     idioma = p.idioma if p.idioma in (r.get("idiomas") or {}) else ""
     r = config.localizar(r, idioma)
-    if r.get("ejemplo"):
-        # Modelo de ejemplo para mostrar la idea: sin mesas, cada persona que abre el link tiene su propia conversación.
+    if r.get("ejemplo") or r.get("domicilio"):
+        # Ejemplo o domicilios: sin mesas, cada persona que abre el link tiene su propia conversación.
         sid = uuid.uuid4().hex
-        secreto = db.nueva_sesion(sid, r["id"], "ejemplo", idioma)
+        secreto = db.nueva_sesion(sid, r["id"], "domicilio" if r.get("domicilio") else "ejemplo", idioma)
         return {"sesion": sid, "secreto": secreto, "frases": _frases(r), "saludo": r["frases"]["saludo"], "ejemplo": True,
                 "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
     limitar(f"sesion-mesa:{r['id']}:{p.mesa}", 4, 60)
@@ -290,6 +302,8 @@ def accion(a: Accion, request: Request):
     if a.tipo == "ver":                                  # solo el pedido real (para resincronizar la pantalla)
         return {"frase": None, "audio": None, "texto": "", "pedido": orbe.ejecutar(r, s, "ver_pedido", {})}
     if a.tipo == "mesero":
+        if r.get("domicilio"):
+            raise HTTPException(400, "en domicilios no hay mesero: escriba al restaurante por WhatsApp")
         orbe.ejecutar(r, s, "llamar_mesero", {"motivo": "tocó «Llamar al mesero»"})
         return _respuesta(r, s, frase="mesero")
     if a.tipo == "pedir":
@@ -320,6 +334,10 @@ def accion(a: Accion, request: Request):
                 and not _ya_dijo(r, s, "oferta"):
             _anotar(r, s, "Tocó «Confirmar pedido».", "oferta")
             return _respuesta(r, s, frase="oferta", pedido=pedido, oferta=oferta)
+        if r.get("domicilio"):                           # domicilios: ahora el cliente pone sus datos (/v1/domicilio)
+            frase = "datos" if "datos" in r["frases"] else "eleccion"
+            _anotar(r, s, "Tocó «Continuar» para poner sus datos de entrega.", frase)
+            return _respuesta(r, s, frase=frase, pedido=pedido, datos=True)
         res = orbe.ejecutar(r, s, "confirmar_pedido", {})
         if not res.get("ok"):
             raise HTTPException(409, res.get("error", "no se pudo enviar"))
@@ -339,6 +357,66 @@ def accion(a: Accion, request: Request):
     except orbe.SinRanura:
         return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=pedido)
     return _respuesta(r, s, res["texto"], pedido=res["pedido"] or pedido, despedida=bool(res["confirmado"]))
+
+
+class Entrega(Credencial):
+    nombre: str = Field(min_length=2, max_length=60)
+    telefono: str = Field(min_length=7, max_length=20)
+    direccion: str = Field(min_length=5, max_length=120)
+    barrio: str = Field("", max_length=60)
+    zona: str = Field(max_length=20)
+    notas: str = Field("", max_length=200)
+    pago: str = Field(pattern="^(contra_entrega|nequi|pse)$")
+    acepta_datos: bool
+
+
+@app.post("/v1/domicilio")
+def domicilio(e: Entrega, request: Request):
+    """El cliente puso su dirección y la forma de pago: el pedido sale para la caja con los datos de entrega."""
+    s, r = _sesion(e.sesion, e.secreto, request)
+    d = r.get("domicilio")
+    if not d:
+        raise HTTPException(404, "este restaurante no tiene domicilios")
+    limitar(f"domicilio-intento:{ip(request)}", 20, 600)
+    if not e.acepta_datos:
+        raise HTTPException(422, "Para entregar el pedido necesitamos que acepte el uso de sus datos.")
+    telefono = "".join(c for c in e.telefono if c.isdigit())
+    if not 7 <= len(telefono) <= 15:
+        raise HTTPException(422, "Revise el número de teléfono.")
+    zona = next((z for z in d.get("zonas", []) if z["id"] == e.zona), None)
+    if not zona:
+        raise HTTPException(422, "Elija la zona de entrega.")
+    if e.pago not in d.get("pagos", []):
+        raise HTTPException(422, "Esa forma de pago todavía no está disponible.")
+    items = db.carrito(s["id"])
+    if not items:
+        raise HTTPException(409, "Su pedido está vacío.")
+    res = orbe.resumen(r, items)
+    if res["total_numero"] < d.get("minimo", 0):
+        raise HTTPException(409, f"El pedido mínimo para domicilio es {orbe.precio(r, d['minimo'])}.")
+    limitar(f"domicilio:{ip(request)}", 5, 600)                 # pedidos enviados desde un mismo lugar
+    entrega = {"nombre": e.nombre.strip(), "telefono": telefono, "direccion": e.direccion.strip(), "barrio": e.barrio.strip(),
+               "zona": zona["nombre"], "envio": zona["costo"], "subtotal": res["total_numero"], "pago": e.pago,
+               "notas": e.notas.strip(), "seguimiento": secrets.token_urlsafe(12)}
+    total = res["total_numero"] + zona["costo"]
+    num = db.nuevo_pedido(r["id"], "domicilio", s["id"], items, total, entrega)
+    db.guardar_carrito(s["id"], [])
+    frase = "enviado" if "enviado" in r["frases"] else "despedida"
+    _anotar(r, s, "Envió el pedido a domicilio.", frase)
+    return _respuesta(r, s, frase=frase, despedida=True,
+                      pedido={**res, "pedido_numero": num, "envio": zona["costo"], "subtotal": res["total_numero"],
+                              "total_numero": total, "pago": e.pago, "tiempo": d.get("tiempo", ""),
+                              "seguimiento": entrega["seguimiento"]})
+
+
+@app.get("/v1/seguimiento/{rid}/{pid}")
+def seguimiento(rid: str, pid: int, t: str, request: Request):
+    """En qué va el domicilio (solo con el código que recibió quien hizo el pedido)."""
+    limitar(f"seguimiento:{ip(request)}", 30, 60)
+    p = db.pedido(rid, pid)
+    if not p or not p["entrega"] or not hmac.compare_digest(t[:40].encode(), p["entrega"].get("seguimiento", "").encode()):
+        raise HTTPException(404, "pedido no encontrado")
+    return {"pedido_numero": pid, "estado": p["estado"], "creado": p["creado"]}
 
 
 class CambioIdioma(Credencial):
@@ -393,7 +471,7 @@ def _panel(request: Request, rid: str) -> dict:
     if len([t for t in fallos if time.time() - t < 600]) >= 8:      # bloqueado ANTES de probar otro PIN
         raise HTTPException(429, "demasiados intentos, espere 10 minutos")
     try:
-        bien = len(dado) >= 4 and orbe.pin_correcto(r["id"], dado)
+        bien = len(dado) >= 4 and orbe.pin_correcto(r.get("pin_de") or r["id"], dado)
     except orbe.SinRanura:
         raise HTTPException(503, "Axtra no responde o el restaurante no tiene PIN (APEX_PIN_... en el .env de Axtra)")
     if not bien:
@@ -407,7 +485,7 @@ def panel_estado(rid: str, request: Request):
     r = _panel(request, rid)
     abiertas = db.mesas(rid)
     activas = {s["mesa"] for s in db.sesiones_abiertas() if s["restaurante"] == rid}
-    return {"restaurante": r["nombre"], "moneda": r.get("moneda", "COP"),
+    return {"restaurante": r["nombre"], "moneda": r.get("moneda", "COP"), "domicilio": bool(r.get("domicilio")),
             "mesas": [{"mesa": m, "abierta": abiertas.get(m, False), "hablando": m in activas} for m in r["mesas"]],
             "pedidos": db.pedidos(rid), "llamadas": db.llamadas(rid),
             "uso_mes": db.uso_mes(rid), "topes": r["topes"]}
@@ -428,7 +506,7 @@ def panel_mesa(rid: str, c: CambioMesa, request: Request):
 
 
 class CambioPedido(BaseModel):
-    estado: str = Field(pattern="^(nuevo|preparando|entregado|cancelado)$")
+    estado: str = Field(pattern="^(nuevo|preparando|en_camino|entregado|cancelado)$")
 
 
 @app.post("/v1/panel/{rid}/pedido/{pid}")
@@ -458,6 +536,11 @@ def _pagina(nombre: str) -> HTMLResponse:
 @app.get("/demo")
 def demo():
     return _pagina("index.html")
+
+
+@app.get("/domicilios")
+def domicilios():
+    return _pagina("domicilios.html")
 
 
 # ---------------- Muestras de voz: para escoger cómo suena el orbe ----------------

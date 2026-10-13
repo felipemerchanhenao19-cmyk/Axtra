@@ -41,11 +41,14 @@ FRASES_POR_DEFECTO = {
 
 
 def restaurantes() -> dict:
-    """Lee restaurantes/*.json (uno por restaurante). Se relee en cada llamada: editar el archivo basta."""
+    """Lee restaurantes/*.json (uno por restaurante). Se relee en cada llamada: editar el archivo basta.
+    Con "base": "<id>" un archivo hereda todo de otro (carta, fotos, voz) y solo cambia lo que trae."""
+    crudos = {f.stem: json.loads(f.read_text(encoding="utf-8")) for f in sorted((BASE / "restaurantes").glob("*.json"))}
     out = {}
-    for f in sorted((BASE / "restaurantes").glob("*.json")):
-        r = json.loads(f.read_text(encoding="utf-8"))
-        r.setdefault("id", f.stem)
+    for nombre, r in crudos.items():
+        base = crudos.get(r.get("base", ""), {})
+        r = {**{k: v for k, v in base.items() if k != "id"}, **r, "frases": {**base.get("frases", {}), **r.get("frases", {})}}
+        r.setdefault("id", nombre)
         r["topes"] = {**TOPES_POR_DEFECTO, **r.get("topes", {})}
         r["frases"] = {**FRASES_POR_DEFECTO, **r.get("frases", {})}
         r.setdefault("voz", {})

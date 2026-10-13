@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Domicilios</title>
+<meta name="theme-color" content="#0b1626">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;500;600;700;800&display=swap">
+<script src="/web/apex-voz.js?v=11"></script>
+<script src="/web/qrcode.js?v=2"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
+<style>
+/* Layout: una app de celular (máx. 460 px) centrada; tres pantallas: orbe de entrada, carta, pedido enviado. Más la vista de la caja. */
+:root {
+  --noche: #0b1626; --tarjeta: #121e30; --tarjeta-2: #18263b; --tinta: #eef3fa; --suave: #93a4bb;
+  --hielo: #3fd0ff; --hielo-claro: #8be9ff; --oro: #f5c26b; --verde: #43d39e; --rojo: #ff8a80;
+  --linea: rgba(139,233,255,.14);
+  --f-titulo: "Italiana", "Didot", Georgia, serif;
+  --f-cuerpo: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { margin: 0; background: #060c16; color: var(--tinta); font: 16px/1.45 var(--f-cuerpo); }
+h1, h2, h3, p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; border-radius: 999px; }
+button:focus-visible { outline: 2px solid var(--hielo-claro); outline-offset: 2px; }
+.app { max-width: 460px; min-height: 100%; margin: 0 auto; position: relative; overflow: hidden;
+  background: radial-gradient(120% 40% at 50% 0%, #143a66 0%, var(--noche) 70%) no-repeat, var(--noche); }
+.pantalla[hidden] { display: none !important; }
+canvas { display: block; width: 100%; height: 100%; }
+
+/* ---------- 1. Entrada ---------- */
+.entrada { min-height: 100vh; display: grid; place-items: center; text-align: center; padding: 32px 20px; }
+.entrada small { font-size: 12px; letter-spacing: .26em; text-transform: uppercase; color: var(--hielo-claro); border: 1px solid var(--linea); border-radius: 99px; padding: 6px 14px; }
+.entrada h1 { font: 400 44px/1.05 var(--f-titulo); margin-top: 16px; }
+.orbe-entrada { width: 260px; height: 260px; margin: 6px auto 0; border-radius: 50%; display: block; animation: llama 2.4s ease-in-out infinite; }
+@keyframes llama { 50% { transform: scale(1.04); } }
+.entrada p { color: var(--suave); margin-top: 4px; }
+.entrada .toque { color: var(--hielo-claro); font-weight: 700; font-size: 18px; margin-top: 6px; }
+.marca { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 13px; color: var(--suave); margin-top: 26px; }
+.marca i { width: 18px; height: 18px; border-radius: 5px; background: var(--hielo); display: grid; place-items: center; }
+.marca i::after { content: ""; margin-left: 2px; border-left: 7px solid var(--noche); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
+
+/* ---------- 2. Carta ---------- */
+.cabeza { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; padding: 12px 16px 10px; background: linear-gradient(var(--noche) 78%, rgba(11,22,38,0)); }
+.fila-cabeza { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.fila-cabeza .rest { font: 400 24px/1 var(--f-titulo); }
+.fila-cabeza .mesa { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--suave); }
+.chip { font-size: 13px; font-weight: 600; border: 1px solid var(--linea); padding: 7px 12px; color: var(--tinta); }
+.chip.on { background: var(--tarjeta-2); }
+.orbe-zona { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: center; margin-top: 8px; }
+.orbe-arriba { width: 96px; height: 96px; }
+.globo { background: rgba(63,208,255,.12); border: 1px solid rgba(63,208,255,.35); border-radius: 18px 18px 18px 6px; padding: 10px 12px; font-size: 14.5px; color: #dff6ff; min-height: 58px; display: grid; gap: 8px; align-content: center; }
+.globo .acciones-globo { display: flex; gap: 8px; flex-wrap: wrap; }
+.globo .acciones-globo button { background: var(--hielo); color: #04121c; font-weight: 800; font-size: 13px; padding: 7px 12px; }
+.globo .acciones-globo button.no { background: transparent; color: var(--tinta); border: 1px solid var(--linea); font-weight: 600; }
+
+.carta { padding: 4px 16px 130px; display: grid; gap: 14px; }
+.seccion-titulo { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--hielo); font-weight: 700; margin-top: 6px; }
+.plato { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 22px; display: grid; grid-template-columns: 112px 1fr; gap: 14px; padding: 12px; align-items: center; transition: border-color .3s, box-shadow .3s; }
+.plato.elegido { border-color: rgba(63,208,255,.6); box-shadow: 0 0 0 3px rgba(63,208,255,.12); }
+.foto { width: 112px; height: 112px; border-radius: 16px; background: radial-gradient(circle at 50% 45%, #22406a, #0f1b2d 75%); display: grid; place-items: center; }
+.foto svg { width: 100px; height: 100px; }
+.plato .info { min-width: 0; display: grid; gap: 4px; }
+.plato h3 { font-size: 17px; font-weight: 700; line-height: 1.2; }
+.plato p { font-size: 13px; color: var(--suave); line-height: 1.35; }
+.plato .pie-plato { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.precio { color: var(--oro); font-weight: 800; font-variant-numeric: tabular-nums; }
+.precio s { color: var(--suave); font-weight: 500; font-size: 12px; margin-right: 4px; }
+.pedir { background: var(--hielo); color: #04121c; font-weight: 800; padding: 9px 18px; }
+.contador { display: flex; align-items: center; gap: 4px; background: var(--tarjeta-2); border: 1px solid var(--linea); border-radius: 99px; padding: 3px; }
+.contador button { width: 34px; height: 34px; display: grid; place-items: center; font-size: 20px; font-weight: 700; background: rgba(255,255,255,.06); }
+.contador button.mas { background: var(--hielo); color: #04121c; }
+.contador b { min-width: 22px; text-align: center; font-variant-numeric: tabular-nums; }
+.oferta-tag { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .12em; background: var(--oro); color: #2a1a02; padding: 3px 7px; border-radius: 6px; justify-self: start; }
+
+.barra { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 460px; z-index: 6; padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(rgba(11,22,38,0), var(--noche) 30%); }
+.ver-pedido { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: linear-gradient(90deg, #1565c0, var(--hielo)); color: #fff; font-weight: 800; padding: 15px 20px; box-shadow: 0 12px 30px -10px rgba(63,208,255,.6); }
+.ver-pedido:disabled { opacity: .35; box-shadow: none; cursor: default; }
+.ver-pedido .cuantos { background: rgba(255,255,255,.22); border-radius: 99px; padding: 2px 10px; font-size: 14px; }
+
+/* Hoja del pedido */
+.velo { position: fixed; inset: 0; background: rgba(2,6,12,.6); z-index: 8; }
+.hoja { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: 100%; max-width: 460px; z-index: 9; background: #0f1a2b; border-top: 1px solid var(--linea); border-radius: 26px 26px 0 0; padding: 10px 18px calc(18px + env(safe-area-inset-bottom, 0px)); max-height: 86vh; overflow-y: auto; animation: sube .28s ease both; }
+@keyframes sube { from { transform: translate(-50%, 40px); opacity: 0; } }
+.agarre { width: 42px; height: 5px; border-radius: 9px; background: #2a3a52; margin: 0 auto 12px; }
+.hoja h2 { font: 400 32px/1.1 var(--f-titulo); }
+.hoja .sub { color: var(--suave); font-size: 14px; margin-top: 2px; }
+.lineas { display: grid; gap: 10px; margin-top: 16px; }
+.linea { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 16px; padding: 12px 14px; }
+.linea b { font-size: 15px; } .linea .sub-l { color: var(--oro); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.linea .ctrl { display: flex; align-items: center; gap: 8px; grid-row: span 2; grid-column: 2; grid-row-start: 1; }
+.quitar { color: var(--rojo); font-size: 13px; font-weight: 700; padding: 8px 10px; border: 1px solid rgba(255,138,128,.35); }
+.total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; padding-top: 14px; border-top: 1px dashed #2a3a52; font-size: 18px; font-weight: 800; }
+.total span:last-child { color: var(--oro); font-variant-numeric: tabular-nums; }
+.confirmar { width: 100%; margin-top: 16px; background: var(--verde); color: #04140d; font-weight: 800; font-size: 17px; padding: 16px; }
+.seguir { width: 100%; margin-top: 8px; padding: 12px; color: var(--suave); font-weight: 600; }
+.vacio { color: var(--suave); text-align: center; padding: 26px 0 8px; }
+
+/* Oferta antes de enviar */
+.oferta { margin-top: 16px; display: grid; grid-template-columns: 70px 1fr; gap: 14px; align-items: center; background: linear-gradient(135deg, rgba(245,194,107,.16), rgba(245,194,107,.04)); border: 1px solid rgba(245,194,107,.45); border-radius: 20px; padding: 14px; }
+.oferta .mini-orbe { width: 70px; height: 70px; }
+.oferta p { font-size: 15px; } .oferta p b { color: var(--oro); }
+.oferta .botones { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.oferta .si { background: var(--oro); color: #2a1a02; font-weight: 800; padding: 10px 16px; }
+.oferta .no { border: 1px solid var(--linea); padding: 10px 16px; font-weight: 600; }
+
+/* ---------- 3. Enviado ---------- */
+.enviado { min-height: 100vh; display: grid; align-content: center; gap: 18px; padding: 30px 20px; text-align: center; }
+.check { width: 92px; height: 92px; border-radius: 50%; background: var(--verde); margin: 0 auto; display: grid; place-items: center; box-shadow: 0 0 0 12px rgba(67,211,158,.15); animation: aparece .45s cubic-bezier(.2,1.6,.4,1) both; }
+.check svg { width: 46px; height: 46px; fill: none; stroke: #04140d; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes aparece { from { transform: scale(.4); opacity: 0; } }
+.enviado h2 { font: 400 38px/1.1 var(--f-titulo); }
+.enviado .sub { color: var(--suave); }
+.recibo { text-align: left; background: #f7f3ea; color: #1d1a14; border-radius: 8px; padding: 16px 18px 20px; font: 14px/1.55 "Courier New", ui-monospace, monospace; position: relative; }
+.recibo::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 8px; background: radial-gradient(circle at 6px 0, transparent 6px, #f7f3ea 6.5px) 0 0 / 12px 8px repeat-x; }
+.recibo h3 { font: 800 14px/1 var(--f-cuerpo); letter-spacing: .12em; text-transform: uppercase; display: flex; justify-content: space-between; border-bottom: 1px dashed #b9b0a0; padding-bottom: 10px; margin-bottom: 8px; }
+.recibo .r-linea { display: flex; justify-content: space-between; gap: 10px; }
+.recibo .r-total { border-top: 1px dashed #b9b0a0; margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; font-weight: 700; }
+.botones-fin { display: grid; gap: 10px; }
+.principal { background: var(--hielo); color: #04121c; font-weight: 800; padding: 15px; }
+.secundario { border: 1px solid var(--linea); padding: 13px; font-weight: 600; }
+
+/* ---------- Vista de la caja ---------- */
+.caja { min-height: 100vh; padding: 20px 16px 40px; display: grid; gap: 16px; align-content: start; background: #0a1220; }
+.caja-cabeza { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.caja-cabeza h2 { font: 400 30px/1 var(--f-titulo); }
+.en-vivo { font-size: 12px; font-weight: 700; color: var(--verde); display: flex; align-items: center; gap: 6px; }
+.en-vivo::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--verde); animation: late 1.2s infinite; }
+@keyframes late { 50% { opacity: .3; } }
+.orden { background: var(--tarjeta); border: 1px solid var(--linea); border-left: 4px solid var(--hielo); border-radius: 16px; padding: 14px 16px; display: grid; gap: 8px; animation: sube2 .4s ease both; }
+@keyframes sube2 { from { transform: translateY(-10px); opacity: 0; } }
+.orden.nueva { border-left-color: var(--oro); }
+.orden-cabeza { display: flex; justify-content: space-between; gap: 10px; font-weight: 800; }
+.orden-cabeza span:last-child { color: var(--suave); font-weight: 500; font-size: 14px; }
+.orden ul { margin: 0; padding-left: 18px; color: #d4deea; font-size: 15px; }
+.orden .sugerido { color: var(--verde); font-size: 12px; font-weight: 700; margin-left: 6px; }
+.orden-pie { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.orden-pie b { color: var(--oro); }
+.estado-btn { background: var(--oro); color: #2a1a02; font-weight: 800; font-size: 13px; padding: 8px 14px; }
+.estado-btn.listo { background: var(--verde); color: #04140d; }
+.nota { color: var(--suave); font-size: 13px; }
+
+.aviso { position: fixed; left: 50%; transform: translateX(-50%); top: calc(14px + env(safe-area-inset-top, 0px)); z-index: 20; background: var(--oro); color: #2a1a02; font-weight: 800; padding: 12px 18px; border-radius: 16px; width: calc(100% - 32px); max-width: 428px; text-align: center; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+<style>
+/* Extra del modelo conectado: estado de escucha y lo que dijo el cliente */
+.estado-orbe { font-size: 11px; color: var(--hielo-claro); text-align: center; margin-top: -4px; min-height: 15px; }
+.orbe-arriba { cursor: pointer; }
+.dijo { font-size: 12.5px; color: var(--suave); font-style: italic; }
+.dijo:empty { display: none; }
+.caja-link { text-decoration: none; display: block; text-align: center; color: var(--tinta); }
+.idiomas { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+.idiomas::-webkit-scrollbar { display: none; }
+.idiomas button { flex: none; font-size: 13px; font-weight: 600; color: var(--suave); border: 1px solid var(--linea); padding: 6px 11px; }
+.idiomas button[aria-pressed="true"] { background: var(--tinta); color: var(--noche); border-color: var(--tinta); }
+.entrada .idiomas { justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+.cabeza .idiomas { margin-top: 8px; }
+.orbe-arriba { padding: 0; display: block; }
+.orbe-arriba.escucha { filter: drop-shadow(0 0 14px rgba(63,208,255,.9)); }
+.boton-3d { background: transparent; border: 1px solid var(--linea); color: var(--hielo-claro); font-weight: 700; font-size: 13px; padding: 8px 12px; }
+.ar-velo { position: fixed; inset: 0; z-index: 30; background: var(--noche); display: grid; grid-template-rows: auto 1fr auto; padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); gap: 12px; }
+.ar-velo h3 { font: 400 28px/1.1 var(--f-titulo); margin: 0; }
+.ar-velo model-viewer { width: 100%; height: 100%; min-height: 300px; border-radius: 24px; background: radial-gradient(circle at 50% 40%, #22406a, #0b1626 75%); }
+.ar-velo .fila { display: grid; gap: 10px; }
+.ar-velo .principal { padding: 15px; }
+.qr-boton { color: var(--tinta); font-size: 14px; font-weight: 700; margin-top: 18px; padding: 10px 18px; border: 1px solid var(--linea); }
+.qr-velo { position: fixed; inset: 0; z-index: 30; background: rgba(2,6,12,.85); display: grid; place-items: center; padding: 20px; }
+.qr-caja { background: #fff; color: #0b1626; border-radius: 28px; padding: 24px; width: min(100%, 360px); display: grid; gap: 10px; justify-items: center; text-align: center; }
+.qr-caja .qr { width: 100%; aspect-ratio: 1; max-width: 100%; } .qr-caja .qr svg { width: 100%; height: 100%; display: block; }
+.qr-caja b { font: 400 30px/1 var(--f-titulo); } .qr-caja span { font-size: 13px; color: #4a586b; overflow-wrap: anywhere; }
+.qr-caja button { background: #0b1626; color: #fff; font-weight: 700; padding: 11px 22px; margin-top: 4px; }
+</style>
+<style>
+/* Apex Domicilios: la misma carta y el mismo orbe de Apex Play, más la entrega a domicilio. */
+.datos-rest { display: grid; gap: 8px; margin: 18px auto 0; max-width: 320px; text-align: left; }
+.datos-rest div { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: center; font-size: 14.5px; color: var(--tinta); background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 9px 12px; }
+.datos-rest span:first-child { text-align: center; }
+.wa-boton { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; background: #1f8f55; color: #fff; font-weight: 800; padding: 12px 20px; border-radius: 99px; text-decoration: none; }
+.nota-ejemplo { font-size: 12.5px; color: var(--oro); margin-top: 14px; }
+.chip-dom { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--suave); }
+a.chip { text-decoration: none; display: inline-flex; align-items: center; }
+
+/* Datos de entrega */
+.formulario { display: grid; gap: 12px; margin-top: 16px; }
+.campo { display: grid; gap: 5px; }
+.campo label, .grupo-pago legend { font-size: 13px; font-weight: 700; color: var(--suave); }
+.campo input, .campo select, .campo textarea { width: 100%; font: inherit; color: var(--tinta); background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 12px 14px; }
+.campo textarea { resize: vertical; min-height: 64px; }
+.campo input:focus, .campo select:focus, .campo textarea:focus { outline: 2px solid rgba(63,208,255,.5); border-color: transparent; }
+.grupo-pago { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+.pago { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: center; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 12px 14px; cursor: pointer; }
+.pago input { width: 18px; height: 18px; accent-color: var(--hielo); }
+.pago b { display: block; font-size: 15px; } .pago small { color: var(--suave); font-size: 12.5px; }
+.pago.apagado { opacity: .45; cursor: default; }
+.pago:has(input:checked) { border-color: rgba(63,208,255,.6); box-shadow: 0 0 0 3px rgba(63,208,255,.12); }
+.acepto { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; font-size: 13px; color: var(--suave); }
+.acepto input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--hielo); }
+.cuentas { display: grid; gap: 6px; padding-top: 12px; border-top: 1px dashed #2a3a52; font-variant-numeric: tabular-nums; }
+.cuentas div { display: flex; justify-content: space-between; color: var(--suave); }
+.cuentas .gran { color: var(--tinta); font-size: 18px; font-weight: 800; } .cuentas .gran span:last-child { color: var(--oro); }
+.falta { color: var(--oro); font-size: 13px; font-weight: 600; }
+.aviso-ejemplo { background: rgba(245,194,107,.1); border: 1px solid rgba(245,194,107,.4); color: #f8dca8; border-radius: 14px; padding: 10px 12px; font-size: 13px; }
+
+/* Seguimiento */
+.pasos-dom { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; }
+.paso-dom { display: grid; gap: 6px; justify-items: center; font-size: 12px; color: var(--suave); }
+.paso-dom i { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #2a3a52; display: grid; place-items: center; font-style: normal; font-size: 14px; }
+.paso-dom.hecho { color: var(--tinta); } .paso-dom.hecho i { background: var(--verde); border-color: var(--verde); color: #04140d; }
+.paso-dom.ahora i { border-color: var(--hielo); box-shadow: 0 0 0 4px rgba(63,208,255,.18); }
+.estado-dom { font-weight: 700; color: var(--hielo-claro); }
+.pago-nota { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 12px 14px; font-size: 14px; text-align: left; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 1. Entrada: el restaurante y su orbe -->
+  <section class="pantalla entrada" id="p-entrada">
+    <div>
+      <small>Domicilios</small>
+      <h1 class="nombre-rest">Su restaurante</h1>
+      <button class="orbe-entrada" id="entrar" aria-label="Tocar el orbe para ver la carta"><canvas width="520" height="520"></canvas></button>
+      <p class="toque">Toque el orbe</p>
+      <p>y pida su domicilio. Puede hablarle o pedir con botones.</p>
+      <div class="datos-rest" id="datos-rest"></div>
+      <div id="wa-entrada"></div>
+      <p class="nota-ejemplo" id="nota-ejemplo" hidden>Esto es un ejemplo: los pedidos no se entregan.</p>
+      <div class="marca"><i></i>Apex Domicilios</div><br>
+      <button class="qr-boton" id="ver-qr">Mostrar código QR</button>
+    </div>
+  </section>
+
+  <!-- 2. Carta -->
+  <section class="pantalla" id="p-carta" hidden>
+    <div class="cabeza">
+      <div class="fila-cabeza">
+        <div><div class="chip-dom">🛵 Domicilios</div><div class="rest nombre-rest">Su restaurante</div></div>
+        <div style="display:flex;gap:6px">
+          <button class="chip on" id="sonido" aria-pressed="true" aria-label="Voz del orbe">🔊</button>
+          <span id="wa-carta"></span>
+        </div>
+      </div>
+      <div class="orbe-zona">
+        <div><button class="orbe-arriba" id="orbe-arriba" aria-label="Hablar con el orbe"><canvas width="200" height="200"></canvas></button>
+          <div class="estado-orbe" id="estado"></div></div>
+        <div class="globo" id="globo" aria-live="polite"><div>Un momento…</div></div>
+      </div>
+    </div>
+    <div class="carta" id="carta"></div>
+    <div class="barra">
+      <button class="ver-pedido" id="ver-pedido" disabled><span>Ver pedido <span class="cuantos" id="cuantos">0</span></span><span id="total-barra">$ 0</span></button>
+    </div>
+  </section>
+
+  <!-- 3. Pedido recibido y seguimiento -->
+  <section class="pantalla enviado" id="p-enviado" hidden>
+    <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div><h2>¡Pedido recibido!</h2><p class="sub" id="llega"></p></div>
+    <div class="pasos-dom" id="pasos-dom"></div>
+    <p class="estado-dom" id="estado-dom" aria-live="polite"></p>
+    <div class="recibo" id="recibo"></div>
+    <div class="pago-nota" id="pago-nota" hidden></div>
+    <div class="botones-fin">
+      <span id="wa-fin"></span>
+      <button class="secundario" id="otra-vez">Hacer otro pedido</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const R = new URLSearchParams(location.search).get("r") || "domicilios";
+const API = location.origin;
+const $ = (s) => document.querySelector(s);
+const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ESTADOS = { conectando: "Conectando…", escuchando: "🎙 Hable ahora", oyendo: "🎙 Le escucho…", pensando: "Pensando…", hablando: "", listo: "Toque el orbe para hablar", dormido: "Toque el orbe para hablar" };
+const PASOS = [["nuevo", "Recibido", "✓"], ["preparando", "En preparación", "🍳"], ["en_camino", "En camino", "🛵"], ["entregado", "Entregado", "🏠"]];
+let menu = null, dom = null, plata = (v) => "$ " + Number(v).toLocaleString("es-CO");
+let pedido = {}, nivel = 0, estado = "apagado", seguimiento = null;
+const pensando = () => estado === "pensando" || estado === "conectando";
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const waRest = (texto) => dom?.whatsapp ? `https://wa.me/${encodeURIComponent(dom.whatsapp)}${texto ? "?text=" + encodeURIComponent(texto) : ""}` : "";
+
+// QR para que otra persona abra este mismo ejemplo en su celular
+$("#ver-qr").onclick = () => {
+  const url = location.origin + "/domicilios" + (R !== "domicilios" ? `?r=${encodeURIComponent(R)}` : "");
+  const c = qrcode(0, "M"); c.addData(url); c.make();
+  const v = document.createElement("div"); v.className = "qr-velo";
+  v.innerHTML = `<div class="qr-caja"><div class="qr">${c.createSvgTag({ cellSize: 8, margin: 2, scalable: true })}</div>
+    <b>Escanee y pruébelo</b><span>${esc(url)}</span><button>Cerrar</button></div>`;
+  v.onclick = (e) => { if (e.target === v || e.target.tagName === "BUTTON") v.remove(); };
+  document.body.append(v);
+};
+
+/* ---------- Dibujos de los platos (si el restaurante no tiene foto) ---------- */
+const DIBUJO = {
+  bandeja: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="46" ry="38" fill="#e9eef3"/><ellipse cx="50" cy="52" rx="39" ry="31" fill="#f8fafc"/>
+    <ellipse cx="36" cy="40" rx="13" ry="9" fill="#fffdf6"/><ellipse cx="36" cy="39" rx="10" ry="6" fill="#ffffff"/>
+    <ellipse cx="62" cy="38" rx="13" ry="9" fill="#6b3a1f"/><circle cx="58" cy="36" r="1.6" fill="#8a4d2a"/><circle cx="65" cy="40" r="1.6" fill="#8a4d2a"/>
+    <path d="M28 58c4-6 14-6 18 0s-2 10-9 10-12-4-9-10z" fill="#fff"/><circle cx="37" cy="61" r="4.5" fill="#f4b320"/>
+    <path d="M55 55c8-3 18 0 20 6-6 3-16 3-20-6z" fill="#7cb342"/><path d="M57 56c6-2 13 0 15 4-5 2-11 2-15-4z" fill="#c5e1a5"/>
+    <rect x="44" y="66" width="22" height="7" rx="3" fill="#a0522d"/><rect x="46" y="67" width="18" height="2" rx="1" fill="#d2864a"/>
+    <ellipse cx="70" cy="51" rx="7" ry="4" fill="#e8a33a" transform="rotate(-25 70 51)"/><circle cx="24" cy="50" r="6" fill="#f0dca8"/></svg>`,
+  ajiaco: `<svg viewBox="0 0 100 100"><defs><radialGradient id="sopa"><stop offset="0" stop-color="#f6d465"/><stop offset="1" stop-color="#d9a52a"/></radialGradient></defs>
+    <ellipse cx="50" cy="58" rx="42" ry="30" fill="#5d4037"/><ellipse cx="50" cy="52" rx="42" ry="28" fill="#795548"/>
+    <ellipse cx="50" cy="50" rx="35" ry="22" fill="url(#sopa)"/>
+    <rect x="30" y="40" width="20" height="9" rx="4.5" fill="#f2c94c" transform="rotate(-15 40 44)"/><g fill="#e0a800"><circle cx="34" cy="44" r="1.3"/><circle cx="38" cy="43" r="1.3"/><circle cx="42" cy="42" r="1.3"/><circle cx="46" cy="41" r="1.3"/></g>
+    <path d="M56 50c4-5 12-4 14 0-3 4-10 5-14 0z" fill="#fffef8"/><g fill="#4e7d2b"><circle cx="40" cy="56" r="1.8"/><circle cx="45" cy="59" r="1.5"/><circle cx="62" cy="58" r="1.6"/><circle cx="58" cy="44" r="1.4"/></g>
+    <path d="M30 56l4-2M64 40l4 1M54 60l3 2" stroke="#558b2f" stroke-width="2" stroke-linecap="round"/></svg>`,
+  omelet: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="54" rx="44" ry="34" fill="#e9eef3"/><ellipse cx="50" cy="54" rx="37" ry="27" fill="#f8fafc"/>
+    <path d="M22 56c2-16 18-24 32-22s24 12 24 22c-14 6-40 8-56 0z" fill="#f6c945"/><path d="M26 55c4-11 16-17 28-15s18 8 20 15c-14 4-34 5-48 0z" fill="#fbd96b"/>
+    <g fill="#e53935"><circle cx="40" cy="46" r="3"/><circle cx="55" cy="44" r="2.6"/><circle cx="63" cy="50" r="2.8"/><circle cx="47" cy="52" r="2.4"/></g>
+    <g fill="#43a047"><circle cx="44" cy="44" r="1.4"/><circle cx="59" cy="47" r="1.4"/><circle cx="52" cy="50" r="1.3"/><circle cx="36" cy="51" r="1.3"/></g>
+    <ellipse cx="70" cy="66" rx="9" ry="5" fill="#c62828"/><ellipse cx="70" cy="65" rx="7" ry="3.5" fill="#ef5350"/></svg>`,
+  limonada: `<svg viewBox="0 0 100 100"><path d="M30 22h40l-6 66H36z" fill="#d7eef7" opacity=".55"/><path d="M33 34h34l-4.6 52H37.6z" fill="#f4f1e6"/>
+    <path d="M33 34h34l-.8 8H33.8z" fill="#ffffff"/><circle cx="44" cy="54" r="3" fill="#fff" opacity=".7"/><circle cx="56" cy="64" r="2.4" fill="#fff" opacity=".7"/>
+    <rect x="55" y="8" width="4" height="40" rx="2" fill="#3fd0ff" transform="rotate(12 57 28)"/>
+    <circle cx="68" cy="26" r="11" fill="#7cb342"/><circle cx="68" cy="26" r="8.5" fill="#d4e157"/><path d="M68 18v16M60 26h16M62.5 20.5l11 11M73.5 20.5l-11 11" stroke="#9ccc65" stroke-width="1"/></svg>`,
+  torta: `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="70" rx="42" ry="16" fill="#e9eef3"/>
+    <path d="M22 66V40l50-14v26z" fill="#4a2616"/><path d="M22 40l50-14 8 6-50 14z" fill="#2b140b"/><path d="M72 26l8 6v26l-8-6z" fill="#3a1d10"/>
+    <path d="M22 50l50-14v4L22 54zM22 58l50-14v4L22 62z" fill="#eedcc0"/>
+    <circle cx="52" cy="29" r="5" fill="#d32f2f"/><path d="M50 24l2-3 2 3" stroke="#388e3c" stroke-width="2" fill="none"/></svg>`,
+};
+const PLATO_GENERICO = `<svg viewBox="0 0 100 100"><ellipse cx="50" cy="54" rx="44" ry="34" fill="#e9eef3"/><ellipse cx="50" cy="54" rx="37" ry="27" fill="#f8fafc"/><ellipse cx="50" cy="50" rx="20" ry="12" fill="#d9a35a"/></svg>`;
+
+/* ---------- Orbe (late con la voz real) ---------- */
+function dibujarOrbe(cv, t, extra) {
+  const g = cv.getContext("2d"), w = cv.width, c = w / 2, r = w * 0.27;
+  const k = 1 + 0.035 * Math.sin(t * 1.8) + extra * 0.16;
+  g.clearRect(0, 0, w, w);
+  const halo = g.createRadialGradient(c, c, r * 0.7 * k, c, c, r * 1.85 * k);
+  halo.addColorStop(0, `rgba(63,208,255,${0.3 + extra * 0.45})`); halo.addColorStop(0.5, `rgba(63,208,255,${0.07 + extra * 0.15})`); halo.addColorStop(1, "rgba(63,208,255,0)");
+  g.fillStyle = halo; g.fillRect(0, 0, w, w);
+  const giro = pensando() ? 2.6 : 0.9;
+  const anillo = (inc, vel, a, gr) => { g.save(); g.translate(c, c); g.rotate(inc + t * vel); g.strokeStyle = `rgba(139,233,255,${a})`;
+    g.lineWidth = w * gr; g.beginPath(); g.ellipse(0, 0, r * 1.32 * k, r * 0.3 * k, 0, 0, Math.PI * 2); g.stroke(); g.restore(); };
+  anillo(-0.35, -giro * 0.7, 0.22, 0.008);
+  const cuerpo = g.createRadialGradient(c - r * 0.35, c - r * 0.4, r * 0.05, c, c, r * k);
+  cuerpo.addColorStop(0, "#f2fcff"); cuerpo.addColorStop(0.25, "#7fe2ff"); cuerpo.addColorStop(0.55, "#2a9fe0"); cuerpo.addColorStop(0.85, "#0b3d91"); cuerpo.addColorStop(1, "#061a3d");
+  g.beginPath(); g.arc(c, c, r * k, 0, Math.PI * 2); g.fillStyle = cuerpo; g.fill();
+  // brillo que gira sobre la superficie
+  g.save(); g.beginPath(); g.arc(c, c, r * k, 0, Math.PI * 2); g.clip();
+  const bx = c + Math.cos(t * giro) * r * 0.55, by = c + Math.sin(t * giro) * r * 0.18 - r * 0.1;
+  const brillo = g.createRadialGradient(bx, by, 0, bx, by, r * 0.5); brillo.addColorStop(0, "rgba(255,255,255,.28)"); brillo.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = brillo; g.fillRect(0, 0, w, w); g.restore();
+  const borde = g.createRadialGradient(c, c, r * 0.8 * k, c, c, r * k);
+  borde.addColorStop(0, "rgba(139,233,255,0)"); borde.addColorStop(1, `rgba(139,233,255,${0.35 + extra * 0.4})`);
+  g.beginPath(); g.arc(c, c, r * k, 0, Math.PI * 2); g.fillStyle = borde; g.fill();
+  anillo(0.25, giro, 0.65 + extra * 0.3, 0.012);
+}
+(function animar(now) {
+  const t = reducido ? 0 : now / 1000, extra = ["hablando", "oyendo"].includes(estado) ? nivel : 0;
+  document.querySelectorAll("canvas").forEach((cv) => { if (cv.offsetParent) dibujarOrbe(cv, t, extra); });
+  requestAnimationFrame(animar);
+})(0);
+
+/* ---------- Conexión con Axtra ---------- */
+const orbe = new ApexVoz({ api: API, restaurante: R, mesa: "domicilio", idioma: "es" });
+orbe.onestado = (e) => { estado = e; $("#estado").textContent = ESTADOS[e] ?? "";
+  $("#orbe-arriba").classList.toggle("escucha", ["escuchando", "oyendo"].includes(e)); };
+orbe.onnivel = (n) => { nivel = n; };
+orbe.ontexto = (t, quien) => {
+  if (quien === "cliente") { const d = $("#globo .dijo"); if (d) d.textContent = `Usted: «${t}»`; return; }
+  decir(t);
+};
+orbe.onpedido = (p) => {
+  if (p.pedido_numero) return;                       // el pedido enviado lo muestra hacerPedido()
+  pedido = {}; for (const x of p.platos || []) if (x.id) pedido[x.id] = (pedido[x.id] || 0) + x.cantidad;
+  pintar(); if ($(".hoja.pedido")) abrirPedido(hojaOferta);
+};
+orbe.onsinmic = () => aviso("Sin micrófono: pida con los botones, el orbe le sigue hablando.");
+orbe.onsinvoz = () => aviso("El sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.");
+orbe.onerror = (m) => aviso(m);
+
+function aviso(t) { const a = document.createElement("div"); a.className = "aviso"; a.textContent = t; document.body.append(a); setTimeout(() => a.remove(), 4500); }
+function decir(texto, botones) {
+  const g = $("#globo"); g.innerHTML = ""; const p = document.createElement("div"); p.textContent = texto; g.append(p);
+  if (botones) { const fila = document.createElement("div"); fila.className = "acciones-globo";
+    botones.forEach(([etq, fn, clase]) => { const b = document.createElement("button"); b.textContent = etq; if (clase) b.className = clase; b.onclick = fn; fila.append(b); }); g.append(fila); }
+  const d = document.createElement("div"); d.className = "dijo"; g.append(d);
+}
+
+/* ---------- Carta ---------- */
+const PRECIO = (id) => menu.menu.find((p) => p.id === id)?.precio || 0;
+function tarjeta(p) {
+  const n = pedido[p.id] || 0;
+  const precio = p.antes ? `<span class="precio"><s>${plata(p.antes)}</s>${plata(p.precio)}</span>` : `<span class="precio">${plata(p.precio)}</span>`;
+  const ctrl = n ? `<div class="contador"><button data-menos="${p.id}" aria-label="−1">−</button><b>${n}</b><button class="mas" data-mas="${p.id}" aria-label="+1">+</button></div>`
+                 : `<button class="pedir" data-mas="${p.id}">Pedir</button>`;
+  const foto = p.foto ? `<img src="${esc(p.foto)}" alt="${esc(p.nombre)}" data-respaldo="${p.id}" loading="lazy" style="width:100%;height:100%;object-fit:${p.foto_completa ? "contain" : "cover"};border-radius:16px">`
+                     : (DIBUJO[p.id] || PLATO_GENERICO);
+  const tres = p.modelo3d ? `<button class="boton-3d" data-3d="${p.id}">Ver en 3D</button>` : "";
+  return `<article class="plato ${n ? "elegido" : ""}"><div class="foto">${foto}</div>
+    <div class="info">${p.oferta ? `<span class="oferta-tag">OFERTA DE HOY</span>` : ""}<h3>${esc(p.nombre)}</h3><p>${esc(p.descripcion)}</p><div class="pie-plato">${precio}${tres}${ctrl}</div></div></article>`;
+}
+function pintar() {
+  let html = "", grupo = null;
+  for (const p of menu.menu) { if ((p.grupo || "") !== grupo) { grupo = p.grupo || ""; if (grupo) html += `<div class="seccion-titulo">${esc(grupo)}</div>`; } html += tarjeta(p); }
+  $("#carta").innerHTML = html;
+  $("#carta").querySelectorAll("img[data-respaldo]").forEach((img) => img.addEventListener("error", () => {
+    img.outerHTML = DIBUJO[img.dataset.respaldo] || PLATO_GENERICO; }, { once: true }));
+  const cant = Object.values(pedido).reduce((a, b) => a + b, 0);
+  $("#cuantos").textContent = cant; $("#total-barra").textContent = plata(subtotal()); $("#ver-pedido").disabled = !cant;
+}
+const subtotal = () => Object.entries(pedido).reduce((s, [id, n]) => s + PRECIO(id) * n, 0);
+async function pedir(id) {
+  pedido[id] = (pedido[id] || 0) + 1; pintar(); if ($(".hoja.pedido")) abrirPedido(hojaOferta);
+  const r = await orbe.pedirPlato(id);
+  if (r.sugerir) decir(r.texto, [["Sí, agregar", () => pedir(r.sugerir)], ["No, gracias", () => decir("Listo. Cuando termine, toque «Ver pedido».") , "no"]]);
+}
+async function quitar(id, todo) {
+  const n = todo ? pedido[id] : 1; pedido[id] = Math.max(0, (pedido[id] || 0) - n); if (!pedido[id]) delete pedido[id];
+  pintar(); if ($(".hoja.pedido")) abrirPedido(hojaOferta);
+  await orbe.quitarPlato(id, n);
+}
+function ver3d(id) {
+  const p = menu.menu.find((x) => x.id === id); if (!p) return;
+  const v = document.createElement("div"); v.className = "ar-velo"; v.setAttribute("role", "dialog");
+  v.innerHTML = `<h3>${esc(p.nombre)}</h3>
+    <model-viewer src="${esc(p.modelo3d)}" alt="${esc(p.nombre)}" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed"
+      camera-controls auto-rotate shadow-intensity="1" exposure="1.1" touch-action="pan-y"></model-viewer>
+    <div class="fila"><button class="principal" id="ar-mesa">📱 Verlo en su mesa</button><button class="secundario" id="ar-cerrar">Cerrar</button></div>`;
+  document.body.append(v);
+  const mv = v.querySelector("model-viewer");
+  v.querySelector("#ar-mesa").onclick = () => { try { mv.activateAR(); } catch {} };
+  v.querySelector("#ar-cerrar").onclick = () => v.remove();
+}
+$("#carta").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset["3d"]) return ver3d(b.dataset["3d"]);
+  if (b.dataset.mas) pedir(b.dataset.mas); if (b.dataset.menos) quitar(b.dataset.menos); });
+
+/* ---------- Ver pedido → (oferta) → datos de entrega ---------- */
+let hojaOferta = null;
+function cerrarHoja() { $(".hoja")?.remove(); $(".velo")?.remove(); hojaOferta = null; }
+function nuevaHoja(clase, etiqueta) {
+  cerrarHoja();
+  const velo = document.createElement("div"); velo.className = "velo"; velo.onclick = cerrarHoja;
+  const hoja = document.createElement("div"); hoja.className = "hoja " + clase; hoja.setAttribute("role", "dialog"); hoja.setAttribute("aria-label", etiqueta);
+  document.body.append(velo, hoja); return hoja;
+}
+function abrirPedido(oferta) {
+  const hoja = nuevaHoja("pedido", "Su pedido"); hojaOferta = oferta || null;
+  const ids = Object.keys(pedido);
+  let html = `<div class="agarre"></div><h2>Su pedido</h2><p class="sub">Revise antes de continuar. ¿Se equivocó? Quítelo aquí.</p><div class="lineas">`;
+  html += ids.length ? ids.map((id) => { const p = menu.menu.find((x) => x.id === id), n = pedido[id];
+    return `<div class="linea"><b>${esc(p?.nombre || id)}</b><div class="ctrl"><div class="contador"><button data-menos="${id}" aria-label="−1">−</button><b>${n}</b><button class="mas" data-mas="${id}" aria-label="+1">+</button></div>
+      <button class="quitar" data-quitar="${id}">Quitar</button></div><span class="sub-l">${plata(n * PRECIO(id))}</span></div>`; }).join("")
+    : `<p class="vacio">Su pedido está vacío.</p>`;
+  html += `</div>`;
+  if (ids.length) html += `<div class="total"><span>Subtotal</span><span>${plata(subtotal())}</span></div>`;
+  const of = oferta && menu.menu.find((p) => p.id === oferta);
+  if (of && ids.length) html += `<div class="oferta"><div class="mini-orbe"><canvas width="140" height="140"></canvas></div>
+      <div><p>Hoy tenemos <b>oferta en ${esc(of.nombre)}</b>${of.antes ? `: de ${plata(of.antes)} a <b>${plata(of.precio)}</b>` : ""}. ¿Le gustaría agregarlo?</p>
+      <div class="botones"><button class="si" id="oferta-si">Sí, agregarlo</button><button class="no" id="oferta-no">No, continuar</button></div></div></div>`;
+  else if (ids.length) html += `<button class="confirmar" id="continuar">Continuar</button>`;
+  html += `<button class="seguir" id="seguir">Seguir mirando la carta</button>`;
+  hoja.innerHTML = html;
+  hoja.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.mas) pedir(b.dataset.mas); else if (b.dataset.menos) quitar(b.dataset.menos); else if (b.dataset.quitar) quitar(b.dataset.quitar, true); });
+  $("#seguir").onclick = cerrarHoja;
+  $("#continuar") && ($("#continuar").onclick = () => continuar());
+  $("#oferta-si") && ($("#oferta-si").onclick = () => continuar(oferta));
+  $("#oferta-no") && ($("#oferta-no").onclick = () => continuar());
+}
+$("#ver-pedido").onclick = () => abrirPedido();
+async function continuar(agregar = "") {
+  document.querySelectorAll(".hoja button").forEach((b) => b.disabled = true);
+  const r = await orbe.confirmar(agregar);
+  if (r.oferta) return abrirPedido(r.oferta);
+  if (r.datos) return abrirDatos();
+  document.querySelectorAll(".hoja button").forEach((b) => b.disabled = false);
+}
+
+// Lo que el cliente escribió la última vez (solo en su celular), para no volver a llenarlo
+const GUARDADO = "apex-domicilio:" + R;
+const recordar = () => { try { return JSON.parse(localStorage.getItem(GUARDADO) || "{}"); } catch { return {}; } };
+function abrirDatos() {
+  const hoja = nuevaHoja("datos", "Datos de entrega"), v = recordar();
+  const PAGOS = [["contra_entrega", "Contra entrega", "Efectivo o datáfono al recibir"],
+                 ["nequi", "Nequi", "Transfiera y envíe el comprobante"],
+                 ["pse", "PSE · tarjeta", "Pago en línea (próximamente)"]];
+  const pagos = PAGOS.map(([id, t, s]) => { const ok = dom.pagos.includes(id);
+    return `<label class="pago ${ok ? "" : "apagado"}"><input type="radio" name="pago" value="${id}" ${ok ? "" : "disabled"} ${ok && (v.pago === id || (!v.pago && id === dom.pagos[0])) ? "checked" : ""}><span><b>${t}</b><small>${s}</small></span></label>`; }).join("");
+  hoja.innerHTML = `<div class="agarre"></div><h2>Datos de entrega</h2><p class="sub">Llega en ${esc(dom.tiempo)}. Solo usamos sus datos para este domicilio.</p>
+    <form class="formulario" id="form-dom" novalidate>
+      ${menu.ejemplo ? `<div class="aviso-ejemplo">Esto es un ejemplo: el pedido no se entrega y sus datos se borran solos en unas horas.</div>` : ""}
+      <div class="campo"><label for="f-nombre">Nombre</label><input id="f-nombre" name="nombre" autocomplete="name" required maxlength="60" value="${esc(v.nombre)}"></div>
+      <div class="campo"><label for="f-tel">Celular</label><input id="f-tel" name="telefono" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20" placeholder="300 123 4567" value="${esc(v.telefono)}"></div>
+      <div class="campo"><label for="f-dir">Dirección</label><input id="f-dir" name="direccion" autocomplete="street-address" required maxlength="120" placeholder="Calle 10 # 20-30, apto 401" value="${esc(v.direccion)}"></div>
+      <div class="campo"><label for="f-barrio">Barrio</label><input id="f-barrio" name="barrio" maxlength="60" value="${esc(v.barrio)}"></div>
+      <div class="campo"><label for="f-zona">Zona de entrega</label><select id="f-zona" name="zona" required>
+        ${dom.zonas.map((z) => `<option value="${esc(z.id)}" ${v.zona === z.id ? "selected" : ""}>${esc(z.nombre)} · ${plata(z.costo)}</option>`).join("")}</select></div>
+      <div class="campo"><label for="f-notas">Notas para el domiciliario <span style="font-weight:500">(opcional)</span></label><textarea id="f-notas" name="notas" maxlength="200" placeholder="Torre 2, timbre dañado, sin cebolla…"></textarea></div>
+      <fieldset class="grupo-pago"><legend>Forma de pago</legend>${pagos}</fieldset>
+      <div class="cuentas" id="cuentas"></div>
+      <label class="acepto"><input type="checkbox" id="f-acepto"><span>Acepto que el restaurante use mis datos solo para entregar este pedido (Ley 1581 de 2012).</span></label>
+      <button class="confirmar" id="hacer-pedido" type="submit">Hacer pedido</button>
+    </form>
+    <button class="seguir" id="volver">Volver al pedido</button>`;
+  const cuentas = () => {
+    const z = dom.zonas.find((x) => x.id === $("#f-zona").value) || dom.zonas[0], s = subtotal(), falta = dom.minimo - s;
+    $("#cuentas").innerHTML = `<div><span>Subtotal</span><span>${plata(s)}</span></div><div><span>Domicilio</span><span>${plata(z.costo)}</span></div>
+      <div class="gran"><span>Total</span><span>${plata(s + z.costo)}</span></div>${falta > 0 ? `<p class="falta">El pedido mínimo es ${plata(dom.minimo)}: le faltan ${plata(falta)}.</p>` : ""}`;
+    $("#hacer-pedido").disabled = falta > 0;
+  };
+  $("#f-zona").onchange = cuentas; cuentas();
+  $("#volver").onclick = () => abrirPedido();
+  $("#form-dom").onsubmit = (e) => { e.preventDefault(); hacerPedido(); };
+}
+async function hacerPedido() {
+  const f = $("#form-dom"), datos = Object.fromEntries(new FormData(f));
+  datos.acepta_datos = $("#f-acepto").checked;
+  const falta = (datos.nombre || "").trim().length < 2 ? "su nombre" : (datos.telefono || "").replace(/\D/g, "").length < 7 ? "un celular válido"
+    : (datos.direccion || "").trim().length < 5 ? "la dirección" : !datos.pago ? "la forma de pago" : !datos.acepta_datos ? "aceptar el uso de sus datos" : "";
+  if (falta) return aviso("Falta " + falta + ".");
+  const boton = $("#hacer-pedido"); boton.disabled = true; boton.textContent = "Enviando…";
+  try {
+    const r = await orbe.enviarDomicilio(datos);
+    try { const { notas, ...guardar } = datos; delete guardar.acepta_datos; localStorage.setItem(GUARDADO, JSON.stringify(guardar)); } catch {}
+    recibido(r.pedido, datos);
+  } catch (e) { aviso(e.message); boton.disabled = false; boton.textContent = "Hacer pedido"; }
+}
+
+/* ---------- Pedido recibido: recibo y en qué va ---------- */
+const NOMBRE_PAGO = { contra_entrega: "Contra entrega", nequi: "Nequi", pse: "PSE" };
+function recibido(p, datos) {
+  cerrarHoja();
+  const hora = new Date().toLocaleTimeString("es-CO", { hour: "numeric", minute: "2-digit" });
+  $("#llega").textContent = `Llega en ${p.tiempo || dom.tiempo} a ${datos.direccion}.`;
+  $("#recibo").innerHTML = `<h3><span>Domicilio #${p.pedido_numero}</span><span>${hora}</span></h3>` +
+    p.platos.map((l) => `<div class="r-linea"><span>${l.cantidad} × ${esc(l.plato)}</span><span>${plata(l.cantidad * PRECIO(l.id))}</span></div>`).join("") +
+    `<div class="r-linea" style="margin-top:6px"><span>Domicilio</span><span>${plata(p.envio)}</span></div>` +
+    `<div class="r-total"><span>Total · ${NOMBRE_PAGO[p.pago] || ""}</span><span>${plata(p.total_numero)}</span></div>`;
+  const nota = $("#pago-nota");
+  nota.hidden = p.pago !== "nequi";
+  if (p.pago === "nequi") nota.innerHTML = dom.nequi
+    ? `Pague <b>${plata(p.total_numero)}</b> por Nequi al <b>${esc(dom.nequi)}</b> y envíe el comprobante por WhatsApp.`
+    : `En el restaurante real aquí aparece su número de Nequi o llave Bre-B para pagar <b>${plata(p.total_numero)}</b>.`;
+  const wa = waRest(`Hola, hice el domicilio #${p.pedido_numero}.`);
+  $("#wa-fin").innerHTML = wa ? `<a class="wa-boton" href="${wa}" target="_blank" rel="noopener">💬 Escribir al restaurante</a>` : "";
+  pedido = {}; pintar(); mostrar("p-enviado");
+  seguimiento = { id: p.pedido_numero, t: p.seguimiento }; pintarPasos("nuevo"); revisar();
+}
+function pintarPasos(e) {
+  const i = PASOS.findIndex(([id]) => id === e);
+  $("#pasos-dom").innerHTML = PASOS.map(([id, t, ic], j) => `<div class="paso-dom ${j <= i ? "hecho" : ""} ${j === i + 1 ? "ahora" : ""}"><i>${j <= i ? "✓" : ic}</i>${t}</div>`).join("");
+  $("#estado-dom").textContent = e === "cancelado" ? "El restaurante canceló este pedido. Escríbale para saber qué pasó."
+    : e === "entregado" ? "¡Entregado! Que lo disfrute." : `Estado: ${PASOS[Math.max(0, i)][1]}`;
+}
+let reloj = null;
+async function revisar() {
+  clearTimeout(reloj); if (!seguimiento) return;
+  try { const r = await (await fetch(`${API}/v1/seguimiento/${encodeURIComponent(R)}/${seguimiento.id}?t=${encodeURIComponent(seguimiento.t)}`)).json();
+    if (r.estado) { pintarPasos(r.estado); if (["entregado", "cancelado"].includes(r.estado)) return; } } catch {}
+  reloj = setTimeout(revisar, 10000);
+}
+
+/* ---------- Pantallas ---------- */
+function mostrar(id) { document.querySelectorAll(".pantalla").forEach((s) => s.hidden = s.id !== id); scrollTo(0, 0); }
+$("#entrar").onclick = () => { mostrar("p-carta"); orbe.iniciar(); };
+$("#orbe-arriba").onclick = () => orbe.hablar();
+$("#sonido").onclick = () => { orbe.silencio = !orbe.silencio; const on = !orbe.silencio;
+  $("#sonido").textContent = on ? "🔊" : "🔇"; $("#sonido").setAttribute("aria-pressed", on); $("#sonido").classList.toggle("on", on); };
+$("#otra-vez").onclick = () => { clearTimeout(reloj); seguimiento = null; mostrar("p-carta"); decir("¿Qué más se le antoja?"); };
+addEventListener("pagehide", () => orbe.terminar("salió de la página"));
+
+async function cargar() {
+  try { menu = await (await fetch(`${API}/v1/menu/${encodeURIComponent(R)}`)).json(); }
+  catch { aviso("No se pudo cargar la carta. Revise la conexión."); return; }
+  dom = menu.domicilio || { zonas: [], pagos: [], minimo: 0, tiempo: "" };
+  plata = (v) => new Intl.NumberFormat("es-CO", { style: "currency", currency: menu.moneda || "COP", maximumFractionDigits: 0 }).format(v);
+  document.title = menu.nombre + " · Domicilios"; document.querySelectorAll(".nombre-rest").forEach((e) => e.textContent = menu.nombre);
+  $("#datos-rest").innerHTML = [["🕑", dom.horario], ["🛵", dom.tiempo && `Llega en ${dom.tiempo}`], ["💵", dom.minimo && `Pedido mínimo ${plata(dom.minimo)}`], ["📍", dom.direccion]]
+    .filter(([, t]) => t).map(([i, t]) => `<div><span>${i}</span><span>${esc(t)}</span></div>`).join("");
+  const wa = waRest("Hola, quiero hacer un pedido.");
+  if (wa) { $("#wa-entrada").innerHTML = `<a class="wa-boton" href="${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>`;
+    $("#wa-carta").innerHTML = `<a class="chip" href="${wa}" target="_blank" rel="noopener">💬</a>`; }
+  $("#nota-ejemplo").hidden = !menu.ejemplo;
+  pintar();
+}
+cargar();
+</script>
+</body>
+</html>
