@@ -275,6 +275,17 @@
     /* «Confirmar pedido»: la primera vez puede volver con {oferta: id} (el orbe ofrece el postre del día).
        confirmar(id) = «Sí, agregarlo»; confirmar() otra vez = «No, enviar así». */
     confirmar(agregar = "") { return this._accion("confirmar", { plato_id: agregar }); }
+    /* Domicilios: el cliente puso su dirección y la forma de pago. Si algo falla (dato inválido, pedido mínimo)
+       lanza el error para que la página lo muestre; si sale bien, el orbe se despide. */
+    async enviarDomicilio(datos) {
+      if (!this.s) throw new Error("Su pedido se venció. Vuelva a elegir los platos, por favor.");
+      this._callar();
+      const res = await this._post("/v1/domicilio", { ...this._cred(), ...datos });
+      if (res.pedido) this.onpedido(res.pedido, res);
+      this.despedida = true;
+      this._decir(res).then(() => this._despues());
+      return res;
+    }
     /* Pausar o seguir escuchando (tocar el orbe). */
     alternarEscucha() { if (!this.mic) return; if (this.estado === "dormido") this._escuchar(); else if (this.estado === "escuchando") this._estado("dormido"); }
     /* 3. «Pedir todo lo seleccionado» → repite el pedido y pide confirmación por voz. */

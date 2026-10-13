@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Apex Play · Panel del mesero</title>
+<title>Apex Play · Panel de la caja</title>
 <meta name="robots" content="noindex">
 <style>
 :root { --bg:#07090f; --card:#0f141d; --line:#1d2533; --txt:#eef3fa; --muted:#8a97ab; --c2:#3fd0ff; --ok:#43d39e; --warn:#ffb547; --bad:#ff7a7a; }
@@ -21,29 +21,38 @@ button, select, input { font:inherit; border-radius:10px; border:1px solid var(-
 button.prim { background:var(--c2); color:#04121c; border:0; font-weight:600; }
 .muted { color:var(--muted); font-size:13px; }
 .llamada { border-color:var(--warn); }
+.card.nuevo { border-color:var(--warn); }
+.dom { margin-top:8px; padding:10px 12px; border-radius:10px; background:#121a26; display:grid; gap:2px; font-size:14px; }
+.dom b { font-size:15px; }
+.dom-botones { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.dom-botones a { text-decoration:none; color:var(--txt); border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:14px; }
+.dom-botones a.wa { background:#1f8f55; border-color:#1f8f55; color:#fff; font-weight:600; }
+.etq { font-size:12px; font-weight:700; letter-spacing:.06em; color:#04121c; background:var(--c2); border-radius:6px; padding:2px 7px; margin-right:6px; }
 #login { max-width:320px; margin:20vh auto; text-align:center; }
 #login input { width:100%; text-align:center; font-size:22px; letter-spacing:.3em; margin:14px 0; }
 </style>
 </head>
 <body>
 <div id="login">
-  <h1>Panel del mesero</h1>
+  <h1>Panel de la caja</h1>
   <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN">
   <button class="prim" id="entrar" style="width:100%">Entrar</button>
   <p class="muted" id="msg" style="margin-top:10px"></p>
 </div>
 <div id="app" hidden>
   <div class="fila"><h1 id="titulo"></h1><span class="muted" id="uso"></span></div>
-  <h2>Mesas · toque para abrir o cerrar</h2>
-  <div class="mesas" id="mesas"></div>
-  <h2>Llamadas al mesero</h2><div id="llamadas"></div>
+  <div id="zona-mesas">
+    <h2>Mesas · toque para abrir o cerrar</h2>
+    <div class="mesas" id="mesas"></div>
+    <h2>Llamadas al mesero</h2><div id="llamadas"></div>
+  </div>
   <h2>Pedidos para la caja</h2><div id="pedidos"></div>
 </div>
 <script>
 const R = new URLSearchParams(location.search).get("r") || "demo";
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-let PIN = sessionStorage.getItem("apex-pin:" + R) || "", moneda = "COP";
+let PIN = sessionStorage.getItem("apex-pin:" + R) || "", moneda = "COP", editando = false;
 async function api(ruta, cuerpo) {
   const r = await fetch(`/v1/panel/${encodeURIComponent(R)}${ruta}`, { method: cuerpo ? "POST" : "GET",
     headers: { "X-Apex-Pin": PIN, "Content-Type": "application/json" }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
@@ -51,9 +60,34 @@ async function api(ruta, cuerpo) {
 }
 const plata = (v) => new Intl.NumberFormat("es-CO", { style: "currency", currency: moneda, maximumFractionDigits: 0 }).format(v);
 const hora = (ts) => new Date(ts * 1000).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+const ESTADOS = { nuevo: "Nuevo", preparando: "En preparación", en_camino: "En camino", entregado: "Entregado", cancelado: "Cancelado" };
+const PAGOS = { contra_entrega: "Contra entrega (efectivo o datáfono)", nequi: "Nequi", pse: "PSE (pagado en línea)" };
+// Número para WhatsApp: los celulares de Colombia (10 dígitos, empiezan por 3) llevan el 57 adelante
+const wa = (t) => (t.length === 10 && t.startsWith("3") ? "57" + t : t);
+// Aviso con sonido cuando entra un pedido nuevo (el toque de «Entrar» habilita el audio)
+let vistos = null, sonido = null;
+function pitar() {
+  try { sonido = sonido || new (window.AudioContext || window.webkitAudioContext)();
+    [0, .25].forEach((t) => { const o = sonido.createOscillator(), g = sonido.createGain(); o.frequency.value = 880; o.connect(g); g.connect(sonido.destination);
+      g.gain.setValueAtTime(.25, sonido.currentTime + t); g.gain.exponentialRampToValueAtTime(.001, sonido.currentTime + t + .2);
+      o.start(sonido.currentTime + t); o.stop(sonido.currentTime + t + .22); }); } catch {}
+}
+function domicilio(p) {
+  const e = p.entrega; if (!e) return "";
+  const msg = encodeURIComponent(`Hola ${e.nombre}, recibimos su pedido #${p.id}. ¡Ya lo estamos preparando!`);
+  return `<div class="dom"><b>${esc(e.nombre)} · ${esc(e.telefono)}</b><span>${esc(e.direccion)}${e.barrio ? " · " + esc(e.barrio) : ""}</span>
+    <span class="muted">Zona: ${esc(e.zona)} · Domicilio ${plata(e.envio)} · Pago: ${esc(PAGOS[e.pago] || e.pago)}</span>
+    ${e.notas ? `<span class="muted">Notas: ${esc(e.notas)}</span>` : ""}
+    <div class="dom-botones"><a class="wa" href="https://wa.me/${wa(e.telefono)}?text=${msg}" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="tel:${esc(e.telefono)}">Llamar</a></div></div>`;
+}
 async function cargar() {
   const d = await api(""); moneda = d.moneda;
-  $("#login").hidden = true; $("#app").hidden = false; $("#titulo").textContent = d.restaurante;
+  $("#login").hidden = true; $("#app").hidden = false; $("#titulo").textContent = d.restaurante + (d.domicilio ? " · Domicilios" : "");
+  $("#zona-mesas").hidden = !d.mesas.length;
+  const nuevos = d.pedidos.filter((p) => p.estado === "nuevo").map((p) => p.id);
+  if (vistos && nuevos.some((id) => !vistos.has(id))) pitar();
+  vistos = new Set([...(vistos || []), ...nuevos]);
   const u = d.uso_mes, t = d.topes;
   $("#uso").textContent = `Este mes: ${u.conversaciones} conversaciones · ${u.pedidos} pedidos (${plata(u.ventas)}) · orbe ${plata(u.gasto_cop)} de ${plata(t.tope_cop_mes)}`;
   $("#mesas").innerHTML = d.mesas.map((m) => `<div class="mesa ${m.abierta ? "on" : ""}" data-m="${esc(m.mesa)}" data-a="${m.abierta ? 1 : 0}">
@@ -62,15 +96,18 @@ async function cargar() {
   $("#llamadas").innerHTML = d.llamadas.length ? d.llamadas.map((l) => `<div class="card llamada fila"><span><b>Mesa ${esc(l.mesa)}</b> · ${hora(l.creada)} ${l.motivo ? "· " + esc(l.motivo) : ""}</span>
     <button data-l="${l.id}">Atendida</button></div>`).join("") : `<p class="muted">Ninguna.</p>`;
   document.querySelectorAll("[data-l]").forEach((b) => b.onclick = async () => { await api(`/llamada/${b.dataset.l}`, {}); cargar(); });
-  $("#pedidos").innerHTML = d.pedidos.length ? d.pedidos.map((p) => `<div class="card">
-    <div class="fila"><b>#${p.id} · Mesa ${esc(p.mesa)} · ${hora(p.creado)}</b><b>${plata(p.total)}</b></div>
+  $("#pedidos").innerHTML = d.pedidos.length ? d.pedidos.map((p) => `<div class="card ${p.estado === "nuevo" ? "nuevo" : ""}">
+    <div class="fila"><b>${p.entrega ? `<span class="etq">DOMICILIO</span>` : ""}#${p.id}${p.entrega ? "" : " · Mesa " + esc(p.mesa)} · ${hora(p.creado)}</b><b>${plata(p.total)}</b></div>
     <div class="muted">${p.items.map((i) => `${i.cantidad} × ${esc(i.nombre)}${i.nota ? " (" + esc(i.nota) + ")" : ""}`).join(" · ")}</div>
-    <div class="fila" style="margin-top:8px"><span></span><select data-p="${p.id}">${["nuevo", "preparando", "entregado", "cancelado"]
-      .map((e) => `<option ${e === p.estado ? "selected" : ""}>${e}</option>`).join("")}</select></div></div>`).join("") : `<p class="muted">Aún no hay pedidos.</p>`;
-  document.querySelectorAll("[data-p]").forEach((s) => s.onchange = () => api(`/pedido/${s.dataset.p}`, { estado: s.value }));
+    ${domicilio(p)}
+    <div class="fila" style="margin-top:8px"><span></span><select data-p="${p.id}">${Object.keys(ESTADOS)
+      .filter((e) => p.entrega || e !== "en_camino")
+      .map((e) => `<option value="${e}" ${e === p.estado ? "selected" : ""}>${ESTADOS[e]}</option>`).join("")}</select></div></div>`).join("") : `<p class="muted">Aún no hay pedidos.</p>`;
+  document.querySelectorAll("[data-p]").forEach((s) => { s.onfocus = () => { editando = true; }; s.onblur = () => { editando = false; };
+    s.onchange = async () => { editando = false; await api(`/pedido/${s.dataset.p}`, { estado: s.value }); cargar(); }; });
 }
 $("#entrar").onclick = async () => { PIN = $("#pin").value.trim();
-  try { await cargar(); sessionStorage.setItem("apex-pin:" + R, PIN); setInterval(() => cargar().catch(() => {}), 5000); }
+  try { await cargar(); sessionStorage.setItem("apex-pin:" + R, PIN); setInterval(() => { if (!editando) cargar().catch(() => {}); }, 5000); }
   catch (e) { $("#msg").textContent = e.status === 401 ? "PIN incorrecto." : e.message; } };
 $("#pin").onkeydown = (e) => { if (e.key === "Enter") $("#entrar").click(); };
 if (PIN) $("#entrar").click();
