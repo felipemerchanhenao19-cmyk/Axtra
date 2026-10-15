@@ -72,6 +72,13 @@ def test_pin(c, monkeypatch):
     assert c.post("/pin", json={"restaurante": "otro", "pin": "1234"}).status_code == 503
 
 
+def test_varios_pin_por_restaurante(c, monkeypatch):
+    monkeypatch.setenv("APEX_PIN_DOMICILIOS", "3333, 2222")
+    assert c.post("/pin", json={"restaurante": "domicilios", "pin": "3333"}).json()["ok"] is True
+    assert c.post("/pin", json={"restaurante": "domicilios", "pin": "2222"}).json()["ok"] is True
+    assert c.post("/pin", json={"restaurante": "domicilios", "pin": "4444"}).json()["ok"] is False
+
+
 def test_negocios_en_axtra(monkeypatch):
     monkeypatch.setattr(config, "MODO_DESARROLLO", True)
     lista = TestClient(app_mod.app).get("/api/negocios").json()
