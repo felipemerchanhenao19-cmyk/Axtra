@@ -49,10 +49,12 @@ class Pin(BaseModel):
 
 @app.post("/pin")
 def verificar_pin(p: Pin):
-    esperado = os.getenv(f"APEX_PIN_{p.restaurante.upper().replace('-', '_')}", "")
-    if len(esperado) < 4:
+    """Un restaurante puede tener varios PIN separados por coma (APEX_PIN_DOMICILIOS=3333,2222): sirve cualquiera."""
+    valor = os.getenv(f"APEX_PIN_{p.restaurante.upper().replace('-', '_')}", "")
+    esperados = [x.strip() for x in valor.split(",") if len(x.strip()) >= 4]
+    if not esperados:
         raise HTTPException(503, "este restaurante no tiene PIN configurado")
-    return {"ok": hmac.compare_digest(p.pin.encode(), esperado.encode())}
+    return {"ok": any([hmac.compare_digest(p.pin.encode(), e.encode()) for e in esperados])}
 
 
 # ---------------- Oído: voz → texto ----------------
