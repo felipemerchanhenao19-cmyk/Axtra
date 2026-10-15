@@ -96,3 +96,10 @@ def test_los_ejemplos_borran_los_datos_viejos(c):
     db.nuevo_pedido("domicilios", "domicilio", "y", [], 1000, {"nombre": "Nuevo"})
     db.borrar_pedidos_viejos("domicilios", 6 * 3600)
     assert [p["entrega"]["nombre"] for p in db.pedidos("domicilios")] == ["Nuevo"]
+
+
+def test_la_caja_de_domicilios_tiene_su_propio_pin(c, axtra):
+    c.get("/v1/panel/domicilios", headers=PIN)
+    c.get("/v1/panel/demo", headers=PIN)
+    pines = [j["restaurante"] for ruta, j in axtra.llamadas if ruta == "/pin"]
+    assert pines == ["domicilios", "demo"]          # cada restaurante pregunta por su PIN (APEX_PIN_<ID>)
