@@ -84,7 +84,7 @@ Para agregar un restaurante, copia `demo.json`, cámbialo y agrega su PIN en el 
 
 Es el mismo orbe y la misma carta, pero para pedidos **a domicilio** desde un link (Instagram, WhatsApp, Google Maps).
 - **Página del cliente:** `https://api.axtra.chat/domicilios`.
-- **Caja:** `https://api.axtra.chat/panel?r=domicilios`.
+- **Caja:** `https://api.axtra.chat/panel?r=domicilios`, con su propio PIN (`APEX_PIN_DOMICILIOS`).
 
 **Lo que hace:**
 1. El cliente elige con el orbe o con botones.
@@ -98,7 +98,7 @@ Es el mismo orbe y la misma carta, pero para pedidos **a domicilio** desde un li
 
 **Archivo:** `restaurantes/domicilios.json`.
 - `"base": "demo"` hereda la carta, las fotos y la voz del demo.
-- `"pin_de": "demo"` usa el mismo PIN del panel del demo.
+- La caja tiene **su propio PIN**: `APEX_PIN_DOMICILIOS` en el `.env` de Axtra. Cada restaurante usa `APEX_PIN_<ID>`. Si se quiere compartir el PIN de otro restaurante, se pone `"pin_de": "<id>"`.
 - En `"domicilio"` van:
   - `horario`, `tiempo`, `minimo`, `direccion`;
   - `whatsapp`: con indicativo, por ejemplo `573001234567`;
