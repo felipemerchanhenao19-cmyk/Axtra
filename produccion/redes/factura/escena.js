@@ -7,12 +7,13 @@ const rebote = (x) => { x = cl(x); const c = 1.70158 + 1; return 1 + c * Math.po
 const entre = (t, a, b) => t >= a && t < b;
 // Diálogos: [inicio, fin, quién, texto]  (quién: "orbi" o "dueno")
 const DIALOGOS = [
-  [5.15, 6.45, "dueno", "¿Por qué me haces esto?"],
-  [10.1, 11.5, "orbi", "Ya, ya…"],
-  [11.5, 13.9, "orbi", "Nadie debería pagar por cocinar."],
-  [15.9, 18.9, "orbi", "Su propio canal. Sin comisiones."],
+  [5.15, 6.45, "dueno", "¿Por qué me haces esto?", "d1"],
+  [10.1, 11.5, "orbi", "Ya, ya…", "o1"],
+  [11.5, 13.9, "orbi", "Nadie debería pagar por cocinar.", "o2"],
+  [15.9, 18.9, "orbi", "Su propio canal. Sin comisiones.", "o3"],
 ];
-const HABLA = DIALOGOS.filter((d) => d[2] === "orbi").map((d) => [d[0], d[1]]);
+// La boca se mueve mientras suena su voz (si hay voces grabadas), si no, durante todo el subtítulo
+const HABLA = DIALOGOS.filter((d) => d[2] === "orbi").map((d) => [d[0] + 0.05, VOZ[d[4]] ? d[0] + 0.05 + VOZ[d[4]] : d[1]]);
 function grano(f) { const c = $("#grano"), x = c.getContext("2d"), d = x.createImageData(c.width, c.height); let s = (f * 9301 + 49297) % 233280;
   for (let i = 0; i < d.data.length; i += 4) { s = (s * 9301 + 49297) % 233280; d.data[i] = d.data[i + 1] = d.data[i + 2] = (s / 233280) * 255; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); }
 function fondo(t) {
@@ -96,7 +97,7 @@ async function render(t, f) {
     if (entre(t, 20.75, 21.0)) sacudir = 8; }
   // 6 · Sello Apex
   if (t >= 22.6) { const k = out3((t - 22.6) / 0.6);
-    $("#sello-final").style.opacity = k; $("#o-final").innerHTML = orbiCara(t, t < 23.1 ? "normal" : "guino", entre(t, 23.3, 24.6));
+    $("#sello-final").style.opacity = k; $("#o-final").innerHTML = orbiCara(t, t < 23.1 ? "normal" : "guino", entre(t, 23.35, 23.35 + (VOZ.o4 || 1.25)));
     $("#o-final").style.transform = `scale(${0.7 + 0.3 * rebote((t - 22.6) / 0.5)})`;
     $("#frase").style.opacity = out3((t - 23.2) / 0.4); $("#logo").style.opacity = out3((t - 24.0) / 0.5); }
   // Subtítulos

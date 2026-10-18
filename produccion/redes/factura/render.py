@@ -7,6 +7,7 @@ FPS, DUR = 24, 25.5
 if not os.path.exists(W_ + "fk/00001.jpg"):
     subprocess.run(["ffmpeg", "-v", "error", "-i", VIDEOS + "grabaciones/domicilios/caja.webm", "-vf", "fps=24", "-q:v", "3", W_ + "fk/%05d.jpg"], check=True)
 M = json.load(open(VIDEOS + "grabaciones/domicilios/marcas.json"))
+VOZ = json.load(open(W_ + "voces/voz.json")) if os.path.exists(W_ + "voces/voz.json") else {}
 HTML = f'''<!doctype html><html><head><meta charset="utf-8">{open(VIDEOS + "fuentes.html").read()}<style>
 * {{ box-sizing: border-box; margin: 0; padding: 0; }}
 html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: #050a14; font-family: "Figtree", sans-serif; color: #fff; }}
@@ -79,7 +80,7 @@ html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: #050a
 </div>
 <div id="barras" style="opacity:0"></div><div id="vineta"></div><canvas id="grano" width="360" height="640"></canvas><div id="flash"></div>
 <script>
-const DIR_K = "file://{W_}fk", N_K = {len(os.listdir(W_ + "fk"))}, CAJA0 = {M["caja_desde"] + 0.6};
+const VOZ = {json.dumps(VOZ)}, DIR_K = "file://{W_}fk", N_K = {len(os.listdir(W_ + "fk"))}, CAJA0 = {M["caja_desde"] + 0.6};
 {open(REDES + "orbi.js").read()}
 {open(AQUI + "escena.js").read()}
 </script></body></html>'''
@@ -111,7 +112,7 @@ async def todo():
     segs = await asyncio.gather(*[obrero(i, i * tr, min(NCU, (i + 1) * tr)) for i in range(n)])
     open(W_ + "segs.txt", "w").write("".join(f"file '{s}'\n" for s in segs))
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", W_ + "segs.txt", "-c", "copy", W_ + "imagen.mp4"], check=True)
-    subprocess.run([sys.executable, AQUI + "sonido.py", W_ + "sonido.wav"], check=True)
+    subprocess.run([sys.executable, AQUI + "sonido.py", W_ + "sonido.wav", W_ + "voces"], check=True)
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", W_ + "imagen.mp4", "-i", W_ + "sonido.wav", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
                     "-shortest", "-movflags", "+faststart", SAL], check=True)
 if os.getenv("PRUEBA"): asyncio.run(prueba([float(x) for x in os.getenv("PRUEBA").split(",")]))

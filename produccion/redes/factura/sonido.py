@@ -1,9 +1,10 @@
-"""Diseño sonoro de «La factura»: python sonido.py <salida.wav>"""
-import sys, numpy as np
+"""Diseño sonoro de «La factura»: python sonido.py <salida.wav> [carpeta_voces]"""
+import sys, os, json, numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve
 from scipy.io import wavfile
 SR = 48000; DUR = 25.5; N = int(DUR * SR); t = np.arange(N) / SR
 rng = np.random.default_rng(3)
+VOCES = sys.argv[2].rstrip("/") + "/" if len(sys.argv) > 2 and os.path.exists(sys.argv[2] + "/voz.json") else None
 L = np.zeros(N); R = np.zeros(N)
 def hz(n):
     d = {"C": -9, "C#": -8, "D": -7, "D#": -6, "E": -5, "F": -4, "F#": -3, "G": -2, "G#": -1, "A": 0, "A#": 1, "B": 2}
@@ -42,6 +43,7 @@ def blip(f, dur=0.07, g=0.18, cuadrada=False):
     if cuadrada: o = np.sign(o) * 0.6
     return lp(o, 3000) * np.sin(np.linspace(0, np.pi, n)) ** 0.6 * g
 def hablar(a, b, base, g=0.16, cuadrada=False):
+    if VOCES: return
     tt = a
     while tt < b - 0.05:
         d = rng.uniform(0.06, 0.11); pon(blip(base * rng.uniform(0.85, 1.35), d, g, cuadrada), tt, 1, rng.uniform(-0.2, 0.2)); tt += d + rng.uniform(0.01, 0.05)
@@ -65,7 +67,7 @@ for i in range(6):
 # 3 · Orbi: «ding», brillo y colchón cálido (do mayor)
 pon(campana(hz("E6"), 1.6, 0.35), 9.0); pon(campana(hz("B6"), 1.6, 0.2), 9.05)
 for k in range(10): pon(campana(hz("C7") * (1 + 0.06 * k), 0.4, 0.04), 9.0 + k * 0.04)
-pon(cuerdas(["C3", "G3", "C4", "E4"], 5.2, 0.16, corte=1800), 9.1)
+pon(cuerdas(["C3", "G3", "C4", "E4"], 5.2, 0.08, corte=1500), 9.1)
 hablar(10.1, 11.4, 720); hablar(11.5, 13.9, 760)
 # 4 · Caja: silbido de entrada, sello 0 % y ritmo alegre (marimba en do mayor, 112 bpm)
 pon(silbido(300, 5000, 0.4, 0.2), 13.8); pon(golpe(70, 0.8, 0.9), 15.4)
@@ -88,6 +90,13 @@ pon(cuerdas(["D3", "A3", "D4", "F4"], 1.2, 0.5), 21.35); pon(golpe(45, 1.2, 0.9)
 pon(campana(hz("E6"), 2.0, 0.35), 22.6); pon(campana(hz("B6"), 2.0, 0.2), 22.65)
 pon(cuerdas(["C3", "G3", "C4", "E4", "G4"], 2.9, 0.2, corte=2600), 22.6)
 hablar(23.3, 24.6, 780)
+# Voces de los personajes (si existen): reemplazan las burbujas
+if VOCES:
+    from scipy.io import wavfile as wf
+    for k, a in {"d1": 5.2, "o1": 10.15, "o2": 11.55, "o3": 15.95, "o4": 23.35}.items():
+        sr, v = wf.read(VOCES + k + ".wav"); v = v.astype(float) / 32767
+        if v.ndim > 1: v = v.mean(1)
+        pon(v, a, 2.4)
 # Sala: reverberación corta y volumen
 ir = rng.standard_normal(int(1.2 * SR)) * np.exp(-np.linspace(0, 8, int(1.2 * SR))) * 0.03
 L = L + fftconvolve(L, ir)[:N] * 0.6; R = R + fftconvolve(R, ir[::-1])[:N] * 0.6
