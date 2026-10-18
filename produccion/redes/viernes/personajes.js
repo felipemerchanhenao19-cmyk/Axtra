@@ -29,8 +29,8 @@ function julian(o = {}) {
   const sudor = o.sudor ? `<path d="M52 -170 q 8 14 0 22 q -8 -8 0 -22Z" fill="#7fd7ff"/><path d="M-60 -150 q 7 12 0 19 q -7 -7 0 -19Z" fill="#7fd7ff"/>` : "";
   const ojos = o.ojos === "grandes" ? `<circle cx="-18" cy="-140" r="11" fill="#fff"/><circle cx="18" cy="-140" r="11" fill="#fff"/><circle cx="-18" cy="-140" r="5" fill="#111"/><circle cx="18" cy="-140" r="5" fill="#111"/>`
     : o.ojos === "cerrados" ? `<path d="M-26 -140 q 8 6 16 0 M10 -140 q 8 6 16 0" stroke="#111" stroke-width="5" fill="none"/>`
-    : `<circle cx="-18" cy="-140" r="6" fill="#111"/><circle cx="18" cy="-140" r="6" fill="#111"/>`;
-  const bocaJ = o.boca === "o" ? `<ellipse cx="0" cy="-108" rx="10" ry="14" fill="#5a1a1a"/>` : o.boca === "triste" ? `<path d="M-16 -104 Q 0 -118 16 -104" stroke="#5a1a1a" stroke-width="5" fill="none"/>`
+    : `<circle cx="${-18 + (o.mira || 0)}" cy="-140" r="6" fill="#111"/><circle cx="${18 + (o.mira || 0)}" cy="-140" r="6" fill="#111"/>`;
+  const bocaJ = typeof o.boca === "number" ? `<ellipse cx="0" cy="-110" rx="14" ry="${3 + 12 * o.boca}" fill="#5a1a1a"/>` : o.boca === "o" ? `<ellipse cx="0" cy="-108" rx="10" ry="14" fill="#5a1a1a"/>` : o.boca === "triste" ? `<path d="M-16 -104 Q 0 -118 16 -104" stroke="#5a1a1a" stroke-width="5" fill="none"/>`
     : `<path d="M-18 -114 Q 0 -96 18 -114" stroke="#5a1a1a" stroke-width="5" fill="none"/>`;
   const bandeja = o.bandeja ? `<g transform="translate(96 -150) rotate(${o.inclina || 0})"><ellipse cx="0" cy="0" rx="80" ry="14" fill="#c9ced6" stroke="#8b939e" stroke-width="3"/>
       ${(o.platos || 3) > 0 ? Array.from({ length: o.platos || 3 }, (_, i) => `<ellipse cx="${-46 + i * 46}" cy="-10" rx="22" ry="8" fill="#fff"/><circle cx="${-46 + i * 46}" cy="-18" r="12" fill="${["#c9572e", "#e8b33a", "#6aa84f"][i % 3]}"/>`).join("") : ""}</g>` : "";
@@ -38,7 +38,7 @@ function julian(o = {}) {
     <rect x="-46" y="40" width="34" height="150" rx="14" fill="#1d2430"/><rect x="12" y="40" width="34" height="150" rx="14" fill="#1d2430"/>
     <path d="M-72 70 Q -76 -50 0 -64 Q 76 -50 72 70 Z" fill="#f4f6f8"/>
     <path d="M-72 70 Q -76 -50 -20 -60 L -8 70 Z M72 70 Q 76 -50 20 -60 L 8 70 Z" fill="#1d2430"/>
-    <rect x="-60" y="30" width="120" height="110" rx="10" fill="#efe9dd"/>
+    <rect x="-46" y="34" width="92" height="84" rx="16" fill="#efe9dd"/>
     <path d="M-52 -40 Q -86 0 -64 60" stroke="#f4f6f8" stroke-width="32" stroke-linecap="round" fill="none"/>
     <path d="M52 -40 Q 92 -90 92 -140" stroke="#f4f6f8" stroke-width="32" stroke-linecap="round" fill="none"/><circle cx="92" cy="-146" r="18" fill="#d9a273"/>
     <rect x="-14" y="-92" width="28" height="34" rx="10" fill="#d9a273"/>
@@ -50,6 +50,10 @@ function julian(o = {}) {
 }
 // Don Papel, la libreta de toda la vida: espiral, bigote, ceño, lápiz en la oreja.
 function donPapel(o = {}) {
+  if (o.cerrado) return `<g><rect x="-90" y="-130" width="180" height="240" rx="14" fill="#7a4b2e" stroke="#4a2c18" stroke-width="5"/>
+    ${[-60, -36, -12, 12, 36, 60].map((x) => `<circle cx="${x}" cy="-130" r="10" fill="none" stroke="#7d7d7d" stroke-width="6"/>`).join("")}
+    <text x="0" y="0" text-anchor="middle" font-size="34" font-weight="800" fill="#e8d3b0" font-family="Figtree">LIBRETA</text>
+    <path d="M-40 40 q 10 -10 20 0 M20 40 q 10 -10 20 0" stroke="#e8d3b0" stroke-width="5" fill="none"/><text x="60" y="-60" font-size="40" fill="#e8d3b0">z</text></g>`;
   const enojo = o.cara === "enojo", hab = o.boca ?? 0.2;
   return `<g>
     <rect x="-90" y="-130" width="180" height="240" rx="14" fill="#fbf6e6" stroke="#c9bd98" stroke-width="5"/>
@@ -74,11 +78,11 @@ function restaurante(t, luz = 1) {
      <circle cx="${x}" cy="${238 + i % 2 * 30}" r="${150 * luz}" fill="url(#calido)" opacity="${0.9 * luz}"/>`).join("");
   return `<defs><radialGradient id="calido"><stop offset="0" stop-color="rgba(255,205,130,.55)"/><stop offset="1" stop-color="rgba(255,205,130,0)"/></radialGradient>
      <linearGradient id="pared" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2418"/><stop offset="1" stop-color="#5a3622"/></linearGradient></defs>
-    <rect x="0" y="0" width="1080" height="1100" fill="url(#pared)"/>
-    ${Array.from({ length: 12 }, (_, i) => `<rect x="${i * 92}" y="560" width="86" height="540" fill="rgba(0,0,0,.12)"/>`).join("")}
+    <rect x="-800" y="-800" width="2680" height="1900" fill="url(#pared)"/>
+    ${Array.from({ length: 24 }, (_, i) => `<rect x="${-460 + i * 92}" y="560" width="86" height="540" fill="rgba(0,0,0,.12)"/>`).join("")}
     <rect x="620" y="300" width="360" height="230" rx="10" fill="#0d1a2e" stroke="#2a1d14" stroke-width="12"/>
     ${Array.from({ length: 14 }, (_, i) => `<rect x="${640 + (i * 53) % 320}" y="${380 + (i * 37) % 120}" width="10" height="${40 + (i * 13) % 60}" fill="#f1c76a" opacity=".6"/>`).join("")}
     <text x="300" y="420" fill="#f1c76a" font-size="64" font-family="Italiana, serif" opacity=".9">La Fonda</text>
-    <rect x="0" y="1100" width="1080" height="820" fill="#6b4226"/>${Array.from({ length: 9 }, (_, i) => `<line x1="0" y1="${1150 + i * 90}" x2="1080" y2="${1150 + i * 90}" stroke="rgba(0,0,0,.18)" stroke-width="4"/>`).join("")}
+    <rect x="-800" y="1100" width="2680" height="1800" fill="#6b4226"/>${Array.from({ length: 18 }, (_, i) => `<line x1="-800" y1="${1150 + i * 90}" x2="1880" y2="${1150 + i * 90}" stroke="rgba(0,0,0,.18)" stroke-width="4"/>`).join("")}
     ${lamparas}`;
 }
