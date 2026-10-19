@@ -76,6 +76,10 @@ function render(t, f) {
   $("#negro").style.opacity = negro; $("#flash").style.opacity = Math.max(flash, pl.trans === "flash" ? 1 - cl(tt / 0.25) : 0);
   $("#cine").style.filter = pl.trans === "barrido" && tt < 0.25 ? `blur(${(1 - tt / 0.25) * 14}px)` : "none";
   $("#gancho").style.opacity = cl((3.0 - t) / 0.3);
+  $("#tinte").style.background = pl.tinte ? `radial-gradient(70% 60% at 50% 40%, rgba(255,255,255,0) 30%, ${pl.tinte} 100%)` : "none"; $("#tinte").style.opacity = pl.tinte ? 0.55 : 0;
+  const ti = $("#titulo");
+  if (pl.cartel) { $("#titulo b").textContent = pl.cartel[0]; $("#titulo small").textContent = pl.cartel[1] || ""; ti.style.opacity = out3((tt - 0.5) / 0.4) * cl((fin - 0.1) / 0.3);
+    $("#titulo b").style.backgroundPosition = `${120 - 140 * p}% 0`; ti.style.transform = `translate(-50%,-50%) scale(${1.08 - 0.08 * out3((tt - 0.5) / 1.5)})`; } else ti.style.opacity = 0;
   const l = TODAS.find((q) => t >= q.ini - 0.05 && t < q.fin + 0.25), sub = $("#sub");
   if (l && t < SELLO) { if (ultSub !== l.txt + l.ini) { ultSub = l.txt + l.ini; const rp = EP.reparto[l.quien]; sub.innerHTML = `<small style="color:${rp.color}">${rp.nombre}</small>${l.txt}`; }
     sub.style.opacity = out3((t - l.ini + 0.05) / 0.12) * cl((l.fin + 0.25 - t) / 0.12); } else sub.style.opacity = 0;
@@ -95,10 +99,13 @@ def video(eid):
     lin = asyncio.run(motor.voces(ep, W)); json.dump(lin, open(W + "linea.json", "w"), ensure_ascii=False, indent=1)
     css = open(AQUI + "../heroes/estilo.css").read() + """
       .toma { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; opacity: 0; }
+      #tinte { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; }
+      #titulo { top: 87%; width: 1080px; padding: 26px 0 30px; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.72) 25%, rgba(0,0,0,.72) 75%, rgba(0,0,0,0)); } #titulo small { margin-top: 12px; } #titulo b { font: 400 120px/1 "Italiana", Georgia, serif; text-transform: none; letter-spacing: 0;
+        background: linear-gradient(100deg, #b8862b 0%, #fff1c4 40%, #fff 50%, #fff1c4 60%, #b8862b 100%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; }
       #o-final img { width: 560px; height: 760px; object-fit: cover; border-radius: 40px; box-shadow: 0 0 60px rgba(47,187,232,.5); }"""
-    tomas_html = "".join(f'<img class="toma" src="file://{TOMAS}{eid}_{i:02d}.png">' for i in range(len(ep["planos"])))
+    tomas_html = "".join(f'<img class="toma" src="file://{AQUI + pl["imagen"] if pl.get("imagen") else TOMAS + f"{eid}_{i:02d}.png"}">' for i, pl in enumerate(ep["planos"]))
     html = f'''<!doctype html><html><head><meta charset="utf-8">{open(RAIZ + "produccion/videos/fuentes.html").read()}<style>{css}</style></head><body>
-<div id="cine">{tomas_html}</div><div id="pantalla"></div><div id="vineta"></div><div id="pedido"></div><div id="sub"></div>
+<div id="cine">{tomas_html}<div id="tinte"></div></div><div id="titulo"><b></b><small></small></div><div id="pantalla"></div><div id="vineta"></div><div id="pedido"></div><div id="sub"></div>
 <div id="flash"></div><div id="negro"></div><div id="barras"></div><div id="gancho"></div>
 <div id="sello"><div id="o-final"><img src="file://{FICHAS}orbi.png"></div><div id="frase"></div><div id="logo"><b></b><span></span></div></div>
 <canvas id="grano" width="360" height="640"></canvas>

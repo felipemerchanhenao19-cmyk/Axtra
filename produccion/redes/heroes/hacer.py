@@ -180,6 +180,8 @@ def sonido(ep, lin, W):
     def _(a, b):
         n = int(2.4 * SR); tl = np.arange(n) / SR; f = 233 * 2 ** (-tl / 2.4 * 0.6) * (1 + 0.02 * np.sin(2 * np.pi * 6 * tl))
         pon(M, lp(2 * ((np.cumsum(f) / SR) % 1) - 1, 1200) * 0.12 * np.minimum(1, (2.4 - tl) / 0.3), a + 0.1)
+    @cue("novela")
+    def _(a, b): pon(M, acorde(["A2", "E3", "A3", "C4", "E4"], b - a + 0.4, 0.2, 2200, 0.05), a); pon(FX, taiko(45, 1.4, 0.7), a); piano(a + 0.4, b, ["A4", "C5", "E5", "C5", "B4", "D5", "G#4", "B4"], 0.32, 0.06)
     @cue("fin")
     def _(a, b): pon(M, acorde(["C3", "G3", "C4", "E4", "G4"], b - a + 1.0, 0.18, 3000, 0.1), a); pon(FX, taiko(44, 1.6, 0.9), a)
     P = lin["planos"]
