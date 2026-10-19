@@ -130,7 +130,7 @@ def sonido(ep, lin, W):
     def taiko(f=55, d=1.0, g=1.0):
         n = int(d * SR); tl = np.arange(n) / SR
         return (np.sin(2 * np.pi * (f * 2.2 * np.exp(-tl * 18) + f) * tl) * np.exp(-tl * 4) + lp(rng.standard_normal(n), 900) * np.exp(-tl * 30) * 0.5) * g
-    def caja(g=0.3): n = int(0.25 * SR); return bp(rng.standard_normal(n), 900, 6000) * env(n, 0.001, 18) * g + tono(190, 0.2, 20, (1,), g * 0.6)
+    def caja(g=0.3): n = int(0.25 * SR); return bp(rng.standard_normal(n), 900, 6000) * env(n, 0.001, 18) * g + tono(190, 0.25, 20, (1,), g * 0.6)
     def ruido(d, a, b, g): n = int(d * SR); return bp(rng.standard_normal(n), a, b) * g
     def braam(a, g=0.5, d=3.0):
         n = int(d * SR); tl = np.arange(n) / SR; x = np.zeros(n)
