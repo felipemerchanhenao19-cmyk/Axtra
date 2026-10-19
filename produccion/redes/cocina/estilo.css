@@ -1,0 +1,29 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; font-family: "Figtree", sans-serif; color: #fff; }
+#escena, #tinte, #sello { position: absolute; inset: 0; }
+#tinte { opacity: 0; background: radial-gradient(70% 60% at 50% 50%, rgba(200,0,60,.1), rgba(120,0,30,.9)); }
+#rayas { position: absolute; inset: -20%; background: repeating-conic-gradient(from 0deg at 50% 45%, rgba(255,255,255,0) 0deg 4deg, rgba(255,255,255,.22) 4deg 5deg); mix-blend-mode: screen; opacity: 0; }
+#serie { position: absolute; left: 50%; top: 70px; transform: translateX(-50%); background: rgba(5,9,15,.82); border: 3px solid #ffd166; color: #ffd166; font-weight: 800; font-size: 30px;
+  letter-spacing: .14em; padding: 10px 26px; border-radius: 40px; white-space: nowrap; }
+#gancho { position: absolute; left: 50%; top: 150px; width: 980px; text-align: center; font-size: 72px; font-weight: 900; line-height: 1.05; color: #111;
+  background: #ffd166; padding: 22px 30px 26px; border-radius: 28px; box-shadow: 0 10px 0 rgba(0,0,0,.35); transform: translateX(-50%); }
+#sub { position: absolute; left: 50%; top: 340px; transform: translateX(-50%); width: max-content; max-width: 960px; text-align: center; padding: 18px 34px 22px; border-radius: 30px;
+  font-size: 54px; font-weight: 800; line-height: 1.15; background: rgba(5,9,15,.88); border: 4px solid #fff; opacity: 0; }
+#sub small { display: block; font-size: 24px; letter-spacing: .24em; margin-bottom: 6px; }
+#chip { position: absolute; left: 50%; top: 1300px; font-size: 86px; font-weight: 900; padding: 10px 40px 16px; border-radius: 26px; white-space: nowrap;
+  background: rgba(40,0,10,.92); border: 8px solid #ff3b5c; color: #ff8fa3; opacity: 0; }
+#chip.ok { background: rgba(5,30,20,.92); border-color: #2ee59d; color: #2ee59d; }
+#pedido { position: absolute; left: 50%; top: 1460px; width: 820px; padding: 22px 30px 24px 120px; border-radius: 30px; background: #0b1626; border: 5px solid #2fbbe8; opacity: 0;
+  box-shadow: 0 16px 40px rgba(0,0,0,.5); }
+#pedido i { position: absolute; left: 30px; top: 50%; width: 66px; height: 66px; margin-top: -33px; border-radius: 18px; background: #2fbbe8; }
+#pedido i::after { content: ""; position: absolute; left: 20px; top: 15px; width: 26px; height: 26px; border-radius: 50% 50% 50% 0; background: #0b1626; transform: rotate(-45deg); }
+#pedido b { display: block; font-size: 40px; font-weight: 800; } #pedido span { display: block; font-size: 30px; color: #9db0c5; margin-top: 4px; }
+#sello { display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(85% 55% at 50% 45%, #17406f 0%, #0b1626 60%, #050a14 100%); opacity: 0; }
+#o-final { width: 640px; height: 640px; } #o-final svg { width: 100%; height: 100%; }
+#frase { font: 400 110px/1 "Italiana", Georgia, serif; color: #ffd8a8; margin-top: 10px; opacity: 0; }
+#logo { margin-top: 60px; text-align: center; opacity: 0; } #logo b { font-size: 70px; font-weight: 800; }
+#logo b i { display: inline-block; width: 64px; height: 64px; border-radius: 18px; background: #2fbbe8; vertical-align: -8px; margin-right: 16px; position: relative; }
+#logo b i::after { content: ""; position: absolute; left: 19px; top: 14px; width: 26px; height: 26px; border-radius: 50% 50% 50% 0; background: #0b1626; transform: rotate(-45deg); }
+#logo span { display: block; font-size: 34px; color: #9db0c5; margin-top: 16px; font-weight: 600; }
+#vineta { position: absolute; inset: 0; background: radial-gradient(80% 70% at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,.45) 100%); pointer-events: none; }
+#grano { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .04; mix-blend-mode: overlay; pointer-events: none; }
