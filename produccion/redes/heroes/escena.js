@@ -40,7 +40,7 @@ function dibujaActor(a, st, t) {
     case "julian": return julian({ ...pr, boca: h ? bocaT(t) : pr.boca });
     case "persona": return persona({ ...pr, boca: h ? bocaT(t) : (pr.boca ?? 0.4) });
   }
-  return "";
+  return typeof dibujaExtra === "function" ? dibujaExtra(a, { ...st, cara }, t, h, b) : "";
 }
 function actores(pl, L, t, p, golpes) {
   const est = {};
@@ -118,7 +118,8 @@ function camara(pl, p) {
   const k = CURVAS[pl.curva || "ease"](p); return c[0].map((v, j) => lerp(v, c[1][j], k));
 }
 const GRADOS = { noche: "contrast(1.12) saturate(.85) brightness(.95)", calido: "contrast(1.06) saturate(1.12) sepia(.12)", sepia: "sepia(.85) contrast(1.15) brightness(.88)",
-  radar: "grayscale(1) contrast(1.9) brightness(.8) sepia(1) hue-rotate(-42deg) saturate(8)", frio: "contrast(1.1) saturate(.75) hue-rotate(8deg)", epico: "contrast(1.18) saturate(1.15)" };
+  radar: "grayscale(1) contrast(1.9) brightness(.8) sepia(1) hue-rotate(-42deg) saturate(8)", frio: "contrast(1.1) saturate(.75) hue-rotate(8deg)", epico: "contrast(1.18) saturate(1.15)",
+  ...(typeof GRADOS_EXTRA === "object" ? GRADOS_EXTRA : {}) };
 let ultSub = "", ultPed = "";
 async function render(t, f) {
   const i = planoEn(t), pl = EP.planos[i], L = P[i], p = cl((t - L.ini) / (L.fin - L.ini)), tt = t - L.ini;

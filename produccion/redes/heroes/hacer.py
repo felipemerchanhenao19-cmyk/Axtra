@@ -182,6 +182,30 @@ def sonido(ep, lin, W):
         pon(M, lp(2 * ((np.cumsum(f) / SR) % 1) - 1, 1200) * 0.12 * np.minimum(1, (2.4 - tl) / 0.3), a + 0.1)
     @cue("novela")
     def _(a, b): pon(M, acorde(["A2", "E3", "A3", "C4", "E4"], b - a + 0.4, 0.2, 2200, 0.05), a); pon(FX, taiko(45, 1.4, 0.7), a); piano(a + 0.4, b, ["A4", "C5", "E5", "C5", "B4", "D5", "G#4", "B4"], 0.32, 0.06)
+    @cue("romance")
+    def _(a, b):
+        seq = [["F3", "A3", "C4", "E4"], ["D3", "F3", "A3", "C4"], ["A#2", "D3", "F3", "A3"], ["C3", "E3", "G3", "C4"]]; tt, k = a, 0
+        while tt < b - 0.1: pon(M, acorde(seq[k % 4], min(2.6, b - tt + 0.5), 0.07, 1600, 0.6), tt); tt += 2.2; k += 1
+        piano(a + 0.2, b, ["A4", "C5", "F5", "E5", "D5", "C5", "A4", "G4"], 0.55, 0.08)
+    @cue("jazz")
+    def _(a, b):
+        bajo = ["D2", "F2", "A2", "C3", "G2", "B2", "D3", "F3", "C2", "E2", "G2", "B2"]; paso, tt, k = 60 / 132, a, 0
+        while tt < b - 0.05:
+            pon(M, tono(hz(bajo[k % 12]), paso * 0.95, 4, (1, .5, .2), 0.22), tt)
+            if k % 2 == 1: pon(FX, ruido(0.08, 6000, 12000, 0.03) * np.exp(-np.arange(int(0.08 * SR)) / SR * 40), tt)
+            if k % 4 == 0: pon(M, acorde([["F4", "A4", "C5", "E5"], ["B3", "D4", "F4", "A4"], ["E4", "G4", "B4", "D5"]][(k // 4) % 3], paso * 1.6, 0.05, 3000, 0.01), tt + paso * 0.66)
+            tt += paso; k += 1
+        piano(a + 0.5, b, ["A5", "G5", "E5", "D5", "C5", "D5", "E5", "G5"], 60 / 132 * 1.5, 0.06)
+    @cue("synth")
+    def _(a, b):
+        seq = [["D2", "A2", "D3", "F3"], ["A#1", "F2", "A#2", "D3"], ["C2", "G2", "C3", "E3"]]; tt, k = a, 0
+        while tt < b - 0.1: pon(M, sala(acorde(seq[k % 3], min(4.0, b - tt + 1.0), 0.16, 1400, 1.2), 2.5, 0.5), tt); tt += 3.2; k += 1
+        pon(M, sala(metal(["D4", "A4"], min(3.0, b - a), 0.12), 3.0, 0.6), a + 0.8)
+    @cue("romcom")
+    def _(a, b):
+        tt, k, notas = a, 0, ["C5", "E5", "G5", "E5", "F5", "A5", "C6", "A5", "G5", "B5", "D6", "B5"]
+        while tt < b - 0.05: pon(M, tono(hz(notas[k % 12]), 0.25, 14, (1, .3), 0.09), tt, 1, 0.2 * np.sin(k)); tt += 60 / 140 / 2; k += 1
+        ostinato(a, b, 140, ["C3", "C3", "G2", "G2", "A2", "A2", "F2", "G2"], 0.05, 900)
     @cue("fin")
     def _(a, b): pon(M, acorde(["C3", "G3", "C4", "E4", "G4"], b - a + 1.0, 0.18, 3000, 0.1), a); pon(FX, taiko(44, 1.6, 0.9), a)
     P = lin["planos"]
