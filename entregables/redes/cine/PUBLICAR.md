@@ -21,3 +21,20 @@ Seis videos verticales de 30 a 45 s, con estilo de cine retro y contemporáneo: 
 
 ## Cuándo publicarlos
 Uno por noche entre las 8 y las 9 p. m., alternando entre géneros: zombis → romance → ciencia ficción → comedia. Así la cuenta se ve como una «cartelera».
+
+## La música original de cada película (se pone desde la app)
+Las bandas sonoras originales tienen derechos de autor: si van pegadas al video, las redes lo silencian. Por eso se sube la versión **`-sin-musica.mp4`** y la canción se agrega desde TikTok o Instagram, donde está licenciada.
+
+| Video | Canción para buscar en «Sonidos» o «Música» | Desde qué segundo de la canción |
+|---|---|---|
+| `hambre-mundial-z-sin-musica` | **Isolated System**, de Muse (Guerra Mundial Z) | Desde el principio: el piano tenso entra con «Empezó un viernes…» |
+| `los-que-esperan-sin-musica` | **The Walking Dead Main Title**, de Bear McCreary | Desde el principio: los violonchelos acompañan al comisario en la carretera |
+| `el-diario-de-orbi-sin-musica` | **The Notebook (Main Title)**, de Aaron Zigman | Desde el principio: el piano suave va con todo el video |
+| `perder-un-cliente-sin-musica` | **You're So Vain**, de Carly Simon (la escena del karaoke) | Desde el coro («You're so vain…») |
+| `ciudad-de-las-luces-sin-musica` | **A Lovely Night**, de *La La Land* (es justo la escena del mirador) | Desde el silbido del inicio; si no aparece, **City of Stars** |
+| `blade-mesero-2049-sin-musica` | **Blade Runner (End Titles)** o **Tears in Rain**, de Vangelis | End Titles desde el principio; Tears in Rain para el monólogo final |
+
+**Cómo se pone (TikTok):** subes el video → «Agregar sonido» → buscas la canción → «Volumen» → **sonido original 100 %** y **sonido agregado entre 20 y 30 %**, para que se entiendan las voces.
+**En Instagram:** igual, desde «Música» al crear el Reel, y bajas el volumen de la canción.
+
+**Importante:** las cuentas **de empresa** casi no tienen acceso a estas canciones; solo ven música comercial genérica. Para usarlas, la cuenta debe ser **personal o de creador** (en Instagram: Configuración → Tipo de cuenta → Creador de contenido). Si una canción no aparece en tu país, usa otra del mismo estilo que te salga en la búsqueda.
