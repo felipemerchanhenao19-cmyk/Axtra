@@ -1,0 +1,71 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #050a14; font-family: "Figtree", sans-serif; color: #eef4fa; }
+#fondo { position: absolute; inset: 0; background: radial-gradient(90% 60% at 50% 35%, #17406f 0%, #0b1626 55%, #050a14 100%); }
+#rejilla { position: absolute; inset: -200px; background-image: linear-gradient(rgba(127,216,240,.06) 2px, transparent 2px), linear-gradient(90deg, rgba(127,216,240,.06) 2px, transparent 2px); background-size: 120px 120px; }
+.luz { position: absolute; width: 900px; height: 900px; border-radius: 50%; background: radial-gradient(circle, rgba(47,187,232,.18), rgba(47,187,232,0) 70%); }
+#marca { position: absolute; left: 70px; right: 70px; top: 96px; display: flex; justify-content: space-between; font: 800 30px/1 "Figtree"; letter-spacing: .02em; z-index: 5; }
+#marca span { color: #7fd8f0; font-weight: 700; letter-spacing: .28em; font-size: 24px; text-transform: uppercase; }
+.plano { position: absolute; inset: 0; opacity: 0; }
+.sup { font: 700 26px/1 "Figtree"; letter-spacing: .3em; color: #7fd8f0; text-transform: uppercase; }
+.tit { font: 400 104px/1.04 "Italiana", Georgia, serif; color: #fff; }
+.tit em { font-style: normal; color: #7fd8f0; }
+.sub { font: 500 40px/1.3 "Figtree"; color: #a9bbcf; }
+.portada { position: absolute; left: 80px; right: 80px; top: 470px; }
+.portada .tit { margin: 34px 0 40px; }
+.cifra { position: absolute; left: 70px; right: 70px; top: 520px; text-align: center; }
+.cifra .eti { font: 600 44px/1.25 "Figtree"; color: #cfe0ee; }
+.cifra .val { font: 800 150px/1 "Figtree"; letter-spacing: -4px; margin: 40px 0 26px; color: #fff; }
+.cifra .val.rojo { color: #ff6b7a; } .cifra .val.cian { color: #7fd8f0; }
+.cifra .nota { font: 500 36px/1.3 "Figtree"; color: #8ea3b8; }
+.compa { position: absolute; left: 70px; right: 70px; top: 360px; }
+.compa .tit { font-size: 86px; margin: 22px 0 60px; }
+.fila { margin-bottom: 64px; }
+.fila .nom { font: 700 38px/1.2 "Figtree"; color: #dfe9f2; } .fila .nom small { display: block; font: 500 28px/1.3 "Figtree"; color: #8ea3b8; }
+.barra { height: 64px; border-radius: 12px; margin-top: 18px; background: #5a6678; position: relative; }
+.barra b { position: absolute; left: 100%; top: 50%; transform: translate(18px, -50%); font: 800 46px/1 "Figtree"; white-space: nowrap; color: #fff; }
+.fila.mala .barra { background: linear-gradient(90deg, #8a1e2c, #ff5a6a); } .fila.buena .barra { background: linear-gradient(90deg, #1a6fa0, #7fd8f0); box-shadow: 0 0 40px rgba(127,216,240,.45); }
+.lista { position: absolute; left: 80px; right: 80px; top: 380px; }
+.lista .tit { font-size: 92px; margin: 24px 0 56px; }
+.item { display: flex; align-items: center; gap: 30px; font: 600 44px/1.25 "Figtree"; color: #eef4fa; margin-bottom: 40px; }
+.item i { flex: none; width: 64px; height: 64px; border-radius: 18px; background: rgba(127,216,240,.14); border: 2px solid #7fd8f0; position: relative; }
+.item i::after { content: ""; position: absolute; left: 20px; top: 13px; width: 14px; height: 26px; border: solid #7fd8f0; border-width: 0 6px 6px 0; transform: rotate(45deg); }
+.demo { position: absolute; left: 0; right: 0; top: 200px; text-align: center; }
+.demo .paso { font: 400 62px/1.05 "Italiana", Georgia, serif; color: #fff; margin: 18px 70px 0; }
+.cel { position: absolute; left: 50%; top: 400px; width: 560px; height: 1204px; margin-left: -280px; border-radius: 70px; background: #05070c; border: 14px solid #1d2532;
+  box-shadow: 0 0 0 3px #3a4658, 0 40px 120px rgba(0,0,0,.6), 0 0 120px rgba(47,187,232,.25); overflow: hidden; transform-origin: 50% 0; }
+.cel video { width: 100%; height: 100%; object-fit: cover; }
+.cel::before { content: ""; position: absolute; left: 50%; top: 14px; width: 140px; height: 34px; margin-left: -70px; border-radius: 20px; background: #05070c; z-index: 2; }
+.lap { position: absolute; left: 40px; width: 1000px; top: 560px; }
+.lap .pan { width: 1000px; height: 694px; border-radius: 22px 22px 0 0; border: 18px solid #1d2532; background: #05070c; overflow: hidden; position: relative; box-shadow: 0 0 120px rgba(47,187,232,.25); }
+.lap .pan video { width: 964px; height: 670px; object-fit: cover; transform-origin: 0 0; }
+.lap .base { height: 34px; margin: 0 -40px; border-radius: 0 0 30px 30px; background: linear-gradient(#3a4658, #1d2532); }
+.pasos { position: absolute; left: 80px; right: 80px; top: 330px; }
+.pasos .tit { font-size: 84px; margin: 22px 0 50px; }
+.pa { display: flex; gap: 34px; margin-bottom: 46px; }
+.pa .n { flex: none; width: 92px; height: 92px; border-radius: 50%; border: 3px solid #7fd8f0; color: #7fd8f0; font: 800 44px/86px "Figtree"; text-align: center; background: rgba(127,216,240,.1); }
+.pa b { display: block; font: 800 44px/1.15 "Figtree"; color: #fff; } .pa span { display: block; font: 500 34px/1.3 "Figtree"; color: #a9bbcf; margin-top: 8px; }
+.precios { position: absolute; left: 70px; right: 70px; top: 330px; }
+.precios .tit { font-size: 84px; margin: 22px 0 46px; }
+.tarjeta { border: 2px solid rgba(127,216,240,.5); border-radius: 26px; padding: 34px 40px; margin-bottom: 36px; background: rgba(11,22,38,.75); }
+.tarjeta h3 { font: 800 50px/1 "Figtree"; color: #fff; display: flex; align-items: center; gap: 18px; }
+.tarjeta .linea { display: flex; justify-content: space-between; align-items: baseline; margin-top: 26px; font: 500 34px/1.2 "Figtree"; color: #a9bbcf; }
+.tarjeta .linea b { font: 800 52px/1 "Figtree"; color: #7fd8f0; } .tarjeta .linea s { font-size: 30px; color: #6a7c90; margin-right: 14px; }
+.pin { display: inline-block; width: 56px; height: 56px; border-radius: 16px; background: #2fbbe8; position: relative; flex: none; }
+.pin::after { content: ""; position: absolute; left: 17px; top: 12px; width: 22px; height: 22px; border-radius: 50% 50% 50% 0; background: #0b1626; transform: rotate(-45deg); }
+.pregunta { position: absolute; left: 80px; right: 80px; top: 470px; }
+.pregunta .tit { font-size: 96px; margin: 30px 0 60px; }
+.resp { border-left: 8px solid #7fd8f0; padding: 26px 0 26px 40px; font: 600 50px/1.3 "Figtree"; color: #fff; background: linear-gradient(90deg, rgba(127,216,240,.12), rgba(127,216,240,0)); }
+.cierre { position: absolute; left: 0; right: 0; top: 520px; text-align: center; }
+.cierre .logo { display: inline-flex; align-items: center; gap: 24px; font: 800 96px/1 "Figtree"; }
+.cierre .logo .pin { width: 96px; height: 96px; border-radius: 26px; } .cierre .logo .pin::after { left: 29px; top: 21px; width: 38px; height: 38px; }
+.cierre .frase { font: 400 70px/1.15 "Italiana", Georgia, serif; color: #dfe9f2; margin: 50px 80px 70px; }
+.wa { display: inline-flex; align-items: center; gap: 26px; background: #fff; color: #0b1626; border-radius: 30px; padding: 30px 46px; }
+.wa small { display: block; font: 700 30px/1 "Figtree"; color: #3a4658; text-align: left; } .wa b { display: block; font: 900 74px/1.05 "Figtree"; letter-spacing: -1px; }
+.wa i { width: 96px; height: 96px; border-radius: 26px; background: #25d366; position: relative; flex: none; }
+.wa i::after { content: ""; position: absolute; left: 22px; top: 20px; width: 46px; height: 46px; border: 7px solid #fff; border-radius: 50% 50% 50% 8px; }
+.pie { margin-top: 70px; font: 600 24px/1.4 "Figtree"; letter-spacing: .24em; color: #6a7c90; text-transform: uppercase; }
+#sub { position: absolute; left: 50%; top: 1500px; transform: translateX(-50%); width: max-content; max-width: 960px; text-align: center; font: 600 44px/1.28 "Figtree"; color: #fff;
+  background: rgba(5,10,20,.78); border: 1px solid rgba(127,216,240,.35); border-radius: 14px; padding: 18px 30px 22px; opacity: 0; z-index: 6; }
+#nota { position: absolute; left: 80px; right: 80px; top: 1730px; text-align: center; font: 500 22px/1.35 "Figtree"; color: #6a7c90; z-index: 6; }
+#negro { position: absolute; inset: 0; background: #000; opacity: 0; z-index: 9; }
+#grano { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .035; mix-blend-mode: overlay; pointer-events: none; z-index: 8; }

@@ -206,6 +206,14 @@ def sonido(ep, lin, W):
         tt, k, notas = a, 0, ["C5", "E5", "G5", "E5", "F5", "A5", "C6", "A5", "G5", "B5", "D6", "B5"]
         while tt < b - 0.05: pon(M, tono(hz(notas[k % 12]), 0.25, 14, (1, .3), 0.09), tt, 1, 0.2 * np.sin(k)); tt += 60 / 140 / 2; k += 1
         ostinato(a, b, 140, ["C3", "C3", "G2", "G2", "A2", "A2", "F2", "G2"], 0.05, 900)
+    @cue("corporativo")
+    def _(a, b):
+        seq = [["C3", "G3", "D4", "E4"], ["A2", "E3", "B3", "C4"], ["F2", "C3", "G3", "A3"], ["G2", "D3", "A3", "B3"]]; tt, k = a, 0
+        while tt < b - 0.1: pon(M, acorde(seq[k % 4], min(2.9, b - tt + 0.6), 0.09, 1800, 0.5), tt); tt += 2.4; k += 1
+        notas = ["E5", "G5", "D5", "G5", "C5", "G5", "B4", "G5"]; tt, k = a + 0.1, 0
+        while tt < b - 0.05: pon(M, tono(hz(notas[k % 8]), 0.9, 4, (1, .35, .12), 0.045), tt, 1, 0.25 * np.sin(k)); tt += 60 / 100 / 2; k += 1
+        tt = a
+        while tt < b - 0.1: pon(FX, taiko(52, 0.5, 0.18), tt); tt += 60 / 100
     @cue("fin")
     def _(a, b): pon(M, acorde(["C3", "G3", "C4", "E4", "G4"], b - a + 1.0, 0.18, 3000, 0.1), a); pon(FX, taiko(44, 1.6, 0.9), a)
     P = lin["planos"]
