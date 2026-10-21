@@ -9,7 +9,7 @@ LOGO = '''<svg viewBox="0 0 100 100" width="{t}" height="{t}"><path d="M50 12 L 
 CSS = '''<style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { width: 1080px; height: 1350px; background: #fbfaf7; color: #0b1f3a; font-family: "Figtree", sans-serif; position: relative; overflow: hidden; }
-.marco { position: absolute; inset: 36px; border: 2px solid #0b1f3a; }
+.marco { position: absolute; top: 36px; left: 36px; right: 36px; bottom: 236px; border: 2px solid #0b1f3a; }
 .marco::after { content: ""; position: absolute; inset: 10px; border: 1px solid rgba(11,31,58,.25); }
 .pie-azul { position: absolute; left: 0; right: 0; bottom: 0; height: 200px; background: #0b1f3a; }
 .cab { position: absolute; top: 90px; left: 100px; right: 100px; display: flex; align-items: center; gap: 18px; }
@@ -40,7 +40,7 @@ reclutar = pagina('''<div style="position:absolute;top:220px;left:100px;right:10
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 40px;margin-top:40px;font-size:25px;color:#34465e">
     <div>— Horario flexible</div><div>— Capacitación y material de venta</div><div>— Código personal de asesor</div><div>— Presentación formal</div></div></div>''',
-  "SE BUSCA", "Postúlese por", WA, "ÚNASE")
+  "SE BUSCA", "¿Le interesa?", "Responda este mensaje", "ÚNASE")
 # 2 · Venta a restaurantes
 vender = pagina('''<div style="position:absolute;top:220px;left:100px;right:100px">
   <div class="et">SOFTWARE E IA PARA RESTAURANTES</div>
