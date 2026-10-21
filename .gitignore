@@ -3,3 +3,6 @@ venv/
 .venv/
 __pycache__/
 *.pyc
+
+# visor 3D descargado con npm pack para volver a grabar el demo
+produccion/mv/
