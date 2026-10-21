@@ -40,7 +40,7 @@ function continuo(spec, tt, L) {
 const ang = (a) => { while (a > PI) a -= 2 * PI; while (a < -PI) a += 2 * PI; return a; };
 // voz de cada personaje: envolvente real del audio, cuadro a cuadro
 function voz(quien, t) {
-  for (const L of LINEA.planos) for (const l of L.lineas) if (l.quien === quien && t >= l.ini && t < l.fin) { const e = l.env || []; return e[Math.min(e.length - 1, Math.floor((t - l.ini) * 30))] || 0; }
+  for (const L of LINEA.planos) for (const l of L.lineas) if ((l.quien === quien || l.quien.startsWith(quien + "_")) && t >= l.ini && t < l.fin) { const e = l.env || []; return e[Math.min(e.length - 1, Math.floor((t - l.ini) * 30))] || 0; }
   return 0;
 }
 function origen(set) { return SETS[set].position; }
@@ -102,7 +102,7 @@ function render(t) {
   // color de cine, viñeta, subtítulos, título, negro y destellos
   $("#lienzo").style.filter = pl.grado || "contrast(1.08) saturate(1.06)";
   const linea = L.lineas.find((l) => t >= l.ini - 0.05 && t < l.fin + 0.25), sub = $("#sub");
-  sub.textContent = linea ? linea.txt : ""; sub.style.opacity = linea ? 1 : 0;
+  const extra = linea && ((pl.lineas || [])[L.lineas.indexOf(linea)] || [])[3]; sub.textContent = linea ? (extra && extra.sub) || linea.txt : "";   // «sub»: traducción de las líneas en inglés sub.style.opacity = linea ? 1 : 0;
   const ti = $("#titulo");
   if (pl.titulo) { const a = cl((tt - 0.4) / 0.6) * cl((dur - 0.4 - tt) / 0.5); ti.innerHTML = `<small>${pl.titulo[0]}</small><b>${pl.titulo[1] || ""}</b>`; ti.style.opacity = a; } else ti.style.opacity = 0;
   let negro = 0; if (pl.trans === "negro") negro = Math.max(negro, 1 - cl(tt / 0.6)); if (PL[i + 1] && PL[i + 1].trans === "negro") negro = Math.max(negro, cl((tt - dur + 0.45) / 0.45));

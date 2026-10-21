@@ -123,6 +123,7 @@ const GESTOS = {
   cadera: { bi: [0.1, -0.6], bd: [0.1, 0.6] },
   explica: { bi: [-0.7, -0.2], bd: [-0.9, 0.25] },
   celular: { bi: [0.05, -0.08], bd: [-1.35, -0.25], obj: "celular" },
+  llamada: { bi: [0.05, -0.08], bd: [-2.45, 0.42], obj: "celular" },
   tinto: { bi: [0.05, -0.08], bd: [-1.6, -0.2], obj: "tinto" },
   manos_mesa: { bi: [-1.1, -0.1], bd: [-1.1, 0.1], torso: 0.12 },
   rendido: { bi: [0.15, -0.15], bd: [0.15, 0.15], torso: 0.18 },

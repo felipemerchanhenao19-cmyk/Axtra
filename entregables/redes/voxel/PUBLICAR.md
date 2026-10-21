@@ -21,6 +21,9 @@ Los personajes la viven en serio, y el asistente de Apex (Orbi, con la cara nuev
 |---|---|---|---|
 | `mesa-siete.mp4` | Apex Play | ~1 min | «Viernes · 8:00 p. m.»: salón lleno, lluvia, manos levantadas |
 | `la-comision.mp4` | Apex Domicilios | ~50 s | «Lunes · 11:40 p. m.»: oficina, tormenta, Marcela frente al portátil |
+| `el-turista.mp4` | Apex Play (idiomas) | ~45 s | «Excuse me… what is chicharrón?», y Brayan congelado |
+| `una-estrella.mp4` | Apex Play (recomienda) | ~50 s | Don Jairo lee una reseña: «Una estrella. "El mesero nunca volvió."» |
+| `la-llamada.mp4` | Apex Domicilios (Nequi) | ~45 s | Suena el teléfono: «¿Ustedes tienen domicilio? Es que en la aplicación todo sale más caro.» |
 
 Cada capítulo viene en tres versiones:
 - **Principal:** con música y subtítulos.
@@ -30,16 +33,36 @@ Cada capítulo viene en tres versiones:
 ### Textos para publicar
 **Capítulo 1 · Mesa siete**
 > Viernes, 8 p. m. Un solo mesero. Veinticinco minutos de espera en la mesa cuatro. Turno de noche, capítulo 1. 🎬
-> #Restaurantes #Emprendedores #Tulua #Negocios #TurnoDeNoche
 
 **Capítulo 2 · La comisión**
 > Lunes, 11:40 p. m. Marcela tiene que darle una noticia a don Jairo. Turno de noche, capítulo 2. 🎬
-> #Restaurantes #Domicilios #Emprendedores #Tulua #TurnoDeNoche
 
-**Comentario fijado (los dos):** «¿Su restaurante también tiene turno de noche? Escríbanos: 310 789 7960»
+**Capítulo 3 · El turista**
+> Sábado, 1 p. m. La mesa nueve pregunta qué es «chicharrón». En inglés. Turno de noche, capítulo 3. 🎬
+
+**Capítulo 4 · Una estrella**
+> Domingo, 10:30 p. m. Don Jairo lee las reseñas del restaurante. La primera tiene una estrella. Turno de noche, capítulo 4. 🎬
+
+**Capítulo 5 · La llamada**
+> Martes, 9:50 p. m. Suena el teléfono de la oficina: «¿Ustedes tienen domicilio?». Turno de noche, capítulo 5. 🎬
+
+### Hashtags (3 a 5; los genéricos como #fyp o #viral no ayudan)
+Fórmula: 1 de la serie + 1 del formato + 1 o 2 del público + 1 local. `#TurnoDeNoche` siempre.
+
+| Capítulo | Instagram | TikTok | X |
+|---|---|---|---|
+| 1 · Mesa siete | #TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Tulua | #TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Colombia | #Restaurantes #TurnoDeNoche |
+| 2 · La comisión | #TurnoDeNoche #Animacion3D #Domicilios #DueñosDeRestaurante #Tulua | #TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia | #Domicilios #TurnoDeNoche |
+| 3 · El turista | #TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Tulua | #TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Colombia | #Turismo #TurnoDeNoche |
+| 4 · Una estrella | #TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Tulua | #TurnoDeNoche #Animacion3D #Restaurantes #Reseñas #Colombia | #Restaurantes #TurnoDeNoche |
+| 5 · La llamada | #TurnoDeNoche #Animacion3D #Domicilios #Nequi #Tulua | #TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia | #Domicilios #TurnoDeNoche |
+
+No poner nombres de apps de domicilio como hashtag: en videos que hablan de comisiones puede verse como ataque a una marca.
+
+**Comentario fijado (todos):** «¿Su restaurante también tiene turno de noche? Escríbanos: 310 789 7960»
 
 ## Recomendaciones
-- Publicar el capítulo 1 un jueves o viernes entre 6 y 8 p. m., que es cuando el dueño vive la hora pico. El capítulo 2, el lunes siguiente.
+- Orden sugerido, dos por semana: 1 (viernes) → 2 (lunes) → 3 (viernes) → 5 (lunes) → 4 (viernes). Publicar entre 6 y 8 p. m.
 - En TikTok, usar la versión sin música con un sonido de suspenso en tendencia a volumen bajo; los diálogos tienen que oírse.
 - Portada: el primer plano de don Jairo con los ojos cerrados (cap. 1) o Marcela con la luz roja del portátil (cap. 2).
 - Responder comentarios en el tono de la serie: serio y breve («Don Jairo dice que gracias»).
