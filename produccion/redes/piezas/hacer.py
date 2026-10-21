@@ -41,6 +41,18 @@ reclutar = pagina('''<div style="position:absolute;top:220px;left:100px;right:10
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 40px;margin-top:40px;font-size:25px;color:#34465e">
     <div>— Horario flexible</div><div>— Capacitación y material de venta</div><div>— Código personal de asesor</div><div>— Presentación formal</div></div></div>''',
   "SE BUSCA", "¿Le interesa?", "Responda este mensaje", "ÚNASE")
+# 1b · Reclutamiento sin experiencia (plan junior → senior)
+junior = pagina('''<div style="position:absolute;top:220px;left:100px;right:100px">
+  <div class="et">CONVOCATORIA · TODO EL PAÍS</div>
+  <h1>Asesores comerciales,<br><em>con o sin</em><br>experiencia.</h1><div class="linea"></div>
+  <p class="sub">Te capacitamos para ofrecer software e inteligencia artificial a restaurantes. Empiezas acompañado y creces a tu ritmo.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:46px">
+    <div style="border:2px solid #0b1f3a;padding:30px 32px"><div class="et" style="margin-bottom:10px">1 · ASESOR JUNIOR</div><div style="font:800 46px Figtree">50 %</div><div style="font-size:24px;color:#34465e;margin-top:6px">de la comisión mientras<br>aprendes acompañado</div></div>
+    <div style="border:2px solid #0b1f3a;padding:30px 32px;background:#0b1f3a;color:#fff"><div class="et" style="margin-bottom:10px;color:#9fb6d3">2 · ASESOR SENIOR</div><div style="font:800 46px Figtree">Hasta $360.000</div><div style="font-size:24px;color:#c9d6e6;margin-top:6px">por venta, desde tu<br>tercer cierre</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 40px;margin-top:40px;font-size:25px;color:#34465e">
+    <div>— Capacitación gratuita</div><div>— Horario flexible</div><div>— Material de venta listo</div><div>— Código personal de asesor</div></div></div>''',
+  "SE BUSCA", "¿Le interesa?", "Responda este mensaje", "ÚNASE")
 # 2 · Venta a restaurantes
 vender = pagina('''<div style="position:absolute;top:220px;left:100px;right:100px">
   <div class="et">SOFTWARE E IA PARA RESTAURANTES</div>
@@ -72,7 +84,7 @@ async def main():
     from playwright.async_api import async_playwright
     async with async_playwright() as p:
         br = await p.chromium.launch(executable_path="/opt/pw-browsers/chromium-1194/chrome-linux/chrome")
-        for n, h in [("1-Reclutamiento-asesores", reclutar), ("2-Apex-para-restaurantes", vender), ("3-Tarifario", tarifas)]:
+        for n, h in [("1-Reclutamiento-asesores", reclutar), ("1b-Reclutamiento-sin-experiencia", junior), ("2-Apex-para-restaurantes", vender), ("3-Tarifario", tarifas)]:
             pg = await br.new_page(viewport={"width": 1080, "height": 1350}); await pg.set_content(h); await pg.wait_for_timeout(400)
             await pg.screenshot(path=SAL + f"Apex-{n}.png"); await pg.close()
         await br.close()
