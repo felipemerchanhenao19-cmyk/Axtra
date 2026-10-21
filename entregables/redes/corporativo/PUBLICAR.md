@@ -1,5 +1,7 @@
 # Videos corporativos para dueños de restaurante
 
+> **Reemplazados por las «Películas Apex»** (`entregables/redes/peliculas/`). Se retiraron «play-un-mesero-mas» y «como-contratar-apex» porque mostraban un precio fijo de Apex Play, que no existe: Apex Play se cotiza según las mesas y la carta. Los otros cuatro siguen disponibles como material de apoyo.
+
 Seis videos verticales serios, sin caricaturas: gráficos animados con la identidad de Apex, cifras reales de las propuestas y el sistema grabado funcionando en pantalla. La narración es profesional y cada video cierra con el WhatsApp comercial **310 789 7960**. Cada uno viene en tres versiones: con música, sin música (para Instagram de empresa) y liviana (para WhatsApp).
 
 | Video | Para qué sirve | Contenido |

@@ -214,6 +214,18 @@ def sonido(ep, lin, W):
         while tt < b - 0.05: pon(M, tono(hz(notas[k % 8]), 0.9, 4, (1, .35, .12), 0.045), tt, 1, 0.25 * np.sin(k)); tt += 60 / 100 / 2; k += 1
         tt = a
         while tt < b - 0.1: pon(FX, taiko(52, 0.5, 0.18), tt); tt += 60 / 100
+    @cue("pelicula")
+    def _(a, b):
+        pon(M, acorde(["D2", "A2", "D3"], b - a + 0.8, 0.16, 700, 1.2), a)
+        tt = a + 0.2
+        while tt < b - 0.1: pon(FX, taiko(44, 0.7, 0.32), tt); pon(FX, taiko(44, 0.5, 0.18), tt + 0.34); tt += 1.3
+        piano(a + 0.5, b, ["D5", "A4", "F5", "E5", "D5", "A4", "C5", "A4"], 0.65, 0.06)
+        n = int(min(2.0, b - a) * SR); pon(FX, hp(rng.standard_normal(n), 2500) * np.linspace(0, 1, n) ** 3 * 0.05, max(a, b - 2.0))
+    @cue("esperanza")
+    def _(a, b):
+        seq = [["D3", "A3", "D4", "F#4"], ["B2", "F#3", "B3", "D4"], ["G2", "D3", "G3", "B3"], ["A2", "E3", "A3", "C#4"]]; tt, k = a, 0
+        while tt < b - 0.1: pon(M, acorde(seq[k % 4], min(2.8, b - tt + 0.6), 0.13, 2600, 0.4), tt); pon(FX, taiko(46, 0.9, 0.25), tt); tt += 2.2; k += 1
+        piano(a + 0.2, b, ["F#5", "A5", "D6", "A5", "E5", "A5", "C#6", "A5"], 0.275, 0.05)
     @cue("fin")
     def _(a, b): pon(M, acorde(["C3", "G3", "C4", "E4", "G4"], b - a + 1.0, 0.18, 3000, 0.1), a); pon(FX, taiko(44, 1.6, 0.9), a)
     P = lin["planos"]

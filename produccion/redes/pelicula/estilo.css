@@ -1,0 +1,48 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; font-family: "Figtree", sans-serif; color: #fff; }
+#mundo { position: absolute; inset: 0; transform-origin: 50% 55%; }
+#lejos, #medio, #cerca, #tinte, #destello, #polvo, #negro, #blanco, #fuga { position: absolute; inset: 0; }
+#tinte { mix-blend-mode: soft-light; opacity: 0; }
+#destello { mix-blend-mode: screen; opacity: 0; }
+#fuga { mix-blend-mode: screen; opacity: 0; background: linear-gradient(100deg, rgba(255,120,40,0) 20%, rgba(255,150,60,.75) 45%, rgba(255,220,160,.9) 52%, rgba(255,120,40,0) 75%); background-size: 260% 100%; }
+#negro { background: #000; opacity: 0; z-index: 20; } #blanco { background: #fff; opacity: 0; z-index: 19; }
+#vineta { position: absolute; inset: 0; background: radial-gradient(70% 58% at 50% 50%, rgba(0,0,0,0) 45%, rgba(0,0,0,.75) 100%); pointer-events: none; z-index: 8; }
+#barras::before, #barras::after { content: ""; position: absolute; left: 0; right: 0; height: 120px; background: #000; z-index: 18; } #barras::before { top: 0; } #barras::after { bottom: 0; }
+#grano { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .07; mix-blend-mode: overlay; pointer-events: none; z-index: 17; }
+/* celular y pantalla en 3D */
+#dispositivo { position: absolute; left: 50%; top: 50%; opacity: 0; z-index: 9; transform-style: preserve-3d; }
+#dispositivo.cel { width: 560px; height: 1204px; border-radius: 76px; background: #05070c; border: 16px solid #1b222d;
+  box-shadow: 0 0 0 3px #4a5668, 0 60px 160px rgba(0,0,0,.8), 0 0 140px rgba(47,187,232,.35); overflow: hidden; }
+#dispositivo .pantalla { position: absolute; inset: 0; overflow: hidden; } #dispositivo video { width: 100%; height: 100%; object-fit: cover; }
+#dispositivo .brillo { position: absolute; inset: 0; pointer-events: none; }
+#dispositivo .isla { position: absolute; left: 50%; top: 16px; width: 150px; height: 38px; margin-left: -75px; border-radius: 22px; background: #000; }
+#dispositivo.lap { width: 980px; height: 680px; border-radius: 24px 24px 6px 6px; background: #05070c; border: 18px solid #1b222d; box-shadow: 0 60px 160px rgba(0,0,0,.8), 0 0 140px rgba(47,187,232,.3); }
+#dispositivo.lap .base { position: absolute; left: -70px; right: -70px; bottom: -58px; height: 40px; border-radius: 0 0 36px 36px; background: linear-gradient(#4a5668, #1b222d); }
+/* textos */
+#texto { position: absolute; left: 70px; right: 70px; opacity: 0; z-index: 10; text-shadow: 0 4px 30px rgba(0,0,0,.8); }
+#texto.centro { top: 760px; text-align: center; } #texto.arriba { top: 220px; text-align: center; } #texto.abajo { top: 1290px; text-align: left; }
+#texto small { display: block; font: 700 28px/1 "Figtree"; letter-spacing: .3em; color: #7fd8f0; text-transform: uppercase; margin-bottom: 26px; }
+#texto b { display: block; font: 400 112px/1.02 "Italiana", Georgia, serif; color: #fff; }
+#texto em { display: block; font: 500 38px/1.3 "Figtree"; color: #c8d6e4; font-style: normal; margin-top: 26px; }
+#cifra { position: absolute; left: 60px; right: 60px; text-align: center; opacity: 0; z-index: 10; }
+#cifra small { display: block; font: 600 40px/1.2 "Figtree"; color: #e4eef6; text-shadow: 0 2px 20px #000; }
+#cifra b { display: block; font: 800 150px/1 "Figtree"; letter-spacing: -4px; margin: 26px 0 18px; }
+#cifra b i { font-size: .36em; font-style: normal; letter-spacing: 0; margin-left: 10px; }
+#cifra em { display: block; font: 500 32px/1.3 "Figtree"; color: #b8c8d8; font-style: normal; }
+#cifra.cian b { color: #bff3ff; text-shadow: 0 0 30px rgba(80,210,255,.9), 0 0 80px rgba(47,187,232,.6); }
+#cifra.rojo b { color: #ffd0cc; text-shadow: 0 0 30px rgba(255,70,60,.9), 0 0 80px rgba(255,40,40,.6); }
+#palabras span { position: absolute; transform: translate(-50%,-50%); font: 400 64px/1 "Italiana", Georgia, serif; color: #e8fbff; text-shadow: 0 0 24px rgba(80,210,255,.8); z-index: 10; white-space: nowrap; }
+#final { position: absolute; left: 0; right: 0; top: 560px; text-align: center; opacity: 0; z-index: 11; }
+#final .logo { display: inline-flex; align-items: center; gap: 26px; font: 800 104px/1 "Figtree";
+  background: linear-gradient(100deg, #9fb4c8 0%, #fff 40%, #bff3ff 50%, #fff 60%, #9fb4c8 100%); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pin { display: inline-block; width: 100px; height: 100px; border-radius: 28px; background: #2fbbe8; position: relative; box-shadow: 0 0 60px rgba(47,187,232,.7); }
+.pin::after { content: ""; position: absolute; left: 30px; top: 22px; width: 40px; height: 40px; border-radius: 50% 50% 50% 0; background: #0b1626; transform: rotate(-45deg); }
+#final .frase { font: 400 72px/1.12 "Italiana", Georgia, serif; color: #e4eef6; margin: 50px 80px 30px; }
+#final .detalle { font: 600 34px/1.35 "Figtree"; color: #9fdcf0; margin: 0 90px 60px; }
+#final .wa { display: inline-flex; align-items: center; gap: 26px; background: #fff; color: #0b1626; border-radius: 30px; padding: 28px 44px; }
+#final .wa small { display: block; font: 700 28px/1 "Figtree"; color: #3a4658; text-align: left; } #final .wa b { display: block; font: 900 70px/1.05 "Figtree"; }
+#final .wa i { width: 90px; height: 90px; border-radius: 24px; background: #25d366; position: relative; flex: none; }
+#final .wa i::after { content: ""; position: absolute; left: 20px; top: 18px; width: 44px; height: 44px; border: 7px solid #fff; border-radius: 50% 50% 50% 8px; }
+#final .pie { margin-top: 60px; font: 600 24px/1 "Figtree"; letter-spacing: .3em; color: #6a7c90; text-transform: uppercase; }
+#sub { position: absolute; left: 60px; right: 60px; top: 1570px; text-align: center; font: 600 42px/1.3 "Figtree"; color: #fff; text-shadow: 0 2px 4px #000, 0 0 30px rgba(0,0,0,.9); opacity: 0; z-index: 12; }
+#nota { position: absolute; left: 80px; right: 80px; top: 1720px; text-align: center; font: 500 21px/1.35 "Figtree"; color: #8a9cb0; z-index: 12; }
