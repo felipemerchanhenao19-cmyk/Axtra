@@ -2,7 +2,7 @@
   python hacer.py <id|todos>               →  entregables/redes/peliculas/<id>.mp4 (+ sin música y liviano)
   PRUEBA=planos python hacer.py <id>       →  un cuadro por plano para revisar
 Usa las voces, la música y el render del motor de «heroes». Las grabaciones reales están en produccion/videos/grabaciones/."""
-import sys, os, json, asyncio, subprocess, time
+import shutil, sys, os, json, asyncio, subprocess, time
 AQUI = os.path.dirname(os.path.abspath(__file__)) + "/"
 sys.path.insert(0, AQUI)
 from episodios import EPISODIOS
@@ -34,6 +34,7 @@ def pagina(ep, lin, W):
 {leer(AQUI + "mundo.js")}
 {leer(AQUI + "escena.js")}</script></body></html>'''
     open(W + "cuadro.html", "w").write(html)
+    shutil.copytree(AQUI + "fotos", W + "fotos", dirs_exist_ok=True)
 
 def hacer(eid):
     ep = EPISODIOS[eid]; W = motor.TRABAJO + "peli_" + eid + "/"; os.makedirs(W, exist_ok=True); t0 = time.time()

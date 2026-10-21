@@ -108,7 +108,7 @@ EPISODIOS = {
         lineas=[N("Es un asistente que escucha a sus clientes…", 1.6)]),
    dict(escenario="vacio", orbe=dict(x=540, y=900, r=130), cam=[[540, 940, 1.0, 0], [540, 920, 1.08, 0]], angulo=[[0, -8], [0, 8]], grado="limpio", musica="esperanza", palabras=["Hola", "Hello", "Olá", "Hallo", "Привет", "こんにちは"], palabrasY=900,
         lineas=[O("Hola. Hello. Olá.", 0.6), N("…y les habla en seis idiomas.", 0.4)]),
-   dict(escenario="mesa", op=dict(qr=True, qrLuz=0.7, platoX=500), orbe=dict(x=540, y=760, r=80), foco=dict(lejos=6), cam=[[540, 1100, 1.15, 0], [540, 1000, 1.02, 0]], angulo=[[12, -6], [6, 6]], grado="ambar", musica="esperanza", trans="fuga",
+   dict(escenario="mesa", op=dict(qr=True, qrLuz=0.7, platoX=500, plato="torta"), orbe=dict(x=540, y=760, r=80), foco=dict(lejos=6), cam=[[540, 1100, 1.15, 0], [540, 1000, 1.02, 0]], angulo=[[12, -6], [6, 6]], grado="ambar", musica="esperanza", trans="fuga",
         lineas=[O("¿Le provoca la torta de chocolate de la casa? Hoy está en oferta.", 0.6), N("Recomienda el postre perfecto, en el momento justo.", 0.4)]),
    dict(escenario="salon", op=dict(orbes={"0": 0.3, "1": 0.5, "2": 0.7, "3": 0.9, "4": 1.1, "5": 1.3}), cam=[[540, 1400, 1.45, 0], [540, 940, 1.0, 0]], angulo=[[18, 0], [4, 0]], grado="sueño", musica="esperanza", trans="flash", min=5.0,
         lineas=[N("Y atiende todas las mesas a la vez. Sin descanso.", 1.2)]),

@@ -96,6 +96,14 @@ function orbe(x, y, r0, t, o = {}) {
 }
 // Nivel de voz simulado por sílabas (para que la boca se abra y cierre con ritmo de habla)
 function nivelVoz(t) { const v = Math.abs(Math.sin(t * 10.5) * Math.sin(t * 6.1 + 1)) * (0.6 + 0.4 * Math.sin(t * 2.3) ** 2); return 0.15 + 0.85 * v; }
+// ---------- Platos reales: fotos de la carta recortadas (fotos/), con sombra de contacto y la luz cálida de la vela encima
+const PLATOS = { bandeja: { w: 620, alto: 446 / 738 * 0.74, base: 0.5 }, torta: { w: 440, alto: 466 / 534, base: 0.78 } };
+function platoReal(x, y, tipo, t) {
+  const p = PLATOS[tipo], w = p.w, h = w * p.alto, top = y - h * p.base;
+  return `<ellipse cx="${x}" cy="${y + h * (1 - p.base) - 18}" rx="${w * 0.5}" ry="${w * 0.1}" fill="rgba(0,0,0,.55)" filter="url(#desenfoque)"/>
+    <image href="fotos/${tipo}.png" x="${x - w / 2}" y="${top}" width="${w}" height="${h}" preserveAspectRatio="none"/>
+    <ellipse cx="${x - w * 0.15}" cy="${top + h * 0.35}" rx="${w * 0.45}" ry="${h * 0.4}" fill="url(#calida)" opacity="${0.35 + 0.05 * Math.sin(t * 9)}" style="mix-blend-mode:soft-light"/>`;
+}
 // ---------- Escenarios
 function lampara(x, y, s, t, on = 1, cono = "cono") {
   const fl = 0.95 + 0.05 * Math.sin(t * 13 + x);
@@ -149,7 +157,7 @@ function mesa(t, o = {}) {
   // vela, copa, plato y el código QR en su base de acrílico
   medio += `<circle cx="${o.velaX ?? 240}" cy="1120" r="${300 + 20 * Math.sin(t * 9)}" fill="url(#calida)"/><rect x="${(o.velaX ?? 240) - 26}" y="1020" width="52" height="140" rx="6" fill="#efe6d0"/><ellipse cx="${o.velaX ?? 240}" cy="${1004 + Math.sin(t * 11) * 3}" rx="14" ry="30" fill="#ffd27a"/>`;
   medio += `<g transform="translate(860 1200)"><path d="M-46 0 L -56 -150 Q 0 -190 56 -150 L 46 0 Z" fill="rgba(255,240,220,.12)" stroke="rgba(255,235,210,.6)" stroke-width="3"/><path d="M-50 -80 Q 0 -70 50 -80 L 46 0 L -46 0 Z" fill="rgba(150,20,40,.55)"/><rect x="-4" y="0" width="8" height="90" fill="rgba(255,240,220,.4)"/><ellipse cy="92" rx="50" ry="10" fill="rgba(255,240,220,.3)"/></g>`;
-  if (o.plato !== false) medio += `<g transform="translate(${o.platoX ?? 470} 1460)"><ellipse rx="260" ry="80" fill="#f2ede4"/><ellipse rx="200" ry="58" fill="#e4ddd2"/><ellipse cx="-50" cy="-10" rx="80" ry="30" fill="#a8541e"/><ellipse cx="60" cy="0" rx="70" ry="24" fill="#d9b25a"/><ellipse cx="0" cy="20" rx="60" ry="18" fill="#6aa84f"/><ellipse cx="-40" cy="-30" rx="40" ry="10" fill="rgba(255,255,255,.3)"/></g>`;
+  if (o.plato !== false) medio += platoReal(o.platoX ?? 470, 1460, o.plato || "bandeja", t);
   if (o.qr) { const brillo = o.qrLuz ?? 0, cx = o.qrX ?? 540, cy = o.qrY ?? 1180;
     medio += `<g transform="translate(${cx} ${cy})"><circle cy="-120" r="${260 * brillo}" fill="url(#fria)" opacity="${brillo}"/><rect x="-90" y="-240" width="180" height="230" rx="10" fill="rgba(220,240,255,.18)" stroke="rgba(255,255,255,.6)" stroke-width="3"/>
       <rect x="-70" y="-220" width="140" height="140" fill="#f4f8fb"/>${Array.from({ length: 49 }, (_, i) => rnd(i + 11) > 0.5 ? `<rect x="${-66 + (i % 7) * 19}" y="${-216 + Math.floor(i / 7) * 19}" width="17" height="17" fill="#0b1626"/>` : "").join("")}

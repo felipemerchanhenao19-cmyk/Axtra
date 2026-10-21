@@ -46,6 +46,9 @@ async function render(t, f) {
   $("#lejos").innerHTML = g(k, MUNDO_DEFS) + esc.lejos + "</g></svg>";
   $("#medio").innerHTML = g(1) + esc.medio + orbeSvg + "</g></svg>";
   $("#cerca").innerHTML = g(1.35) + (esc.cerca || "") + "</g></svg>";
+  // las fotos de los platos tienen que estar pintadas antes de tomar el cuadro
+  await Promise.all([...document.querySelectorAll("#medio image")].map((im) => Promise.race([
+    im.decode ? im.decode().catch(() => {}) : new Promise((r) => im.addEventListener("load", r, { once: true })), new Promise((r) => setTimeout(r, 3000))])));
   const dof = resolver(pl.foco || {}, p);
   $("#lejos").style.filter = `blur(${dof.lejos ?? 3}px)`; $("#medio").style.filter = `blur(${dof.medio ?? 0}px)`; $("#cerca").style.filter = `blur(${dof.cerca ?? 10}px)`;
   $("#mundo").style.transform = `perspective(1800px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${1 + Math.abs(rx) / 120 + Math.abs(ry) / 120})`;
