@@ -47,7 +47,7 @@ EPISODIOS = {
         texto=dict(kicker="Todas las mesas", titulo="Al mismo tiempo", estilo="arriba", desde=1.6),
         lineas=[N("Todas las mesas, al mismo tiempo.", 1.0), N("Cada pedido viaja directo a la cocina.", 0.4)]),
    dict(escenario="cocina", op=dict(tickets=4), foco=dict(lejos=9, medio=9), cam=[[540, 960, 1.0, 0], [540, 960, 1.06, 0]], grado="ambar", musica="esperanza", trans="barrido",
-        dispositivo=dict(tipo="lap", video="play/caja.webm", desde=56.5, hasta=66.0, pose=[[0, -40, 0.9, 14, -10, 0], [0, -60, 1.0, 5, 6, 0]], cam=[[0, 0.0, 1.0], [0.0, 0.42, 1.55]]),
+        dispositivo=dict(tipo="lap", video="play/caja.webm", desde=57.8, hasta=67.3, pose=[[0, -40, 0.9, 14, -10, 0], [0, -60, 1.0, 5, 6, 0]], cam=[[0, 0.0, 1.0], [0.0, 0.42, 1.55]]),
         texto=dict(kicker="Directo a la caja", titulo="Sin errores", estilo="arriba", desde=0.5),
         lineas=[N("Y llega a la caja completo: la mesa, los platos, la hora.", 0.4)]),
    dict(escenario="salon", op=dict(orbes={"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0}), foco=dict(lejos=10, medio=9), cam=[[540, 960, 1.05, 0], [540, 960, 1.12, 0]], grado="sueño", musica="esperanza", trans="fuga", nota=NOTA_PLAY,

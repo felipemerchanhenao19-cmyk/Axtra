@@ -1,13 +1,13 @@
 {
  "qr": 1.81,
- "carta": 10.71,
- "pedir": 19.26,
- "tresd": 30.93,
- "oferta": 38.61,
- "envio": 44.76,
- "envio_caja": 58.96,
- "enviado": 44.99,
- "idiomas": 50.99,
- "fin": 57.49,
- "caja_offset": 14.2
+ "carta": 10.72,
+ "pedir": 19.27,
+ "tresd": 31.17,
+ "oferta": 38.85,
+ "envio": 45.0,
+ "envio_caja": 60.24,
+ "enviado": 45.24,
+ "idiomas": 51.24,
+ "fin": 57.74,
+ "caja_offset": 15.24
 }

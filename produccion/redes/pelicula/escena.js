@@ -27,6 +27,9 @@ async function buscar(v, t) {
   t = Math.max(0, Math.min(t, (isFinite(v.duration) ? v.duration : 999) - 0.05)); if (Math.abs(v.currentTime - t) < 0.001) return;
   await new Promise((r) => { v.addEventListener("seeked", r, { once: true }); v.currentTime = t; setTimeout(r, 3000); });
 }
+// El cuadro del video se copia a un lienzo después de cada búsqueda: así nunca sale la pantalla en negro por un cuadro aún sin pintar
+function lienzo(v) { if (!v._lz) v._lz = document.createElement("canvas"); return v._lz; }
+function pintar(v) { const c = lienzo(v); if (!v.videoWidth) return; if (c.width !== v.videoWidth) { c.width = v.videoWidth; c.height = v.videoHeight; } c.getContext("2d").drawImage(v, 0, 0); }
 EP.planos.forEach((pl, i) => { if (pl.dispositivo) vid(i, pl.dispositivo.video); });
 let ultSub = "", ultTexto = -1;
 async function render(t, f) {
@@ -63,12 +66,13 @@ async function render(t, f) {
   // Celular o pantalla en 3D con la grabación real
   const dv = $("#dispositivo");
   if (pl.dispositivo) { const d = pl.dispositivo, v = VID[i], [x, y, s, a, b, c] = claves(d.pose, p, [0, 0, 1, 0, 0, 0]);
-    if (dv.dataset.i !== String(i)) { dv.dataset.i = i; dv.className = d.tipo; dv.innerHTML = d.tipo === "cel" ? `<div class="pantalla"></div><div class="brillo"></div><div class="isla"></div>` : `<div class="pantalla"></div><div class="brillo"></div><div class="base"></div>`; dv.querySelector(".pantalla").appendChild(v); }
+    if (dv.dataset.i !== String(i)) { dv.dataset.i = i; dv.className = d.tipo; dv.innerHTML = d.tipo === "cel" ? `<div class="pantalla"></div><div class="brillo"></div><div class="isla"></div>` : `<div class="pantalla"></div><div class="brillo"></div><div class="base"></div>`; dv.querySelector(".pantalla").appendChild(lienzo(v)); }
     dv.style.opacity = out3(tt / 0.5) * cl(fin / 0.3);
     dv.style.transform = `translate(-50%,-50%) translate(${x}px, ${y}px) perspective(2000px) rotateX(${a}deg) rotateY(${b}deg) rotateZ(${c}deg) scale(${s})`;
     dv.querySelector(".brillo").style.background = `linear-gradient(${110 + b * 2}deg, rgba(255,255,255,0) ${30 + b}%, rgba(255,255,255,.16) ${42 + b}%, rgba(255,255,255,0) ${55 + b}%)`;
-    if (d.cam) { const [vx, vy, vz] = claves(d.cam, p, [0, 0, 1]); v.style.transformOrigin = "0 0"; v.style.transform = `scale(${vz}) translate(${-vx * 100}%, ${-vy * 100}%)`; }
+    if (d.cam) { const [vx, vy, vz] = claves(d.cam, p, [0, 0, 1]); v._lz.style.transformOrigin = "0 0"; v._lz.style.transform = `scale(${vz}) translate(${-vx * 100}%, ${-vy * 100}%)`; }
     await buscar(v, Math.min(d.desde + tt * (d.vel ?? 1), d.hasta ?? 999));
+    pintar(v);
   } else { dv.style.opacity = 0; dv.dataset.i = ""; }
   // Textos de cine
   const tx = $("#texto");

@@ -13,7 +13,7 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
 #dispositivo { position: absolute; left: 50%; top: 50%; opacity: 0; z-index: 9; transform-style: preserve-3d; }
 #dispositivo.cel { width: 560px; height: 1204px; border-radius: 76px; background: #05070c; border: 16px solid #1b222d;
   box-shadow: 0 0 0 3px #4a5668, 0 60px 160px rgba(0,0,0,.8), 0 0 140px rgba(47,187,232,.35); overflow: hidden; }
-#dispositivo .pantalla { position: absolute; inset: 0; overflow: hidden; } #dispositivo video { width: 100%; height: 100%; object-fit: cover; }
+#dispositivo .pantalla { position: absolute; inset: 0; overflow: hidden; } #dispositivo video, #dispositivo canvas { width: 100%; height: 100%; object-fit: cover; }
 #dispositivo .brillo { position: absolute; inset: 0; pointer-events: none; }
 #dispositivo .isla { position: absolute; left: 50%; top: 16px; width: 150px; height: 38px; margin-left: -75px; border-radius: 22px; background: #000; }
 #dispositivo.lap { width: 980px; height: 680px; border-radius: 24px 24px 6px 6px; background: #05070c; border: 18px solid #1b222d; box-shadow: 0 60px 160px rgba(0,0,0,.8), 0 0 140px rgba(47,187,232,.3); }
