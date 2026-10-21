@@ -376,9 +376,11 @@ function dibujarCara(g, c, r, t, extra) {
   // boca
   const by = c + r * 0.3;
   g.lineCap = "round";
-  if (habla && extra > 0.04) { const alto = r * (0.05 + 0.22 * Math.min(1, extra * 1.6));
-    g.fillStyle = "#071a33"; g.beginPath(); g.ellipse(c, by, r * 0.17, alto, 0, 0, Math.PI * 2); g.fill();
-    g.fillStyle = "#ff7b8a"; g.beginPath(); g.ellipse(c, by + alto * 0.45, r * 0.09, alto * 0.35, 0, 0, Math.PI * 2); g.fill(); }
+  if (habla && extra > 0.04) {   // sonrisa que se abre un poco con la voz (nunca una «O»)
+    const alto = r * (0.06 + 0.1 * Math.min(1, extra * 1.6));
+    g.fillStyle = "#071a33"; g.beginPath(); g.moveTo(c - r * 0.21, by - r * 0.03); g.quadraticCurveTo(c, by + r * 0.01, c + r * 0.21, by - r * 0.03);
+    g.quadraticCurveTo(c, by + alto * 2.1, c - r * 0.21, by - r * 0.03); g.fill();
+    g.save(); g.clip(); g.fillStyle = "#ff7b8a"; g.beginPath(); g.ellipse(c, by + alto * 1.2, r * 0.09, alto * 0.5, 0, 0, Math.PI * 2); g.fill(); g.restore(); }
   else if (piensa) { g.strokeStyle = "#071a33"; g.lineWidth = r * 0.055; g.beginPath(); g.moveTo(c - r * 0.1, by + r * 0.02); g.lineTo(c + r * 0.12, by - r * 0.02); g.stroke(); }
   else if (oye) { g.fillStyle = "#071a33"; g.beginPath(); g.ellipse(c, by, r * 0.07, r * 0.08, 0, 0, Math.PI * 2); g.fill(); }
   else { g.strokeStyle = "#071a33"; g.lineWidth = r * 0.055; g.beginPath(); g.moveTo(c - r * 0.2, by - r * 0.02); g.quadraticCurveTo(c, by + r * 0.16, c + r * 0.2, by - r * 0.02); g.stroke(); }
