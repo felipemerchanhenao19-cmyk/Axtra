@@ -40,8 +40,9 @@ async function render(t, f) {
   const g = (fz, extra = "") => `<svg viewBox="0 0 1080 1920" width="1080" height="1920" style="overflow:visible">${extra}<g transform="translate(${540 + hx * fz} ${960 + hy * fz}) rotate(${rot * fz}) scale(${1 + (z - 1) * fz}) translate(${-(540 + (cx - 540) * fz)} ${-(960 + (cy - 960) * fz)})">`;
   let orbeSvg = "";
   if (pl.orbe) { const o = resolver(pl.orbe, p), q = pl.orbe.nace ? cl((tt - pl.orbe.nace[0]) / (pl.orbe.nace[1] - pl.orbe.nace[0])) : 1;
-    const habla = TODAS.some((l) => l.quien === "orbe" && t >= l.ini && t < l.fin) ? 0.8 : (o.habla || 0);
-    orbeSvg = q > 0 ? orbe(o.x, o.y + Math.sin(t * 1.6) * 10, o.r, t, { nace: q, habla }) : ""; }
+    const dice = TODAS.some((l) => l.quien === "orbe" && t >= l.ini && t < l.fin);
+    const estado = dice ? "habla" : (pl.orbe.estado || "reposo"), habla = dice ? nivelVoz(t) : 0.4;
+    orbeSvg = q > 0 ? orbe(o.x, o.y + Math.sin(t * 1.6) * 10, o.r, t, { nace: q, estado, habla }) : ""; }
   $("#lejos").innerHTML = g(k, MUNDO_DEFS) + esc.lejos + "</g></svg>";
   $("#medio").innerHTML = g(1) + esc.medio + orbeSvg + "</g></svg>";
   $("#cerca").innerHTML = g(1.35) + (esc.cerca || "") + "</g></svg>";

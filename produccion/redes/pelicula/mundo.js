@@ -17,6 +17,10 @@ const MUNDO_DEFS = `<defs>
   <linearGradient id="acero" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a2e34"/><stop offset=".5" stop-color="#8a929c"/><stop offset="1" stop-color="#2a2e34"/></linearGradient>
   <linearGradient id="asfalto" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05070c"/><stop offset="1" stop-color="#11151e"/></linearGradient>
   <radialGradient id="esfera" cx="36%" cy="30%" r="75%"><stop offset="0" stop-color="#f4fdff"/><stop offset=".14" stop-color="#9ff0ff"/><stop offset=".42" stop-color="#2fbbe8"/><stop offset=".8" stop-color="#0b4f9e"/><stop offset="1" stop-color="#061a3d"/></radialGradient>
+  <radialGradient id="cuerpoOrbe" cx="50%" cy="50%" r="50%" fx="32.5%" fy="30%"><stop offset="0" stop-color="#f2fcff"/><stop offset=".25" stop-color="#7fe2ff"/><stop offset=".55" stop-color="#2a9fe0"/><stop offset=".85" stop-color="#0b3d91"/><stop offset="1" stop-color="#061a3d"/></radialGradient>
+  <radialGradient id="haloOrbe"><stop offset=".378" stop-color="rgb(63,208,255)" stop-opacity=".75"/><stop offset=".69" stop-color="rgb(63,208,255)" stop-opacity=".22"/><stop offset="1" stop-color="rgb(63,208,255)" stop-opacity="0"/></radialGradient>
+  <radialGradient id="brilloOrbe"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="bordeOrbe"><stop offset=".8" stop-color="rgb(139,233,255)" stop-opacity="0"/><stop offset="1" stop-color="rgb(139,233,255)" stop-opacity=".75"/></radialGradient>
   <radialGradient id="aura"><stop offset="0" stop-color="rgba(120,230,255,.75)"/><stop offset=".3" stop-color="rgba(60,190,255,.3)"/><stop offset="1" stop-color="rgba(40,160,255,0)"/></radialGradient>
   <filter id="desenfoque" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
   <filter id="suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
@@ -40,23 +44,58 @@ function silueta(x, y, s, o = {}) {
   }
   return `<g transform="translate(${x} ${y}) scale(${s})" opacity="${o.op ?? 1}">${cuerpo}${cab}</g>`;
 }
-// ---------- El asistente: esfera de luz con anillo, partículas y ondas de voz
-function orbe(x, y, r, t, o = {}) {
-  const nace = o.nace ?? 1, habla = o.habla || 0, k = Math.max(0.001, 0.2 + 0.8 * nace);
-  let s = `<circle cx="${x}" cy="${y}" r="${r * (3.2 + 0.25 * Math.sin(t * 2))}" fill="url(#aura)" opacity="${0.9 * nace}"/>`;
-  if (nace < 1) s += Array.from({ length: 40 }, (_, i) => { const a = rnd(i) * Math.PI * 2, d = r * (1 + 9 * (1 - nace) * (0.4 + rnd(i + 3)));
+// ---------- El asistente: el orbe nuevo de Apex (el mismo de la app): esfera con cara —ojos, cejas y boca—,
+// anillo inclinado por debajo de la cara con una luz que lo recorre, halo y brillo que gira.
+// Estados: reposo (sonrisa), habla (la boca se abre con la voz, nunca una «O»), escucha (cejas arriba, boquita «o»), piensa (mira arriba y una ceja alzada).
+let ORBE_N = 0;
+function orbe(x, y, r0, t, o = {}) {
+  const nace = o.nace ?? 1, estado = o.estado || (o.habla > 0.02 ? "habla" : "reposo");
+  const extra = estado === "habla" || estado === "escucha" ? (o.habla ?? 0.5) : 0;
+  const piensa = estado === "piensa", oye = estado === "escucha", habla = estado === "habla";
+  const k = (1 + 0.035 * Math.sin(t * 1.8) + extra * 0.12) * Math.max(0.001, 0.2 + 0.8 * nace), r = r0 * k, n = ++ORBE_N;
+  const giro = piensa ? 2.6 : 0.9;
+  let s = `<circle cx="${x}" cy="${y}" r="${r * 3.2}" fill="url(#aura)" opacity="${0.55 * nace}"/>
+    <circle cx="${x}" cy="${y}" r="${r * 1.85}" fill="url(#haloOrbe)" opacity="${Math.min(1, (0.3 + extra * 0.45) / 0.75) * nace}"/>`;
+  if (nace < 1) s += Array.from({ length: 40 }, (_, i) => { const a = rnd(i) * Math.PI * 2, d = r0 * (1 + 9 * (1 - nace) * (0.4 + rnd(i + 3)));
     return `<circle cx="${x + Math.cos(a + t) * d}" cy="${y + Math.sin(a + t) * d}" r="${2 + 3 * rnd(i + 5)}" fill="#bff6ff" opacity="${0.4 + 0.6 * nace}"/>`; }).join("");
-  if (habla > 0.02) s += [0, 1, 2].map((i) => { const q = ((t * 1.4 + i / 3) % 1); return `<circle cx="${x}" cy="${y}" r="${r * (1.1 + q * 1.6)}" fill="none" stroke="rgba(160,240,255,${0.55 * (1 - q) * Math.min(1, habla * 2)})" stroke-width="${3 + 3 * (1 - q)}"/>`; }).join("");
-  s += `<g transform="translate(${x} ${y}) scale(${k})">
-    <ellipse rx="${r * 1.75}" ry="${r * 0.42}" fill="none" stroke="rgba(170,235,255,.35)" stroke-width="${r * 0.05}" transform="rotate(-14)"/>
-    <circle r="${r}" fill="url(#esfera)"/>
-    ${[0, 1, 2].map((i) => `<ellipse rx="${r * 0.82}" ry="${r * (0.25 + 0.15 * i)}" fill="none" stroke="rgba(220,250,255,.22)" stroke-width="${r * 0.025}" transform="rotate(${t * (30 + i * 17) + i * 60})"/>`).join("")}
-    <ellipse cx="${-r * 0.32}" cy="${-r * 0.36}" rx="${r * 0.28}" ry="${r * 0.16}" fill="rgba(255,255,255,.55)" transform="rotate(-30 ${-r * 0.32} ${-r * 0.36})"/>
-    <path d="M${-r * 1.75 * 0.97} ${r * 0.1} A ${r * 1.75} ${r * 0.42} 0 0 0 ${r * 1.75 * 0.97} ${-r * 0.1}" fill="none" stroke="rgba(200,245,255,.9)" stroke-width="${r * 0.05}" transform="rotate(-14)"/>
-    ${Array.from({ length: 8 }, (_, i) => { const a = t * 0.8 + i * 0.785; return `<circle cx="${Math.cos(a) * r * 1.75}" cy="${Math.sin(a) * r * 0.42}" r="${r * 0.04}" fill="#e8fbff" transform="rotate(-14)"/>`; }).join("")}
-  </g>`;
-  return s;
+  // anillo: mitad de atrás (arriba) y mitad de adelante (abajo), con la luz pasando por delante o por detrás
+  const ra = r * 1.32, rb = r * 0.26, la = (t * giro) % (Math.PI * 2);
+  const anillo = (frente) => `<g transform="translate(${x} ${y + r * 0.38}) rotate(${(-0.22 + 0.06 * Math.sin(t * 1.3)) * 57.3})">
+    <path d="M${ra} 0 A ${ra} ${rb} 0 0 ${frente ? 1 : 0} ${-ra} 0" fill="none" stroke="rgba(139,233,255,${frente ? 0.7 + extra * 0.3 : 0.3})" stroke-width="${r0 * (frente ? 0.044 : 0.03)}"/>
+    ${(la < Math.PI) === frente ? `<circle cx="${Math.cos(la) * ra}" cy="${Math.sin(la) * rb}" r="${r0 * 0.052}" fill="#e8fbff"/>` : ""}</g>`;
+  s += anillo(false);
+  // cuerpo, brillo que gira y borde luminoso
+  const bx = x + Math.cos(t * giro) * r * 0.55, by = y + Math.sin(t * giro) * r * 0.18 - r * 0.1;
+  s += `<clipPath id="oc${n}"><circle cx="${x}" cy="${y}" r="${r}"/></clipPath>
+    <circle cx="${x}" cy="${y}" r="${r}" fill="url(#cuerpoOrbe)"/>
+    <circle cx="${bx}" cy="${by}" r="${r * 0.5}" fill="url(#brilloOrbe)" clip-path="url(#oc${n})"/>
+    <circle cx="${x}" cy="${y}" r="${r}" fill="url(#bordeOrbe)" opacity="${Math.min(1, (0.35 + extra * 0.4) / 0.75)}"/>`;
+  // cara: ojos que parpadean y miran alrededor, cejas y boca
+  const ap = (t % 3.7) < 0.13 && !piensa ? 0.1 : oye ? 1.15 : 1;
+  const mx = piensa ? r * 0.06 : Math.sin(t * 0.55) * r * 0.05, my = piensa ? -r * 0.07 : Math.sin(t * 0.37) * r * 0.02;
+  const ey = y - r * 0.1, sep = r * 0.33;
+  [-1, 1].forEach((d) => {
+    const ex = x + d * sep;
+    s += `<ellipse cx="${ex}" cy="${ey}" rx="${r * 0.14}" ry="${r * 0.2 * ap}" fill="#f4fbff"/>`;
+    if (ap > 0.3) s += `<ellipse cx="${ex + mx}" cy="${ey + my + r * 0.02}" rx="${r * 0.075}" ry="${r * 0.1 * Math.min(1, ap)}" fill="#071a33"/>
+      <circle cx="${ex + mx + r * 0.03}" cy="${ey + my - r * 0.03}" r="${r * 0.028}" fill="#fff"/>`;
+    const alza = oye ? r * 0.07 : piensa && d > 0 ? r * 0.09 : 0, inc = piensa ? d * 0.18 : oye ? -d * 0.08 : 0;
+    s += `<path transform="translate(${ex} ${ey - r * 0.3 - alza}) rotate(${inc * 57.3})" d="M${-r * 0.13} ${r * 0.02} Q 0 ${-r * 0.04} ${r * 0.13} ${r * 0.02}" fill="none" stroke="#06244f" stroke-width="${r * 0.06}" stroke-linecap="round"/>`;
+  });
+  const my2 = y + r * 0.3;
+  if (habla && extra > 0.04) {
+    const alto = r * (0.06 + 0.1 * Math.min(1, extra * 1.6));
+    const boca = `M${x - r * 0.21} ${my2 - r * 0.03} Q ${x} ${my2 + r * 0.01} ${x + r * 0.21} ${my2 - r * 0.03} Q ${x} ${my2 + alto * 2.1} ${x - r * 0.21} ${my2 - r * 0.03} Z`;
+    s += `<clipPath id="ob${n}"><path d="${boca}"/></clipPath><path d="${boca}" fill="#071a33"/>
+      <ellipse cx="${x}" cy="${my2 + alto * 1.2}" rx="${r * 0.09}" ry="${alto * 0.5}" fill="#ff7b8a" clip-path="url(#ob${n})"/>`;
+  } else if (piensa) s += `<path d="M${x - r * 0.1} ${my2 + r * 0.02} L ${x + r * 0.12} ${my2 - r * 0.02}" stroke="#071a33" stroke-width="${r * 0.055}" stroke-linecap="round"/>`;
+  else if (oye) s += `<ellipse cx="${x}" cy="${my2}" rx="${r * 0.07}" ry="${r * 0.08}" fill="#071a33"/>`;
+  else s += `<path d="M${x - r * 0.2} ${my2 - r * 0.02} Q ${x} ${my2 + r * 0.16} ${x + r * 0.2} ${my2 - r * 0.02}" fill="none" stroke="#071a33" stroke-width="${r * 0.055}" stroke-linecap="round"/>`;
+  s += anillo(true);
+  return `<g opacity="${Math.min(1, nace * 1.4)}">${s}</g>`;
 }
+// Nivel de voz simulado por sílabas (para que la boca se abra y cierre con ritmo de habla)
+function nivelVoz(t) { const v = Math.abs(Math.sin(t * 10.5) * Math.sin(t * 6.1 + 1)) * (0.6 + 0.4 * Math.sin(t * 2.3) ** 2); return 0.15 + 0.85 * v; }
 // ---------- Escenarios
 function lampara(x, y, s, t, on = 1, cono = "cono") {
   const fl = 0.95 + 0.05 * Math.sin(t * 13 + x);
@@ -93,7 +132,7 @@ function salon(t, o = {}) {
     medio += silueta(x - 150 * s, y - 20 * s, s * 0.95, { mano, lado: -1, t: t + id, borde: rojo > 0.5 ? "rgba(255,110,80,.7)" : "rgba(255,190,120,.6)" });
     medio += silueta(x + 150 * s, y - 20 * s, s * 0.95, { lado: 1, t, borde: "rgba(255,190,120,.6)" });
     medio += mesaSalon(x, y, s, t, { qr: o.qr });
-    if (o.orbes && (o._tt ?? t) > (o.orbes[id] ?? 99)) { const q = cl(((o._tt ?? t) - o.orbes[id]) / 0.8); medio += orbe(x, y - 170 * s, 34 * s, t + id, { nace: q, habla: 0.4 * Math.max(0, Math.sin(t * 2 + id)) }); }
+    if (o.orbes && (o._tt ?? t) > (o.orbes[id] ?? 99)) { const q = cl(((o._tt ?? t) - o.orbes[id]) / 0.8); medio += orbe(x, y - 170 * s, 34 * s, t + id, { nace: q, estado: Math.sin(t * 2 + id) > 0.2 ? "habla" : "reposo", habla: 0.6 * nivelVoz(t + id) }); }
   }));
   if (o.trazos) filas.flat().forEach(([x, y, s], i) => { const a = o.trazos + i * 0.25, tt = o._tt ?? t; if (tt < a) return; const q = cl((tt - a) / 1.2);
     medio += `<path d="M${x} ${y - 170 * s} Q ${(x + 1150) / 2} ${y - 500} 1150 760" fill="none" stroke="rgba(127,216,240,.8)" stroke-width="${6 * s + 2}" stroke-dasharray="${1400 * q} 3000" stroke-linecap="round"/>

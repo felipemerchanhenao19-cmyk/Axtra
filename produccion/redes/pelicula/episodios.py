@@ -29,7 +29,7 @@ EPISODIOS = {
         lineas=[N("Una mano levantada. Otra más.", 0.3), N("Y el mesero no da abasto.", 0.3)]),
    dict(escenario="cocina", op=dict(tickets=9, fuego=True), cam=[[540, 1000, 1.05, -4], [540, 1050, 1.22, 3]], angulo=[[4, 10], [6, -6]], grado="rojo", musica="tension", trans="barrido", mano=7,
         lineas=[N("En la cocina, los pedidos llegan tarde… o mal anotados.", 0.3)]),
-   dict(escenario="mesa", op=dict(qr=True, qrLuz=A(0, 1, 0.1, 0.45)), orbe=dict(x=540, y=760, r=90, nace=[1.0, 3.2]), cam=[[540, 1150, 1.25, 0], [540, 960, 1.0, 0]], angulo=[[14, 0], [4, 0]],
+   dict(escenario="mesa", op=dict(qr=True, qrLuz=A(0, 1, 0.1, 0.45)), orbe=dict(x=540, y=760, r=90, nace=[1.0, 3.2], estado="escucha"), cam=[[540, 1150, 1.25, 0], [540, 960, 1.0, 0]], angulo=[[14, 0], [4, 0]],
         foco=dict(lejos=6), grado="frio", tinte="#2fbbe8", tinteK=0.25, destello=dict(x=540, y=760, k=A(0, 1, 0.2, 0.55)), trans="negro", musica="esperanza", min=6.5,
         fx=[dict(tipo="destello", p=0.3)],
         texto=dict(kicker="Apex Play", titulo="Cada mesa, atendida", estilo="arriba", desde=3.4),
