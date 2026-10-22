@@ -34,7 +34,7 @@ def pagina(ep, lin, W):
     leer = lambda p: open(p).read()
     html = f'''<!doctype html><html><head><meta charset="utf-8">{leer(RAIZ + "produccion/videos/fuentes.html")}<style>{leer(AQUI + "estilo.css")}</style></head><body>
 <canvas id="lienzo" width="1080" height="1920"></canvas><div id="vineta"></div><canvas id="grano" width="360" height="640"></canvas>
-<div id="titulo"></div><div id="sub"></div><div id="cortina"></div><div id="final"></div><div id="nota"></div><div id="blanco"></div><div id="negro"></div>
+<div id="titulo"></div><div id="gancho"></div><div id="sub"></div><div id="cortina"></div><div id="final"></div><div id="nota"></div><div id="blanco"></div><div id="negro"></div>
 <script src="file://{THREE}"></script>
 <script>const EP = {json.dumps(ep, ensure_ascii=False)}; const LINEA = {json.dumps(lin, ensure_ascii=False)};
 {leer(AQUI + "personajes3d.js")}

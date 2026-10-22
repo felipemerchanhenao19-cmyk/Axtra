@@ -106,7 +106,10 @@ function render(t) {
   const ti = $("#titulo");
   if (pl.titulo) { const a = cl((tt - 0.4) / 0.6) * cl((dur - 0.4 - tt) / 0.5); ti.innerHTML = `<small>${pl.titulo[0]}</small><b>${pl.titulo[1] || ""}</b>`; ti.style.opacity = a; } else ti.style.opacity = 0;
   let negro = 0; if (pl.trans === "negro") negro = Math.max(negro, 1 - cl(tt / 0.6)); if (PL[i + 1] && PL[i + 1].trans === "negro") negro = Math.max(negro, cl((tt - dur + 0.45) / 0.45));
-  if (i === 0) negro = Math.max(negro, 1 - cl(tt / 0.8)); $("#negro").style.opacity = negro;
+  if (i === 0 && !EP.gancho) negro = Math.max(negro, 1 - cl(tt / 0.8));
+  // gancho: texto grande desde el primer cuadro (estilo TikTok), se va a los 3 s
+  const gch = $("#gancho"); if (EP.gancho) { if (!gch.dataset.ok) { gch.dataset.ok = 1; gch.innerHTML = `<span>${EP.gancho[0]}</span>${EP.gancho[1] ? `<small>${EP.gancho[1]}</small>` : ""}`; }
+    gch.style.opacity = 1 - cl((t - (EP.gancho[2] || 3.2)) / 0.4); gch.style.transform = `scale(${1 + 0.04 * (1 - cl(t / 0.25))})`; } $("#negro").style.opacity = negro;
   $("#blanco").style.opacity = pl.trans === "flash" ? Math.max(0, 0.8 - tt * 3) : 0;
   const fi = $("#final");
   if (pl.final) { const f = pl.final; if (fi.dataset.i !== String(i)) { fi.dataset.i = i; fi.innerHTML = `<div class="logo"><i class="pin"></i>${f.marca}</div><div class="frase">${f.frase}</div>${f.detalle ? `<div class="detalle">${f.detalle}</div>` : ""}<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation · Tuluá</div>`; }
