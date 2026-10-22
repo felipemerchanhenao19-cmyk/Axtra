@@ -7,7 +7,7 @@ REN.toneMapping = THREE.ACESFilmicToneMapping; REN.toneMappingExposure = 1.35; R
 const ESC = new THREE.Scene(); ESC.background = new THREE.Color(0x060504); ESC.fog = new THREE.FogExp2(0x0a0806, 0.02);
 const CAM = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 90);
 const RELLENO = new THREE.DirectionalLight(0xffe6cc, 0.55); ESC.add(RELLENO); ESC.add(RELLENO.target);   // luz suave desde la cámara para leer las caras
-const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC) };
+const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC) };
 const ACT = {}, ORBIS = {};
 Object.entries(EP.elenco).forEach(([id, cfg]) => { ACT[id] = persona(cfg); ESC.add(ACT[id].raiz); });
 const EXTRAS = (EP.extras || []).map((x, i) => { const P = persona({ semilla: 100 + i, ...x.cfg }); ESC.add(P.raiz); return { P, x }; });
@@ -112,9 +112,12 @@ function render(t) {
     gch.style.opacity = 1 - cl((t - (EP.gancho[2] || 3.2)) / 0.4); gch.style.transform = `scale(${1 + 0.04 * (1 - cl(t / 0.25))})`; } $("#negro").style.opacity = negro;
   $("#blanco").style.opacity = pl.trans === "flash" ? Math.max(0, 0.8 - tt * 3) : 0;
   const fi = $("#final");
-  if (pl.final) { const f = pl.final; if (fi.dataset.i !== String(i)) { fi.dataset.i = i; fi.innerHTML = `<div class="logo"><i class="pin"></i>${f.marca}</div><div class="frase">${f.frase}</div>${f.detalle ? `<div class="detalle">${f.detalle}</div>` : ""}<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation</div>`; }
+  if (pl.final) { const f = pl.final; if (fi.dataset.i !== String(i)) { fi.dataset.i = i; fi.className = f.clase || ""; fi.innerHTML = `<div class="logo">${f.logo ?? '<i class="pin"></i>'}${f.marca}</div><div class="frase">${f.frase}</div>${f.detalle ? `<div class="detalle">${f.detalle}</div>` : ""}<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation</div>`; }
     fi.style.opacity = cl((tt - (f.desde || 0.3)) / 0.7); $("#cortina").style.opacity = 0.78 * cl((tt - (f.desde || 0.3) + 0.3) / 0.8); } else { fi.style.opacity = 0; $("#cortina").style.opacity = 0; }
   $("#nota").textContent = pl.nota || "";
+  // tarjeta de información (cifras, beneficios): entra con un leve desplazamiento
+  const inf = $("#info"); if (pl.info) { if (inf.dataset.i !== String(i)) { inf.dataset.i = i; inf.innerHTML = pl.info.html; }
+    const a = cl((tt - tClave(pl.info.desde ?? 0.3, L)) / 0.5); inf.style.opacity = a * cl((dur - tt) / 0.3); inf.style.transform = `translateY(${(1 - suave(a)) * 40}px)`; } else { inf.style.opacity = 0; inf.dataset.i = ""; }
   // grano de película
   const gc = $("#grano"), gg = gc.getContext("2d"); if (!grano) grano = gg.createImageData(360, 640); const r = semilla(Math.floor(t * 30) + 1);
   for (let k = 0; k < grano.data.length; k += 4) { const v = r() * 255; grano.data[k] = grano.data[k + 1] = grano.data[k + 2] = v; grano.data[k + 3] = 255; } gg.putImageData(grano, 0, 0);

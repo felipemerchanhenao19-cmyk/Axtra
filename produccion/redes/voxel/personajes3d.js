@@ -12,6 +12,7 @@ function mat(color, o = {}) {
   return new THREE.MeshStandardMaterial({ color, map: o.liso ? null : RUIDO, roughness: o.r ?? 0.85, metalness: o.m ?? 0, emissive: o.e ?? 0, emissiveIntensity: o.ei ?? 1,
     transparent: o.op !== undefined, opacity: o.op ?? 1 });
 }
+const MAT = (...a) => mat(...a);
 function caja(w, h, d, m, x = 0, y = 0, z = 0, padre = null, sombra = true) {
   const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m && (m.isMaterial || Array.isArray(m)) ? m : mat(m));
   b.position.set(x, y, z); b.castShadow = sombra; b.receiveShadow = true; if (padre) padre.add(b); return b;
@@ -33,7 +34,10 @@ function dibujarCaraVoxel(g, c, s) {
   g.fillStyle = c.sombraPiel; g.fillRect(0, 52, 64, 12); g.fillRect(0, 0, 3, 64); g.fillRect(61, 0, 3, 64);
   [-1, 1].forEach((d) => {
     const ex = 32 + d * 12, ey = 29;
-    if (lid < 0.95) {
+    if (c.juguete && lid < 0.95) {
+      g.fillStyle = "#14161a"; const h = Math.max(1, 7 * (1 - lid)); g.fillRect(ex - 2.5 + (s.mx || 0) * 1.5, ey - h / 2 + 1, 5, h);
+      if (lid < 0.5) { g.fillStyle = "rgba(255,255,255,.9)"; g.fillRect(ex - 1 + (s.mx || 0) * 1.5, ey - 1, 1.5, 1.5); }
+    } else if (lid < 0.95) {
       g.fillStyle = "#f4f1ea"; g.fillRect(ex - 5, ey - ojo / 2, 10, ojo);
       g.fillStyle = c.iris || "#1c2430"; const px = Math.round(ex - 2 + (s.mx || 0) * 2.5), py = Math.round(ey - 3 + (s.my || 0) * 1.5); g.fillRect(px, py, 4, 6);
       g.fillStyle = "rgba(255,255,255,.85)"; g.fillRect(px + 2, py + 1, 1, 1);
@@ -62,6 +66,9 @@ function dibujarCaraVoxel(g, c, s) {
 // ---------- Persona de bloques
 function persona(cfg) {
   const c = Object.assign({ piel: "#c98d6b", sombraPiel: "#b47a5a", pelo: "#2b1d16", cejas: "#2b1d16", camisa: "#e7e1d6", pantalon: "#2c3442", zapatos: "#1a1a1a", alto: 1 }, cfg);
+  // estilo juguete de bloques: plástico liso y brillante, cabeza cilíndrica con botón, ojos de punto
+  const mat = c.juguete ? (col, o = {}) => MAT(col, { liso: true, r: 0.3, ...o }) : MAT;
+  if (c.juguete) c.sombraPiel = c.piel;
   const raiz = new THREE.Group(), cuerpo = pivote(0, 0, 0, raiz); raiz.scale.setScalar(c.alto);
   const mPiel = mat(c.piel), mCamisa = mat(c.camisa), mPant = mat(c.pantalon), mPelo = mat(c.pelo);
   // piernas
@@ -72,6 +79,7 @@ function persona(cfg) {
   if (c.delantal) caja(0.46, 0.78, 0.02, mat(c.delantal), 0, 0.2, 0.155, torso);
   if (c.chaleco) { caja(0.17, 0.6, 0.3, mat(c.chaleco), -0.18, 0.33, 0, torso); caja(0.17, 0.6, 0.3, mat(c.chaleco), 0.18, 0.33, 0, torso); }
   if (c.saco) { caja(0.55, 0.62, 0.31, mat(c.saco), 0, 0.33, -0.005, torso); caja(0.14, 0.4, 0.02, mCamisa, 0, 0.45, 0.16, torso); }
+  if (c.corbata) { caja(0.075, 0.36, 0.02, mat(c.corbata), 0, 0.38, 0.175, torso); caja(0.09, 0.06, 0.03, mat(c.corbata), 0, 0.56, 0.175, torso); }
   if (c.corbatin) { caja(0.14, 0.07, 0.04, mat(c.corbatin), 0, 0.6, 0.16, torso); }
   if (c.cadena) caja(0.2, 0.03, 0.02, mat("#c9a24a", { r: 0.3, m: 0.8 }), 0, 0.56, 0.16, torso);
   // brazos (pivote en el hombro) con mano
@@ -80,9 +88,21 @@ function persona(cfg) {
   // cabeza: cara en textura de píxeles
   const cuello = pivote(0, 0.64, 0, torso); caja(0.2, 0.08, 0.2, mPiel, 0, 0.03, 0, cuello);
   const cabeza = pivote(0, 0.07, 0, cuello);
-  const lienzo = document.createElement("canvas"); lienzo.width = lienzo.height = 64; const g2 = lienzo.getContext("2d");
+  const lienzo = document.createElement("canvas"); lienzo.width = c.juguete ? 192 : 64; lienzo.height = 64; const g2 = lienzo.getContext("2d");
   const texCara = new THREE.CanvasTexture(lienzo); texCara.magFilter = THREE.NearestFilter; texCara.minFilter = THREE.LinearFilter; texCara.colorSpace = THREE.SRGBColorSpace;
   const mCara = new THREE.MeshStandardMaterial({ map: texCara, roughness: 0.85 });
+  if (c.juguete) {   // cabeza cilíndrica: la cara queda en el frente (u = 0.5) y el botón arriba
+    const cab = new THREE.Mesh(new THREE.CylinderGeometry(0.23, 0.23, 0.42, 48, 1, false, -PI, 2 * PI), [mCara, mPiel, mPiel]);
+    cab.position.y = 0.25; cab.castShadow = cab.receiveShadow = true; cabeza.add(cab);
+    const boton = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 32), mPiel); boton.position.y = 0.5; boton.castShadow = true; cabeza.add(boton);
+    mCara.roughness = 0.3;
+    if (!c.calvo) {
+      const tapa = new THREE.Mesh(new THREE.CylinderGeometry(0.245, 0.25, 0.08, 48), mPelo); tapa.position.y = 0.45; tapa.castShadow = true; cabeza.add(tapa);
+      const nuca = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.26, 48, 1, true, PI / 2, PI), mPelo); nuca.material.side = THREE.DoubleSide; nuca.position.y = 0.3; cabeza.add(nuca);
+      if (c.peinado === "largo") { const m2 = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.27, 0.5, 48, 1, true, PI * 0.6, PI * 0.8), mPelo); m2.material.side = THREE.DoubleSide; m2.position.y = 0.18; cabeza.add(m2); }
+      if (c.peinado === "moño") { const m3 = new THREE.Mesh(new THREE.SphereGeometry(0.11, 16, 12), mPelo); m3.position.set(0, 0.5, -0.2); cabeza.add(m3); }
+    }
+  } else {
   caja(0.52, 0.52, 0.48, [mPiel, mPiel, mPiel, mPiel, mCara, mPiel], 0, 0.26, 0, cabeza);
   caja(0.08, 0.09, 0.05, mPiel, 0, 0.22, 0.265, cabeza);   // nariz
   if (c.bigote) caja(0.24, 0.04, 0.03, mat(c.bigote), 0, 0.15, 0.25, cabeza);
@@ -94,6 +114,7 @@ function persona(cfg) {
     if (c.peinado === "largo") { caja(0.55, 0.62, 0.1, mPelo, 0, 0.2, -0.26, cabeza); caja(0.06, 0.5, 0.2, mPelo, -0.28, 0.2, -0.12, cabeza); caja(0.06, 0.5, 0.2, mPelo, 0.28, 0.2, -0.12, cabeza); }
     if (c.peinado === "moño") caja(0.22, 0.2, 0.2, mPelo, 0, 0.6, -0.22, cabeza);
     if (c.peinado === "flequillo") caja(0.5, 0.08, 0.05, mPelo, 0, 0.5, 0.245, cabeza); }
+  }
   if (c.gorra) { caja(0.57, 0.15, 0.53, mat(c.gorra), 0, 0.57, 0, cabeza); caja(0.5, 0.03, 0.2, mat(c.gorra), 0, 0.51, c.gorraAtras ? -0.34 : 0.34, cabeza); }
   if (c.gorroChef) { caja(0.54, 0.1, 0.5, mat("#f2efe8"), 0, 0.56, 0, cabeza); caja(0.46, 0.3, 0.44, mat("#f2efe8"), 0, 0.76, 0, cabeza); }
   // objetos en la mano derecha
@@ -107,7 +128,7 @@ function persona(cfg) {
   Object.values(objetos).forEach((o) => { o.visible = false; o.castShadow = true; mano.add(o); });
   const r = semilla(c.semilla || 3), fase = r() * 10;
   return { raiz, cuerpo, torso, piernas, brazos, cuello, cabeza, objetos, c, fase,
-    cara(s) { dibujarCaraVoxel(g2, c, s); texCara.needsUpdate = true; } };
+    cara(s) { if (c.juguete) { g2.fillStyle = c.piel; g2.fillRect(0, 0, 192, 64); g2.save(); g2.translate(64, 0); dibujarCaraVoxel(g2, c, s); g2.restore(); } else dibujarCaraVoxel(g2, c, s); texCara.needsUpdate = true; } };
 }
 
 // ---------- Gestos: ángulos de brazos [hombro X, hombro Z] izquierdo y derecho, inclinación de torso, piernas

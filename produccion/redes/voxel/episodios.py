@@ -78,6 +78,19 @@ JPIE = [0.95, -1.35]
 # temporada 2: ganchos fuertes desde el primer cuadro
 M4C = [2.4, 1.15]; BM4 = [0.9, 1.5]; JV = [-3.9, 0.2]; MV = [-2.2, 0.8]; BG = [-1.55, 1.75]
 PUM = [dict(tipo="pum", p=0.0)]
+# convocatoria: equipo de traje, estilo juguete de bloques
+TRAJES = {
+    "director": dict(juguete=True, piel="#c48a64", pelo="#5e5a56", cejas="#2a2826", saco="#14213a", camisa="#f4f2ee", corbata="#5a1a24", pantalon="#14213a", zapatos="#0b0b0d", semilla=21, alto=1.02),
+    "asesora": dict(juguete=True, piel="#d9a27e", pelo="#2a1a12", cejas="#2a1a12", peinado="moño", saco="#2b2f36", camisa="#f4f2ee", pantalon="#2b2f36", labios="#8a3a40", semilla=22, alto=0.96),
+    "asesor": dict(juguete=True, piel="#9a6446", pelo="#121010", cejas="#121010", saco="#0f1115", camisa="#f4f2ee", corbata="#2f6fb0", pantalon="#0f1115", zapatos="#0b0b0d", semilla=23),
+}
+DIR = [0, -1.5]
+DIRECTOR = dict(pos=DIR, rot=0, mira="cam", emo="serio", gesto="reposo", manos=0.4)
+ASESORA = dict(pos=[-0.95, -2.35], rot=8, mira="director", emo="serio", gesto="reposo")
+ASESOR = dict(pos=[0.95, -2.35], rot=-8, mira="director", emo="serio", gesto="cruzado")
+EQUIPO = {"director": DIRECTOR, "asesora": ASESORA, "asesor": ASESOR}
+FRIO = "contrast(1.14) saturate(0.88) brightness(1.02)"
+LOGO_A = '<svg viewBox="0 0 80 80"><path d="M16 72 L40 8 L64 72" stroke="#fff" stroke-width="7" fill="none" stroke-linejoin="round"/><ellipse cx="40" cy="47" rx="33" ry="10" transform="rotate(-18 40 47)" stroke="#7fb2ea" stroke-width="4" fill="none"/></svg>'
 ROSA = [-2.6, -0.15]; MARC2 = [1.55, -2.75]
 MESA_GLORIA = {"gloria": dict(pos=BR7, rot=180, sentado=True, gesto="manos_mesa", mira="rosa", emo="feliz"),
                "rosa": dict(pos=ROSA, rot=0, sentado=True, gesto="manos_mesa", mira="gloria", emo="neutro")}
@@ -829,5 +842,36 @@ EPISODIOS = {
         actores={"marcela": dict(pos=MAR, rot=180, sentado=True, mira="oo", emo="sorpresa"), "jairo": dict(pos=JPIE, rot=-25, mira="oo", emo="sorpresa")},
         lineas=[L("orbi", "Sí va a volver a pasar. La señora acaba de pedir otra vez.", 1.1, pedido=True)]),
    CIERRE_DOM("Clientes que vuelven a pedir.", "Su propio link, seguimiento en vivo y sin comisión."),
+  ]),
+ # ═══════════ Convocatoria de asesores comerciales (estilo juguete de bloques, serio) ═══════════
+ "convocatoria-asesores": dict(producto="marca", reparto=dict(REPARTO, director=dict(voz=("es-CO-GonzaloNeural", "-8%", "-22Hz"), fx="narrador")),
+  elenco=dict(ELENCO, **TRAJES), extras=[], gancho=["Se busca: asesores comerciales", "Con o sin experiencia · Convocatoria en Colombia"],
+  copy="Apex Corporation busca asesores comerciales, con o sin experiencia. Ofrezca software e inteligencia artificial a restaurantes. Escríbanos: 310 789 7960",
+  hashtags="#Empleo #AsesoresComerciales #Ventas #Colombia #ApexCorporation",
+  planos=[
+   dict(set="sala", musica="tension", cola=0.4, fx=PUM, grado=FRIO, relleno=1.1, mano=0.006, cam=[cerca(DIR, 0, 3.4, 6, 0.02, 34), cerca(DIR, 0, 2.8, 4, 0.0, 34)],
+        actores=EQUIPO, lineas=[L("director", "Apex Corporation busca asesores comerciales.", 0.15), L("director", "Con o sin experiencia.", 0.35)]),
+   dict(set="sala", musica="corporativo", cola=0.4, grado=FRIO, relleno=1.1, cam=[[0, 1.7, 5.2, 0, 1.45, -1.8, 40], [0, 1.62, 4.4, 0, 1.48, -1.8, 38]],
+        actores=dict(EQUIPO, director=dict(DIRECTOR, gesto=[[0, "reposo"], ["l1", "explica"]])),
+        lineas=[L("director", "Usted ofrece software e inteligencia artificial a restaurantes.", 0.3), L("director", "Trabaja con su red. Nosotros ponemos la tecnología.", 0.3)]),
+   dict(set="sala", musica="corporativo", cola=0.8, grado=FRIO, relleno=1.1, cam=[[2.7, 1.8, -0.9, 0, 1.62, -1.6, 34], [2.4, 1.76, -1.0, 0, 1.62, -1.6, 34]],
+        info=dict(desde=0.5, html='<div class="tarjeta"><small>Apex Play</small><b>20 %</b><em>de cada venta<br>(de $ 140.000 a $ 360.000)</em></div>'),
+        actores=dict(EQUIPO, director=dict(DIRECTOR, mira=[[0, -60], [0.8, "cam"]])),
+        lineas=[L("director", "Por cada venta de Apex Play, usted gana el veinte por ciento.", 0.5)]),
+   dict(set="sala", musica="corporativo", cola=0.8, grado=FRIO, relleno=1.1, cam=[[0, 1.05, 0.9, 0, 1.78, -1.5, 40], [0, 1.1, 0.6, 0, 1.78, -1.5, 40]],
+        info=dict(desde=0.5, html='<div class="tarjeta oscura"><small>Apex Domicilios</small><b>$ 100.000</b><em>por cada restaurante vendido</em></div>'),
+        actores=EQUIPO,
+        lineas=[L("director", "Y por cada restaurante que contrate Apex Domicilios: cien mil pesos.", 0.5)]),
+   dict(set="sala", musica="corporativo", cola=0.8, grado=FRIO, relleno=1.1, cam=[[-2.4, 1.9, 2.4, 0, 1.5, -1.9, 40], [-2.0, 1.85, 2.0, 0, 1.52, -1.9, 38]],
+        info=dict(desde=0.4, html='<div class="tarjeta"><ul><li>Horario flexible</li><li>Código personal de asesor</li><li>Capacitación y material de venta</li><li>Presentación formal</li></ul></div>'),
+        actores=dict(EQUIPO, asesora=dict(ASESORA, mira="cam"), asesor=dict(ASESOR, mira="cam")),
+        lineas=[L("director", "Horario flexible. Código personal de asesor. Capacitación, material de venta y presentación formal.", 0.4)]),
+   dict(set="sala", musica="tension", cola=0.9, grado=FRIO, relleno=1.1, mano=0.005, cam=[cerca(DIR, 0, 3.0, -6, 0.0, 32), cerca(DIR, 0, 2.4, -4, 0.0, 32)],
+        actores=EQUIPO, lineas=[L("director", "Si conoce restaurantes…", 0.4), L("director", "ya tiene clientes.", 0.5)]),
+   dict(set="sala", musica="pelicula", min=6.5, trans="negro", grado=FRIO, relleno=1.1, cam=[[0, 1.7, 5.4, 0, 1.45, -1.8, 40], [0, 1.66, 4.9, 0, 1.45, -1.8, 40]],
+        actores=EQUIPO, lineas=[L("director", "Escríbanos por WhatsApp. Únase.", 1.2)],
+        final=dict(clase="marca", marca="Apex Corporation", desde=0.5, logo=LOGO_A,
+                   frase="Buscamos asesores comerciales, <i>con o sin experiencia.</i>",
+                   detalle='Convocatoria · solo en Colombia<br><span class="unase">ÚNASE</span>')),
   ]),
 }

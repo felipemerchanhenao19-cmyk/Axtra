@@ -30,11 +30,22 @@ def envolventes(lin, W):
             rms = rms / (np.percentile(rms, 92) + 1e-9); rms = np.convolve(rms, [0.25, 0.5, 0.25], "same")
             l["env"] = [round(float(min(1, max(0, (v - 0.12) * 1.25)) ** 0.8), 2) for v in rms]
 
+def playfair():
+    """Playfair Display (cursiva) para las piezas de marca; se descarga con npm pack en la carpeta de trabajo."""
+    d = motor.TRABAJO + "fuentes/"
+    if not os.path.exists(d + "package"):
+        os.makedirs(d, exist_ok=True); subprocess.run(["npm", "pack", "@fontsource/playfair-display@5.0.21"], cwd=d, check=True, capture_output=True)
+        subprocess.run("tar xzf fontsource-playfair-display-*.tgz", shell=True, cwd=d, check=True)
+    import base64
+    caras = [("italic", 700, "latin-700-italic"), ("italic", 800, "latin-800-italic"), ("normal", 700, "latin-700-normal")]
+    return "<style>" + "".join(f"@font-face {{ font-family: 'Playfair'; font-style: {e}; font-weight: {p}; src: url(data:font/woff2;base64,"
+        + base64.b64encode(open(d + f"package/files/playfair-display-{n}.woff2", "rb").read()).decode() + ") format('woff2'); }" for e, p, n in caras) + "</style>"
+
 def pagina(ep, lin, W):
     leer = lambda p: open(p).read()
-    html = f'''<!doctype html><html><head><meta charset="utf-8">{leer(RAIZ + "produccion/videos/fuentes.html")}<style>{leer(AQUI + "estilo.css")}</style></head><body>
+    html = f'''<!doctype html><html><head><meta charset="utf-8">{leer(RAIZ + "produccion/videos/fuentes.html")}{playfair()}<style>{leer(AQUI + "estilo.css")}</style></head><body>
 <canvas id="lienzo" width="1080" height="1920"></canvas><div id="vineta"></div><canvas id="grano" width="360" height="640"></canvas>
-<div id="titulo"></div><div id="gancho"></div><div id="sub"></div><div id="cortina"></div><div id="final"></div><div id="nota"></div><div id="blanco"></div><div id="negro"></div>
+<div id="titulo"></div><div id="gancho"></div><div id="info"></div><div id="sub"></div><div id="cortina"></div><div id="final"></div><div id="nota"></div><div id="blanco"></div><div id="negro"></div>
 <script src="file://{THREE}"></script>
 <script>const EP = {json.dumps(ep, ensure_ascii=False)}; const LINEA = {json.dumps(lin, ensure_ascii=False)};
 {leer(AQUI + "personajes3d.js")}

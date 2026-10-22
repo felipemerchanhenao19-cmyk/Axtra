@@ -189,3 +189,39 @@ function oficina(escena) {
   U.paso = (tt, e = {}) => { U.lluvia.userData.paso(tt, e.rayo || 0); U.rayo.intensity = (e.rayo || 0) * 6; U.portatil.userData.pintar(e.portatil || {}, tt); U.luzPantalla.intensity = 2.0 + (e.rojo ? 0.8 : 0); U.luzPantalla.color.set(e.rojo ? 0xff6a70 : 0x6fc8ff); U.lap.rotation.y = e.lapRot ?? -0.15; };
   return O;
 }
+
+// ---------- Sala de juntas de Apex: piso de bloques con botones, mesa larga, ventanal de ciudad de noche y el letrero de la marca
+function sala(escena) {
+  const S = new THREE.Group(); escena.add(S); const U = {};
+  S.position.set(-40, 0, 0);
+  const botones = texCanvas(32, 32, (g) => { g.fillStyle = "#1b2433"; g.fillRect(0, 0, 32, 32); const r = g.createRadialGradient(13, 13, 2, 16, 16, 11);
+    r.addColorStop(0, "#3a4a63"); r.addColorStop(0.7, "#243048"); r.addColorStop(1, "#141b28"); g.fillStyle = r; g.beginPath(); g.arc(16, 16, 10, 0, PI * 2); g.fill(); }, [60, 60], false);
+  plano(24, 24, new THREE.MeshStandardMaterial({ map: botones, roughness: 0.35, metalness: 0.1 }), 0, 0, 0, -PI / 2, 0, S);
+  const mMuro = new THREE.MeshStandardMaterial({ color: 0x141a24, roughness: 0.6 });
+  plano(16, 4, mMuro, 0, 2, 6, 0, PI, S); plano(16, 4, mMuro, 5, 2, 0, 0, -PI / 2, S);
+  // muro izquierdo con el letrero
+  plano(16, 4, mMuro, -5, 2, 0, 0, PI / 2, S);
+  const letrero = texCanvas(512, 128, (g) => { g.fillStyle = "rgba(0,0,0,0)"; g.clearRect(0, 0, 512, 128); g.fillStyle = "#e8eef8"; g.font = "600 46px Figtree, sans-serif";
+    g.textAlign = "center"; g.fillText("A P E X   C O R P O R A T I O N", 256, 78); }, [1, 1], false);
+  const let_ = plano(3.6, 0.9, new THREE.MeshBasicMaterial({ map: letrero, transparent: true }), -4.98, 2.4, -0.6, 0, PI / 2, S);
+  const luzLetrero = new THREE.PointLight(0xbfd8ff, 1.2, 3, 2); luzLetrero.position.set(-4.5, 2.4, -0.6); S.add(luzLetrero);
+  // ventanal del fondo: ciudad de noche
+  U.ciudad = ventanaLluvia(); plano(10, 3.2, new THREE.MeshBasicMaterial({ map: U.ciudad }), 0, 1.9, -3.98, 0, 0, S);
+  for (let i = -5; i <= 5; i += 1.25) caja(0.06, 3.3, 0.08, mat("#0b0f16", { liso: true, r: 0.3, m: 0.6 }), i, 1.9, -3.95, S);
+  caja(10, 0.1, 0.1, mat("#0b0f16", { liso: true }), 0, 0.3, -3.95, S);
+  plano(16, 16, new THREE.MeshStandardMaterial({ color: 0x0b0f16 }), 0, 3.6, 0, PI / 2, 0, S);
+  // mesa larga brillante y sillas
+  const mMesa = mat("#2a1a12", { liso: true, r: 0.18, m: 0.1 });
+  caja(1.5, 0.07, 4.2, mMesa, 0, 0.76, 1.1, S); caja(0.12, 0.72, 3.6, mat("#0e0f12", { liso: true }), 0, 0.36, 1.1, S);
+  for (let z = -0.4; z <= 2.8; z += 1.05) [-1, 1].forEach((d) => { const s = new THREE.Group(); s.position.set(d * 1.05, 0, z); s.rotation.y = -d * PI / 2; S.add(s);
+    const m = mat("#0e0f12", { liso: true, r: 0.35 }); caja(0.5, 0.08, 0.5, m, 0, 0.5, 0, s); caja(0.5, 0.7, 0.08, m, 0, 0.88, -0.23, s); caja(0.06, 0.46, 0.06, m, 0, 0.25, 0, s); });
+  [[-0.3, 0.3], [0.35, 1.6], [-0.2, 2.6]].forEach(([x, z]) => { caja(0.3, 0.012, 0.42, mat("#f4f1ea", { liso: true }), x, 0.8, z, S); });
+  // luces: cenitales frías, contraluz y el ventanal
+  const foco = (x, z, i, col) => { const l = new THREE.SpotLight(col, i, 9, 0.5, 0.6, 1.3); l.position.set(x, 3.5, z); l.target.position.set(x, 0, z); l.castShadow = true; l.shadow.mapSize.set(1024, 1024); l.shadow.bias = -0.0008; S.add(l); S.add(l.target); return l; };
+  U.focoDirector = foco(0, -1.1, 75, 0xfff1dc); foco(0, 1.2, 14, 0xdfe8ff); foco(-0.9, -2.2, 16, 0xdfe8ff); foco(0.9, -2.2, 16, 0xdfe8ff);
+  const contra = new THREE.DirectionalLight(0x6f9cff, 0.8); contra.position.set(0, 3, -6); contra.target.position.set(0, 1, 0); S.add(contra); S.add(contra.target);
+  S.add(new THREE.HemisphereLight(0x5a6a8a, 0x1a1410, 0.5));
+  S.userData = U;
+  U.paso = (tt, e = {}) => { U.ciudad.userData.paso(tt, e.rayo || 0); };
+  return S;
+}
