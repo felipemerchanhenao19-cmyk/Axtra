@@ -25,6 +25,34 @@ Los personajes la viven en serio, y el asistente de Apex (Orbi, con la cara nuev
 | `una-estrella.mp4` | Apex Play (recomienda) | ~50 s | Don Jairo lee una reseña: «Una estrella. "El mesero nunca volvió."» |
 | `la-llamada.mp4` | Apex Domicilios (Nequi) | ~45 s | Suena el teléfono: «¿Ustedes tienen domicilio? Es que en la aplicación todo sale más caro.» |
 
+### Temporada 2: ganchos desde el primer cuadro
+Desde el capítulo 6, cada video abre con un **texto grande en pantalla** (estilo TikTok), un golpe de sonido y la frase de conflicto en el primer segundo, sin fundido ni título.
+
+| Archivo | Producto | Gancho en pantalla | Remate |
+|---|---|---|---|
+| `la-renuncia.mp4` | Apex Play | «El mesero renunció un viernes a las 8 p. m.» | «Llevar los platos. Y sonreír.» «Eso sí sé.» |
+| `sin-cebolla.mp4` | Apex Play (pedido exacto) | «Es la tercera vez que me traen cebolla» | «¿Y qué escribió?» «"Sin cebollo".» |
+| `la-caja.mp4` | Apex Play (todo queda registrado) | «Faltan $ 300.000 en la caja… y todos miran al mesero» | «Pero el tinto me lo paga usted.» |
+| `donde-esta-mi-pedido.mp4` | Apex Domicilios (seguimiento) | «¿Dónde está mi pedido? Llevo una hora» | «Sí. Pero ahora sí nos cree.» |
+| `el-de-enfrente.mp4` | Apex Play | «El restaurante de enfrente puso algo en las mesas…» | «Yo firmo muchas cosas.» |
+| `dona-gloria.mp4` | Apex Play (pedir hablando) | «Doña Gloria, 78 años, contra el código QR» | «Dígale a don Jairo que le suba el sueldo.» «A mí no me lo ha subido.» |
+
+**Textos para publicar (temporada 2)**
+- La renuncia: «Viernes, 8 p. m. Catorce mesas. Un solo mesero. Y acaba de renunciar. 🎬 Turno de noche, cap. 6»
+- Sin cebolla: «Mesa 4. Ajiaco sin cebolla. Tercer intento. 🎬 Turno de noche, cap. 7»
+- La caja: «Cierre de caja. Faltan trescientos mil. Y todos miran a Brayan. 🎬 Turno de noche, cap. 8»
+- ¿Dónde está mi pedido?: «"Ya va en camino." La frase más dicha en un restaurante. 🎬 Turno de noche, cap. 9»
+- El de enfrente: «El de enfrente tiene fila hasta la esquina. Don Jairo quiere saber por qué. 🎬 Turno de noche, cap. 10»
+- Doña Gloria: «Doña Gloria no sabe qué es un código QR. Y no lo necesita. 🎬 Turno de noche, cap. 11»
+
+Hashtags: la misma fórmula de la tabla de abajo. Para Doña Gloria se puede sumar `#Abuela` en TikTok, y para La caja, `#Meseros`.
+
+**Para volverse viral:**
+- La portada es el primer cuadro: ya trae el gancho escrito, así que no hace falta otra.
+- Publique la temporada 2 primero: tiene mejores ganchos para traer seguidores nuevos. Luego la temporada 1 completa la historia.
+- Pregunte en el texto o fije un comentario que invite a responder: «¿Cuál es la peor comanda que ha visto?» (Sin cebolla) o «¿Su abuela también pelea con el QR?» (Doña Gloria). Los comentarios empujan el alcance.
+- Responda los primeros comentarios en la primera hora.
+
 Cada capítulo viene en tres versiones:
 - **Principal:** con música y subtítulos.
 - **`-sin-musica`:** para poner un sonido en tendencia dentro de la app.
