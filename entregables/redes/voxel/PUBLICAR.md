@@ -53,6 +53,25 @@ Hashtags: la misma fórmula de la tabla de abajo. Para Doña Gloria se puede sum
 - Pregunte en el texto o fije un comentario que invite a responder: «¿Cuál es la peor comanda que ha visto?» (Sin cebolla) o «¿Su abuela también pelea con el QR?» (Doña Gloria). Los comentarios empujan el alcance.
 - Responda los primeros comentarios en la primera hora.
 
+### Partes 2 (continuaciones)
+Cada una retoma un capítulo anterior: el gancho dice «Parte 2 de…» para que quien vio la primera se quede.
+
+| Archivo | Continúa | Gancho en pantalla | Texto para publicar |
+|---|---|---|---|
+| `dona-gloria-2.mp4` | Doña Gloria | «Doña Gloria volvió… y trajo a su amiga» | Doña Gloria volvió. Y esta vez no vino sola. 🎬 Turno de noche · Parte 2 |
+| `el-aumento.mp4` | La renuncia | «Brayan pidió aumento» | Brayan ya no renuncia. Ahora quiere aumento. 🎬 Turno de noche · Parte 2 |
+| `sin-cebolla-2.mp4` | Sin cebolla | «Volvió el señor del "sin cebolla"» | Volvió. Y esta vez trae una lista. 🎬 Turno de noche · Parte 2 |
+| `somos-veinte.mp4` | El turista | «Boa noite! Somos vinte.» | Primero fue un turista. Ahora llegaron veinte. 🎬 Turno de noche · Parte 2 |
+| `la-cuenta-del-viernes.mp4` | La caja | «Volvieron los de la mesa nueve…» | Se fueron sin pagar el viernes. Hoy volvieron. 🎬 Turno de noche · Parte 2 |
+| `la-felicitacion.mp4` | ¿Dónde está mi pedido? | «La señora del pedido volvió a llamar…» | La señora del pedido volvió a llamar. Nadie quería contestar. 🎬 Turno de noche · Parte 2 |
+
+Publique cada parte 2 entre dos y cuatro días después de su primera parte, y en el texto o en un comentario fijado ponga «Parte 1 en el perfil».
+
+## Convocatoria de asesores (pieza aparte, estilo juguete de bloques)
+`convocatoria-asesores.mp4`: tono serio, voz grave. El gancho es «Se busca: asesores comerciales». No lleva el nombre de la serie.
+> Apex Corporation busca asesores comerciales, con o sin experiencia. Ofrezca software e inteligencia artificial a restaurantes: 20 % por cada venta de Apex Play y $ 100.000 por cada restaurante con Apex Domicilios. Escríbanos: 310 789 7960
+> #Empleo #AsesoresComerciales #Ventas #Colombia #ApexCorporation
+
 Cada capítulo viene en tres versiones:
 - **Principal:** con música y subtítulos.
 - **`-sin-musica`:** para poner un sonido en tendencia dentro de la app.
