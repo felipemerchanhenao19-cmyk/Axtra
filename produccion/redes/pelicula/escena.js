@@ -93,7 +93,7 @@ async function render(t, f) {
     return `<span style="left:${540 + Math.cos(a) * 360}px;top:${(pl.palabrasY ?? 900) + Math.sin(a) * 240}px;opacity:${q * (0.55 + 0.45 * Math.sin(a + 1.2))}">${w}</span>`; }).join("");
   // Cierre
   const fi = $("#final");
-  if (pl.final) { const c = pl.final; if (!fi.dataset.listo) { fi.dataset.listo = 1; fi.innerHTML = `<div class="logo"><span class="pin"></span>${c.producto}</div><div class="frase">${c.frase}</div>${c.detalle ? `<div class="detalle">${c.detalle}</div>` : ""}<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation · Tuluá</div>`; }
+  if (pl.final) { const c = pl.final; if (!fi.dataset.listo) { fi.dataset.listo = 1; fi.innerHTML = `<div class="logo"><span class="pin"></span>${c.producto}</div><div class="frase">${c.frase}</div>${c.detalle ? `<div class="detalle">${c.detalle}</div>` : ""}<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation</div>`; }
     fi.style.opacity = out3((tt - 0.3) / 0.8); [".logo", ".frase", ".detalle", ".wa", ".pie"].forEach((s, j) => { const e = fi.querySelector(s); if (!e) return; const q = out3((tt - 0.4 - j * 0.35) / 0.6); e.style.opacity = q; e.style.transform = `translateY(${(1 - q) * 30}px)`; });
     fi.querySelector(".logo").style.backgroundPosition = `${120 - 160 * cl(tt / 2.5)}% 0`;
   } else fi.style.opacity = 0;

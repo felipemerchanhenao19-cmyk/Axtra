@@ -1,7 +1,7 @@
 # «Turno de noche»: serie en 3D de Apex
 
 Miniserie vertical (1080×1920) en 3D real, con personajes de bloques, para Instagram Reels, TikTok y X.
-Una fonda de Tuluá vista por dentro: don Jairo (el dueño), Brayan (el mesero) y Marcela (la administradora).
+Una fonda colombiana vista por dentro: don Jairo (el dueño), Brayan (el mesero) y Marcela (la administradora).
 
 **El tono:** drama serio con humor seco, como «The Office» o los videos de bloques que se vuelven virales.
 Nadie hace chistes. La gracia sale de la situación: la hora pico con un solo mesero, la comisión de la app.
@@ -79,11 +79,11 @@ Fórmula: 1 de la serie + 1 del formato + 1 o 2 del público + 1 local. `#TurnoD
 
 | Capítulo | Instagram | TikTok | X |
 |---|---|---|---|
-| 1 · Mesa siete | #TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Tulua | #TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Colombia | #Restaurantes #TurnoDeNoche |
-| 2 · La comisión | #TurnoDeNoche #Animacion3D #Domicilios #DueñosDeRestaurante #Tulua | #TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia | #Domicilios #TurnoDeNoche |
-| 3 · El turista | #TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Tulua | #TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Colombia | #Turismo #TurnoDeNoche |
-| 4 · Una estrella | #TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Tulua | #TurnoDeNoche #Animacion3D #Restaurantes #Reseñas #Colombia | #Restaurantes #TurnoDeNoche |
-| 5 · La llamada | #TurnoDeNoche #Animacion3D #Domicilios #Nequi #Tulua | #TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia | #Domicilios #TurnoDeNoche |
+| 1 · Mesa siete | #TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Colombia | #TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Colombia | #Restaurantes #TurnoDeNoche |
+| 2 · La comisión | #TurnoDeNoche #Animacion3D #Domicilios #DueñosDeRestaurante #Colombia | #TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia | #Domicilios #TurnoDeNoche |
+| 3 · El turista | #TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Colombia | #TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Colombia | #Turismo #TurnoDeNoche |
+| 4 · Una estrella | #TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Colombia | #TurnoDeNoche #Animacion3D #Restaurantes #Reseñas #Colombia | #Restaurantes #TurnoDeNoche |
+| 5 · La llamada | #TurnoDeNoche #Animacion3D #Domicilios #Nequi #Colombia | #TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia | #Domicilios #TurnoDeNoche |
 
 No poner nombres de apps de domicilio como hashtag: en videos que hablan de comisiones puede verse como ataque a una marca.
 

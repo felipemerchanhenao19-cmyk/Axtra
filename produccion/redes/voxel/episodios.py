@@ -28,6 +28,9 @@ ELENCO = {
     "cliente": dict(piel="#b97c58", sombraPiel="#a36b4a", pelo="#2b1d16", camisa="#3a5a7a", peinado="flequillo", semilla=7),
     "gloria": dict(piel="#d9a27e", sombraPiel="#c48d6a", pelo="#d4cfc8", cejas="#a8a29a", peinado="moño", gafas="#5a3a2a", saco="#6a3a5a",
                    camisa="#e8e4dc", labios="#9a4a4f", pantalon="#3a3040", semilla=12, alto=0.92),
+    "rosa": dict(piel="#c98d6b", sombraPiel="#b47a5a", pelo="#e0dcd6", cejas="#b0aaa2", peinado="largo", saco="#3a5a6a", camisa="#efe8dc",
+                 labios="#a04a50", pantalon="#30343a", semilla=13, alto=0.9),
+    "amigo": dict(piel="#a86f4e", sombraPiel="#93603f", pelo="#1a120e", cejas="#1a120e", camisa="#7a2a2a", peinado="copete", semilla=14),
     "turista": dict(piel="#e8b896", sombraPiel="#d39f7c", pelo="#d8b860", cejas="#a88a40", camisa="#3f8a8a", mangaCorta=True, peinado="flequillo", iris="#2a5a8a", semilla=8),
     "turista2": dict(piel="#f0c4a4", sombraPiel="#dcab8a", pelo="#8a4a2a", cejas="#6a3a20", camisa="#e8d8b0", peinado="largo", iris="#3a6a4a", semilla=9),
 }
@@ -42,7 +45,11 @@ REPARTO = {
     "turista2": dict(voz=("en-US-JennyNeural", "+0%", "+0Hz")),
     "llamada": dict(voz=("es-MX-DaliaNeural", "+0%", "+0Hz"), fx="radio"),
     "brava": dict(voz=("es-MX-DaliaNeural", "+8%", "+4Hz"), fx="radio"),          # clienta molesta al teléfono
-    "gloria": dict(voz=("es-MX-DaliaNeural", "-14%", "-14Hz")),       # la clienta al teléfono
+    "gloria": dict(voz=("es-MX-DaliaNeural", "-14%", "-14Hz")),
+    "rosa": dict(voz=("es-US-PalomaNeural", "-12%", "-12Hz")),
+    "amigo": dict(voz=("es-MX-JorgeNeural", "+0%", "+0Hz")),
+    "turista_pt": dict(voz=("pt-BR-AntonioNeural", "+0%", "+0Hz")),
+    "orbi_pt": dict(voz=("pt-BR-FranciscaNeural", "+0%", "+2Hz"), fx="radio"),       # la clienta al teléfono
 }
 # clientes del salón (sentados, conversan); mesa 7: el acompañante del cliente
 _c = [("#7a3b3b", "#2b1d16", "largo"), ("#3a6a4a", "#5a3a28", None), ("#c9a24a", "#1a120e", "moño"), ("#4a4a6a", "#6e6862", None),
@@ -71,6 +78,16 @@ JPIE = [0.95, -1.35]
 # temporada 2: ganchos fuertes desde el primer cuadro
 M4C = [2.4, 1.15]; BM4 = [0.9, 1.5]; JV = [-3.9, 0.2]; MV = [-2.2, 0.8]; BG = [-1.55, 1.75]
 PUM = [dict(tipo="pum", p=0.0)]
+ROSA = [-2.6, -0.15]; MARC2 = [1.55, -2.75]
+MESA_GLORIA = {"gloria": dict(pos=BR7, rot=180, sentado=True, gesto="manos_mesa", mira="rosa", emo="feliz"),
+               "rosa": dict(pos=ROSA, rot=0, sentado=True, gesto="manos_mesa", mira="gloria", emo="neutro")}
+GLORIA_34 = [[-1.4, 1.5, -0.4, -2.6, 1.38, 1.35, 36], [-1.5, 1.48, -0.2, -2.6, 1.38, 1.35, 34]]
+ROSA_34 = [[-0.85, 1.55, 0.9, -2.6, 1.38, -0.15, 36], [-0.95, 1.52, 0.8, -2.6, 1.38, -0.15, 34]]
+LADO7 = [[-0.2, 1.68, 0.6, -2.6, 1.36, 0.6, 42], [-0.45, 1.62, 0.6, -2.6, 1.38, 0.6, 40]]
+LADO9 = [[0.9, 1.75, 3.6, -2.4, 1.36, 3.6, 40], [0.6, 1.68, 3.6, -2.4, 1.38, 3.6, 38]]
+CLI_CAM = [[1.3, 1.52, -0.6, 2.4, 1.38, 1.15, 36], [1.45, 1.5, -0.35, 2.4, 1.38, 1.15, 34]]
+MESA9_DOS = {"cliente": dict(pos=TUR, rot=180, sentado=True, gesto="manos_mesa", mira="amigo", emo="neutro"),
+             "amigo": dict(pos=TUR2, rot=0, sentado=True, gesto="manos_mesa", mira="cliente", emo="neutro")}
 WIDE = [[6.2, 2.8, 2.0, -2.6, 1.1, 1.6, 50], [6.0, 2.6, 1.8, -2.6, 1.1, 1.6, 50]]
 TODAS_ORBIS = {"o7": dict(pos=O7, voz=False), "o4": dict(pos=O4, voz=False), "o9": dict(pos=O9, voz=False), "o2": dict(pos=O2, voz=False)}
 def CIERRE_PLAY(frase, detalle, **k):
@@ -90,7 +107,7 @@ EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
  "mesa-siete": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
   copy="Viernes, 8 p. m. Un solo mesero. Veinticinco minutos de espera en la mesa cuatro. Turno de noche, capítulo 1. 🎬",
-  hashtags="#Restaurantes #Emprendedores #Tulua #Negocios #TurnoDeNoche",
+  hashtags="#Restaurantes #Emprendedores #Colombia #Negocios #TurnoDeNoche",
   planos=[
    dict(set="restaurante", titulo=["Viernes · 8:00 p. m.", "Turno de noche"], musica="tension", min=3.6, mano=0.02,
         cam=[[0.2, 2.7, 7.0, 0, 1.0, -1.2, 40], [0.0, 2.2, 5.2, 0, 1.1, -1.4, 40]], fx=[dict(tipo="lluvia", k=1.4)],
@@ -173,7 +190,7 @@ EPISODIOS = {
  # ─────────── Capítulo 2 · «La comisión» (Apex Domicilios)
  "la-comision": dict(producto="dom", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
   copy="Lunes, 11:40 p. m. Marcela tiene que darle una noticia a don Jairo. Turno de noche, capítulo 2. 🎬",
-  hashtags="#Restaurantes #Domicilios #Emprendedores #Tulua #TurnoDeNoche",
+  hashtags="#Restaurantes #Domicilios #Emprendedores #Colombia #TurnoDeNoche",
   planos=[
    dict(set="oficina", titulo=["Lunes · 11:40 p. m.", "Turno de noche"], musica="misterio", min=3.6, mano=0.015,
         cam=[[2.9, 2.1, 2.7, -0.1, 1.1, 0.3, 44], [2.5, 1.9, 2.3, -0.1, 1.15, 0.3, 42]], fx=[dict(tipo="lluvia", k=1.6), dict(tipo="rayo", p=0.55)],
@@ -254,7 +271,7 @@ EPISODIOS = {
  # ─────────── Capítulo 3 · «El turista» (Apex Play: atiende en otros idiomas)
  "el-turista": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
   copy="Sábado, 1 p. m. La mesa nueve pregunta qué es «chicharrón». En inglés. Turno de noche, capítulo 3. 🎬",
-  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Colombia",
   planos=[
    dict(set="restaurante", titulo=["Sábado · 1:15 p. m.", ""], musica="misterio", cola=0.6, sinExtras=[2, 3],
         cam=[sobre(BT, TUR, 1.0, 0.72, 0.15, 38, 1.72, 1.38), sobre(BT, TUR, 1.0, 0.72, 0.12, 36, 1.72, 1.38)],
@@ -306,7 +323,7 @@ EPISODIOS = {
  # ─────────── Capítulo 4 · «Una estrella» (Apex Play: recomienda en el momento justo)
  "una-estrella": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
   copy="Domingo, 10:30 p. m. Don Jairo lee las reseñas del restaurante. La primera tiene una estrella. Turno de noche, capítulo 4. 🎬",
-  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Colombia",
   planos=[
    dict(set="restaurante", titulo=["Domingo · 10:30 p. m.", ""], musica="misterio", cola=0.6, sinExtras=TODOS, mano=0.006,
         cam=[cerca(JAIRO, 0, 2.4, -10), cerca(JAIRO, 0, 2.0, -8)],
@@ -349,7 +366,7 @@ EPISODIOS = {
  # ─────────── Capítulo 5 · «La llamada» (Apex Domicilios: link propio y lector de comprobantes de Nequi)
  "la-llamada": dict(producto="dom", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
   copy="Martes, 9:50 p. m. Suena el teléfono de la oficina: «¿Ustedes tienen domicilio?». Turno de noche, capítulo 5. 🎬",
-  hashtags="#TurnoDeNoche #Animacion3D #Domicilios #Nequi #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Domicilios #Nequi #Colombia",
   planos=[
    dict(set="oficina", titulo=["Martes · 9:50 p. m.", ""], musica="misterio", cola=0.5, fx=[dict(tipo="onda", p=0, p1=0.18), dict(tipo="lluvia", k=1.0)],
         cam=[cerca(MAR, 180, 2.4, 26, 0.08, 36, 1.38), cerca(MAR, 180, 2.1, 24, 0.06, 36, 1.38)],
@@ -393,7 +410,7 @@ EPISODIOS = {
  # ─────────── 6 · «La renuncia» (Play)
  "la-renuncia": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["El mesero renunció un viernes a las 8 p. m.", "Turno de noche · cap. 6"],
   copy="Viernes, 8 p. m. Catorce mesas. Un solo mesero. Y acaba de renunciar. 🎬 Turno de noche, cap. 6",
-  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Colombia",
   planos=[
    dict(set="restaurante", musica="tension", cola=0.3, fx=PUM,
         cam=[cerca(BRAYAN, 180, 1.7, -8, y=1.68, fov=36), cerca(BRAYAN, 180, 1.9, -8, y=1.68, fov=36)],
@@ -434,7 +451,7 @@ EPISODIOS = {
  # ─────────── 7 · «Sin cebolla» (Play: el pedido llega como lo pidió el cliente)
  "sin-cebolla": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["«Es la tercera vez que me traen cebolla»", "Turno de noche · cap. 7"],
   copy="Mesa 4. Ajiaco sin cebolla. Tercer intento. 🎬 Turno de noche, cap. 7",
-  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Colombia",
   planos=[
    dict(set="restaurante", musica="tension", cola=0.4, fx=PUM, sinExtras=[0],
         cam=[[1.3, 1.52, -0.6, 2.4, 1.38, 1.15, 36], [1.45, 1.5, -0.35, 2.4, 1.38, 1.15, 34]],
@@ -478,7 +495,7 @@ EPISODIOS = {
  # ─────────── 8 · «La caja» (Play: cada pedido queda registrado)
  "la-caja": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["Faltan $ 300.000 en la caja…", "y todos miran al mesero"],
   copy="Cierre de caja. Faltan trescientos mil. Y todos miran a Brayan. 🎬 Turno de noche, cap. 8",
-  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Colombia",
   planos=[
    dict(set="restaurante", musica="tension", cola=0.4, fx=PUM, sinExtras=TODOS,
         cam=[cerca(MARC, 180, 2.1, -12, y=1.65), cerca(MARC, 180, 1.9, -10, y=1.65)],
@@ -518,7 +535,7 @@ EPISODIOS = {
  # ─────────── 9 · «¿Dónde está mi pedido?» (Domicilios: seguimiento en vivo)
  "donde-esta-mi-pedido": dict(producto="dom", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["«¿Dónde está mi pedido? Llevo una hora»", "La llamada que todo restaurante odia"],
   copy="«Ya va en camino.» La frase más dicha en un restaurante. 🎬 Turno de noche, cap. 9",
-  hashtags="#TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia",
   planos=[
    dict(set="oficina", musica="tension", cola=0.4, fx=PUM + [dict(tipo="lluvia", k=1.0)],
         cam=[cerca(MAR, 180, 2.3, 26, 0.08, 38, 1.38), cerca(MAR, 180, 2.0, 24, 0.06, 36, 1.38)],
@@ -556,7 +573,7 @@ EPISODIOS = {
  # ─────────── 10 · «El de enfrente» (Play)
  "el-de-enfrente": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["El restaurante de enfrente puso algo en las mesas…", "y ahora tiene fila hasta la esquina"],
   copy="El de enfrente tiene fila hasta la esquina. Don Jairo quiere saber por qué. 🎬 Turno de noche, cap. 10",
-  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Colombia",
   planos=[
    dict(set="restaurante", musica="misterio", cola=0.4, fx=[dict(tipo="lluvia", k=1.2)], sinExtras=TODOS, relleno=0.35,
         cam=[[-5.35, 1.8, 1.5, -3.9, 1.72, 0.2, 34], [-5.25, 1.78, 1.35, -3.9, 1.72, 0.2, 34]],
@@ -590,7 +607,7 @@ EPISODIOS = {
  # ─────────── 11 · «Doña Gloria» (Play: pedir hablando, fácil para cualquiera)
  "dona-gloria": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["Doña Gloria, 78 años, contra el código QR", "Turno de noche · cap. 11"],
   copy="Doña Gloria no sabe qué es un código QR. Y no lo necesita. 🎬 Turno de noche, cap. 11",
-  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Abuela #Tulua",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Abuela #Colombia",
   planos=[
    dict(set="restaurante", musica="misterio", cola=0.4, sinExtras=[6],
         cam=[[-1.4, 1.5, -0.4, -2.6, 1.38, 1.35, 36], [-1.5, 1.48, -0.2, -2.6, 1.38, 1.35, 34]],
@@ -624,5 +641,193 @@ EPISODIOS = {
         actores={"gloria": dict(pos=BR7, rot=210, sentado=True, mira="brayan", emo="feliz"), "brayan": dict(pos=BG, rot=-111, mira="gloria", emo=[[0, "neutro"], ["l1", "serio"]])},
         lineas=[L("gloria", "Pues dígale a don Jairo que le suba el sueldo.", 0.3), L("brayan", "A mí no me lo ha subido.", 0.6)]),
    CIERRE_PLAY("Fácil para todos sus clientes.", "Se le habla como a un mesero. Sin descargar nada."),
+  ]),
+ # ═══════════ Partes 2 ═══════════
+ # ─────────── 12 · «Doña Gloria 2»
+ "dona-gloria-2": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["Doña Gloria volvió… y trajo a su amiga", "Parte 2 de «Doña Gloria»"],
+  copy="Doña Gloria volvió. Y esta vez no vino sola. 🎬 Turno de noche · Parte 2",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Abuela #Colombia",
+  planos=[
+   dict(set="restaurante", musica="misterio", cola=0.4, sinExtras=[6], cam=ROSA_34, actores=MESA_GLORIA,
+        lineas=[L("rosa", "Gloria, ¿y aquí quién atiende?", 0.15), L("gloria", "Mi muchacho.", 0.3), L("rosa", "¿Cuál muchacho?", 0.3)]),
+   dict(set="restaurante", musica="esperanza", cola=0.5, sinExtras=[6], fx=[dict(tipo="destello", p=0.1)], cam=LADO7,
+        e=dict(qrLuz={"7": [[0, 0], [0.3, 1.0], [1.8, 0.15]]}),
+        orbis={"o7": dict(pos=O7, nace=[0.2, 1.2], luz=0.5, mira=[[0, "cam"], [1.2, "rosa"]])},
+        actores={"gloria": dict(pos=BR7, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo="feliz"),
+                 "rosa": dict(pos=ROSA, rot=0, sentado=True, gesto="manos_mesa", mira="o7", emo=[[0, "neutro"], [1.0, "sorpresa"]])},
+        lineas=[L("orbi", "Buenas noches, señoras. ¿Qué se les antoja?", 1.3)]),
+   dict(set="restaurante", musica="esperanza", cola=0.5, sinExtras=[6], cam=GLORIA_34,
+        orbis={"o7": dict(pos=O7, luz=0.5, mira=[[0, "gloria"], ["l1", "rosa"]])},
+        actores={"gloria": dict(pos=BR7, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo="feliz"),
+                 "rosa": dict(pos=ROSA, rot=0, sentado=True, gesto="manos_mesa", mira="o7", emo="neutro")},
+        lineas=[L("gloria", "Para mí un ajiaco, calientico.", 0.3), L("rosa", "Y para mí lo mismo, pero sin alcaparras, que me caen mal.", 0.3),
+                L("orbi", "Dos ajiacos bien calientes, uno sin alcaparras. Ya van para la cocina.", 0.3, pedido=True)]),
+   dict(set="restaurante", musica="esperanza", cola=0.5, sinExtras=[6], cam=ROSA_34, mano=0.006,
+        orbis={"o7": dict(pos=O7, luz=0.5, voz=False)},
+        actores={"gloria": dict(pos=BR7, rot=180, sentado=True, gesto="manos_mesa", mira="rosa", emo=[[0, "feliz"], ["l1", "sorpresa"]]),
+                 "rosa": dict(pos=ROSA, rot=0, sentado=True, gesto="manos_mesa", mira=[[0, "o7"], ["l0", "gloria"]], emo="feliz")},
+        lineas=[L("rosa", "Gloria… ¿y él tiene novia?", 0.6), L("gloria", "¡Rosa, por Dios!", 0.3)]),
+   dict(set="restaurante", musica="esperanza", cola=0.5, sinExtras=[6], cam=[cerca(BG, -111, 2.0, 25), cerca(BG, -111, 1.8, 23)],
+        orbis={"o7": dict(pos=O7, luz=0.5, voz=False)},
+        actores={**MESA_GLORIA, "brayan": dict(pos=BG, rot=-111, mira="rosa", emo="serio")},
+        lineas=[L("brayan", "Es un asistente, doña Rosa.", 0.3), L("rosa", "Pues por eso pregunto. Es educado.", 0.3)]),
+   dict(set="restaurante", musica="esperanza", cola=1.1, sinExtras=[6], cam=[cerca(BG, -111, 1.9, 25), cerca(BG, -111, 1.75, 23)],
+        orbis={"o7": dict(pos=O7, luz=0.5, voz=False)},
+        actores={**MESA_GLORIA, "gloria": dict(pos=BR7, rot=210, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"),
+                 "brayan": dict(pos=BG, rot=-111, mira="gloria", emo=[[0, "neutro"], ["f1", "serio"]])},
+        lineas=[L("brayan", "Yo también soy educado.", 0.4), L("gloria", "Sí, mijo. Pero él no se demora.", 0.4)]),
+   CIERRE_PLAY("Cada cliente pide a su manera.", "Varios en la misma mesa, con sus notas y sin confusiones."),
+  ]),
+
+ # ─────────── 13 · «El aumento» (parte 2 de «La renuncia»)
+ "el-aumento": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["Brayan pidió aumento", "Parte 2 de «La renuncia»"],
+  copy="Brayan ya no renuncia. Ahora quiere aumento. 🎬 Turno de noche · Parte 2",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Colombia",
+  planos=[
+   dict(set="restaurante", musica="tension", cola=0.4, fx=PUM, cam=[cerca(BRAYAN, 180, 1.7, -8, y=1.68), cerca(BRAYAN, 180, 1.9, -8, y=1.68)],
+        actores={"jairo": dict(pos=JAIRO, gesto="trapo", emo="cansado"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="serio", gesto="manos_mesa")},
+        lineas=[L("brayan", "Don Jairo, quiero un aumento.", 0.15)]),
+   dict(set="restaurante", musica="tension", cola=0.5, cam=[cerca(JAIRO, 0, 2.3, 8), cerca(JAIRO, 0, 2.0, 6)], mano=0.006,
+        actores={"jairo": dict(pos=JAIRO, gesto="trapo", mira=[[0, -8], [0.5, "brayan"]], miraY=0.1, emo="duda"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo")},
+        lineas=[L("jairo", "¿Y eso por qué?", 0.6)]),
+   dict(set="restaurante", musica="tension", cola=0.4, cam=[cerca(BRAYAN, 180, 2.1, -12, y=1.68), cerca(BRAYAN, 180, 1.9, -9, y=1.68)],
+        actores={"jairo": dict(pos=JAIRO, gesto="baja"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="serio", gesto="explica")},
+        lineas=[L("brayan", "Desde que llegó el asistente, las mesas piden más. Postre, bebida, todo.", 0.2)]),
+   dict(set="restaurante", musica="tension", cola=0.5, cam=[sobre(JAIRO, MARC2, 1.0, -0.72, 0.1, 38), sobre(JAIRO, MARC2, 1.0, -0.72, 0.08, 36)],
+        e=dict(tablet={"pedidos": [["Propinas del mes", "+30 % frente al mes pasado"]], "nuevo": True}),
+        actores={"jairo": dict(pos=JAIRO, gesto="baja", mira="marcela"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo"),
+                 "marcela": dict(pos=MARC2, rot=200, mira="jairo", emo="neutro", gesto="explica")},
+        lineas=[L("marcela", "Es verdad. Las propinas subieron un treinta por ciento.", 0.3)]),
+   dict(set="restaurante", musica="tension", cola=0.5, cam=[cerca(JAIRO, 0, 2.3, 8), cerca(JAIRO, 0, 1.9, 6)],
+        actores={"jairo": dict(pos=JAIRO, gesto="baja", mira="brayan", emo="neutro"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo"), "marcela": dict(pos=MARC2, rot=200, mira="jairo")},
+        lineas=[L("jairo", "Brayan… las propinas son suyas.", 0.4)]),
+   dict(set="restaurante", musica="esperanza", cola=0.6, mano=0.006, cam=[cerca(BRAYAN, 180, 2.0, -10, y=1.68), cerca(BRAYAN, 180, 1.75, -8, y=1.68)],
+        actores={"jairo": dict(pos=JAIRO, gesto="baja"), "brayan": dict(pos=BRAYAN, rot=180, mira=[[0, "jairo"], [1.0, -30], ["l1", "jairo"]], emo=[[0, "serio"], [0.8, "sorpresa"], ["l1", "neutro"]])},
+        lineas=[L("brayan", "…Ah.", 1.2), L("brayan", "Entonces retiro lo dicho.", 0.5)]),
+   dict(set="restaurante", musica="esperanza", cola=1.1, cam=[sobre(BRAYAN, JAIRO, 1.0, 0.72, 0.12, 38), sobre(BRAYAN, JAIRO, 1.0, 0.72, 0.1, 36)],
+        actores={"jairo": dict(pos=JAIRO, gesto="baja", mira="brayan", emo=[[0, "neutro"], ["l1", "cansado"]]), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="feliz")},
+        lineas=[L("jairo", "Muy bien.", 0.3), L("brayan", "Pero el tinto me lo sigue pagando.", 0.4)]),
+   CIERRE_PLAY("Más ventas por mesa. Más propinas para su equipo.", "El asistente recomienda la bebida y el postre en el momento justo.",
+               nota="Historia de ficción. Los resultados dependen del movimiento de cada restaurante."),
+  ]),
+
+ # ─────────── 14 · «Sin cebolla 2»
+ "sin-cebolla-2": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["Volvió el señor del «sin cebolla»", "Parte 2 de «Sin cebolla»"],
+  copy="Volvió. Y esta vez trae una lista. 🎬 Turno de noche · Parte 2",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Meseros #Colombia",
+  planos=[
+   dict(set="restaurante", musica="tension", cola=0.4, fx=PUM, cam=[cerca(BRAYAN, 180, 1.8, -10, y=1.68), cerca(BRAYAN, 180, 1.95, -10, y=1.68)],
+        actores={"jairo": dict(pos=JAIRO, gesto="trapo"), "brayan": dict(pos=BRAYAN, rot=[[0, 150], ["l0", 180]], mira=[[0, -40], ["l0", "jairo"]], emo="sorpresa")},
+        lineas=[L("brayan", "Don Jairo… volvió.", 0.15), L("jairo", "¿Quién?", 0.3), L("brayan", "El de la cebolla.", 0.3)]),
+   dict(set="restaurante", musica="tension", cola=0.4, sinExtras=[0], cam=CLI_CAM,
+        actores={"cliente": dict(pos=M4C, rot=180, sentado=True, gesto="explica", mira=[[0, 10], [0.5, 25]], emo="serio")},
+        lineas=[L("cliente", "Quiero un ajiaco. Sin cebolla, sin alcaparras, sin crema… y sin papa.", 0.3)]),
+   dict(set="restaurante", musica="esperanza", cola=0.5, sinExtras=[0], fx=[dict(tipo="destello", p=0.08)],
+        cam=[[-0.9, 1.75, 0.8, 2.4, 1.36, 0.8, 40], [-0.6, 1.68, 0.8, 2.4, 1.38, 0.8, 38]],
+        e=dict(qrLuz={"4": [[0, 0], [0.3, 1.0], [1.8, 0.15]]}),
+        orbis={"o4": dict(pos=O4, nace=[0.2, 1.2], luz=0.5, mira=[[0, "cam"], [1.0, "cliente"]])},
+        actores={"cliente": dict(pos=M4C, rot=180, sentado=True, gesto="manos_mesa", mira="o4", emo="serio")},
+        lineas=[L("orbi", "Un ajiaco sin papa ya sería una sopa de pollo. ¿Le recomiendo la bandeja paisa sin chicharrón?", 1.3)]),
+   dict(set="restaurante", musica="esperanza", cola=0.5, sinExtras=[0], cam=CLI_CAM, mano=0.006,
+        orbis={"o4": dict(pos=O4, mira="cliente", luz=0.5)},
+        actores={"cliente": dict(pos=M4C, rot=180, sentado=True, gesto="manos_mesa", mira="o4", emo=[[0, "serio"], [1.0, "duda"], ["l0", "feliz"]])},
+        lineas=[L("cliente", "…Me cae bien este muchacho.", 1.3), L("orbi", "Bandeja paisa sin chicharrón. Ya va para la cocina.", 0.3, pedido=True)]),
+   dict(set="restaurante", musica="esperanza", cola=1.1,
+        cam=[[1.85, 1.62, -2.75, 1.7, 1.22, -3.45, 30], [1.4, 1.95, -0.2, 0.6, 1.55, -3.6, 36]],
+        e=dict(tablet={"pedidos": [["Mesa 4 · 8:47 p. m.", "1 × Bandeja paisa · NOTA: SIN CHICHARRÓN"]], "nuevo": True}),
+        actores={"jairo": dict(pos=JAIRO, gesto="baja", mira=[[0, -40], ["l0", "brayan"]], emo=[[0, "neutro"], ["l2", "cansado"]]),
+                 "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="neutro")},
+        lineas=[L("jairo", "Brayan. A usted ese señor lo hacía llorar.", 1.2), L("brayan", "Y a usted también.", 0.4), L("jairo", "…Sí.", 0.6)]),
+   CIERRE_PLAY("Atiende hasta al cliente más difícil.", "Toma las notas de cada plato y recomienda opciones de su carta."),
+  ]),
+
+ # ─────────── 15 · «Somos veinte» (parte 2 de «El turista»)
+ "somos-veinte": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["«Boa noite! Somos vinte.»", "Parte 2 de «El turista»"],
+  copy="Primero fue un turista. Ahora llegaron veinte. 🎬 Turno de noche · Parte 2",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Turismo #Colombia",
+  planos=[
+   dict(set="restaurante", musica="tension", cola=0.4, fx=PUM, sinExtras=[2, 3],
+        cam=[sobre(BT, TUR, 1.0, 0.72, 0.15, 38, 1.72, 1.38), sobre(BT, TUR, 1.0, 0.72, 0.12, 36, 1.72, 1.38)],
+        actores={**MESA9, "turista": dict(pos=TUR, rot=180, sentado=True, gesto="explica", mira="brayan", emo="feliz"), "brayan": dict(pos=BT, rot=-90, mira="turista", emo="neutro")},
+        lineas=[L("turista_pt", "Boa noite! Somos vinte.", 0.15, sub="¡Buenas noches! Somos veinte.")]),
+   dict(set="restaurante", musica="tension", cola=0.4, sinExtras=[2, 3], mano=0.006, cam=[cerca(BT, -90, 2.2, 8), cerca(BT, -90, 1.9, 6)],
+        actores={**MESA9, "brayan": dict(pos=BT, rot=-90, mira=[[0, "turista"], ["l1", 60]], emo="sorpresa")},
+        lineas=[L("brayan", "¿Veinte?", 0.3), L("brayan", "Don Jairo… ¡don Jairo!", 0.8)]),
+   dict(set="restaurante", musica="tension", cola=0.5, trans="flash", cam=[cerca(JAIRO, 0, 2.4, 10), cerca(JAIRO, 0, 2.0, 8)],
+        actores={"jairo": dict(pos=JAIRO, gesto="trapo", mira="brayan", emo=[[0, "cansado"], ["l1", "sorpresa"]]), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo")},
+        lineas=[L("jairo", "¿Ahora qué pasó?", 0.2), L("brayan", "Llegaron veinte brasileños.", 0.3), L("jairo", "¿Y qué hablan?", 0.3), L("brayan", "Portugués, creo.", 0.3)]),
+   dict(set="restaurante", musica="esperanza", cola=0.8, fx=[dict(tipo="destello", p=0.1), dict(tipo="destello", p=0.3), dict(tipo="destello", p=0.5)],
+        cam=[[6.3, 2.5, 2.2, -2.6, 1.15, 1.8, 50], [6.0, 2.2, 1.9, -2.6, 1.25, 1.8, 48]],
+        orbis={"o2": dict(pos=O2, nace=[0.2, 1.0], voz=False), "o4": dict(pos=O4, nace=[0.5, 1.3], voz=False), "o7": dict(pos=O7, nace=[0.8, 1.6], voz=False), "o9": dict(pos=O9, nace=[1.1, 1.9])},
+        sinExtras=[2, 3], actores={**MESA9, **SALON},
+        lineas=[L("orbi_pt", "Boa noite! Bem-vindos. Já podem fazer o pedido.", 2.0, sub="¡Buenas noches! Bienvenidos. Ya pueden pedir.", pedido=True)]),
+   dict(set="restaurante", musica="esperanza", cola=0.6,
+        cam=[[1.85, 1.62, -2.75, 1.7, 1.22, -3.45, 30], [1.4, 1.95, -0.2, 0.6, 1.55, -3.6, 36]],
+        e=dict(tablet={"pedidos": [["Mesa 9 · 7 personas · en portugués", "5 × Bandeja paisa · 2 × Ajiaco"], ["Mesa 2 · 6 personas · en portugués", "4 × Bandeja paisa · 6 × Limonada"], ["Mesa 4 · 7 personas · en portugués", "7 × Ajiaco"]], "nuevo": True}),
+        orbis={"o4": dict(pos=O4, voz=False), "o7": dict(pos=O7)},
+        actores={"jairo": dict(pos=JAIRO, gesto="baja", mira=[[0, -40], ["l0", "brayan"]], emo="sorpresa"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo")},
+        lineas=[L("jairo", "Brayan, ¿cómo se dice «gracias» en portugués?", 1.4), L("orbi_pt", "Obrigado.", 0.4, sub="Gracias.")]),
+   dict(set="restaurante", musica="esperanza", cola=1.1, mano=0.006, cam=[cerca(JAIRO, 0, 2.3, 8), cerca(JAIRO, 0, 1.9, 6)],
+        actores={"jairo": dict(pos=JAIRO, gesto="baja", mira=[[0, -30], ["l1", "brayan"]], emo=[[0, "serio"], ["l2", "feliz"]]), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo")},
+        lineas=[L("jairo", "Obrigado.", 0.4, sub="«Obrigado».") , L("brayan", "Don Jairo, eso le quedó mejor que el inglés.", 0.4), L("jairo", "Estoy practicando.", 0.4)]),
+   CIERRE_PLAY("Grupos grandes, en su idioma.", "Todas las mesas piden a la vez. Los pedidos llegan a la caja en español.", sinExtras=[2, 3]),
+  ]),
+
+ # ─────────── 16 · «La cuenta del viernes» (parte 2 de «La caja»)
+ "la-cuenta-del-viernes": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["Volvieron los de la mesa nueve…", "los que se fueron sin pagar · Parte 2 de «La caja»"],
+  copy="Se fueron sin pagar el viernes. Hoy volvieron. 🎬 Turno de noche · Parte 2",
+  hashtags="#TurnoDeNoche #Animacion3D #Restaurantes #Emprendedores #Colombia",
+  planos=[
+   dict(set="restaurante", musica="tension", cola=0.4, fx=PUM, cam=[cerca(BRAYAN, 180, 1.8, -10, y=1.68), cerca(BRAYAN, 180, 1.95, -10, y=1.68)],
+        actores={"jairo": dict(pos=JAIRO, gesto="trapo"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="sorpresa", inclina=0.08)},
+        lineas=[L("brayan", "Don Jairo. Los de la mesa nueve volvieron.", 0.15)]),
+   dict(set="restaurante", musica="tension", cola=0.5, mano=0.006, cam=[cerca(JAIRO, 0, 2.3, 8), cerca(JAIRO, 0, 1.9, 6)],
+        actores={"jairo": dict(pos=JAIRO, gesto=[[0, "trapo"], ["l0", "baja"]], mira="brayan", emo=[[0, "neutro"], ["l0", "serio"]]), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo")},
+        lineas=[L("jairo", "¿Los del viernes?", 0.3), L("brayan", "Los mismos.", 0.3), L("jairo", "Que los atienda el asistente. Y que les muestre la cuenta del viernes.", 0.5)]),
+   dict(set="restaurante", musica="tension", cola=0.6, sinExtras=[2, 3], fx=[dict(tipo="destello", p=0.08)], cam=LADO9,
+        e=dict(qrLuz={"9": [[0, 0], [0.3, 1.0], [1.8, 0.15]]}),
+        orbis={"o9": dict(pos=O9, nace=[0.2, 1.2], mira=[[0, "cam"], [1.0, "cliente"]])},
+        actores={**MESA9_DOS, "cliente": dict(pos=TUR, rot=180, sentado=True, gesto="manos_mesa", mira="o9", emo=[[0, "neutro"], ["l0+2.5", "sorpresa"]]),
+                 "amigo": dict(pos=TUR2, rot=0, sentado=True, gesto="manos_mesa", mira=[[0, "o9"], ["l0+3.0", "cliente"]], emo=[[0, "neutro"], ["l0+3.0", "sorpresa"]])},
+        lineas=[L("orbi", "Buenas noches. Antes de pedir: quedó pendiente la cuenta del viernes. Dos bandejas y tres limonadas.", 1.3)]),
+   dict(set="restaurante", musica="tension", cola=0.6, sinExtras=[2, 3], cam=LADO9, mano=0.006,
+        orbis={"o9": dict(pos=O9, mira="cliente")},
+        actores={**MESA9_DOS, "cliente": dict(pos=TUR, rot=180, sentado=True, gesto="manos_mesa", mira="o9", emo="sorpresa"),
+                 "amigo": dict(pos=TUR2, rot=0, sentado=True, gesto="manos_mesa", mira="cliente", emo="cansado")},
+        lineas=[L("cliente", "Eh… ¿y cuánto es?", 0.3), L("orbi", "Noventa y ocho mil pesos.", 0.3), L("amigo", "…Hágale. Pagamos todo.", 0.6)]),
+   dict(set="restaurante", musica="esperanza", cola=1.1,
+        cam=[[1.85, 1.62, -2.75, 1.7, 1.22, -3.45, 30], [1.4, 1.95, -0.2, 0.6, 1.55, -3.6, 36]],
+        e=dict(tablet={"pedidos": [["Mesa 9 · cuenta del viernes", "PAGADA · $ 98.000"], ["Mesa 9 · hoy", "2 × Torta de chocolate"]], "nuevo": True}),
+        orbis={"o9": dict(pos=O9, voz=False)},
+        actores={"jairo": dict(pos=JAIRO, gesto="baja", mira=[[0, -40], ["l1", "brayan"]], emo=[[0, "neutro"], ["l3", "feliz"]]), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="feliz")},
+        lineas=[L("brayan", "Pagaron, don Jairo.", 1.0), L("jairo", "Y pidieron postre.", 0.4), L("brayan", "¿Postre?", 0.3), L("jairo", "Se lo recomendó el asistente.", 0.4)]),
+   CIERRE_PLAY("Cada pedido queda registrado.", "Con la mesa, la hora y los platos. Nada se queda sin cobrar.", nota="Historia de ficción."),
+  ]),
+
+ # ─────────── 17 · «La felicitación» (parte 2 de «¿Dónde está mi pedido?»)
+ "la-felicitacion": dict(producto="dom", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["La señora del pedido volvió a llamar…", "Parte 2 de «¿Dónde está mi pedido?»"],
+  copy="La señora del pedido volvió a llamar. Nadie quería contestar. 🎬 Turno de noche · Parte 2",
+  hashtags="#TurnoDeNoche #Animacion3D #Domicilios #Emprendedores #Colombia",
+  planos=[
+   dict(set="oficina", musica="tension", cola=0.4, fx=PUM + [dict(tipo="onda", p=0, p1=0.3)],
+        cam=[sobre(MAR, JPIE, 1.1, 0.72, 0.25, 38, 1.38, 1.72), sobre(MAR, JPIE, 1.0, 0.72, 0.22, 36, 1.38, 1.72)],
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, gesto="llamada", mira="jairo", emo="sorpresa"), "jairo": dict(pos=JPIE, rot=-25, mira="marcela", emo="neutro")},
+        lineas=[L("marcela", "Don Jairo… es la señora del pedido.", 0.15), L("jairo", "¿Otra vez? Dígale que ya va en camino.", 0.3), L("marcela", "Todavía no ha pedido nada.", 0.3)]),
+   dict(set="oficina", musica="misterio", cola=0.5, cam=[cerca(MAR, 180, 2.3, 26, 0.08, 36, 1.38), cerca(MAR, 180, 2.0, 24, 0.06, 36, 1.38)],
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, gesto="llamada", mira=30, emo=[[0, "serio"], ["l0+1.0", "sorpresa"]])},
+        lineas=[L("brava", "Buenas noches. Llamo para… felicitarlos.", 0.4)]),
+   dict(set="oficina", musica="esperanza", cola=0.5, cam=[cerca(MAR, 180, 2.0, -24, 0.06, 34, 1.38), cerca(MAR, 180, 1.8, -22, 0.05, 34, 1.38)],
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, gesto="llamada", mira=-10, emo=[[0, "sorpresa"], ["l1", "feliz"]])},
+        lineas=[L("brava", "Vi mi pedido en el celular todo el camino, y llegó calientico.", 0.3), L("marcela", "…Gracias, señora.", 0.4)]),
+   dict(set="oficina", musica="esperanza", cola=0.6, cam=[sobre(MAR, JPIE, 1.1, 0.72, 0.25, 38, 1.38, 1.72), sobre(MAR, JPIE, 1.0, 0.72, 0.22, 36, 1.38, 1.72)],
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, gesto="reposo", mira="jairo", emo="feliz"), "jairo": dict(pos=JPIE, rot=-25, mira="marcela", emo=[[0, "neutro"], ["l1", "sorpresa"], ["l3", "serio"]])},
+        lineas=[L("marcela", "Don Jairo. Nos felicitaron.", 0.3), L("jairo", "¿A nosotros?", 0.3), L("marcela", "A nosotros.", 0.3), L("jairo", "Grábelo. Eso no vuelve a pasar.", 0.4)]),
+   dict(set="oficina", musica="esperanza", cola=1.0, fx=[dict(tipo="destello", p=0.08)],
+        cam=[[-1.35, 1.8, 2.1, 0.1, 1.3, -0.25, 38], [-1.2, 1.74, 1.85, 0.1, 1.3, -0.25, 36]],
+        e=dict(portatil={"titulo": "Pedido #52 · por link", "filas": [["Doña Martha", "Recibido", "#9ff0b0"], ["Comisión", "$ 0", "#bff3ff"]]}),
+        orbis={"oo": dict(pos=[0.15, 1.32, -0.05], nace=[0.1, 1.0], r=0.15, luz=0.45, mira="cam")},
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, mira="oo", emo="sorpresa"), "jairo": dict(pos=JPIE, rot=-25, mira="oo", emo="sorpresa")},
+        lineas=[L("orbi", "Sí va a volver a pasar. La señora acaba de pedir otra vez.", 1.1, pedido=True)]),
+   CIERRE_DOM("Clientes que vuelven a pedir.", "Su propio link, seguimiento en vivo y sin comisión."),
   ]),
 }

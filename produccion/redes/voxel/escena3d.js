@@ -112,7 +112,7 @@ function render(t) {
     gch.style.opacity = 1 - cl((t - (EP.gancho[2] || 3.2)) / 0.4); gch.style.transform = `scale(${1 + 0.04 * (1 - cl(t / 0.25))})`; } $("#negro").style.opacity = negro;
   $("#blanco").style.opacity = pl.trans === "flash" ? Math.max(0, 0.8 - tt * 3) : 0;
   const fi = $("#final");
-  if (pl.final) { const f = pl.final; if (fi.dataset.i !== String(i)) { fi.dataset.i = i; fi.innerHTML = `<div class="logo"><i class="pin"></i>${f.marca}</div><div class="frase">${f.frase}</div>${f.detalle ? `<div class="detalle">${f.detalle}</div>` : ""}<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation · Tuluá</div>`; }
+  if (pl.final) { const f = pl.final; if (fi.dataset.i !== String(i)) { fi.dataset.i = i; fi.innerHTML = `<div class="logo"><i class="pin"></i>${f.marca}</div><div class="frase">${f.frase}</div>${f.detalle ? `<div class="detalle">${f.detalle}</div>` : ""}<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation</div>`; }
     fi.style.opacity = cl((tt - (f.desde || 0.3)) / 0.7); $("#cortina").style.opacity = 0.78 * cl((tt - (f.desde || 0.3) + 0.3) / 0.8); } else { fi.style.opacity = 0; $("#cortina").style.opacity = 0; }
   $("#nota").textContent = pl.nota || "";
   // grano de película
