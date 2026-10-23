@@ -1,39 +1,113 @@
-# «El mesero robot»: imágenes para animar cuadro a cuadro (stop-motion)
+# «El mesero robot»: prompts para crear las imágenes
 
-Así se hacen las películas de figuras de juguete (*brickfilms*): fotos seguidas a **12 imágenes por segundo**, cambiando solo lo que se mueve.
-Usted me envía las imágenes y yo me encargo de:
-- **Labios sincronizados con la voz:** elijo la boca de cada cuadro según el volumen real del audio.
-- **Parpadeos, tiempos y movimientos de cámara.**
-- **Sonido, subtítulos, gancho y cierre.**
+Usted crea las imágenes con estos prompts (por ejemplo, en **Gemini**: suba la imagen que se indica y pegue el texto) y me las envía.
+Yo las organizo: bocas sincronizadas con la voz, parpadeos, gestos, movimientos, cámara, sonido, subtítulos y cierre.
 
-## Regla de oro: que solo cambie lo que se mueve
-Si entre una imagen y otra cambia la luz, el fondo, el tamaño o un detalle de la ropa, el video «tiembla».
-Por eso cada imagen nueva se pide como **edición de la anterior**, no como imagen nueva desde cero.
+**Cómo hacerlo:**
+- Cada prompt dice **qué imagen subir**. Casi siempre es una de sus imágenes originales (`taller.jpg`, `ingeniero.jpg`, `socios.jpg`), y a veces la que acaba de crear.
+- Guarde cada resultado con el **nombre indicado** (ejemplo: `t_boca_media.png`), o mándemela en el chat diciendo cuál es.
+- Si una imagen sale con otra luz, otro fondo u otra ropa, repítala: si cambia algo más que lo pedido, el video «tiembla».
 
-**Texto para editar en Gemini** (suba la imagen base y pida el cambio):
-> Usa esta misma imagen y cambia SOLO [la boca: ligeramente abierta]. No cambies nada más: misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores. Sin texto ni logos.
+**Final de todos los prompts** (ya va incluido en cada uno):
+> Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
 
-**Formato:**
-- Vertical 9:16 (ideal 1080 × 1920). Si no se puede, cuadrado, pero todas las de una toma del mismo tamaño.
-- Nombre cada archivo como `t1_base.png`, `t1_boca_media.png`, `t1_gafas_2.png`…, o me dice en el chat cuál es cuál.
+---
 
-## Bocas (las necesita cada personaje que habla, en cada toma)
-| Archivo | Qué cambia |
-|---|---|
-| `_base` | boca cerrada, la imagen original |
-| `_boca_media` | boca entreabierta |
-| `_boca_abierta` | boca bien abierta, como diciendo «a» |
-| `_ojos_cerrados` | parpadeo (ojos cerrados, todo lo demás igual) |
+## A. Iván en el taller (imagen a subir: `taller.jpg`)
+Se usan en las tomas 1, 4 y 7.
 
-## Lista por toma (≈ 36 imágenes)
-| Toma | Imagen base | Imágenes que necesito |
+**`t_boca_media.png`**
+> Edita esta imagen. Cambia SOLO la boca de la figura de chaqueta roja: ligeramente entreabierta, como hablando. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`t_boca_abierta.png`**
+> Edita esta imagen. Cambia SOLO la boca de la figura de chaqueta roja: bien abierta, como diciendo la letra «A». Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`t_ojos_cerrados.png`**
+> Edita esta imagen. Cambia SOLO los ojos de la figura de chaqueta roja: cerrados, como parpadeando. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`t_gafas_subiendo.png`**
+> Edita esta imagen. Cambia SOLO el brazo derecho de la figura de chaqueta roja: ahora sube las gafas negras a la altura de la cara, a punto de ponérselas. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`t_gafas_puestas.png`**
+> Edita esta imagen. Cambia SOLO esto: la figura de chaqueta roja ahora tiene puestas las gafas negras de sol y una sonrisa segura. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`t_dolor.png`**
+> Edita esta imagen. Cambia SOLO la cara de la figura de chaqueta roja: ojos apretados y dientes apretados, con cara de vergüenza, como si algo acabara de romperse. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`t_mira_robot.png`**
+> Edita esta imagen. Cambia SOLO la cabeza de la figura de chaqueta roja: girada hacia el brazo robótico de la izquierda, con cara seria y cansada. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+## B. El brazo robótico (en orden; cada una se hace sobre la anterior)
+Se usan en las tomas 4 y 7.
+
+**`r1_plato.png`** · subir `taller.jpg`
+> Edita esta imagen. Cambia SOLO la pinza del brazo robótico gris de la izquierda: ahora sostiene un pequeño plato blanco de juguete con comida (arroz, carne y aguacate). Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`r2_aire.png`** · subir `r1_plato.png`
+> Edita esta imagen. Cambia SOLO esto: el plato y la comida salen volando por el aire desde la pinza del brazo robótico, girando, con piezas sueltas. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`r3_suelo.png`** · subir `r1_plato.png`
+> Edita esta imagen. Cambia SOLO esto: la pinza del brazo robótico ahora está vacía, y el plato y la comida están regados en el suelo del taller. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`r4_medio.png`** · subir `r3_suelo.png`
+> Edita esta imagen. Cambia SOLO el brazo robótico gris: ahora está a medio bajar, inclinado hacia el suelo, como apagándose. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`r5_caido.png`** · subir `r4_medio.png`
+> Edita esta imagen. Cambia SOLO el brazo robótico gris: ahora está completamente caído y doblado hacia el suelo, apagado. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+## C. Iván de cerca (imagen a subir: `ingeniero.jpg`)
+Se usan en las tomas 3 y 6.
+
+**`i_boca_media.png`**
+> Edita esta imagen. Cambia SOLO la boca de la figura: ligeramente entreabierta, como hablando. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`i_boca_abierta.png`**
+> Edita esta imagen. Cambia SOLO la boca de la figura: bien abierta, como diciendo la letra «A». Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`i_ojos_cerrados.png`**
+> Edita esta imagen. Cambia SOLO los ojos de la figura: cerrados, como parpadeando. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`i_ceja.png`**
+> Edita esta imagen. Cambia SOLO las cejas de la figura: una ceja levantada, con expresión de sabio que se cree muy listo. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`i_gafas_puestas.png`**
+> Edita esta imagen. Cambia SOLO esto: la figura tiene puestas las gafas negras de sol (las que tenía en la mano ya no están en la mano). Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`i_gafas_nariz.png`** · subir `i_gafas_puestas.png`
+> Edita esta imagen. Cambia SOLO las gafas: ahora están bajadas hasta la punta de la nariz y la figura mira por encima de ellas, sorprendido y desconfiado. Todo lo demás debe quedar exactamente igual: misma figura de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+## D. Los socios (imagen a subir: `socios.jpg`)
+Se usan en las tomas 2 y 5. **El bravo** es el de traje negro, a la derecha; **el calmado** es el de camisa azul, a la izquierda.
+
+**`s_bravo_cerrada.png`**
+> Edita esta imagen. Cambia SOLO la boca de la figura de traje negro (derecha): cerrada y apretada, todavía enojado. Todo lo demás debe quedar exactamente igual: mismas figuras de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`s_bravo_media.png`**
+> Edita esta imagen. Cambia SOLO la boca de la figura de traje negro (derecha): entreabierta, enojado, como hablando fuerte. Todo lo demás debe quedar exactamente igual: mismas figuras de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`s_bravo_brazo_abajo.png`**
+> Edita esta imagen. Cambia SOLO el brazo de la figura de traje negro (derecha): ahora está abajo, sin señalar. Todo lo demás debe quedar exactamente igual: mismas figuras de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`s_bravo_tranquilo.png`** · subir `s_bravo_brazo_abajo.png`
+> Edita esta imagen. Cambia SOLO la cara de la figura de traje negro (derecha): ahora está tranquilo, con la boca cerrada y cara de sorprendido. Todo lo demás debe quedar exactamente igual: mismas figuras de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`s_calmado_cerrada.png`** · subir `s_bravo_tranquilo.png`
+> Edita esta imagen. Cambia SOLO la boca de la figura de camisa azul (izquierda): sonrisa tranquila con la boca cerrada. Todo lo demás debe quedar exactamente igual: mismas figuras de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`s_calmado_media.png`** · subir `s_bravo_tranquilo.png`
+> Edita esta imagen. Cambia SOLO la boca de la figura de camisa azul (izquierda): sonriendo con la boca entreabierta, como hablando. Todo lo demás debe quedar exactamente igual: mismas figuras de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+**`s_calmado_ojos.png`** · subir `s_bravo_tranquilo.png`
+> Edita esta imagen. Cambia SOLO los ojos de la figura de camisa azul (izquierda): cerrados, como parpadeando, con su sonrisa. Todo lo demás debe quedar exactamente igual: mismas figuras de juguete, misma posición, mismo encuadre, misma luz, mismo fondo, mismos colores y mismo tamaño de imagen. Sin texto ni logos.
+
+---
+
+## Resumen: 25 imágenes
+| Grupo | Imágenes | Para qué |
 |---|---|---|
-| 1 · Gancho | Iván de cuerpo entero en el taller (`taller.jpg`) | 3 bocas + parpadeo · **ponerse las gafas:** 3 poses (gafas en la mano → subiendo → puestas) |
-| 2 · Socio bravo | el de traje (`socios.jpg`) | 3 bocas (la abierta puede ser gritando) + parpadeo · **señalar:** brazo abajo → brazo señalando |
-| 3 · La excusa | Iván de cerca, mano en la barbilla (`ingeniero.jpg`) | 3 bocas + parpadeo · ceja levantada (1) |
-| 4 · El robot falla | el brazo robótico del taller | 5 poses: brazo con plato → plato temblando → plato en el aire → plato cayendo → piezas en el suelo · Iván con cara de dolor (1) |
-| 5 · La solución | el socio calmado (`socios.jpg`) | 3 bocas + parpadeo · socio bravo ya tranquilo (1) |
-| 6 · La pregunta | Iván muy de cerca | gafas puestas → gafas a media nariz → gafas abajo (3) · 3 bocas |
-| 7 · Remate | taller completo | Iván mirando al robot (1) · brazo robótico arriba → a medio caer → caído (3) |
+| A · Iván en el taller | 7 | hablar, parpadear, ponerse las gafas, cara de dolor, mirar al robot |
+| B · Brazo robótico | 5 | sostener el plato → plato volando → plato en el suelo → brazo apagándose |
+| C · Iván de cerca | 6 | hablar, parpadear, ceja, gafas puestas, gafas en la nariz |
+| D · Los socios | 7 | el bravo gritando y calmándose; el calmado hablando y parpadeando |
 
-**Consejo:** empiece por la **toma 1** (son 7 imágenes). Yo la animo y le muestro cómo queda antes de que haga las demás; así confirmamos que se ve fluido.
+**Empiece por el grupo A** (7 imágenes). Con esas animo la toma 1 y le muestro el resultado antes de que haga las demás.

@@ -8,6 +8,8 @@
 
 **Gancho en pantalla (primer cuadro):** «Pasó 3 meses construyendo un mesero robot… y sus socios tenían otra idea».
 
+**Método elegido: imágenes creadas con prompts (ver `IMAGENES.md`) y animadas cuadro a cuadro por mí.** Los textos para herramientas de video de abajo quedan como alternativa.
+
 La animática (`animatica.mp4`) ya tiene el montaje con sus imágenes y voces provisionales. Úsela para ver el ritmo; cada toma de abajo reemplaza a una toma de la animática.
 
 ---
