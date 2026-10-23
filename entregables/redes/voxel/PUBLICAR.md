@@ -67,6 +67,17 @@ Cada una retoma un capítulo anterior: el gancho dice «Parte 2 de…» para que
 
 Publique cada parte 2 entre dos y cuatro días después de su primera parte, y en el texto o en un comentario fijado ponga «Parte 1 en el perfil».
 
+### Temporada 3: rápidos (20-30 s)
+El clímax primero: la frase de conflicto antes de los 0,3 s, un misterio en pantalla que solo se resuelve al final, cortes cada 2-3 s y el remate en el último segundo.
+
+| Archivo | Gancho en pantalla | Texto para publicar |
+|---|---|---|
+| `el-cliente-fantasma.mp4` | «La mesa 2 pidió dos bandejas… pero no hay nadie sentado» | La mesa 2 pidió dos bandejas. Pero no hay nadie sentado. 👻 Turno de noche |
+| `el-examen.mp4` | «Don Jairo le hizo un examen al asistente… y salió perdiendo» | Don Jairo quiso ponerlo a prueba. Mala idea. 😅 Turno de noche |
+| `la-competencia-pidio.mp4` | «El restaurante de enfrente acaba de pedir domicilio… a nosotros» | El de enfrente pidió domicilio. A nosotros. 🍲 Turno de noche |
+| `las-dos-tortas.mp4` | «Desaparecieron dos tortas de la cocina… y hay un sospechoso» | Desaparecieron dos tortas. Todos saben a quién mirar. 🍰 Turno de noche |
+| `el-critico.mp4` | «En la mesa 7 hay un crítico de comida… y Brayan acaba de enterarse» | Un crítico de comida en la mesa 7. Y un solo mesero. 😰 Turno de noche |
+
 ## Convocatoria de asesores (pieza aparte, estilo juguete de bloques)
 `convocatoria-asesores.mp4`: tono serio, voz grave. El gancho es «Se busca: asesores comerciales». No lleva el nombre de la serie.
 > Apex Corporation busca asesores comerciales, con o sin experiencia. Ofrezca software e inteligencia artificial a restaurantes: 20 % por cada venta de Apex Play y $ 100.000 por cada restaurante con Apex Domicilios. Escríbanos: 310 789 7960
