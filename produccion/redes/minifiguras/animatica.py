@@ -14,13 +14,16 @@ SALIDA = RAIZ + "entregables/redes/minifiguras/"
 PAGINA = r'''
 const $ = (s) => document.querySelector(s), cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), suave = (x) => { x = cl(x); return x * x * (3 - 2 * x); };
 const lerp = (a, b, k) => a + (b - a) * k;
-const IMGS = {}; EP.tomas.forEach((tm) => { if (tm.imagen && !IMGS[tm.imagen]) { const im = new Image(); im.src = "modelos/" + tm.imagen; im.className = "foto"; $("#lienzo").appendChild(im); IMGS[tm.imagen] = im; } });
+const IMGS = {}, ruta = (n) => n.includes("/") ? n : "modelos/" + n;
+EP.tomas.forEach((tm) => [tm.imagen, ...(PLAN[EP.tomas.indexOf(tm)] || []).map((p) => p[1])].forEach((n) => { if (n && !IMGS[n]) { const im = new Image(); im.src = ruta(n); im.className = "foto"; $("#lienzo").appendChild(im); IMGS[n] = im; } }));
 function render(t) {
   const LP = LINEA.planos; let i = LP.findIndex((L) => t < L.fin); if (i < 0) i = LP.length - 1;
   const tm = EP.tomas[i], L = LP[i], tt = t - L.ini, dur = L.fin - L.ini, p = suave(tt / dur);
-  Object.entries(IMGS).forEach(([n, im]) => { im.style.display = n === tm.imagen ? "block" : "none"; });
-  if (tm.imagen) {
-    const im = IMGS[tm.imagen], [x0, y0, h0] = tm.de, [x1, y1, h1] = tm.a || tm.de, cx = lerp(x0, x1, p), cy = lerp(y0, y1, p), h = lerp(h0, h1, p), s = 1920 / h;
+  // cuadro a cuadro: la imagen de este instante sale del plan (12 por segundo)
+  let actual = tm.imagen; const plan = PLAN[i]; if (plan && plan.length) { const k = Math.floor(tt * 12); actual = plan[Math.min(plan.length - 1, k)][1]; }
+  Object.entries(IMGS).forEach(([n, im]) => { im.style.display = n === actual ? "block" : "none"; });
+  if (actual) {
+    const im = IMGS[actual], [x0, y0, h0] = tm.de, [x1, y1, h1] = tm.a || tm.de, cx = lerp(x0, x1, p), cy = lerp(y0, y1, p), h = lerp(h0, h1, p), s = 1920 / h;
     let sx = 0, sy = 0; if (tm.temblor) { const k = tm.temblor * Math.max(0, 1 - Math.abs(tt - (tm.golpe || 0.6)) * 2.5); sx = k * Math.sin(t * 90); sy = k * Math.cos(t * 77); }
     const bx = 0.6 * Math.sin(t * 0.9), by = 0.6 * Math.cos(t * 1.1);   // cámara en mano muy leve
     im.style.transform = `translate(${540 - cx * s + sx + bx}px, ${960 - cy * s + sy + by}px) scale(${s})`;
@@ -35,21 +38,24 @@ function render(t) {
   const fi = $("#final");
   if (tm.final) { const f = tm.final; if (!fi.dataset.ok) { fi.dataset.ok = 1; fi.innerHTML = `<div class="logo"><i class="pin"></i>${f.marca}</div><div class="frase">${f.frase}</div><div class="detalle">${f.detalle}</div><div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div><div class="pie">Apex Corporation</div>`; }
     fi.style.opacity = cl((tt - 0.3) / 0.7); $("#cortina").style.opacity = 0.8 * cl((tt) / 0.8); } else { fi.style.opacity = 0; $("#cortina").style.opacity = 0; }
-  $("#marca").textContent = tm.imagen ? "ANIMÁTICA · TOMA " + (i + 1) : "";
+  $("#marca").textContent = EP.marcaAgua === false ? "" : (tm.imagen ? "ANIMÁTICA · TOMA " + (i + 1) : "");
 }
 '''
 CSS = '''#lienzo { position: absolute; inset: 0; overflow: hidden; background: #111; } .foto { position: absolute; left: 0; top: 0; transform-origin: 0 0; display: none; }
 #marca { position: absolute; left: 40px; top: 1840px; font: 700 22px/1 "Figtree"; letter-spacing: .2em; color: rgba(255,255,255,.55); z-index: 12; }'''
 
-def pagina(ep, lin, W):
+def pagina(ep, lin, W, plan=None):
     leer = lambda p: open(p).read(); V = AQUI + "../voxel/"
     html = f'''<!doctype html><html><head><meta charset="utf-8">{leer(RAIZ + "produccion/videos/fuentes.html")}<style>{leer(V + "estilo.css")}{CSS}</style></head><body>
 <div id="lienzo"></div><div id="vineta"></div><div id="gancho"></div><div id="sub"></div><div id="cortina"></div><div id="final"></div><div id="marca"></div>
 <div id="blanco"></div><div id="negro"></div>
-<script>const EP = {json.dumps(ep, ensure_ascii=False)}; const LINEA = {json.dumps(lin, ensure_ascii=False)};
+<script>const EP = {json.dumps(ep, ensure_ascii=False)}; const LINEA = {json.dumps(lin, ensure_ascii=False)}; const PLAN = {json.dumps(plan or [], ensure_ascii=False)};
 {PAGINA}</script></body></html>'''
     open(W + "cuadro.html", "w").write(html)
     shutil.copytree(AQUI + "modelos", W + "modelos", dirs_exist_ok=True)
+    if os.path.isdir(AQUI + gid_carpeta(ep)): shutil.copytree(AQUI + gid_carpeta(ep), W + "cuadros", dirs_exist_ok=True)
+
+def gid_carpeta(ep): return ep.get("carpeta", "") or "__ninguna__"
 
 def hacer(gid):
     g = GUIONES[gid]; ep = dict(g, planos=g["tomas"]); W = motor.TRABAJO + "mini_" + gid + "/"; os.makedirs(W, exist_ok=True)

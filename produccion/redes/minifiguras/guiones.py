@@ -36,3 +36,32 @@ GUIONES = {
         final=dict(marca="Apex Play", frase="Un asistente de IA en cada mesa.", detalle="Sin construir robots: un código en cada mesa y listo.<br>Cotización según sus mesas y su carta · Clientes nuevos: 50 %")),
   ]),
 }
+
+# ─────────── «El mesero robot», cuadro a cuadro con las imágenes del cliente (cuadros/ = 01…20 en el orden en que llegaron)
+CARA_T = [438, 298, 572, 408]; OJOS_T = [440, 318, 570, 350]       # Iván en el taller (imágenes 1024 × 1024)
+BOCA_T = dict(quien="ingeniero", sobre="modelos/taller.jpg", media="cuadros/01.jpg", abierta="cuadros/02.jpg", zona=CARA_T)
+BOCA_T2 = dict(quien="ingeniero", sobre="cuadros/11.jpg", media="cuadros/12.jpg", abierta="cuadros/13.jpg", zona=CARA_T)
+GUIONES["el-mesero-robot-cc"] = dict(producto="play", reparto=VOCES, carpeta="el-mesero-robot/cuadros",
+  gancho=["Pasó 3 meses construyendo un mesero robot…", "y sus socios tenían otra idea"],
+  paneles={"izq19": ["cuadros/19.jpg", [0, 0, 686, 768]], "der19": ["cuadros/19.jpg", [690, 0, 1376, 768]], "der20": ["cuadros/20.jpg", [690, 0, 1376, 768]]},
+  tomas=[
+   dict(poses=[[0, "modelos/taller.jpg"], ["f0+0.15", "cuadros/04.jpg"], ["f0+0.55", "cuadros/05.jpg"]], bocas=BOCA_T, ojos=dict(img="cuadros/03.jpg", zona=OJOS_T, sobre="modelos/taller.jpg"),
+        de=[505, 520, 900], a=[505, 430, 640], musica="comico", fx=[dict(tipo="pum", p=0.0)], cola=1.2,
+        lineas=[L("ingeniero", "Tres meses construyendo un mesero robot.", 0.2)]),
+   dict(poses="cc/izq19.jpg", de=[343, 420, 768], a=[330, 400, 600], musica="comico", trans="flash", min=2.6,
+        lineas=[L("ingeniero", "Cada tornillo… lo puse yo.", 0.3)]),
+   dict(poses=[[0, "cuadros/08.jpg"], [1.0, "cuadros/09.jpg"], [1.5, "cuadros/10.jpg"]], de=[330, 470, 820], a=[360, 500, 700], temblor=18, golpe=1.05,
+        musica="comico", fx=[dict(tipo="vidrios", p=0.3)], min=2.6),
+   dict(poses="cuadros/11.jpg", bocas=BOCA_T2, ojos=dict(img="cuadros/14.jpg", zona=OJOS_T, sobre="cuadros/11.jpg"), de=[500, 470, 760], a=[505, 420, 560], musica="comico", cola=0.6,
+        lineas=[L("ingeniero", "…Casi.", 0.5)]),
+   dict(poses=[[0, "cc/der19.jpg"], ["f0+0.2", "cc/der20.jpg"]], de=[300, 420, 768], a=[285, 430, 560], musica="tension", trans="flash", fx=[dict(tipo="pum", p=0.05)],
+        lineas=[L("socio_bravo", "¿Tres meses? ¡Un robot que tira la comida!", 0.2)]),
+   dict(imagen="socios.jpg", de=[330, 560, 820], a=[320, 480, 600], musica="esperanza",
+        lineas=[L("socio_calmado", "Nosotros pusimos un código en cada mesa. El asistente toma el pedido y lo manda a la caja.", 0.3)]),
+   dict(poses=[[0, "cuadros/11.jpg"], ["f1+0.3", "cuadros/14.jpg"]], bocas=BOCA_T2, de=[505, 420, 620], a=[505, 400, 480], musica="esperanza", cola=0.8,
+        lineas=[L("ingeniero", "¿Y en cuánto tiempo lo instalaron?", 0.3), L("socio_calmado", "Una semana.", 0.5)]),
+   dict(poses=[[0, "cuadros/14.jpg"], ["f0+0.4", "cuadros/15.jpg"], ["l1-0.3", "cuadros/16.jpg"]], bocas=dict(quien="ingeniero", sobre="cuadros/16.jpg", media="cuadros/17.jpg", zona=CARA_T), de=[505, 470, 900], a=[505, 440, 700], musica="comico", cola=1.2,
+        lineas=[L("ingeniero", "…Apágalo.", 0.4), L("ingeniero", "Pero que quede claro: el mío tiene más estilo.", 0.9)]),
+   dict(imagen="cuadros/16.jpg", de=[512, 512, 1024], a=[512, 512, 980], musica="pelicula", min=6.0, trans="negro",
+        final=dict(marca="Apex Play", frase="Un asistente de IA en cada mesa.", detalle="Sin construir robots: un código en cada mesa y listo.<br>Cotización según sus mesas y su carta · Clientes nuevos: 50 %")),
+  ])
