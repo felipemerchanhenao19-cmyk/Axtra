@@ -78,6 +78,28 @@ JPIE = [0.95, -1.35]
 # temporada 2: ganchos fuertes desde el primer cuadro
 M4C = [2.4, 1.15]; BM4 = [0.9, 1.5]; JV = [-3.9, 0.2]; MV = [-2.2, 0.8]; BG = [-1.55, 1.75]
 PUM = [dict(tipo="pum", p=0.0)]
+# ═══ La Liga Apex: héroes de juguete propios (inspirados en arquetipos, sin personajes ni marcas registradas)
+PIEL_J = "#f0c9a4"
+LIGA = {
+    "noche": dict(juguete=True, piel=PIEL_J, camisa="#17191d", pantalon="#17191d", zapatos="#0e0f12", manos="#17191d", capucha="#121417", mascara="#121417", mascaraAlta=True,
+                  ojosBlancos=True, capa="#0d0e11", emblema="luna", colorEmblema="#f2c84a", cinturon="#c9a24a", cejas="#121417", semilla=31, alto=1.04),
+    "ferro": dict(juguete=True, piel=PIEL_J, pelo="#2a1a12", cejas="#2a1a12", camisa="#8e1616", pantalon="#b8902a", zapatos="#8e1616", manos="#8e1616", casco="#8e1616", oro="#c9a24a",
+                  barba="#1f140e", emblema="hexagono", colorEmblema="#8ff0ff", brilloEmblema=True, cinturon="#c9a24a", semilla=32),
+    "comision": dict(juguete=True, piel="#8a5aa8", cejas="#2a1440", camisa="#3a2458", pantalon="#3a2458", zapatos="#2a1440", manos="#3a2458", capucha="#c9a24a", cuernos=True,
+                     emblema="porcentaje", colorEmblema="#f2c84a", guante="#c9a24a", cinturon="#c9a24a", semilla=33, alto=1.16),
+    "dueno": dict(juguete=True, piel=PIEL_J, pelo="#8a8580", cejas="#4a4540", bigoteDibujo="#5a5550", camisa="#e8e2d6", delantal="#3b2a22", pantalon="#2a2f3a", semilla=34),
+}
+VOCES_LIGA = {
+    "noche": dict(voz=("es-CO-GonzaloNeural", "-12%", "-28Hz"), fx="villano"),
+    "ferro": dict(voz=("es-MX-JorgeNeural", "+6%", "+2Hz")),
+    "comision": dict(voz=("es-ES-AlvaroNeural", "-8%", "-20Hz"), fx="villano"),
+    "dueno": dict(voz=("es-CO-GonzaloNeural", "-9%", "-14Hz")),
+    "orbi": dict(voz=("es-CO-SalomeNeural", "+2%", "+2Hz"), fx="radio"),
+}
+VIL = [0.3, -0.9]; NOC = [-0.45, 1.7]; FER = [1.15, 1.8]; ORB = [-0.35, 1.85, 0.4]
+VILLANO = dict(pos=VIL, rot=0, mira="cam", emo="serio", gesto="reposo")
+HEROES = {"noche": dict(pos=NOC, rot=164, mira="comision", emo="serio", gesto="reposo"), "ferro": dict(pos=FER, rot=197, mira="comision", emo="neutro", gesto="reposo")}
+
 # convocatoria: equipo de traje, estilo juguete de bloques
 TRAJES = {
     "director": dict(juguete=True, piel="#c48a64", pelo="#5e5a56", cejas="#2a2826", saco="#14213a", camisa="#f4f2ee", corbata="#5a1a24", pantalon="#14213a", zapatos="#0b0b0d", semilla=21, alto=1.02),
@@ -873,5 +895,49 @@ EPISODIOS = {
         final=dict(clase="marca", marca="Apex Corporation", desde=0.5, logo=LOGO_A,
                    frase="Buscamos asesores comerciales, <i>con o sin experiencia.</i>",
                    detalle='Convocatoria · solo en Colombia<br><span class="unase">ÚNASE</span>')),
+  ]),
+ # ═══════════ La Liga Apex · piloto (boceto del estilo) ═══════════
+ "liga-apex-piloto": dict(producto="dom", reparto=VOCES_LIGA, elenco=LIGA, extras=EXTRAS,
+  gancho=["Un villano se está quedando con el 30 % de tus domicilios", "La Liga Apex · episodio piloto"],
+  copy="Lord Comisión llegó por el 30 % de los domicilios. No contaba con la Liga Apex. 🦸 Episodio piloto",
+  hashtags="#LigaApex #Animacion3D #Superheroes #Domicilios #Restaurantes",
+  planos=[
+   dict(set="restaurante", musica="villano", cola=0.4, fx=PUM + [dict(tipo="rayo", p=0.05)], e=dict(rayos=[[0.05, 0.7]]), mano=0.02,
+        cam=[[0.3, 0.95, 1.7, 0.3, 1.95, -0.9, 46], [0.3, 1.0, 1.4, 0.3, 1.95, -0.9, 44]],
+        actores={"comision": dict(VILLANO, gesto=[[0, "reposo"], [0.25, "mano_arriba"]]), "dueno": dict(pos=JAIRO, gesto="trapo", mira="comision", emo="sorpresa")},
+        lineas=[L("comision", "¡Desde hoy, el treinta por ciento de cada domicilio… es mío!", 0.2)]),
+   dict(set="restaurante", musica="villano", cola=0.6, mano=0.006, cam=[cerca(JAIRO, 0, 2.9, 8, 0.05, 38), cerca(JAIRO, 0, 2.6, 6, 0.04, 38)],
+        actores={"comision": dict(VILLANO, rot=180, mira="dueno", gesto="cadera"), "dueno": dict(pos=JAIRO, gesto="baja", mira="comision", emo=[[0, "sorpresa"], ["l2", "cansado"]])},
+        lineas=[L("dueno", "¿Treinta?", 0.3), L("comision", "Treinta y cinco. Por la tarifa de servicio.", 0.3), L("dueno", "…Eso no estaba en el contrato.", 0.5)]),
+   dict(set="restaurante", musica="heroe", cola=0.6, fx=[dict(tipo="pum", p=0.32)], trans="flash",
+        cam=[[1.0, 1.25, -0.3, -0.45, 2.0, 1.7, 42], [0.85, 1.3, -0.1, -0.45, 1.8, 1.7, 40]],
+        actores={"comision": dict(VILLANO, rot=180, mira="noche", emo="sorpresa"),
+                 "noche": dict(HEROES["noche"], y=[[0, 3.4], [0.9, 0.0]], vuelo=[[0, 0.9], [0.9, 0.0]], gesto=[[0, "mano_arriba"], [0.9, "reposo"]])},
+        lineas=[L("noche", "Soy la noche.", 1.3)]),
+   dict(set="restaurante", musica="heroe", cola=0.5,
+        cam=[cerca(FER, 197, 3.0, 10, 0.05, 38), cerca(FER, 197, 2.7, 8, 0.04, 38)],
+        actores={"comision": dict(VILLANO, rot=180, mira="ferro"), "noche": HEROES["noche"],
+                 "ferro": dict(HEROES["ferro"], pos=[[0, 3.0, 2.6], [1.2, 1.15, 1.8]], mira=[[0, "comision"], [1.3, "cam"]], gesto=[[0, "reposo"], [1.3, "explica"]])},
+        lineas=[L("ferro", "Y yo soy el que paga la luz.", 1.4)]),
+   dict(set="restaurante", musica="villano", cola=0.5, mano=0.01, cam=[cerca(VIL, 180, 3.2, -12, 0.05, 40, 1.95), cerca(VIL, 180, 2.9, -10, 0.04, 40, 1.95)],
+        actores={"comision": dict(VILLANO, rot=180, mira="noche", gesto="mano_arriba"), **HEROES},
+        lineas=[L("comision", "Nadie puede contra la comisión.", 0.3)]),
+   dict(set="restaurante", musica="heroe", cola=0.6, cam=[cerca(FER, 197, 2.8, -8, 0.05, 38), cerca(FER, 197, 2.5, -6, 0.04, 38)],
+        actores={"comision": dict(VILLANO, rot=180, mira="ferro"), **HEROES, "ferro": dict(HEROES["ferro"], emo="feliz", gesto="señala")},
+        lineas=[L("ferro", "Nadie… excepto un link.", 0.4), L("comision", "¿Un… link?", 0.5)]),
+   dict(set="restaurante", musica="comico", cola=0.6, fx=[dict(tipo="destello", p=0.05)],
+        cam=[[0.35, 1.75, 3.7, 0.3, 1.6, -0.6, 42], [0.35, 1.7, 3.4, 0.3, 1.6, -0.6, 42]],
+        orbis={"oa": dict(pos=ORB, nace=[0.1, 1.0], r=0.2, mira=[[0, "cam"], [1.0, "comision"]])},
+        actores={**HEROES, "noche": dict(HEROES["noche"], mira="oa"), "ferro": dict(HEROES["ferro"], mira="oa", emo="feliz"),
+                 "comision": dict(VILLANO, mira="oa", emo=[[0, "sorpresa"], ["f0", "triste"]],
+                                  escala=[[0, 1.0], ["f0", 1.0], ["f0+1.1", 0.45]], pos=[[0, 0.3, -0.9], ["l1", 0.3, -0.9], ["f1+0.3", 5.6, -1.0]], rot=[[0, 180], ["l1", 90]])},
+        lineas=[L("orbi", "Su propio link de pedidos. Cero comisión.", 1.2), L("comision", "¡Esto no se va a quedar así!", 1.3, sub="¡Esto no se va a quedar así!")]),
+   dict(set="restaurante", musica="comico", cola=1.0, mano=0.006, cam=[cerca(NOC, 164, 2.9, -10, 0.05, 38), cerca(NOC, 164, 2.6, -8, 0.04, 38)],
+        actores={**HEROES, "noche": dict(HEROES["noche"], mira=[[0, 70], ["l0", "cam"]], gesto="cruzado")},
+        lineas=[L("noche", "Yo quería pelear.", 0.5), L("ferro", "Pelee con la cocina. Entraron veinte pedidos.", 0.4)]),
+   dict(set="restaurante", musica="pelicula", min=6.0, trans="negro", cam=WIDE, orbis={"oa": dict(pos=ORB, r=0.2, voz=False)},
+        actores={**HEROES, "noche": dict(HEROES["noche"], mira="cam"), "ferro": dict(HEROES["ferro"], mira="cam", emo="feliz"), "dueno": dict(pos=JAIRO, gesto="reposo", emo="feliz")},
+        final=dict(marca="Apex Domicilios", frase="Sus domicilios, sin comisión.", desde=0.6,
+                   detalle="Su propio link de pedidos con asistente de IA.<br>Clientes nuevos: 50 % · Montaje $ 450.000 ($ 550.000 con lector de Nequi)<br>$ 60.000 al mes los primeros 12 meses")),
   ]),
 }

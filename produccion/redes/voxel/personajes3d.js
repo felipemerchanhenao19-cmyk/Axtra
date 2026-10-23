@@ -31,10 +31,14 @@ function dibujarCaraVoxel(g, c, s) {
   const mix = (a, b) => lerp(a, b, k), ceja = [mix(e2.ceja[0], e.ceja[0]), mix(e2.ceja[1], e.ceja[1])];
   const lid = s.parpadeo ? 1 : mix(e2.lid, e.lid), ojo = mix(e2.ojo, e.ojo), curva = mix(e2.curva, e.curva) + (s.sonrisa || 0);
   g.fillStyle = c.piel; g.fillRect(0, 0, 64, 64);
+  if (c.mascara) { g.fillStyle = c.mascara; g.fillRect(0, c.mascaraAlta ? 0 : 17, 64, c.mascaraAlta ? 37 : 19); }
+  if (c.tiara) { g.fillStyle = c.tiara; g.fillRect(6, 9, 52, 4); g.beginPath(); g.moveTo(26, 9); g.lineTo(32, 3); g.lineTo(38, 9); g.fill(); }
   g.fillStyle = c.sombraPiel; g.fillRect(0, 52, 64, 12); g.fillRect(0, 0, 3, 64); g.fillRect(61, 0, 3, 64);
   [-1, 1].forEach((d) => {
     const ex = 32 + d * 12, ey = 29;
-    if (c.juguete && lid < 0.95) {
+    if (c.ojosBlancos && lid < 0.95) {   // ojos blancos de antifaz, rasgados
+      g.fillStyle = "#f4f6f8"; g.beginPath(); g.moveTo(ex - 6, ey - 1); g.lineTo(ex + 6, ey - 3 + d * 0); g.lineTo(ex + 5 * d, ey + 3 * (1 - lid)); g.lineTo(ex - 5 * d, ey + 2 * (1 - lid)); g.closePath(); g.fill();
+    } else if (c.juguete && lid < 0.95) {
       g.fillStyle = "#14161a"; const h = Math.max(1, 7 * (1 - lid)); g.fillRect(ex - 2.5 + (s.mx || 0) * 1.5, ey - h / 2 + 1, 5, h);
       if (lid < 0.5) { g.fillStyle = "rgba(255,255,255,.9)"; g.fillRect(ex - 1 + (s.mx || 0) * 1.5, ey - 1, 1.5, 1.5); }
     } else if (lid < 0.95) {
@@ -50,7 +54,9 @@ function dibujarCaraVoxel(g, c, s) {
   });
   if (c.gafas) { g.fillStyle = c.gafas; g.fillRect(29, 26, 6, 1.6); }
   // boca: abre con la voz real; la curva da sonrisa o tristeza
-  const ab = cl(s.voz || 0), w = 16 + Math.round(ab * 2), mx = 32, my = 46;
+  const ab = cl(s.voz || 0), w = (c.juguete ? 12 : 16) + Math.round(ab * 2), mx = 32, my = 46;
+  if (c.barba) { g.fillStyle = c.barba; g.fillRect(mx - 9, my - 4, 18, 2); g.fillRect(mx - 3, my + 3 + Math.round(ab * 5), 6, 7); g.fillRect(mx - 9, my - 3, 2, 6); g.fillRect(mx + 7, my - 3, 2, 6); }
+  if (c.bigoteDibujo) { g.fillStyle = c.bigoteDibujo; g.fillRect(mx - 9, my - 5, 18, 3); }
   if (ab > 0.06) {
     const h = 2 + Math.round(ab * 7);
     g.fillStyle = "#3a1212"; g.fillRect(mx - w / 2, my - 1, w, h);
@@ -61,6 +67,21 @@ function dibujarCaraVoxel(g, c, s) {
     if (curva > 0.3) { g.fillRect(mx - w / 2 - 2, my - 2, 3, 2); g.fillRect(mx + w / 2 - 1, my - 2, 3, 2); }
     if (curva < -0.4) { g.fillRect(mx - w / 2 - 2, my + 2, 3, 2); g.fillRect(mx + w / 2 - 1, my + 2, 3, 2); }
   }
+}
+
+// ---------- Emblemas propios de la Liga Apex
+const EMBLEMAS = {};
+function emblema(tipo, color = "#f2c84a") {
+  const k = tipo + color; if (EMBLEMAS[k]) return EMBLEMAS[k];
+  const cv = document.createElement("canvas"); cv.width = cv.height = 128; const g = cv.getContext("2d"); g.fillStyle = color; g.strokeStyle = color; g.lineWidth = 9;
+  if (tipo === "luna") { g.beginPath(); g.arc(64, 64, 44, 0, PI * 2); g.fill(); g.globalCompositeOperation = "destination-out"; g.beginPath(); g.arc(84, 52, 38, 0, PI * 2); g.fill(); }
+  if (tipo === "hexagono") { g.beginPath(); for (let i = 0; i < 6; i++) { const a = i * PI / 3 + PI / 6; g.lineTo(64 + Math.cos(a) * 40, 64 + Math.sin(a) * 40); } g.closePath(); g.fill();
+    g.fillStyle = "#ffffff"; g.beginPath(); g.arc(64, 64, 16, 0, PI * 2); g.fill(); }
+  if (tipo === "hoja") { g.beginPath(); g.moveTo(64, 14); g.quadraticCurveTo(118, 64, 64, 114); g.quadraticCurveTo(10, 64, 64, 14); g.fill(); g.strokeStyle = "rgba(0,0,0,.35)"; g.lineWidth = 5; g.beginPath(); g.moveTo(64, 24); g.lineTo(64, 104); g.stroke(); }
+  if (tipo === "estrella") { g.beginPath(); for (let i = 0; i < 10; i++) { const a = -PI / 2 + i * PI / 5, r = i % 2 ? 20 : 48; g.lineTo(64 + Math.cos(a) * r, 64 + Math.sin(a) * r); } g.closePath(); g.fill(); }
+  if (tipo === "flecha") { g.beginPath(); g.moveTo(20, 108); g.lineTo(96, 32); g.stroke(); g.beginPath(); g.moveTo(108, 20); g.lineTo(76, 30); g.lineTo(98, 52); g.closePath(); g.fill(); }
+  if (tipo === "porcentaje") { g.font = "900 104px Figtree, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("%", 64, 68); }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; EMBLEMAS[k] = t; return t;
 }
 
 // ---------- Persona de bloques
@@ -76,6 +97,9 @@ function persona(cfg) {
   // torso
   const torso = pivote(0, 0.78, 0, cuerpo);
   caja(0.52, 0.64, 0.29, mCamisa, 0, 0.32, 0, torso);
+  if (c.emblema) { const e = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), new THREE.MeshStandardMaterial({ map: emblema(c.emblema, c.colorEmblema), transparent: true, roughness: 0.35,
+      emissive: c.brilloEmblema ? 0xffffff : 0, emissiveMap: c.brilloEmblema ? emblema(c.emblema, c.colorEmblema) : null, emissiveIntensity: c.brilloEmblema ? 1.4 : 0 })); e.position.set(0, 0.42, 0.147); torso.add(e); }
+  if (c.cinturon) caja(0.53, 0.07, 0.3, mat(c.cinturon), 0, 0.05, 0, torso);
   if (c.delantal) caja(0.46, 0.78, 0.02, mat(c.delantal), 0, 0.2, 0.155, torso);
   if (c.chaleco) { caja(0.17, 0.6, 0.3, mat(c.chaleco), -0.18, 0.33, 0, torso); caja(0.17, 0.6, 0.3, mat(c.chaleco), 0.18, 0.33, 0, torso); }
   if (c.saco) { caja(0.55, 0.62, 0.31, mat(c.saco), 0, 0.33, -0.005, torso); caja(0.14, 0.4, 0.02, mCamisa, 0, 0.45, 0.16, torso); }
@@ -84,7 +108,11 @@ function persona(cfg) {
   if (c.cadena) caja(0.2, 0.03, 0.02, mat("#c9a24a", { r: 0.3, m: 0.8 }), 0, 0.56, 0.16, torso);
   // brazos (pivote en el hombro) con mano
   const brazos = [-1, 1].map((d) => { const p = pivote(d * 0.345, 0.6, 0, torso); const manga = c.saco || c.camisa;
-    caja(0.16, 0.42, 0.19, mat(manga), 0, -0.2, 0, p); caja(0.15, 0.2, 0.18, c.mangaCorta ? mPiel : mat(manga), 0, -0.5, 0, p); caja(0.14, 0.13, 0.17, mPiel, 0, -0.66, 0, p); return p; });
+    caja(0.16, 0.42, 0.19, mat(manga), 0, -0.2, 0, p); caja(0.15, 0.2, 0.18, c.mangaCorta ? mPiel : mat(manga), 0, -0.5, 0, p); if (c.juguete) { const mano = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.03, 10, 20, PI * 1.45), mat(c.manos || c.piel)); mano.rotation.set(0, PI / 2, PI * 0.78); mano.position.set(0, -0.7, 0.03); mano.castShadow = true; p.add(mano); }
+    else caja(0.14, 0.13, 0.17, mPiel, 0, -0.66, 0, p); return p; });
+  if (c.guante) { const gd = pivote(0, -0.72, 0.02, brazos[1]); caja(0.2, 0.2, 0.22, mat(c.guante, { r: 0.25, m: 0.7 }), 0, 0, 0, gd);
+    for (let k = 0; k < 4; k++) { const mo = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.015, 16), new THREE.MeshStandardMaterial({ color: 0xf2c84a, metalness: 0.9, roughness: 0.2, emissive: 0x6a4a00, emissiveIntensity: 0.6 }));
+      mo.rotation.x = PI / 2; mo.position.set(-0.06 + k * 0.04, 0.05, 0.115); gd.add(mo); } }
   // cabeza: cara en textura de píxeles
   const cuello = pivote(0, 0.64, 0, torso); caja(0.2, 0.08, 0.2, mPiel, 0, 0.03, 0, cuello);
   const cabeza = pivote(0, 0.07, 0, cuello);
@@ -117,6 +145,20 @@ function persona(cfg) {
   }
   if (c.gorra) { caja(0.57, 0.15, 0.53, mat(c.gorra), 0, 0.57, 0, cabeza); caja(0.5, 0.03, 0.2, mat(c.gorra), 0, 0.51, c.gorraAtras ? -0.34 : 0.34, cabeza); }
   if (c.gorroChef) { caja(0.54, 0.1, 0.5, mat("#f2efe8"), 0, 0.56, 0, cabeza); caja(0.46, 0.3, 0.44, mat("#f2efe8"), 0, 0.76, 0, cabeza); }
+  if (c.capucha || c.casco) {   // concha alrededor de la cabeza, abierta al frente para la cara
+    const col = c.capucha || c.casco, mC = mat(col, c.casco ? { r: 0.25, m: 0.55 } : {});
+    const concha = new THREE.Mesh(new THREE.CylinderGeometry(0.255, 0.26, 0.46, 48, 1, true, 0.95, 2 * PI - 1.9), mC); concha.material.side = THREE.DoubleSide; concha.position.y = 0.26; concha.castShadow = true; cabeza.add(concha);
+    const tapa = new THREE.Mesh(new THREE.CylinderGeometry(0.255, 0.255, 0.06, 48), mC); tapa.position.y = 0.5; tapa.castShadow = true; cabeza.add(tapa);
+    if (c.casco) { const piv = pivote(0, 0.5, 0.24, cabeza); const visera = caja(0.44, 0.38, 0.05, mC, 0, 0.19, 0, piv); piv.rotation.x = -1.2;   // careta levantada sobre la cabeza
+      caja(0.3, 0.06, 0.02, mat(c.oro || "#c9a24a", { r: 0.25, m: 0.7 }), 0, 0.25, 0.03, piv); }
+    if (c.cuernos) [-1, 1].forEach((d) => { const cu = caja(0.06, 0.26, 0.08, mC, d * 0.22, 0.58, 0, cabeza); cu.rotation.z = -d * 0.35; });
+  }
+  let capa = null;
+  if (c.capa) {
+    const geo = new THREE.PlaneGeometry(0.62, 1.05, 6, 12); geo.translate(0, -0.525, 0);
+    capa = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: c.capa, roughness: 0.55, side: THREE.DoubleSide })); capa.position.set(0, 0.62, -0.16); capa.castShadow = true; torso.add(capa);
+    capa.userData.base = Float32Array.from(geo.attributes.position.array);
+  }
   // objetos en la mano derecha
   const mano = pivote(0, -0.72, 0.05, brazos[1]), objetos = {};
   objetos.vaso = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.04, 0.14, 12), new THREE.MeshStandardMaterial({ color: 0xdfefff, roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.55 }));
@@ -127,7 +169,7 @@ function persona(cfg) {
   objetos.vaso.position.set(0, -0.02, 0.06); objetos.tinto.position.set(0, 0, 0.06);
   Object.values(objetos).forEach((o) => { o.visible = false; o.castShadow = true; mano.add(o); });
   const r = semilla(c.semilla || 3), fase = r() * 10;
-  return { raiz, cuerpo, torso, piernas, brazos, cuello, cabeza, objetos, c, fase,
+  return { raiz, cuerpo, torso, capa, piernas, brazos, cuello, cabeza, objetos, c, fase,
     cara(s) { if (c.juguete) { g2.fillStyle = c.piel; g2.fillRect(0, 0, 192, 64); g2.save(); g2.translate(64, 0); dibujarCaraVoxel(g2, c, s); g2.restore(); } else dibujarCaraVoxel(g2, c, s); texCara.needsUpdate = true; } };
 }
 
@@ -155,7 +197,10 @@ const GESTOS = {
 function animarPersona(P, s, t) {
   // s: {x, z, rot, gesto, gesto2, mezclaG, camina (velocidad), sentado, voz, emo, emo2, mezcla, mira (yaw relativo), miraY, parpadeo...}
   const { raiz, piernas, brazos, torso, cuello, cabeza, objetos } = P, f = P.fase;
-  raiz.position.set(s.x, s.y || 0, s.z); raiz.rotation.y = s.rot || 0;
+  raiz.position.set(s.x, s.y || 0, s.z); raiz.rotation.y = s.rot || 0; raiz.scale.setScalar((P.c.alto || 1) * (s.escala ?? 1));
+  if (P.capa) { const a = P.capa.geometry.attributes.position, b = P.capa.userData.base, viento = 0.05 + Math.min(0.5, (s.camina || 0) * 0.2) + (s.vuelo || 0);
+    for (let k = 0; k < a.count; k++) { const y = -b[k * 3 + 1], x = b[k * 3]; a.setZ(k, -y * (0.12 + viento) - Math.sin(t * 3 + y * 4 + x * 3 + f) * 0.035 * y); }
+    a.needsUpdate = true; P.capa.geometry.computeVertexNormals(); }
   const G1 = GESTOS[s.gesto] || GESTOS.reposo, G0 = GESTOS[s.gesto2] || G1, k = s.mezclaG ?? 1, m = (a, b) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k)];
   let bi = m(G0.bi, G1.bi), bd = m(G0.bd, G1.bd);
   const respira = Math.sin(t * 1.9 + f) * 0.012, habla = s.voz || 0;

@@ -82,7 +82,7 @@ function render(t) {
       const T = posMundo(m, pl, tt, L); if (!T) return [0, 0]; return [ang(yawHacia(P0, T) - rot), -Math.atan2(T.y - P0.y, Math.hypot(T.x - P0.x, T.z - P0.z)) * 0.7]; };
     const [m0, m1, km] = discreto(a.mira ?? null, tt, L, a.miraDur ?? 0.5), [y0, p0] = mira(m0), [y1, p1] = mira(m1);
     animarPersona(P, { x: pos[0] + o.x, z: pos[1] + o.z, rot, gesto: g1, gesto2: g0, mezclaG: kg, camina: vel, sentado: a.sentado, voz: voz(id, t),
-      emo: e1, emo2: e0, mezcla: ke, mira: lerp(y0, y1, km), miraY: lerp(p0, p1, km) + (a.miraY || 0), inclina: continuo(a.inclina || 0, tt, L)[0], ladea: a.ladea, manos: a.manos, sonrisa: a.sonrisa }, t);
+      emo: e1, emo2: e0, mezcla: ke, mira: lerp(y0, y1, km), miraY: lerp(p0, p1, km) + (a.miraY || 0), inclina: continuo(a.inclina || 0, tt, L)[0], y: continuo(a.y || 0, tt, L)[0], escala: continuo(a.escala ?? 1, tt, L)[0], vuelo: continuo(a.vuelo || 0, tt, L)[0], ladea: a.ladea, manos: a.manos, sonrisa: a.sonrisa }, t);
   });
   // extras del salón (clientes sentados que conversan)
   EXTRAS.forEach(({ P, x }, j) => { P.raiz.visible = x.set === pl.set && !(pl.sinExtras || []).includes(j);
