@@ -57,7 +57,7 @@ redes = pagina('''<div style="position:absolute;top:220px;left:100px;right:100px
 closer = pagina('''<div style="position:absolute;top:220px;left:100px;right:100px">
   <div class="et">CONVOCATORIA · 100 % REMOTO · COLOMBIA 🇨🇴</div>
   <h1>Buscamos closers<br>de ventas, <em>100 %<br>remoto.</em></h1><div class="linea"></div>
-  <p class="sub">Llame a restaurantes, agende con el gerente y cierre la venta desde donde esté.</p>
+  <p class="sub">Cierre ventas de software e inteligencia artificial para el sector gastronómico, desde donde esté.</p>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:46px">
     <div style="border:2px solid #0b1f3a;padding:30px 32px"><div class="et" style="margin-bottom:10px">APEX PLAY</div><div style="font:800 54px Figtree">35 %</div><div style="font-size:24px;color:#34465e;margin-top:6px">de cada venta<br>(de $245.000 a $630.000)</div></div>
     <div style="border:2px solid #0b1f3a;padding:30px 32px;background:#0b1f3a;color:#fff"><div class="et" style="margin-bottom:10px;color:#9fb6d3">APEX DOMICILIOS</div><div style="font:800 54px Figtree">$200.000</div><div style="font-size:24px;color:#c9d6e6;margin-top:6px">por cada<br>restaurante vendido</div></div>
@@ -69,7 +69,7 @@ closer = pagina('''<div style="position:absolute;top:220px;left:100px;right:100p
 closer_li = pagina('''<div style="position:absolute;top:220px;left:100px;right:100px">
   <div class="et">CONVOCATORIA · 100 % REMOTO · COLOMBIA 🇨🇴</div>
   <h1>Buscamos closers<br>de ventas, <em>100 %<br>remoto.</em></h1><div class="linea"></div>
-  <p class="sub">Llame a restaurantes, agende con el gerente y cierre la venta desde donde esté.</p>
+  <p class="sub">Cierre ventas de software e inteligencia artificial para el sector gastronómico, desde donde esté.</p>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:46px">
     <div style="border:2px solid #0b1f3a;padding:30px 32px"><div class="et" style="margin-bottom:10px">APEX PLAY</div><div style="font:800 54px Figtree">35 %</div><div style="font-size:24px;color:#34465e;margin-top:6px">de cada venta<br>(de $245.000 a $630.000)</div></div>
     <div style="border:2px solid #0b1f3a;padding:30px 32px;background:#0b1f3a;color:#fff"><div class="et" style="margin-bottom:10px;color:#9fb6d3">APEX DOMICILIOS</div><div style="font:800 54px Figtree">$200.000</div><div style="font-size:24px;color:#c9d6e6;margin-top:6px">por cada<br>restaurante vendido</div></div>
@@ -82,7 +82,7 @@ closer_li = closer_li.replace(LOGO.format(t=64), '<svg viewBox="0 0 100 100" wid
 closer_wa = pagina('''<div style="position:absolute;top:220px;left:100px;right:100px">
   <div class="et">CONVOCATORIA · 100 % REMOTO · COLOMBIA 🇨🇴</div>
   <h1>Buscamos closers<br>de ventas, <em>100 %<br>remoto.</em></h1><div class="linea"></div>
-  <p class="sub">Llame a restaurantes, agende con el gerente y cierre la venta desde donde esté.</p>
+  <p class="sub">Cierre ventas de software e inteligencia artificial para el sector gastronómico, desde donde esté.</p>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:46px">
     <div style="border:2px solid #0b1f3a;padding:30px 32px"><div class="et" style="margin-bottom:10px">APEX PLAY</div><div style="font:800 54px Figtree">35 %</div><div style="font-size:24px;color:#34465e;margin-top:6px">de cada venta<br>(de $245.000 a $630.000)</div></div>
     <div style="border:2px solid #0b1f3a;padding:30px 32px;background:#0b1f3a;color:#fff"><div class="et" style="margin-bottom:10px;color:#9fb6d3">APEX DOMICILIOS</div><div style="font:800 54px Figtree">$200.000</div><div style="font-size:24px;color:#c9d6e6;margin-top:6px">por cada<br>restaurante vendido</div></div>
