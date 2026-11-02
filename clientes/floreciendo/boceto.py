@@ -39,7 +39,7 @@ body {{ width: 1800px; height: 1100px; background: linear-gradient(135deg, #efe7
 .cel .pant {{ width: 100%; height: 100%; border-radius: 40px; overflow: hidden; background: #fff; }}
 .sitio {{ background: #fdfaf6; color: #3b2f26; height: 100%; display: flex; flex-direction: column; }}
 header {{ display: flex; align-items: center; gap: 14px; padding: 20px 56px; border-bottom: 1px solid #efe5d6; }}
-.logo {{ width: 62px; height: 62px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px #e3cf9c; }}
+.logo {{ width: 70px; height: 70px; border-radius: 50%; box-shadow: 0 2px 10px rgba(168,129,47,.25); }}
 .marca b {{ display: block; font: 400 26px "Italiana", serif; letter-spacing: .08em; color: #a8812f; }} .marca span {{ font-size: 11px; letter-spacing: .25em; color: #9b8a78; text-transform: uppercase; }}
 nav {{ margin-left: auto; display: flex; gap: 34px; font-size: 15px; color: #6b5b4d; }} nav a:first-child {{ color: #a8812f; border-bottom: 2px solid #c9a24a; padding-bottom: 4px; }}
 .hero {{ flex: 1; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 30px; padding: 30px 70px; background: radial-gradient(60% 70% at 80% 50%, #fbeeee 0%, rgba(253,250,246,0) 70%); }}
@@ -51,7 +51,7 @@ h1 {{ font: 400 66px/1.05 "Italiana", serif; color: #3b2f26; }} h1 em {{ font: i
 .chips {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }} .chips span {{ padding: 8px 16px; border-radius: 20px; background: #f8eded; color: #8a5a5a; font-size: 14px; }}
 .ramo svg {{ width: 100%; max-height: 640px; }}
 footer {{ display: flex; justify-content: center; gap: 48px; padding: 18px; background: #3b2f26; color: #e8d6a8; font-size: 15px; letter-spacing: .05em; }}
-.m header {{ padding: 46px 20px 14px; }} .m .logo {{ width: 46px; height: 46px; }} .m .marca b {{ font-size: 19px; }} .m .marca span {{ font-size: 7.5px; }} .menu {{ margin-left: auto; font-style: normal; font-size: 24px; color: #a8812f; }}
+.m header {{ padding: 46px 20px 14px; }} .m .logo {{ width: 52px; height: 52px; }} .m .marca b {{ font-size: 19px; }} .m .marca span {{ font-size: 7.5px; }} .menu {{ margin-left: auto; font-style: normal; font-size: 24px; color: #a8812f; }}
 .m .hero {{ display: flex; flex-direction: column-reverse; padding: 10px 22px 18px; gap: 6px; text-align: center; }}
 .m .ramo svg {{ width: 230px; }} .m .et {{ font-size: 9px; margin-bottom: 10px; }} .m h1 {{ font-size: 38px; }} .m h1 em {{ font-size: 36px; }}
 .m .hero p {{ font-size: 13.5px; margin: 12px 0 16px; }} .m .bot {{ flex-direction: column; gap: 10px; }} .m .bot a {{ padding: 13px; font-size: 14px; }}
@@ -59,7 +59,7 @@ footer {{ display: flex; justify-content: center; gap: 48px; padding: 18px; back
 .m footer {{ gap: 18px; font-size: 12px; padding: 14px 14px 26px; }}
 .titulo {{ position: absolute; left: 60px; bottom: 34px; font-size: 14px; letter-spacing: .28em; color: #8a7d70; font-weight: 700; }}
 </style></head><body>
-<div class="pc"><div class="barra"><i></i><i></i><i></i><span>floreciendotulua.com</span></div><div style="height:856px">{portada(False)}</div></div>
+<div class="pc"><div class="barra"><i></i><i></i><i></i><span>floreciendotulua.axtra.chat</span></div><div style="height:856px">{portada(False)}</div></div>
 <div class="cel"><div class="pant">{portada(True)}</div></div>
 <div class="titulo">BOCETO · PORTADA DE LA PÁGINA WEB · FLORECIENDO TULUÁ</div>
 </body></html>'''
