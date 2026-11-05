@@ -521,3 +521,28 @@ def test_sitio_de_la_empresa(c):
         for frases in g["frases"].values():
             for f in frases:
                 assert c.get(f["src"]).status_code == 200 and f["dur"] > 0
+
+
+def test_video_del_sitio_con_la_voz_de_apex(c, axtra):
+    r = c.post("/v1/sitio/video", json={"idioma": "es", "nombre": "El Fogón <b>de</b> Rosa", "ciudad": "Cali", "plato": "Sancocho{}"})
+    assert r.status_code == 200
+    lineas = r.json()["lineas"]
+    assert [l["escena"] for l in lineas] == ["apertura", "mesa", "saludo", "carta", "cocina", "cierre"]
+    assert lineas[0]["txt"] == "Una noche cualquiera en El Fogón b de b Rosa, en Cali."       # sin marcas ni símbolos
+    assert lineas[3]["txt"].startswith("Hoy le recomiendo Sancocho.")
+    voces = [kw for ruta, kw in axtra.llamadas if ruta == "/voz"]
+    assert len(voces) == 6 and {v["voz_edge"] for v in voces} == {"es-CO-GonzaloNeural"} and not voces[0]["voz_google"]
+    audio = c.get(lineas[2]["src"])
+    assert audio.status_code == 200 and audio.headers["content-type"] == "audio/mpeg" and "Bienvenido a El Fogón".encode() in audio.content
+    assert c.get("/v1/sitio/voz/../../config").status_code == 404 and c.get("/v1/sitio/voz/" + "z" * 24).status_code == 404
+    en = c.post("/v1/sitio/video", json={"idioma": "en", "nombre": "Casa Rosa"}).json()["lineas"]
+    assert en[0]["txt"] == "One night at Casa Rosa." and en[3]["txt"].startswith("Today I recommend the house special")
+    assert c.post("/v1/sitio/video", json={"idioma": "fr", "nombre": "x"}).status_code == 422
+
+
+def test_video_del_sitio_sin_voz_y_con_limite(c, axtra):
+    axtra.caido = True
+    assert c.post("/v1/sitio/video", json={"nombre": "La Fogata"}).status_code == 503       # el sitio usa la voz grabada genérica
+    axtra.caido = False
+    codigos = [c.post("/v1/sitio/video", json={"nombre": f"R{i}"}).status_code for i in range(6)]
+    assert codigos[-1] == 429                                                                   # 6 videos cada 10 minutos por visitante

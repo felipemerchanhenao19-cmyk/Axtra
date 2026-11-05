@@ -30,12 +30,12 @@
       do_1: "<span><b>Zero commissions</b> per order: the margin stays in your restaurant.</span>", do_2: "<span><b>Automatic payment verification</b> with Nequi.</span>",
       do_3: "<span><b>Live order tracking</b> for your customer.</span>", do_4: "<span><b>Your own customer base</b>, so you can sell to them again.</span>", do_demo: "Try Apex Domicilios →",
       do_e1: "Nequi payment verified ✓<small>in seconds</small>", do_e2: "Your order is on its way<small>live tracking</small>",
-      s_ceja: "See Apex in your restaurant", s_titulo: "Type your restaurant's name and watch it in action.", s_texto: "In seconds we put together a short video with your name, your dishes and your colors. Watch it right here.",
+      s_ceja: "See Apex in your restaurant", s_titulo: "Type your restaurant's name and watch it in action.", s_texto: "In seconds we put together a video with your name, your dishes and your colors, narrated by our assistant. Watch it right here and download it.",
       f_titulo: "Your restaurant", f_sub: "It takes less than a minute.", f_nombre: "Restaurant name", f_ciudad: "City", f_tipo: "Type of food", f_platos: "Three of your dishes",
-      f_color: "Your brand color", f_logo: "＋ Upload logo", f_boton: "▶&nbsp; See my restaurant with Apex", f_nota: "Your details stay in your browser: we don't store them.",
+      f_color: "Your brand color", f_logo: "＋ Upload logo", f_boton: "▶&nbsp; See my restaurant with Apex", f_nota: "We only use the name, city and first dish to narrate your video. We don't store your details.",
       f_tipo_ph: "Grill", f_p1: "House platter", f_p2: "400 g steak", f_p3: "Coconut lemonade",
       v_mesa: "TABLE 4 · APEX PLAY", v_bienvenido: "Welcome to", v_cocina: "● NEW ORDER · KITCHEN", v_fin_ceja: "This is how Apex would look", v_fin_texto: "We install it remotely in 5 to 7 business days.",
-      v_fin_wa: "I want it for my restaurant", v_fin_otra: "Watch again",
+      v_fin_wa: "I want it for my restaurant", v_fin_otra: "↺ Watch again", v_ver: "▶ Watch the video", v_preparando: "Preparing your video…", v_bajar: "⬇ Download video",
       t_ceja: "How we work", t_titulo: "From the first conversation to your restaurant up and running.",
       t1: "We talk", t1x: "An in-person or online meeting to get to know your restaurant and what it needs.", t2: "We set up", t2x: "We load your menu, photos, prices and your assistant's voice.",
       t3: "We install", t3x: "Remote installation in 5 to 7 business days, with QR codes ready for your tables.", t4: "We support you", t4x: "Support from Monday to Sunday, 6:00 a.m. to 11:00 p.m.",
@@ -71,12 +71,12 @@
       do_1: "<span><b>Zero comissões</b> por pedido: a margem fica no seu restaurante.</span>", do_2: "<span><b>Verificação automática de pagamentos</b> pelo Nequi.</span>",
       do_3: "<span><b>Acompanhamento ao vivo</b> do pedido para o cliente.</span>", do_4: "<span><b>A sua base de clientes</b>, para vender de novo.</span>", do_demo: "Experimentar o Apex Domicilios →",
       do_e1: "Pagamento Nequi verificado ✓<small>em segundos</small>", do_e2: "O seu pedido está a caminho<small>acompanhamento ao vivo</small>",
-      s_ceja: "Veja a Apex no seu restaurante", s_titulo: "Escreva o nome do seu restaurante e veja funcionando.", s_texto: "Em segundos montamos um vídeo curto com o seu nome, os seus pratos e as suas cores. Assista aqui mesmo.",
+      s_ceja: "Veja a Apex no seu restaurante", s_titulo: "Escreva o nome do seu restaurante e veja funcionando.", s_texto: "Em segundos montamos um vídeo com o seu nome, os seus pratos e as suas cores, narrado pelo nosso assistente. Assista aqui mesmo e baixe.",
       f_titulo: "O seu restaurante", f_sub: "Leva menos de um minuto.", f_nombre: "Nome do restaurante", f_ciudad: "Cidade", f_tipo: "Tipo de comida", f_platos: "Três dos seus pratos",
-      f_color: "Cor da sua marca", f_logo: "＋ Enviar logo", f_boton: "▶&nbsp; Ver meu restaurante com a Apex", f_nota: "Os seus dados ficam no seu navegador: não os guardamos.",
+      f_color: "Cor da sua marca", f_logo: "＋ Enviar logo", f_boton: "▶&nbsp; Ver meu restaurante com a Apex", f_nota: "Usamos o nome, a cidade e o primeiro prato só para narrar o seu vídeo. Não guardamos os seus dados.",
       f_tipo_ph: "Churrascaria", f_p1: "Tábua da casa", f_p2: "Picanha 400 g", f_p3: "Limonada de coco",
       v_mesa: "MESA 4 · APEX PLAY", v_bienvenido: "Bem-vindo ao", v_cocina: "● NOVO PEDIDO · COZINHA", v_fin_ceja: "Assim ficaria a Apex", v_fin_texto: "Instalamos de forma remota em 5 a 7 dias úteis.",
-      v_fin_wa: "Quero para o meu restaurante", v_fin_otra: "Ver de novo",
+      v_fin_wa: "Quero para o meu restaurante", v_fin_otra: "↺ Ver de novo", v_ver: "▶ Ver o vídeo", v_preparando: "Preparando o seu vídeo…", v_bajar: "⬇ Baixar vídeo",
       t_ceja: "Como trabalhamos", t_titulo: "Da primeira conversa ao seu restaurante funcionando.",
       t1: "Conversamos", t1x: "Uma reunião presencial ou online para conhecer o seu restaurante e o que ele precisa.", t2: "Configuramos", t2x: "Carregamos o seu cardápio, as suas fotos, os seus preços e a voz do seu assistente.",
       t3: "Instalamos", t3x: "Instalação remota em 5 a 7 dias úteis, com os QR codes prontos para as suas mesas.", t4: "Acompanhamos", t4x: "Suporte de segunda a domingo, das 6h às 23h.",
@@ -145,23 +145,15 @@
   const cargado = fetch("/web/sitio/voz/guion.json").then((r) => r.json()).then((g) => { guion = g; pintarCapitulos(); }).catch(() => {});
   const audio = new Audio(); audio.preload = "auto";
   const R = { activo: false, pausado: false, terminado: false, cap: 0, frase: 0, silencio: false, cc: true, timer: 0, programado: 0, hablando: false };
-  let actx = null, analizador = null, muestras = null, nivel = 0;
+  let nivel = 0;
   const frases = () => (guion ? guion[R.cap].frases[idioma] || guion[R.cap].frases.es : []);
-
-  function prepararAudio() {
-    if (actx) { actx.resume?.(); return; }
-    try {
-      actx = new (window.AudioContext || window.webkitAudioContext)();
-      const fuente = actx.createMediaElementSource(audio); analizador = actx.createAnalyser(); analizador.fftSize = 512;
-      fuente.connect(analizador); analizador.connect(actx.destination); muestras = new Uint8Array(analizador.fftSize);
-    } catch (e) { actx = null; analizador = null; }
-  }
+  const SILENCIO = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
+  function desbloquearAudio() { if (!audio.src) { audio.src = SILENCIO; audio.play().catch(() => {}); } }   // iPhone: el audio solo arranca dentro del toque
   function nivelVoz() {
-    if (!R.hablando) return 0;
-    if (!analizador || R.silencio) return 0.3 + 0.25 * Math.abs(Math.sin(performance.now() / 90));
-    analizador.getByteTimeDomainData(muestras); let s = 0;
-    for (let i = 0; i < muestras.length; i++) { const v = (muestras[i] - 128) / 128; s += v * v; }
-    return Math.min(1, Math.sqrt(s / muestras.length) * 4.5);
+    if (!R.hablando || R.silencio) return R.hablando ? 0.25 : 0;
+    const f = frases()[R.frase];
+    if (f && f.env && !audio.paused) return (f.env[Math.min(f.env.length - 1, Math.floor(audio.currentTime * 25))] || 0) / 99;
+    return 0.3 + 0.25 * Math.abs(Math.sin(performance.now() / 90));   // voz del navegador (respaldo)
   }
 
   function mostrar(txt) { $("#subtitulo-portada").textContent = txt; $("#subtitulo-dock").textContent = txt; }
@@ -180,18 +172,17 @@
     el?.scrollIntoView({ behavior: reducido ? "auto" : "smooth", block: "center" });
   }
 
-  async function iniciar(cap = 0) {
-    prepararAudio();
-    if (!guion) { mostrar("…"); await cargado; if (!guion) { mostrar(T().fin); return; } }
-    if (sim.corriendo) pausarSim();
+  function iniciar(cap = 0) {
+    if (!guion) { desbloquearAudio(); mostrar("…"); cargado.then(() => { if (guion) iniciar(cap); else mostrar(T().fin); }); return; }
+    if (video.estado === "reproduciendo") video.pausar();
     cortar(); Object.assign(R, { activo: true, pausado: false, terminado: false });
     document.body.classList.add("en-recorrido"); actualizarControles();
-    reproducirCap(cap);
+    reproducirCap(cap, true);   // la primera frase suena en el mismo toque (si no, el iPhone la bloquea)
   }
-  function reproducirCap(i) {
+  function reproducirCap(i, ya = false) {
     R.cap = i; R.frase = 0; const c = guion[i];
     pintarCapitulos(); enfocar(c.resalta); irA(c, i); actualizarDock();
-    R.timer = setTimeout(reproducirFrase, i === 0 || reducido ? 150 : 950);
+    if (ya) reproducirFrase(); else R.timer = setTimeout(reproducirFrase, reducido ? 150 : 950);
   }
   function reproducirFrase() {
     if (!R.activo || R.pausado) return;
@@ -227,8 +218,8 @@
     R.pausado = false; actualizarControles(); actualizarDock();
     const c = guion[R.cap]; enfocar(c.resalta); irA(c, R.cap);
     if (audio.src && audio.currentTime > 0 && !audio.ended && audio.currentTime < (audio.duration || 0) - 0.05) {
-      R.timer = setTimeout(() => { R.hablando = true; audio.play().catch(() => reproducirFrase()); }, 600);
-    } else R.timer = setTimeout(reproducirFrase, 600);
+      R.hablando = true; audio.play().catch(() => reproducirFrase());   // dentro del toque: sigue donde iba
+    } else reproducirFrase();
   }
   function terminar(completo) {
     cortar(); Object.assign(R, { activo: false, pausado: false, terminado: !!completo });
@@ -271,8 +262,7 @@
   const barras = $$("i", onda);
   const visibles = new Set();
   const vigia = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting ? visibles.add(e.target) : visibles.delete(e.target)));
-  ["#orbe", "#orbe-dock", "#orbe-sim"].forEach((s) => vigia.observe($(s)));
-  let simHablando = false;
+  ["#orbe", "#orbe-dock"].forEach((s) => vigia.observe($(s)));
   function cuadro(now) {
     const t = reducido ? 0 : now / 1000;
     const v = nivelVoz(); nivel += (v - nivel) * 0.35;
@@ -282,79 +272,76 @@
       barras.forEach((b, i) => { b.style.height = (4 + (R.hablando ? nivel * 18 * forma[i] * (0.6 + 0.4 * Math.sin(now / 70 + i)) : 0)) + "px"; });
     }
     if (visibles.has($("#orbe-dock")) && $("#dock").classList.contains("visible")) OrbeSaturno.dibujar($("#orbe-dock"), t, nivel, est);
-    if (visibles.has($("#orbe-sim"))) OrbeSaturno.dibujar($("#orbe-sim"), t, simHablando ? 0.3 + 0.2 * Math.sin(now / 80) : 0, { habla: simHablando });
-    pasoSim(now);
     requestAnimationFrame(cuadro);
   }
 
-  /* ================= «Mire Apex en su restaurante» ================= */
-  const form = $("#form-sim"), escena = $("#escena");
-  const precioNum = (s) => +String(s).replace(/\D/g, "") || 0, precio = (n) => "$" + n.toLocaleString("es-CO");
-  let logo = "";
+  /* ================= «Mire Apex en su restaurante»: el video ================= */
+  const VTX = {
+    es: { una_noche: "UNA NOCHE EN", mesa: "MESA 4", escaneando: "Escaneando…", bienvenido: "Bienvenido a", carta: "LA CARTA", recomendado: "★ RECOMENDADO", pedir: "Pedir",
+          agregado: "✓ Listo", ver_pedido: "Ver pedido", enviando: "✓ Enviado a cocina", nuevo_pedido: "NUEVO PEDIDO", total: "TOTAL", via: "vía Apex Play",
+          cifras: ["errores", "comisiones", "esperas"], asi: "Así se vería Apex en", instalacion: "Instalación remota en 5 a 7 días hábiles", idx: 0 },
+    en: { una_noche: "ONE NIGHT AT", mesa: "TABLE 4", escaneando: "Scanning…", bienvenido: "Welcome to", carta: "THE MENU", recomendado: "★ RECOMMENDED", pedir: "Order",
+          agregado: "✓ Added", ver_pedido: "View order", enviando: "✓ Sent to kitchen", nuevo_pedido: "NEW ORDER", total: "TOTAL", via: "via Apex Play",
+          cifras: ["mistakes", "commissions", "waiting"], asi: "This is how Apex would look at", instalacion: "Remote installation in 5 to 7 business days", idx: 1 },
+    pt: { una_noche: "UMA NOITE EM", mesa: "MESA 4", escaneando: "Escaneando…", bienvenido: "Bem-vindo ao", carta: "O CARDÁPIO", recomendado: "★ RECOMENDADO", pedir: "Pedir",
+          agregado: "✓ Pronto", ver_pedido: "Ver pedido", enviando: "✓ Enviado à cozinha", nuevo_pedido: "NOVO PEDIDO", total: "TOTAL", via: "via Apex Play",
+          cifras: ["erros", "comissões", "espera"], asi: "Assim ficaria a Apex em", instalacion: "Instalação remota em 5 a 7 dias úteis", idx: 2 },
+  };
+  const form = $("#form-sim"), lienzo = $("#video"), video = ApexVideo.crear(lienzo);
+  const precioNum = (s) => +String(s).replace(/\D/g, "") || 0;
+  let logo = null, generado = false;
   function datosSim() {
     const v = (k) => (form.elements[k].value || "").trim(), ph = (k) => form.elements[k].placeholder;
-    return { n: v("nombre") || ph("nombre"), c: v("ciudad"), t: v("tipo"), color: form.elements.color.value || "#b3412b",
+    return { n: v("nombre") || ph("nombre"), c: v("ciudad"), t: v("tipo"), color: form.elements.color.value || "#b3412b", logoImg: logo,
       platos: [1, 2, 3].map((i) => ({ nombre: v("p" + i) || ph("p" + i), precio: precioNum(v("v" + i) || ph("v" + i)) })) };
   }
-  function pintarSim() {
-    if (!form) return;
-    const d = datosSim(), S = T().sim;
-    escena.style.setProperty("--marca", d.color);
-    $("#v-nombre1").textContent = d.n; $("#v-nombre2").textContent = d.n; $("#v-fin-titulo").textContent = S.fin(d);
-    const elegido = $("#v-platos .elegido") ? 1 : -1;
-    $("#v-platos").innerHTML = d.platos.map((p, i) => `<li class="${i === elegido ? "elegido" : ""}"></li>`).join("");
-    $$("#v-platos li").forEach((li, i) => { li.textContent = d.platos[i].nombre; const s = document.createElement("span"); s.textContent = precio(d.platos[i].precio); li.append(s); });
-    $("#v-ticket").textContent = `${S.mesa}: 1 × ${d.platos[1].nombre} · 1 × ${d.platos[2].nombre} — ${S.total} ${precio(d.platos[1].precio + d.platos[2].precio)}`;
-    ["#v-logo1", "#v-logo2"].forEach((s) => { const im = $(s); im.hidden = !logo; if (logo) im.src = logo; });
-    $("#v-wa").href = `https://wa.me/${WA}?text=${encodeURIComponent(T().wa.sim(d))}`;
+  let posterPendiente = false;
+  function pintarSim() {   // mientras escribe, la portada del video se actualiza con su nombre y su color
+    if (!form || posterPendiente) return; posterPendiente = true;
+    requestAnimationFrame(() => { posterPendiente = false; if (!["reproduciendo", "pausado"].includes(video.estado)) video.poster(datosSim(), VTX[idioma]);
+      $("#reproductor").style.setProperty("--marca", form.elements.color.value || "#b3412b");
+      $("#v-wa").href = `https://wa.me/${WA}?text=${encodeURIComponent(T().wa.sim(datosSim()))}`; });
   }
   form.addEventListener("input", pintarSim);
+  document.fonts?.ready?.then(pintarSim);
   $("#s-logo").addEventListener("change", (e) => {
     const f = e.target.files[0]; if (!f || !f.type.startsWith("image/") || f.size > 6e6) return;
-    const lector = new FileReader(); lector.onload = () => { logo = lector.result; pintarSim(); }; lector.readAsDataURL(f);
+    const lector = new FileReader(); lector.onload = () => { const im = new Image(); im.onload = () => { logo = im; pintarSim(); }; im.src = lector.result; }; lector.readAsDataURL(f);
   });
-  const ETAPAS = [[0, "e1", "s1"], [4, "e2", "s2"], [10, "e3", "s3"], [16, "e4", "s4"], [21, "e5", "s5"]], TOTAL = 25;
-  const sim = { t: 0, corriendo: false, ultimo: 0, etapa: -1, fin: false };
-  function decir(txt, mostrarTexto = true) {
-    $("#v-sub").textContent = mostrarTexto ? txt : "";
-    if (!("speechSynthesis" in window) || R.silencio) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(txt); u.lang = T().lang; u.rate = 1.03;
-    const voz = speechSynthesis.getVoices().find((v) => v.lang.replace("_", "-").startsWith(T().lang)) || speechSynthesis.getVoices().find((v) => v.lang.startsWith(idioma));
-    if (voz) u.voice = voz;
-    u.onstart = () => { simHablando = true; }; u.onend = u.onerror = () => { simHablando = false; };
-    speechSynthesis.speak(u);
-  }
-  function iniciarSim() {
+  const mmss = (t) => Math.floor(t / 60) + ":" + String(Math.floor(t % 60)).padStart(2, "0");
+  video.onprogreso = (t, total) => { $("#v-pista").style.width = (t / total * 100) + "%"; $("#v-t").textContent = mmss(t); $("#v-total").textContent = mmss(total); };
+  video.onfin = () => { $("#v-play").textContent = "↺"; $("#v-play").setAttribute("aria-label", "↺"); $("#v-otra").hidden = false; };
+  video.onarchivo = (a) => { const b = $("#v-bajar"); b.hidden = false; b.onclick = () => {
+    const url = URL.createObjectURL(a.blob), enlace = document.createElement("a"), slug = datosSim().n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "");
+    enlace.href = url; enlace.download = `Apex-${slug || "video"}.${a.ext}`; document.body.append(enlace); enlace.click(); enlace.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); }; };
+  async function generarVideo() {
+    video.desbloquear();                        // el sonido se habilita en el mismo toque (iPhone)
     if (R.activo && !R.pausado) pausar();
-    pintarSim(); $$("#v-platos li").forEach((li) => li.classList.remove("elegido"));
-    Object.assign(sim, { t: 0, etapa: -1, corriendo: true, ultimo: performance.now(), fin: false });
-    escena.className = "escena animando"; $("#v-sub").textContent = ""; $("#v-play").textContent = "❚❚";
-    if (matchMedia("(max-width: 900px)").matches) escena.scrollIntoView({ behavior: reducido ? "auto" : "smooth", block: "center" });
+    const d = datosSim(), cargando = $("#v-cargando");
+    cargando.hidden = false; $("#v-capa").hidden = true; $("#v-acciones").hidden = true; $("#v-bajar").hidden = true; $("#v-otra").hidden = true;
+    if (matchMedia("(max-width: 900px)").matches) $("#reproductor").scrollIntoView({ behavior: reducido ? "auto" : "smooth", block: "start" });
+    let lineas = null;
+    try {   // la voz de Apex dice el nombre de su restaurante; si no se puede, usa la voz grabada genérica
+      const r = await fetch("/v1/sitio/video", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idioma, nombre: d.n, ciudad: d.c, plato: d.platos[0].nombre }) });
+      if (r.ok) lineas = (await r.json()).lineas;
+    } catch (e) {}
+    if (!lineas) { try { lineas = (await (await fetch("/web/sitio/voz/video.json")).json())[idioma]; } catch (e) { lineas = []; } }
+    await video.preparar(d, VTX[idioma], lineas);
+    cargando.hidden = true; $("#v-acciones").hidden = false; generado = true;
+    $("#v-play").textContent = "❚❚"; video.reproducir();
   }
-  function pausarSim() { sim.corriendo = false; simHablando = false; if ("speechSynthesis" in window) speechSynthesis.cancel(); $("#v-play").textContent = "▶"; }
-  function pasoSim(now) {
-    if (!sim.corriendo) { sim.ultimo = now; return; }
-    sim.t = Math.min(TOTAL, sim.t + (now - sim.ultimo) / 1000); sim.ultimo = now;
-    while (sim.etapa + 1 < ETAPAS.length && sim.t >= ETAPAS[sim.etapa + 1][0]) {
-      sim.etapa++; const [, clase, clave] = ETAPAS[sim.etapa], d = datosSim();
-      escena.classList.add(clase); decir(T().sim[clave](d), clave !== "s5");
-      if (clase === "e3") setTimeout(() => { if (sim.etapa >= 2) $("#v-platos li:nth-child(2)")?.classList.add("elegido"); }, 3200);
-    }
-    $("#v-pista").style.width = (sim.t / TOTAL * 100) + "%";
-    $("#v-t").textContent = "0:" + String(Math.floor(sim.t)).padStart(2, "0");
-    if (sim.t >= TOTAL) { sim.corriendo = false; sim.fin = true; $("#v-play").textContent = "↺"; }
-  }
-  form.addEventListener("submit", (e) => { e.preventDefault(); iniciarSim(); });
+  form.addEventListener("submit", (e) => { e.preventDefault(); generarVideo(); });
+  new IntersectionObserver(([e]) => document.body.classList.toggle("en-video", e.isIntersecting && matchMedia("(max-width: 900px)").matches), { threshold: 0.2 }).observe($("#reproductor"));
   form.addEventListener("focusin", () => { if (R.activo && !R.pausado) pausar(); });
-  $("#v-play").addEventListener("click", () => { if (sim.fin || (!sim.corriendo && sim.etapa < 0)) iniciarSim(); else if (sim.corriendo) pausarSim(); else { sim.corriendo = true; sim.ultimo = performance.now(); $("#v-play").textContent = "❚❚"; } });
-  $("#v-otra").addEventListener("click", iniciarSim);
-  $("#v-total").textContent = "0:" + TOTAL;
-  // Código QR de muestra para el soporte de mesa
-  $("#qr").innerHTML = `<svg viewBox="0 0 21 21" width="58" height="58" aria-hidden="true">${Array.from({ length: 441 }, (_, k) => {
-    const x = k % 21, y = (k / 21) | 0, esq = (a, b) => x >= a && x < a + 7 && y >= b && y < b + 7 && (x === a || x === a + 6 || y === b || y === b + 6 || (x > a + 1 && x < a + 5 && y > b + 1 && y < b + 5));
-    const enEsq = (x < 8 && y < 8) || (x > 12 && y < 8) || (x < 8 && y > 12), lleno = enEsq ? esq(0, 0) || esq(14, 0) || esq(0, 14) : ((x * 7 + y * 13 + x * y) % 5) < 2;
-    return lleno ? `<rect x="${x}" y="${y}" width="1" height="1" fill="#111a2b"/>` : ""; }).join("")}</svg>`;
+  $("#v-capa").addEventListener("click", () => { if (form.reportValidity()) generarVideo(); });
+  $("#v-play").addEventListener("click", () => {
+    if (!generado) { if (form.reportValidity()) generarVideo(); return; }
+    if (video.estado === "reproduciendo") { video.pausar(); $("#v-play").textContent = "▶"; }
+    else { video.desbloquear(); $("#v-otra").hidden = true; video.reproducir(); $("#v-play").textContent = "❚❚"; }
+  });
+  $("#v-otra").addEventListener("click", () => { video.desbloquear(); $("#v-otra").hidden = true; video.reproducir(); $("#v-play").textContent = "❚❚"; });
+  $("#v-sonido").addEventListener("click", (e) => { const b = e.currentTarget, si = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(si)); b.textContent = si ? "🔇" : "🔊"; video.silencio(si); });
 
   /* ================= menú del celular, documentos legales y pie ================= */
   const cab = $("#cabecera"), ham = $("#hamburguesa");
@@ -370,5 +357,5 @@
 
   aplicarIdioma(idioma); actualizarControles();
   requestAnimationFrame(cuadro);
-  window.ApexSitio = { iniciar, pausar, seguir, terminar, aplicarIdioma, iniciarSim, estado: () => ({ ...R, idioma, sim: { ...sim } }) };
+  window.ApexSitio = { iniciar, pausar, seguir, terminar, aplicarIdioma, generarVideo, video, estado: () => ({ ...R, idioma, video: video.estado }) };
 })();

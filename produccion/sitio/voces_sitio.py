@@ -1,12 +1,15 @@
 """Narración del recorrido guiado del sitio de Apex Corporation (edge-tts), una frase por archivo.
 python voces_sitio.py  →  servidor/apex/web/sitio/voz/{idioma}/{capitulo}-{n}.mp3 y voz/guion.json"""
-import os, json, asyncio, subprocess
+import os, sys, json, asyncio, subprocess
+import numpy as np
 import edge_tts
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
+from servidor.apex import sitio as guion_video          # el mismo guion que usa el servidor para el video
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 SALIDA = os.path.join(AQUI, "../../servidor/apex/web/sitio/voz")
 PROXY = os.getenv("HTTPS_PROXY")
-VOCES = {"es": ("es-CO-GonzaloNeural", "+4%"), "en": ("en-US-AndrewMultilingualNeural", "+2%"), "pt": ("pt-BR-AntonioNeural", "+4%")}
+VOCES = {k: (v, f"{round((vel - 1) * 100):+d}%") for k, (v, vel) in guion_video.VOCES.items()}
 
 # (capítulo, sección a mostrar, elemento a resaltar, frases por idioma)
 CAPITULOS = [
@@ -42,27 +45,48 @@ CAPITULOS = [
 
 def duracion(f): return float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f]))
 
+def envolvente(f, por_segundo=25):
+    """Volumen de la voz 25 veces por segundo (0 a 99): el orbe late con esto sin tener que analizar el audio en el teléfono."""
+    crudo = subprocess.check_output(["ffmpeg", "-v", "error", "-i", f, "-f", "s16le", "-ac", "1", "-ar", "8000", "-"])
+    x = np.frombuffer(crudo, dtype=np.int16).astype(np.float32) / 32768
+    n = 8000 // por_segundo; x = x[: len(x) // n * n].reshape(-1, n)
+    rms = np.sqrt((x ** 2).mean(axis=1)); tope = max(1e-4, float(np.percentile(rms, 95)))
+    return [int(v) for v in np.clip(rms / tope * 99, 0, 99)]
+
+async def decir(txt, idioma, crudo, final):
+    voz, vel = VOCES[idioma]
+    for intento in range(4):   # el servicio de voz a veces falla de forma pasajera
+        try: await edge_tts.Communicate(txt, voz, rate=vel, proxy=PROXY).save(crudo); break
+        except edge_tts.exceptions.NoAudioReceived:
+            if intento == 3: raise
+            await asyncio.sleep(2 * (intento + 1))
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", crudo, "-af",
+                    "silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
+                    "highpass=f=80,acompressor=threshold=-20dB:ratio=2.5,loudnorm=I=-16:TP=-1.5", "-ac", "1", "-ar", "24000", "-b:a", "48k", final], check=True)
+    os.remove(crudo)
+
 async def grabar():
     guion = []
     for cap, seccion, resalta, frases in CAPITULOS:
         item = {"id": cap, "seccion": seccion, "resalta": resalta, "frases": {}}
         for idioma, lista in frases.items():
             os.makedirs(f"{SALIDA}/{idioma}", exist_ok=True)
-            voz, vel = VOCES[idioma]; item["frases"][idioma] = []
+            item["frases"][idioma] = []
             for n, txt in enumerate(lista):
-                crudo, final = f"{SALIDA}/{idioma}/_crudo.mp3", f"{SALIDA}/{idioma}/{cap}-{n}.mp3"
-                for intento in range(4):   # el servicio de voz a veces falla de forma pasajera
-                    try: await edge_tts.Communicate(txt, voz, rate=vel, proxy=PROXY).save(crudo); break
-                    except edge_tts.exceptions.NoAudioReceived:
-                        if intento == 3: raise
-                        await asyncio.sleep(2 * (intento + 1))
-                subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", crudo, "-af",
-                                "silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
-                                "highpass=f=80,acompressor=threshold=-20dB:ratio=2.5,loudnorm=I=-16:TP=-1.5", "-ac", "1", "-ar", "24000", "-b:a", "48k", final], check=True)
-                os.remove(crudo)
-                item["frases"][idioma].append({"txt": txt, "src": f"/web/sitio/voz/{idioma}/{cap}-{n}.mp3", "dur": round(duracion(final), 2)})
+                final = f"{SALIDA}/{idioma}/{cap}-{n}.mp3"
+                await decir(txt, idioma, f"{SALIDA}/{idioma}/_crudo.mp3", final)
+                item["frases"][idioma].append({"txt": txt, "src": f"/web/sitio/voz/{idioma}/{cap}-{n}.mp3", "dur": round(duracion(final), 2), "env": envolvente(final)})
         guion.append(item)
-    json.dump(guion, open(f"{SALIDA}/guion.json", "w"), ensure_ascii=False, indent=1)
+    json.dump(guion, open(f"{SALIDA}/guion.json", "w"), ensure_ascii=False, separators=(",", ":"))
+    # Voz genérica del video «Mire Apex en su restaurante» (respaldo si el servidor no puede decir el nombre)
+    video = {}
+    for idioma in VOCES:
+        video[idioma] = []
+        for linea in guion_video.guion(idioma):
+            final = f"{SALIDA}/{idioma}/video-{linea['escena']}.mp3"
+            await decir(linea["txt"], idioma, f"{SALIDA}/{idioma}/_crudo.mp3", final)
+            video[idioma].append({**linea, "src": f"/web/sitio/voz/{idioma}/video-{linea['escena']}.mp3"})
+    json.dump(video, open(f"{SALIDA}/video.json", "w"), ensure_ascii=False, indent=1)
     for idioma in VOCES: print(idioma, round(sum(f["dur"] for c in guion for f in c["frases"][idioma]), 1), "s")
 
 asyncio.run(grabar())
