@@ -525,7 +525,10 @@ def panel_llamada(rid: str, lid: int, request: Request):
 
 # ---------------- Páginas: demo del menú y panel ----------------
 @app.get("/")
-def inicio():
+def inicio(request: Request):
+    # apex.axtra.chat (o cualquier subdominio apex.*) muestra el sitio de la empresa; el resto sigue yendo a la demo
+    if request.headers.get("host", "").split(":")[0].startswith("apex."):
+        return _pagina("sitio.html")
     return RedirectResponse("/demo")
 
 
@@ -541,6 +544,12 @@ def demo():
 @app.get("/domicilios")
 def domicilios():
     return _pagina("domicilios.html")
+
+
+@app.get("/sitio")
+def sitio():
+    """Sitio oficial de Apex Corporation, con el asistente que guía el recorrido."""
+    return _pagina("sitio.html")
 
 
 # ---------------- Muestras de voz: para escoger cómo suena el orbe ----------------
