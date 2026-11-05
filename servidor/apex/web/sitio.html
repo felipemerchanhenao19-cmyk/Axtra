@@ -238,7 +238,7 @@ header .boton { padding: 10px 20px; font-size: 14px; }
 footer { border-top: 1px solid rgba(191,155,95,.14); padding-block: 30px calc(30px + env(safe-area-inset-bottom, 0px)); font-size: 13px; color: var(--suave-osc); background: var(--azul-2); }
 footer .envoltura { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; }
 footer .marca { margin-right: auto; }
-footer button:hover { color: var(--crema); }
+footer button:hover, footer a:hover { color: var(--crema); }
 .whatsapp { position: fixed; right: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 45; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; background: var(--verde); box-shadow: 0 12px 30px rgba(37,211,102,.4); transition: transform .3s; }
 body.en-recorrido .whatsapp { transform: translateY(-96px); }
 
@@ -533,6 +533,7 @@ dialog article ul { padding-left: 20px; }
   <div class="envoltura">
     <div class="marca"><img src="/web/sitio/logo.png" alt="" width="40" height="40"><b>APEX <span>CORPORATION</span></b></div>
     <span data-i="pie_servicio">Servicio en toda Colombia y otros países</span>
+    <a href="mailto:apexcorporation@axtra.chat">apexcorporation@axtra.chat</a>
     <button data-legal="privacidad" data-i="pie_priv">Política de privacidad</button>
     <button data-legal="terminos" data-i="pie_term">Términos y condiciones</button>
     <span>© <span id="anio">2026</span> Apex Corporation</span>
