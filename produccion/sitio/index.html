@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Corporation</title>
+<meta name="description" content="Software e inteligencia artificial para la industria gastronómica: Apex Play, Apex Domicilios y páginas web para restaurantes.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<!--FUENTES-->
+<style>
+:root {
+  --azul: #111a2b; --azul-2: #0a1120; --azul-3: #18243a; --oro: #bf9b5f; --oro-claro: #dcc08c; --crema: #f6f1e7; --crema-2: #ece4d4;
+  --tinta: #1b2333; --suave: #5d6678; --suave-osc: #9aa6ba; --linea: rgba(191,155,95,.28); --hielo: #8be9ff; --verde: #25d366;
+  --titulo: "Playfair Display", Georgia, serif; --cuerpo: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--azul-2); color: var(--crema); font-family: var(--cuerpo); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+.envoltura { width: min(1200px, 100% - 40px); margin-inline: auto; }
+h1, h2, h3 { font-family: var(--titulo); font-style: italic; font-weight: 400; line-height: 1.12; text-wrap: balance; }
+h2 { font-size: clamp(34px, 4.4vw, 54px); }
+.ceja { font-size: 13px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--oro); }
+.boton { display: inline-flex; align-items: center; gap: 10px; padding: 15px 26px; border-radius: 999px; font-weight: 700; font-size: 16px; }
+.boton.oro { background: linear-gradient(135deg, var(--oro-claro), var(--oro)); color: var(--azul); box-shadow: 0 10px 30px rgba(191,155,95,.3); }
+.boton.borde { border: 1px solid var(--linea); color: var(--crema); }
+.boton.borde:hover { border-color: var(--oro); }
+
+/* ---------- barra superior ---------- */
+header { position: sticky; top: 0; z-index: 20; background: rgba(10,17,32,.82); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(191,155,95,.14); }
+header .envoltura { display: flex; align-items: center; gap: 28px; height: 74px; }
+.marca { display: flex; align-items: center; gap: 12px; }
+.marca img { width: 40px; height: 40px; border-radius: 10px; }
+.marca b { font-size: 15px; letter-spacing: .26em; font-weight: 800; }
+.marca b span { color: var(--oro); }
+nav { display: flex; gap: 26px; margin-left: auto; font-size: 15px; color: var(--suave-osc); }
+nav a:hover { color: var(--crema); }
+.idiomas { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--linea); border-radius: 999px; font-size: 12px; font-weight: 700; }
+.idiomas span { padding: 5px 10px; border-radius: 999px; color: var(--suave-osc); }
+.idiomas span.si { background: var(--oro); color: var(--azul); }
+header .boton { padding: 10px 20px; font-size: 14px; }
+.hamburguesa { display: none; margin-left: auto; font-size: 24px; color: var(--oro); }
+
+/* ---------- portada con el asistente ---------- */
+.portada { position: relative; overflow: hidden; background: radial-gradient(900px 600px at 72% 40%, rgba(40,90,160,.35), transparent 70%), radial-gradient(700px 500px at 10% 100%, rgba(191,155,95,.12), transparent 70%), var(--azul-2); }
+.portada .envoltura > * { min-width: 0; }
+.portada .envoltura { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 40px; min-height: calc(100vh - 74px); padding-block: 60px 80px; }
+.portada h1 { font-size: clamp(38px, 4.5vw, 62px); margin: 18px 0 22px; }
+.portada h1 em { color: var(--oro-claro); }
+.portada p.lead { font-size: 19px; color: var(--suave-osc); max-width: 30em; }
+.portada .acciones { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.portada .datos { display: flex; gap: 34px; margin-top: 46px; padding-top: 26px; border-top: 1px solid rgba(191,155,95,.16); }
+.portada .datos div { font-size: 13px; color: var(--suave-osc); line-height: 1.35; }
+.portada .datos b { display: block; font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: 30px; color: var(--crema); }
+.asistente { display: flex; flex-direction: column; align-items: center; }
+.asistente canvas { width: min(470px, 100%); aspect-ratio: 1; }
+.burbuja { position: relative; margin-top: -26px; width: min(440px, 100%); background: rgba(24,36,58,.86); border: 1px solid var(--linea); border-radius: 22px; padding: 18px 22px 16px; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+.burbuja::before { content: ""; position: absolute; top: -8px; left: 50%; width: 16px; height: 16px; background: inherit; border-left: 1px solid var(--linea); border-top: 1px solid var(--linea); transform: translateX(-50%) rotate(45deg); }
+.burbuja .quien { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--oro); text-transform: uppercase; }
+.burbuja .quien i { width: 8px; height: 8px; border-radius: 50%; background: #43d39e; box-shadow: 0 0 10px #43d39e; }
+.burbuja p { font-size: 18px; margin: 8px 0 14px; color: var(--crema); }
+.onda { display: flex; align-items: center; gap: 3px; height: 22px; min-width: 0; overflow: hidden; }
+.onda i { width: 3px; border-radius: 3px; background: var(--oro-claro); }
+.controles { display: flex; align-items: center; gap: 10px; }
+.controles .onda { flex: 1; }
+.controles span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--linea); font-size: 13px; color: var(--crema); }
+.capitulos { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; justify-content: center; font-size: 12px; color: var(--suave-osc); }
+.capitulos span { padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(154,166,186,.2); }
+.capitulos span.si { border-color: var(--oro); color: var(--oro-claro); }
+
+/* ---------- secciones claras ---------- */
+.clara { background: var(--crema); color: var(--tinta); }
+.clara .ceja { color: #9c7a3f; }
+.seccion { padding-block: 110px; }
+.cabeza { max-width: 760px; margin-bottom: 56px; }
+.cabeza p { font-size: 19px; color: var(--suave); margin-top: 16px; }
+.oscura .cabeza p { color: var(--suave-osc); }
+.pilares { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+.pilar { padding: 34px 30px; border-radius: 22px; background: #fff; border: 1px solid var(--crema-2); }
+.pilar .ico { width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; background: var(--azul); margin-bottom: 22px; }
+.pilar h3 { font-size: 28px; margin-bottom: 10px; }
+.pilar p { color: var(--suave); font-size: 16px; }
+
+/* ---------- productos ---------- */
+.oscura { background: var(--azul); }
+.producto { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; }
+.producto + .producto { margin-top: 120px; }
+.producto.invertido .telefono { order: -1; }
+.producto h3 { font-size: clamp(34px, 3.8vw, 48px); margin: 12px 0 16px; }
+.producto p { color: var(--suave-osc); font-size: 18px; }
+.lista { list-style: none; margin-top: 26px; display: grid; gap: 14px; }
+.lista li { display: flex; gap: 14px; align-items: flex-start; }
+.lista li::before { content: ""; flex: none; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; background: radial-gradient(circle, var(--oro) 0 4px, transparent 5px), rgba(191,155,95,.16); }
+.lista b { color: var(--crema); }
+.telefono { justify-self: center; width: 300px; padding: 11px; border-radius: 46px; background: linear-gradient(145deg, #2a3446, #0b111d); box-shadow: 0 40px 80px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.08); position: relative; }
+.telefono img { border-radius: 36px; width: 100%; aspect-ratio: 390 / 760; object-fit: cover; object-position: top; }
+.telefono::after { content: ""; position: absolute; top: 22px; left: 50%; width: 86px; height: 24px; border-radius: 14px; background: #05080f; transform: translateX(-50%); }
+.etiqueta { position: absolute; padding: 10px 16px; border-radius: 14px; background: var(--crema); color: var(--tinta); font-size: 13px; font-weight: 700; box-shadow: 0 16px 40px rgba(0,0,0,.35); white-space: nowrap; }
+.etiqueta small { display: block; font-weight: 500; color: var(--suave); font-size: 12px; }
+.webs { margin-top: 120px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 60px; align-items: center; padding: 50px; border-radius: 28px; background: linear-gradient(135deg, rgba(191,155,95,.14), rgba(191,155,95,.03)); border: 1px solid var(--linea); }
+.webs h3 { font-size: 40px; margin: 10px 0 14px; }
+.webs p { color: var(--suave-osc); }
+.navegador { border-radius: 14px; overflow: hidden; background: var(--crema); box-shadow: 0 30px 60px rgba(0,0,0,.4); }
+.navegador .bar { display: flex; gap: 6px; align-items: center; padding: 10px 12px; background: #e3dccd; }
+.navegador .bar i { width: 9px; height: 9px; border-radius: 50%; background: #c8bfae; }
+.navegador .bar span { margin-left: 10px; padding: 3px 12px; background: #fff; border-radius: 6px; font-size: 11px; color: var(--suave); }
+.navegador .cuerpo { padding: 26px; color: var(--tinta); display: grid; grid-template-columns: 1fr 110px; gap: 16px; align-items: center; }
+.navegador .cuerpo b { font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: 26px; line-height: 1.1; display: block; }
+.navegador .cuerpo small { display: block; color: var(--suave); font-size: 12px; margin: 8px 0 12px; }
+.navegador .cuerpo em { display: inline-block; font-style: normal; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--azul); color: var(--crema); }
+.navegador .cuerpo div.foto { aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f3d5d5, #c98f8f 70%); }
+
+/* ---------- su restaurante ---------- */
+.simulador { display: grid; grid-template-columns: .82fr 1.18fr; gap: 40px; align-items: start; }
+.formulario { background: #fff; border-radius: 26px; padding: 34px; border: 1px solid var(--crema-2); box-shadow: 0 30px 60px rgba(17,26,43,.08); }
+.formulario h3 { font-size: 28px; margin-bottom: 4px; }
+.formulario > p { color: var(--suave); font-size: 15px; margin-bottom: 22px; }
+.campo { display: grid; gap: 6px; margin-bottom: 14px; }
+.campo label { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--suave); }
+.campo .caja { border: 1px solid #ddd3c2; border-radius: 12px; padding: 12px 14px; font-size: 16px; background: #fcfaf6; color: var(--tinta); }
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.platos { display: grid; gap: 8px; }
+.platos div { display: flex; justify-content: space-between; border: 1px solid #ddd3c2; border-radius: 12px; padding: 10px 14px; font-size: 15px; background: #fcfaf6; }
+.platos span { color: var(--suave); font-variant-numeric: tabular-nums; }
+.colores { display: flex; gap: 10px; align-items: center; }
+.colores i { width: 30px; height: 30px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px #ddd3c2; }
+.colores i.si { box-shadow: 0 0 0 2px var(--tinta); }
+.colores small { margin-left: auto; font-size: 13px; color: var(--suave); border: 1px dashed #c9bda8; border-radius: 10px; padding: 8px 12px; }
+.acepto { display: flex; gap: 10px; font-size: 13px; color: var(--suave); margin: 16px 0 20px; line-height: 1.4; }
+.acepto i { flex: none; width: 18px; height: 18px; border-radius: 5px; background: var(--azul); color: var(--oro-claro); font-size: 12px; display: grid; place-items: center; font-style: normal; }
+.formulario .boton { width: 100%; justify-content: center; }
+.reproductor { border-radius: 26px; overflow: hidden; background: var(--azul); box-shadow: 0 40px 80px rgba(17,26,43,.3); }
+.escena { position: relative; height: 520px; overflow: hidden; color: var(--crema); background: radial-gradient(500px 300px at 30% 20%, rgba(255,190,110,.35), transparent 70%), linear-gradient(180deg, #2b1a12, #170e0a 60%); }
+.escena .luz { position: absolute; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(255,214,150,.6), transparent 65%); }
+.escena .mesa { position: absolute; left: -10%; right: -10%; bottom: -36%; height: 70%; border-radius: 50%; background: radial-gradient(ellipse at 50% 20%, #8a5634, #4b2a17 70%); box-shadow: inset 0 10px 30px rgba(255,200,140,.18); }
+.soporte { position: absolute; left: 13%; bottom: 26%; width: 120px; padding: 12px 12px 10px; border-radius: 12px 12px 6px 6px; background: linear-gradient(180deg, #16120f, #0c0a08); border: 1px solid rgba(191,155,95,.6); text-align: center; transform: perspective(500px) rotateY(14deg); box-shadow: 0 20px 30px rgba(0,0,0,.5); }
+.soporte b { display: block; font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: 17px; color: var(--oro-claro); }
+.soporte .qr { margin: 8px auto; width: 70px; height: 70px; background: #fff; border-radius: 6px; padding: 6px; }
+.soporte small { font-size: 10px; letter-spacing: .14em; color: var(--crema); font-weight: 700; }
+.mano { position: absolute; right: 12%; bottom: -4%; width: 230px; padding: 8px; border-radius: 30px; background: #0d121c; transform: rotate(-7deg); box-shadow: -20px 30px 50px rgba(0,0,0,.55); }
+.mano .pant { border-radius: 23px; overflow: hidden; background: linear-gradient(180deg, #0f1e36, #0a1426); padding: 18px 14px 40px; text-align: center; }
+.mano canvas { width: 92px; height: 92px; margin: 0 auto; }
+.mano h4 { font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: 19px; line-height: 1.15; margin-top: 2px; }
+.mano h4 em { color: var(--oro-claro); }
+.mano ul { list-style: none; margin-top: 12px; display: grid; gap: 6px; text-align: left; }
+.mano li { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; padding: 7px 9px; border-radius: 9px; background: rgba(255,255,255,.06); }
+.mano li span { color: var(--oro-claro); font-variant-numeric: tabular-nums; }
+.cocina { position: absolute; right: 4%; top: 9%; padding: 10px 14px; border-radius: 12px; background: rgba(246,241,231,.95); color: var(--tinta); font-size: 12px; line-height: 1.35; box-shadow: 0 12px 30px rgba(0,0,0,.4); }
+.cocina b { display: block; font-size: 10px; letter-spacing: .14em; color: #2a9d6a; }
+.subtitulo { position: absolute; left: 5%; bottom: 6%; max-width: 48%; padding: 10px 16px; border-radius: 12px; background: rgba(0,0,0,.7); color: #fff; font-size: 15px; line-height: 1.4; }
+.barra-video { display: flex; align-items: center; gap: 14px; padding: 16px 22px; font-size: 13px; color: var(--suave-osc); font-variant-numeric: tabular-nums; }
+.barra-video .pista { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.12); position: relative; }
+.barra-video .pista i { position: absolute; inset: 0 60% 0 0; border-radius: 3px; background: var(--oro); }
+.barra-video .pista i::after { content: ""; position: absolute; right: -6px; top: -4px; width: 13px; height: 13px; border-radius: 50%; background: var(--oro-claro); }
+.barra-video .play { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--crema); color: var(--azul); font-size: 12px; }
+.barra-video .bajar { padding: 9px 16px; border-radius: 999px; background: var(--oro); color: var(--azul); font-weight: 700; }
+
+/* ---------- cómo trabajamos y recorrido ---------- */
+.pasos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; counter-reset: paso; }
+.paso { padding: 30px 26px; border-radius: 22px; border: 1px solid rgba(191,155,95,.2); background: rgba(255,255,255,.02); }
+.paso::before { counter-increment: paso; content: "0" counter(paso); display: block; font-family: var(--titulo); font-style: italic; font-size: 40px; color: var(--oro); line-height: 1; margin-bottom: 18px; }
+.paso h3 { font-family: var(--cuerpo); font-style: normal; font-weight: 700; font-size: 19px; margin-bottom: 8px; }
+.paso p { font-size: 15px; color: var(--suave-osc); }
+.recorrido { margin-top: 110px; display: grid; grid-template-columns: .8fr 1.2fr; gap: 60px; }
+.linea { position: relative; display: grid; gap: 30px; padding-left: 34px; }
+.linea::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--oro), rgba(191,155,95,.1)); }
+.hito { position: relative; }
+.hito::before { content: ""; position: absolute; left: -34px; top: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--azul); border: 2px solid var(--oro); }
+.hito small { font-size: 12px; font-weight: 700; letter-spacing: .16em; color: var(--oro); text-transform: uppercase; }
+.hito h3 { font-size: 26px; margin: 4px 0 6px; }
+.hito p { color: var(--suave-osc); font-size: 16px; }
+
+/* ---------- únase y contacto ---------- */
+.unase { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; padding: 50px 56px; border-radius: 28px; background: var(--azul); color: var(--crema); }
+.unase h2 { font-size: 40px; }
+.unase p { color: var(--suave-osc); margin-top: 10px; }
+.cierre { text-align: center; padding-block: 130px 110px; background: radial-gradient(700px 400px at 50% 0%, rgba(191,155,95,.18), transparent 70%), var(--azul-2); }
+.cierre h2 { font-size: clamp(40px, 5vw, 64px); margin: 16px auto 18px; max-width: 14em; }
+.cierre p { color: var(--suave-osc); font-size: 19px; }
+.cierre .acciones { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.contactos { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px 40px; margin-top: 46px; font-size: 15px; color: var(--suave-osc); }
+.contactos b { color: var(--crema); font-weight: 600; }
+footer { border-top: 1px solid rgba(191,155,95,.14); padding-block: 30px; font-size: 13px; color: var(--suave-osc); background: var(--azul-2); }
+footer .envoltura { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; }
+footer .marca { margin-right: auto; }
+.whatsapp { position: fixed; right: 24px; bottom: 24px; z-index: 30; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; background: var(--verde); box-shadow: 0 12px 30px rgba(37,211,102,.4); }
+
+/* ---------- celular ---------- */
+@media (max-width: 900px) {
+  nav, header .boton, .idiomas { display: none; }
+  .hamburguesa { display: block; }
+  .portada .envoltura, .producto, .webs, .simulador, .recorrido, .unase { grid-template-columns: 1fr; }
+  .portada .envoltura { padding-block: 24px 60px; gap: 10px; min-height: 0; }
+  .asistente { order: -1; }
+  .asistente canvas { width: 300px; }
+  .portada h1 { margin-top: 12px; }
+  .portada .acciones .boton { flex: 1 1 100%; justify-content: center; }
+  .portada .datos { gap: 20px; }
+  .pilares, .pasos { grid-template-columns: 1fr; }
+  .producto.invertido .telefono { order: 0; }
+  .etiqueta { display: none; }
+  .simulador > *, .producto > * { min-width: 0; }
+  .escena { height: 440px; }
+  .soporte { left: 5%; width: 108px; }
+  .mano { right: 4%; width: 190px; }
+  .subtitulo { max-width: 90%; bottom: 4%; }
+  .seccion { padding-block: 80px; }
+  .webs, .unase { padding: 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="envoltura">
+    <a class="marca" href="#"><img src="img/logo.png" alt=""><b>APEX <span>CORPORATION</span></b></a>
+    <nav><a href="#hacemos">Qué hacemos</a><a href="#productos">Productos</a><a href="#su-restaurante">Su restaurante</a><a href="#recorrido">Recorrido</a><a href="#unase">Trabaje con nosotros</a></nav>
+    <div class="idiomas"><span class="si">ES</span><span>EN</span><span>PT</span></div>
+    <a class="boton oro" href="#contacto">Hablemos</a>
+    <span class="hamburguesa">☰</span>
+  </div>
+</header>
+
+<!-- 1. Portada: el asistente se presenta y guía el recorrido -->
+<section class="portada">
+  <div class="envoltura">
+    <div>
+      <div class="ceja">Software e inteligencia artificial · Industria gastronómica</div>
+      <h1>Inteligencia artificial que <em>atiende, vende</em> y trabaja en su restaurante.</h1>
+      <p class="lead">Meseros virtuales, domicilios sin comisiones y páginas web para restaurantes. No tiene que buscar nada: toque el orbe y nuestro asistente le muestra todo, en su idioma.</p>
+      <div class="acciones">
+        <a class="boton oro" href="#">▶&nbsp; Toque para comenzar el recorrido</a>
+        <a class="boton borde" href="#contacto">Escríbanos por WhatsApp</a>
+      </div>
+      <div class="datos">
+        <div><b>2</b>productos con<br>inteligencia artificial</div>
+        <div><b>6</b>idiomas que<br>habla el asistente</div>
+        <div><b>5 a 7</b>días hábiles<br>de instalación</div>
+      </div>
+    </div>
+    <div class="asistente">
+      <canvas id="orbe" width="520" height="520" aria-label="Asistente de Apex"></canvas>
+      <div class="burbuja">
+        <div class="quien"><i></i>Asistente de Apex · Español</div>
+        <p>¡Hola! ¿Cómo está? Soy el asistente de Apex Corporation. ¿Le muestro lo que hacemos por los restaurantes?</p>
+        <div class="controles"><div class="onda" id="onda"></div><span>❚❚</span><span>🔊</span><span>CC</span></div>
+      </div>
+      <div class="capitulos"><span class="si">Bienvenida</span><span>Qué hacemos</span><span>Apex Play</span><span>Apex Domicilios</span><span>Su restaurante</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Qué hacemos -->
+<section class="clara seccion" id="hacemos">
+  <div class="envoltura">
+    <div class="cabeza">
+      <div class="ceja">Qué hacemos</div>
+      <h2>Tecnología que se nota en la mesa, en la cocina y en la caja.</h2>
+      <p>Diseñamos herramientas de inteligencia artificial pensadas para restaurantes reales: fáciles para el cliente, útiles para el equipo y rentables para el dueño.</p>
+    </div>
+    <div class="pilares">
+      <div class="pilar"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dcc08c" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><ellipse cx="12" cy="12" rx="11" ry="3.2" transform="rotate(-18 12 12)"/></svg></div>
+        <h3>Atención con IA</h3><p>Un mesero virtual que saluda, recomienda, toma el pedido por voz y lo envía a cocina. En el idioma de cada cliente.</p></div>
+      <div class="pilar"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dcc08c" stroke-width="1.6"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></div>
+        <h3>Ventas directas</h3><p>Su propio canal de domicilios, sin pagar comisiones a aplicaciones. Los clientes y las ganancias son suyos.</p></div>
+      <div class="pilar"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dcc08c" stroke-width="1.6"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8"/></svg></div>
+        <h3>Presencia digital</h3><p>Páginas web elegantes y rápidas, con su marca y su dominio, conectadas a sus pedidos y a su WhatsApp.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Productos -->
+<section class="oscura seccion" id="productos">
+  <div class="envoltura">
+    <div class="cabeza">
+      <div class="ceja">Productos</div>
+      <h2>Dos productos. Un mismo asistente.</h2>
+      <p>El orbe de Apex atiende en la mesa y en los domicilios: escucha, entiende y responde con voz natural.</p>
+    </div>
+
+    <div class="producto">
+      <div>
+        <div class="ceja">Apex Play</div>
+        <h3>El mesero virtual de su restaurante.</h3>
+        <p>El cliente escanea el código QR de la mesa y el orbe lo atiende: le muestra la carta, le recomienda y toma su pedido.</p>
+        <ul class="lista">
+          <li><span><b>Código QR en cada mesa</b>, sin descargar aplicaciones.</span></li>
+          <li><span><b>Platos en 3D y realidad aumentada</b>: el cliente ve el plato antes de pedirlo.</span></li>
+          <li><span><b>Pedidos por voz</b> que llegan directo a la cocina.</span></li>
+          <li><span><b>Seis idiomas</b> para turistas y visitantes.</span></li>
+        </ul>
+      </div>
+      <div class="telefono"><img src="img/play.jpg" alt="Apex Play en un celular">
+        <div class="etiqueta" style="left:-120px; top:150px">Mesa 4 · Pedido enviado<small>2 platos · llega a cocina</small></div>
+        <div class="etiqueta" style="right:-110px; bottom:120px">English · Português<small>el orbe cambia de idioma</small></div>
+      </div>
+    </div>
+
+    <div class="producto invertido">
+      <div>
+        <div class="ceja">Apex Domicilios</div>
+        <h3>Su propio canal de domicilios, sin comisiones.</h3>
+        <p>Sus clientes piden desde su enlace o su WhatsApp, y el asistente se encarga del resto.</p>
+        <ul class="lista">
+          <li><span><b>Cero comisiones</b> por pedido: el margen se queda en su restaurante.</span></li>
+          <li><span><b>Verificación automática de pagos</b> por Nequi.</span></li>
+          <li><span><b>Seguimiento en vivo</b> del pedido para el cliente.</span></li>
+          <li><span><b>Su base de clientes</b>, para volver a venderles.</span></li>
+        </ul>
+      </div>
+      <div class="telefono"><img src="img/domicilios.jpg" alt="Apex Domicilios en un celular">
+        <div class="etiqueta" style="right:-120px; top:170px">Pago Nequi verificado ✓<small>en segundos</small></div>
+        <div class="etiqueta" style="left:-110px; bottom:140px">Su pedido va en camino<small>seguimiento en vivo</small></div>
+      </div>
+    </div>
+
+    <div class="webs">
+      <div>
+        <div class="ceja">Páginas web</div>
+        <h3>Su marca, en su propio dominio.</h3>
+        <p>Diseñamos páginas web elegantes para restaurantes y negocios: rápidas en el celular, con su carta, su ubicación y un botón directo a WhatsApp.</p>
+      </div>
+      <div class="navegador"><div class="bar"><i></i><i></i><i></i><span>sunegocio.axtra.chat</span></div>
+        <div class="cuerpo"><div><b>Flores que dicen lo que sientes.</b><small>Floristería · Tuluá · Domicilios</small><em>Pedir por WhatsApp</em></div><div class="foto"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Mire Apex en su restaurante -->
+<section class="clara seccion" id="su-restaurante">
+  <div class="envoltura">
+    <div class="cabeza">
+      <div class="ceja">Mire Apex en su restaurante</div>
+      <h2>Escriba el nombre de su restaurante y véalo funcionando.</h2>
+      <p>En segundos armamos un video corto con su nombre, sus platos y sus colores. Puede verlo aquí mismo y descargarlo.</p>
+    </div>
+    <div class="simulador">
+      <div class="formulario">
+        <h3>Su restaurante</h3>
+        <p>Toma menos de un minuto.</p>
+        <div class="campo"><label>Nombre del restaurante</label><div class="caja">La Fogata</div></div>
+        <div class="fila">
+          <div class="campo"><label>Ciudad</label><div class="caja">Tuluá</div></div>
+          <div class="campo"><label>Tipo de comida</label><div class="caja">Parrilla</div></div>
+        </div>
+        <div class="campo"><label>Tres de sus platos</label>
+          <div class="platos"><div>Picada de la casa<span>$38.000</span></div><div>Churrasco 400 g<span>$42.000</span></div><div>Limonada de coco<span>$9.000</span></div></div></div>
+        <div class="campo"><label>Color de su marca</label>
+          <div class="colores"><i style="background:#b3412b" class="si"></i><i style="background:#1f4d3a"></i><i style="background:#111a2b"></i><i style="background:#d39a2c"></i><small>＋ Subir logo</small></div></div>
+        <div class="acepto"><i>✓</i>Autorizo a Apex Corporation a usar estos datos para preparar mi demostración (Ley 1581 de 2012).</div>
+        <a class="boton oro" href="#">▶&nbsp; Ver mi restaurante con Apex</a>
+      </div>
+      <div class="reproductor">
+        <div class="escena">
+          <div class="luz" style="left:12%"></div><div class="luz" style="left:58%"></div>
+          <div class="mesa"></div>
+          <div class="soporte"><b>La Fogata</b><div class="qr" id="qr"></div><small>MESA 4 · APEX PLAY</small></div>
+          <div class="mano"><div class="pant"><canvas id="orbe-mini" width="200" height="200"></canvas>
+            <h4>Bienvenido a<br><em>La Fogata</em></h4>
+            <ul><li>Picada de la casa<span>$38.000</span></li><li>Churrasco 400 g<span>$42.000</span></li><li>Limonada de coco<span>$9.000</span></li></ul></div></div>
+          <div class="cocina"><b>● NUEVO PEDIDO · COCINA</b>Mesa 4: 1 Churrasco 400 g<br>1 Limonada de coco</div>
+          <div class="subtitulo">«Bienvenido a La Fogata. ¿Le recomiendo la picada de la casa?»</div>
+        </div>
+        <div class="barra-video"><span class="play">❚❚</span><span>0:12</span><div class="pista"><i></i></div><span>0:30</span><span class="bajar">Descargar video</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Cómo trabajamos y nuestro recorrido -->
+<section class="oscura seccion" id="recorrido">
+  <div class="envoltura">
+    <div class="cabeza">
+      <div class="ceja">Cómo trabajamos</div>
+      <h2>De la primera conversación a su restaurante funcionando.</h2>
+    </div>
+    <div class="pasos">
+      <div class="paso"><h3>Conversamos</h3><p>Una reunión presencial o virtual para conocer su restaurante y lo que necesita.</p></div>
+      <div class="paso"><h3>Configuramos</h3><p>Cargamos su carta, sus fotos, sus precios y la voz de su asistente.</p></div>
+      <div class="paso"><h3>Instalamos</h3><p>Instalación remota en 5 a 7 días hábiles, con los códigos QR listos para sus mesas.</p></div>
+      <div class="paso"><h3>Acompañamos</h3><p>Soporte de lunes a domingo, de 6:00 a. m. a 11:00 p. m.</p></div>
+    </div>
+
+    <div class="recorrido">
+      <div class="cabeza">
+        <div class="ceja">Nuestro recorrido</div>
+        <h2>Nacimos en Tuluá, pensando en grande.</h2>
+        <p>Apex Corporation nace en el Valle del Cauca con una idea sencilla: que cualquier restaurante tenga la tecnología de las grandes cadenas.</p>
+      </div>
+      <div class="linea">
+        <div class="hito"><small>El comienzo</small><h3>Tuluá, Valle del Cauca</h3><p>Empezamos a construir inteligencia artificial para la atención en restaurantes.</p></div>
+        <div class="hito"><small>Primer producto</small><h3>Apex Play</h3><p>El orbe llega a las mesas: carta en 3D, pedidos por voz y seis idiomas.</p></div>
+        <div class="hito"><small>Segundo producto</small><h3>Apex Domicilios</h3><p>Un canal propio de domicilios, sin comisiones y con pagos verificados.</p></div>
+        <div class="hito"><small>Lo que viene</small><h3>Colombia y más allá</h3><p>Un equipo comercial en todo el país y los primeros pasos fuera de Colombia.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Trabaje con nosotros -->
+<section class="clara seccion" id="unase" style="padding-block: 90px">
+  <div class="envoltura">
+    <div class="unase">
+      <div><div class="ceja">Trabaje con nosotros</div><h2>Buscamos closers de venta en toda Colombia.</h2>
+        <p>Trabajo remoto, por comisión, cerrando ventas de software e inteligencia artificial para el sector gastronómico.</p></div>
+      <a class="boton oro" href="#">Enviar hoja de vida</a>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Contacto -->
+<section class="cierre" id="contacto">
+  <div class="envoltura">
+    <div class="ceja">Contacto</div>
+    <h2>¿Hablamos de su restaurante?</h2>
+    <p>Agende una reunión presencial o virtual. Le mostramos Apex funcionando con su propia carta.</p>
+    <div class="acciones"><a class="boton oro" href="#">Escribir por WhatsApp</a><a class="boton borde" href="#">Agendar una reunión</a></div>
+    <div class="contactos"><span>WhatsApp <b>310 789 7960</b></span><span>Correo <b>apexcorporation@axtra.chat</b></span><span>Instagram <b>@apex_corporationn</b></span></div>
+  </div>
+</section>
+
+<footer>
+  <div class="envoltura">
+    <div class="marca"><img src="img/logo.png" alt=""><b>APEX <span>CORPORATION</span></b></div>
+    <span>Tuluá, Valle del Cauca · Colombia</span><a href="#">Política de privacidad</a><a href="#">Términos y condiciones</a><span>© 2026 Apex Corporation</span>
+  </div>
+</footer>
+
+<a class="whatsapp" href="#contacto" aria-label="WhatsApp"><svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-.7-.3-1.4-.7-2-1.3-.5-.5-1-1.1-1.3-1.7-.1-.2 0-.4.1-.5l.4-.5.3-.4v-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.8.8-1.1 1.9-.8 3 .4 1.3 1.1 2.4 2 3.4 1.5 1.6 3.4 2.7 5.6 3.1.9.1 1.8-.3 2.4-1 .3-.4.4-.9.3-1.4-.1 0-.3-.1-.5-.2Z"/></svg></a>
+
+<script src="../../servidor/apex/web/orbe-saturno.js"></script>
+<script>
+// Onda de voz decorativa y código QR de muestra (boceto)
+const onda = document.getElementById("onda");
+onda.innerHTML = Array.from({ length: 34 }, (_, i) => `<i style="height:${4 + Math.round(Math.abs(Math.sin(i * 1.7) * Math.sin(i * 0.45)) * 18)}px;opacity:${i < 22 ? 1 : .35}"></i>`).join("");
+const qr = document.getElementById("qr");
+qr.innerHTML = `<svg viewBox="0 0 21 21" width="58" height="58">${Array.from({ length: 441 }, (_, k) => { const x = k % 21, y = (k / 21) | 0;
+  const esquina = (a, b) => x >= a && x < a + 7 && y >= b && y < b + 7 && (x === a || x === a + 6 || y === b || y === b + 6 || (x > a + 1 && x < a + 5 && y > b + 1 && y < b + 5));
+  const enEsquina = (x < 8 && y < 8) || (x > 12 && y < 8) || (x < 8 && y > 12);
+  const lleno = enEsquina ? esquina(0, 0) || esquina(14, 0) || esquina(0, 14) : ((x * 7 + y * 13 + x * y) % 5) < 2;
+  return lleno ? `<rect x="${x}" y="${y}" width="1" height="1" fill="#111a2b"/>` : ""; }).join("")}</svg>`;
+// El orbe del asistente (el mismo de Apex Play y Domicilios)
+const lienzos = [document.getElementById("orbe"), document.getElementById("orbe-mini")];
+window.cuadro = (t) => lienzos.forEach((cv) => OrbeSaturno.dibujar(cv, t, 0.25 + 0.2 * Math.sin(t * 9) * Math.sin(t * 2.3), { habla: true }));
+if (!window.SIN_ANIMAR) (function animar(now) { cuadro(now / 1000); requestAnimationFrame(animar); })(0);
+</script>
+</body>
+</html>
