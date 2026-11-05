@@ -14,6 +14,7 @@ import secrets
 import threading
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 
@@ -22,7 +23,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Resp
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import config, db, orbe
+from . import config, db, orbe, sitio as guion_sitio
 
 WEB = config.BASE / "web"
 mimetypes.add_type("model/gltf-binary", ".glb")          # modelos 3D para la realidad aumentada
@@ -550,6 +551,49 @@ def domicilios():
 def sitio():
     """Sitio oficial de Apex Corporation, con el asistente que guía el recorrido."""
     return _pagina("sitio.html")
+
+
+class PedidoVideo(BaseModel):
+    idioma: str = Field("es", pattern="^(es|en|pt)$")
+    nombre: str = Field(min_length=1, max_length=60)
+    ciudad: str = Field("", max_length=60)
+    plato: str = Field("", max_length=60)
+
+
+@app.post("/v1/sitio/video")
+def sitio_video(p: PedidoVideo, request: Request):
+    """Voz del video «Mire Apex en su restaurante»: seis frases con el nombre del restaurante y su plato,
+    dichas por la voz gratis de Apex. El texto lo arma el servidor (el visitante solo pone el nombre, la ciudad y el plato)."""
+    limitar(f"sitio-video:{ip(request)}", 6, 600)
+    voz_edge, velocidad = guion_sitio.VOCES[p.idioma]
+    r = {"id": "sitio", "voz": {"google": "", "edge": voz_edge, "velocidad": velocidad}}
+
+    def decir(linea: dict) -> dict:
+        audio = orbe.voz(r, linea["txt"])
+        h = hashlib.sha256(audio).hexdigest()[:24]
+        f = config.AUDIO_DIR / f"sitio-{h}.mp3"
+        if not f.exists():
+            f.write_bytes(audio)
+        return {**linea, "src": f"/v1/sitio/voz/{h}"}
+
+    try:
+        with ThreadPoolExecutor(6) as ex:
+            lineas = list(ex.map(decir, guion_sitio.guion(p.idioma, p.nombre, p.ciudad, p.plato)))
+    except orbe.SinRanura as e:
+        log.warning("voz del video del sitio falló: %s", e)
+        raise HTTPException(503, "la voz no está disponible")
+    for viejo in config.AUDIO_DIR.glob("sitio-*.mp3"):          # los audios de los videos se guardan dos días
+        if time.time() - viejo.stat().st_mtime > 2 * 86400:
+            viejo.unlink(missing_ok=True)
+    return {"lineas": lineas}
+
+
+@app.get("/v1/sitio/voz/{h}")
+def sitio_voz(h: str):
+    f = config.AUDIO_DIR / f"sitio-{h}.mp3"
+    if len(h) != 24 or any(ch not in "0123456789abcdef" for ch in h) or not f.exists():
+        raise HTTPException(404, "audio no encontrado")
+    return Response(f.read_bytes(), media_type="audio/mpeg", headers={"Cache-Control": "public, max-age=86400"})
 
 
 # ---------------- Muestras de voz: para escoger cómo suena el orbe ----------------

@@ -1,0 +1,98 @@
+{
+ "es": [
+  {
+   "escena": "apertura",
+   "txt": "Una noche cualquiera en su restaurante.",
+   "src": "/web/sitio/voz/es/video-apertura.mp3"
+  },
+  {
+   "escena": "mesa",
+   "txt": "Su cliente se sienta, escanea el código de la mesa... y aparezco yo.",
+   "src": "/web/sitio/voz/es/video-mesa.mp3"
+  },
+  {
+   "escena": "saludo",
+   "txt": "¡Bienvenido! ¿Qué le provoca hoy?",
+   "src": "/web/sitio/voz/es/video-saludo.mp3"
+  },
+  {
+   "escena": "carta",
+   "txt": "Hoy le recomiendo el plato de la casa. ¡Es lo más pedido!",
+   "src": "/web/sitio/voz/es/video-carta.mp3"
+  },
+  {
+   "escena": "cocina",
+   "txt": "El pedido llega directo a la cocina. Sin errores, sin esperas y sin comisiones.",
+   "src": "/web/sitio/voz/es/video-cocina.mp3"
+  },
+  {
+   "escena": "cierre",
+   "txt": "Así se vería Apex en su restaurante.",
+   "src": "/web/sitio/voz/es/video-cierre.mp3"
+  }
+ ],
+ "en": [
+  {
+   "escena": "apertura",
+   "txt": "One night at your restaurant.",
+   "src": "/web/sitio/voz/en/video-apertura.mp3"
+  },
+  {
+   "escena": "mesa",
+   "txt": "Your guest sits down, scans the code on the table... and here I am.",
+   "src": "/web/sitio/voz/en/video-mesa.mp3"
+  },
+  {
+   "escena": "saludo",
+   "txt": "Welcome! What would you like today?",
+   "src": "/web/sitio/voz/en/video-saludo.mp3"
+  },
+  {
+   "escena": "carta",
+   "txt": "Today I recommend the house special. It's the favorite!",
+   "src": "/web/sitio/voz/en/video-carta.mp3"
+  },
+  {
+   "escena": "cocina",
+   "txt": "The order goes straight to the kitchen. No mistakes, no waiting, and no commissions.",
+   "src": "/web/sitio/voz/en/video-cocina.mp3"
+  },
+  {
+   "escena": "cierre",
+   "txt": "This is how Apex would look at your restaurant.",
+   "src": "/web/sitio/voz/en/video-cierre.mp3"
+  }
+ ],
+ "pt": [
+  {
+   "escena": "apertura",
+   "txt": "Uma noite qualquer no seu restaurante.",
+   "src": "/web/sitio/voz/pt/video-apertura.mp3"
+  },
+  {
+   "escena": "mesa",
+   "txt": "Seu cliente se senta, escaneia o código da mesa... e aí apareço eu.",
+   "src": "/web/sitio/voz/pt/video-mesa.mp3"
+  },
+  {
+   "escena": "saludo",
+   "txt": "Bem-vindo! O que vai querer hoje?",
+   "src": "/web/sitio/voz/pt/video-saludo.mp3"
+  },
+  {
+   "escena": "carta",
+   "txt": "Hoje eu recomendo o prato da casa. É o mais pedido!",
+   "src": "/web/sitio/voz/pt/video-carta.mp3"
+  },
+  {
+   "escena": "cocina",
+   "txt": "O pedido chega direto na cozinha. Sem erros, sem espera e sem comissões.",
+   "src": "/web/sitio/voz/pt/video-cocina.mp3"
+  },
+  {
+   "escena": "cierre",
+   "txt": "Assim ficaria a Apex no seu restaurante.",
+   "src": "/web/sitio/voz/pt/video-cierre.mp3"
+  }
+ ]
+}

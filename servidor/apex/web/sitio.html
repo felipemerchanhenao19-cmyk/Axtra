@@ -139,9 +139,9 @@ header .boton { padding: 10px 20px; font-size: 14px; }
 .lista li::before { content: ""; flex: none; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%; background: radial-gradient(circle, var(--oro) 0 4px, transparent 5px), rgba(191,155,95,.16); }
 .lista b { color: var(--crema); }
 .producto .boton { margin-top: 30px; }
-.telefono { justify-self: center; width: 300px; max-width: 100%; padding: 11px; border-radius: 46px; background: linear-gradient(145deg, #2a3446, #0b111d); box-shadow: 0 40px 80px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.08); position: relative; }
-.telefono img { border-radius: 36px; width: 100%; aspect-ratio: 390 / 760; object-fit: cover; object-position: top; }
-.telefono::before { content: ""; position: absolute; top: 22px; left: 50%; width: 86px; height: 24px; border-radius: 14px; background: #05080f; transform: translateX(-50%); z-index: 1; }
+.telefono { justify-self: center; width: 300px; max-width: 100%; padding: 42px 11px 14px; border-radius: 46px; background: linear-gradient(145deg, #2a3446, #0b111d); box-shadow: 0 40px 80px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.08); position: relative; }
+.telefono img { border-radius: 10px 10px 34px 34px; width: 100%; height: auto; }
+.telefono::before { content: ""; position: absolute; top: 12px; left: 50%; width: 86px; height: 22px; border-radius: 14px; background: #05080f; transform: translateX(-50%); z-index: 1; }
 .etiqueta { position: absolute; z-index: 2; padding: 10px 16px; border-radius: 14px; background: var(--crema); color: var(--tinta); font-size: 13px; font-weight: 700; box-shadow: 0 16px 40px rgba(0,0,0,.35); white-space: nowrap; }
 .etiqueta small { display: block; font-weight: 500; color: var(--suave); font-size: 12px; }
 
@@ -167,47 +167,23 @@ header .boton { padding: 10px 20px; font-size: 14px; }
 .subir input { display: none; }
 .formulario .boton { width: 100%; margin-top: 10px; }
 .nota { font-size: 12px; color: var(--suave); margin-top: 12px; text-align: center; }
-.reproductor { border-radius: 26px; overflow: hidden; background: var(--azul); box-shadow: 0 40px 80px rgba(17,26,43,.3); position: sticky; top: 100px; }
-.escena { position: relative; height: 540px; overflow: hidden; color: var(--crema); background: radial-gradient(500px 300px at 30% 20%, rgba(255,190,110,.35), transparent 70%), linear-gradient(180deg, #2b1a12, #170e0a 60%); }
-.escena .camara { position: absolute; inset: 0; transition: transform 1.6s cubic-bezier(.3,.7,.2,1); transform-origin: 40% 60%; }
-.escena.e1 .camara { transform: scale(1.06); }
-.escena .luz { position: absolute; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(255,214,150,.6), transparent 65%); }
-.escena .mesa { position: absolute; left: -10%; right: -10%; bottom: -36%; height: 70%; border-radius: 50%; background: radial-gradient(ellipse at 50% 20%, #8a5634, #4b2a17 70%); box-shadow: inset 0 10px 30px rgba(255,200,140,.18); }
-.soporte { position: absolute; left: 12%; bottom: 25%; width: 124px; padding: 12px 12px 10px; border-radius: 12px 12px 6px 6px; background: linear-gradient(180deg, #16120f, #0c0a08); border: 1px solid var(--marca); text-align: center; transform: perspective(500px) rotateY(14deg); box-shadow: 0 20px 30px rgba(0,0,0,.5); }
-.soporte img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; margin: 0 auto 4px; }
-.soporte b { display: block; font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: 17px; line-height: 1.1; color: var(--crema); overflow-wrap: anywhere; }
-.soporte .qr { margin: 8px auto; width: 70px; height: 70px; background: #fff; border-radius: 6px; padding: 6px; }
-.soporte small { font-size: 10px; letter-spacing: .12em; color: var(--crema); font-weight: 700; }
-.mano { position: absolute; right: 12%; bottom: -4%; width: 230px; padding: 8px; border-radius: 30px; background: #0d121c; transform: translateY(110%) rotate(-7deg); transition: transform 1s cubic-bezier(.2,.8,.2,1); box-shadow: -20px 30px 50px rgba(0,0,0,.55); }
-.escena.e2 .mano, .escena.quieta .mano { transform: translateY(0) rotate(-7deg); }
-.mano .pant { border-radius: 23px; overflow: hidden; background: linear-gradient(180deg, #0f1e36, #0a1426); padding: 16px 14px 46px; text-align: center; }
-.mano .logo-cliente { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; margin: 0 auto 2px; }
-.mano canvas { width: 88px; height: 88px; margin: 0 auto; display: block; }
-.mano h4 { font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: 19px; line-height: 1.15; margin-top: 2px; overflow-wrap: anywhere; }
-.mano h4 em { color: var(--crema); border-bottom: 2px solid var(--marca); }
-.mano ul { list-style: none; margin-top: 12px; display: grid; gap: 6px; text-align: left; }
-.mano li { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; padding: 7px 9px; border-radius: 9px; background: rgba(255,255,255,.06); transition: opacity .4s, transform .4s, background .3s; }
-.mano li span { color: var(--oro-claro); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.escena.animando .mano li { opacity: 0; transform: translateX(16px); }
-.escena.e3 .mano li { opacity: 1; transform: none; }
-.escena.e3 .mano li:nth-child(2) { transition-delay: .35s; } .escena.e3 .mano li:nth-child(3) { transition-delay: .7s; }
-.mano li.elegido { background: var(--marca); }
-.cocina { position: absolute; right: 4%; top: 8%; padding: 10px 14px; border-radius: 12px; background: rgba(246,241,231,.96); color: var(--tinta); font-size: 12px; line-height: 1.4; box-shadow: 0 12px 30px rgba(0,0,0,.4); transition: opacity .5s, transform .5s; max-width: 46%; }
-.cocina b { display: block; font-size: 10px; letter-spacing: .14em; color: #2a9d6a; }
-.escena.animando .cocina { opacity: 0; transform: translateY(-14px); }
-.escena.e4 .cocina { opacity: 1; transform: none; }
-.subtitulo { position: absolute; left: 5%; bottom: 6%; max-width: 50%; padding: 10px 16px; border-radius: 12px; background: rgba(0,0,0,.72); color: #fff; font-size: 15px; line-height: 1.4; transition: opacity .3s; }
-.subtitulo:empty { opacity: 0; }
-.final { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 30px; background: rgba(10,17,32,.86); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .6s; }
-.escena.e5 .final { opacity: 1; pointer-events: auto; }
-.final h3 { font-size: 34px; margin: 10px 0 8px; }
-.final p { color: var(--suave-osc); margin-bottom: 22px; }
-.final .boton.borde { color: var(--crema); border-color: rgba(246,241,231,.35); }
-.final .acciones { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.barra-video { display: flex; align-items: center; gap: 14px; padding: 16px 22px; font-size: 13px; color: var(--suave-osc); font-variant-numeric: tabular-nums; }
+.reproductor { --marca: #b3412b; position: sticky; top: 96px; border-radius: 28px; padding: 18px 18px 14px; color: var(--crema);
+  background: radial-gradient(420px 360px at 50% 30%, color-mix(in srgb, var(--marca) 38%, transparent), transparent 70%), linear-gradient(180deg, #121c30, #0a1120); box-shadow: 0 40px 80px rgba(17,26,43,.3); }
+.pantalla-video { position: relative; width: min(100%, 400px, calc((100vh - 230px) * 9 / 16)); min-width: min(100%, 280px); aspect-ratio: 9 / 16; margin-inline: auto; border-radius: 22px; overflow: hidden; background: #05070d; box-shadow: 0 30px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(191,155,95,.25); }
+.pantalla-video canvas { width: 100%; height: 100%; display: block; }
+.capa-video { position: absolute; inset: 0; display: grid; place-items: end center; padding-bottom: 18%; background: linear-gradient(180deg, transparent 55%, rgba(5,7,13,.75)); }
+.capa-video span { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 999px; background: linear-gradient(135deg, var(--oro-claro), var(--oro)); color: var(--azul); font-weight: 800; box-shadow: 0 12px 30px rgba(0,0,0,.4); }
+.cargando { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 16px; text-align: center; background: rgba(5,7,13,.82); font-weight: 600; }
+.cargando i { width: 54px; height: 54px; border-radius: 50%; border: 3px solid rgba(191,155,95,.25); border-top-color: var(--oro-claro); animation: gira .9s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.acciones-video { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
+.acciones-video .boton { padding: 12px 20px; font-size: 15px; }
+.acciones-video .boton.borde { color: var(--crema); border-color: rgba(246,241,231,.3); }
+.barra-video { display: flex; align-items: center; gap: 12px; padding: 14px 6px 2px; font-size: 13px; color: var(--suave-osc); font-variant-numeric: tabular-nums; }
 .barra-video .pista { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.12); position: relative; }
 .barra-video .pista i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 3px; background: var(--oro); }
-.barra-video button { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--crema); color: var(--azul); font-size: 12px; }
+.barra-video button { flex: none; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--crema); color: var(--azul); font-size: 13px; }
+.barra-video button.sonido { background: none; border: 1px solid var(--linea); color: var(--crema); }
 
 /* ---------- cómo trabajamos y recorrido ---------- */
 .pasos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; counter-reset: paso; }
@@ -241,6 +217,7 @@ footer .marca { margin-right: auto; }
 footer button:hover, footer a:hover { color: var(--crema); }
 .whatsapp { position: fixed; right: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 45; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; background: var(--verde); box-shadow: 0 12px 30px rgba(37,211,102,.4); transition: transform .3s; }
 body.en-recorrido .whatsapp { transform: translateY(-96px); }
+body.en-video .whatsapp { opacity: 0; pointer-events: none; }
 
 /* ---------- documentos legales ---------- */
 dialog { margin: auto; width: min(760px, 100% - 24px); max-height: 86vh; border: 0; border-radius: 22px; padding: 0; background: var(--crema); color: var(--tinta); box-shadow: 0 40px 100px rgba(0,0,0,.6); }
@@ -275,12 +252,8 @@ dialog article ul { padding-left: 20px; }
   .etiqueta { display: none; }
   .seccion { padding-block: 80px; }
   .unase { padding: 32px 24px; }
-  .reproductor { position: relative; top: 0; }
-  .escena { height: 460px; }
-  .soporte { left: 5%; width: 108px; }
-  .mano { right: 4%; width: 190px; }
-  .subtitulo { max-width: 90%; bottom: 4%; }
-  .cocina { max-width: 60%; }
+  .reproductor { position: relative; top: 0; padding: 12px 12px 10px; }
+  .pantalla-video { width: 100%; }
   .formulario { padding: 26px 20px; }
   .plato { grid-template-columns: 1fr 100px; }
   body.en-recorrido .whatsapp { transform: translateY(-128px); }
@@ -387,7 +360,7 @@ dialog article ul { padding-left: 20px; }
         </ul>
         <a class="boton borde" href="/demo" target="_blank" rel="noopener" data-i="pl_demo">Probar Apex Play →</a>
       </div>
-      <div class="telefono"><img src="/web/sitio/play.jpg" alt="Apex Play en un celular" loading="lazy" width="390" height="760">
+      <div class="telefono"><img src="/web/sitio/play.jpg" alt="Apex Play en un celular: el orbe saluda y muestra la carta con fotos de los platos" loading="lazy" width="390" height="800">
         <div class="etiqueta" style="left:-120px; top:150px" data-i="pl_e1">Mesa 4 · Pedido enviado<small>2 platos · llega a cocina</small></div>
         <div class="etiqueta" style="right:-110px; bottom:120px" data-i="pl_e2">English · Português<small>el orbe cambia de idioma</small></div>
       </div>
@@ -406,7 +379,7 @@ dialog article ul { padding-left: 20px; }
         </ul>
         <a class="boton borde" href="/domicilios" target="_blank" rel="noopener" data-i="do_demo">Probar Apex Domicilios →</a>
       </div>
-      <div class="telefono"><img src="/web/sitio/domicilios.jpg" alt="Apex Domicilios en un celular" loading="lazy" width="390" height="760">
+      <div class="telefono"><img src="/web/sitio/domicilios.jpg" alt="Apex Domicilios en un celular: el orbe recibe el pedido a domicilio" loading="lazy" width="390" height="800">
         <div class="etiqueta" style="right:-120px; top:170px" data-i="do_e1">Pago Nequi verificado ✓<small>en segundos</small></div>
         <div class="etiqueta" style="left:-110px; bottom:140px" data-i="do_e2">Su pedido va en camino<small>seguimiento en vivo</small></div>
       </div>
@@ -420,7 +393,7 @@ dialog article ul { padding-left: 20px; }
     <div class="cabeza">
       <div class="ceja" data-i="s_ceja">Mire Apex en su restaurante</div>
       <h2 data-i="s_titulo">Escriba el nombre de su restaurante y véalo funcionando.</h2>
-      <p data-i="s_texto">En segundos armamos un video corto con su nombre, sus platos y sus colores. Lo ve aquí mismo.</p>
+      <p data-i="s_texto">En segundos armamos un video con su nombre, sus platos y sus colores, narrado por nuestro asistente. Lo ve aquí mismo y lo puede descargar.</p>
     </div>
     <div class="simulador">
       <form class="formulario" id="form-sim" autocomplete="off">
@@ -446,28 +419,21 @@ dialog article ul { padding-left: 20px; }
             <label class="subir"><input type="file" accept="image/*" id="s-logo"><span data-i="f_logo">＋ Subir logo</span></label>
           </div></div>
         <button class="boton oro" type="submit" data-i="f_boton">▶&nbsp; Ver mi restaurante con Apex</button>
-        <p class="nota" data-i="f_nota">Sus datos se quedan en su navegador: no los guardamos.</p>
+        <p class="nota" data-i="f_nota">Usamos el nombre, la ciudad y el primer plato solo para narrar su video. No guardamos sus datos.</p>
       </form>
-      <div class="reproductor">
-        <div class="escena quieta" id="escena">
-          <div class="camara">
-            <div class="luz" style="left:12%"></div><div class="luz" style="left:58%"></div>
-            <div class="mesa"></div>
-            <div class="soporte"><img id="v-logo1" alt="" hidden><b id="v-nombre1">La Fogata</b><div class="qr" id="qr"></div><small data-i="v_mesa">MESA 4 · APEX PLAY</small></div>
-            <div class="mano"><div class="pant"><img class="logo-cliente" id="v-logo2" alt="" hidden><canvas id="orbe-sim" width="200" height="200"></canvas>
-              <h4><span data-i="v_bienvenido">Bienvenido a</span><br><em id="v-nombre2">La Fogata</em></h4>
-              <ul id="v-platos"></ul></div></div>
-            <div class="cocina"><b data-i="v_cocina">● NUEVO PEDIDO · COCINA</b><span id="v-ticket"></span></div>
-          </div>
-          <div class="subtitulo" id="v-sub" aria-live="polite"></div>
-          <div class="final"><div>
-            <div class="ceja" data-i="v_fin_ceja">Así se vería Apex</div>
-            <h3 id="v-fin-titulo">en La Fogata</h3>
-            <p data-i="v_fin_texto">Lo instalamos de forma remota en 5 a 7 días hábiles.</p>
-            <div class="acciones"><a class="boton oro" id="v-wa" href="https://wa.me/573107897960" target="_blank" rel="noopener" data-i="v_fin_wa">Lo quiero para mi restaurante</a><button class="boton borde" id="v-otra" data-i="v_fin_otra">Ver de nuevo</button></div>
-          </div></div>
+      <div class="reproductor" id="reproductor">
+        <div class="pantalla-video">
+          <canvas id="video" width="720" height="1280" aria-label="Video de Apex en su restaurante"></canvas>
+          <button class="capa-video" id="v-capa" aria-label="Ver el video"><span data-i="v_ver">▶ Ver el video</span></button>
+          <div class="cargando" id="v-cargando" hidden><i></i><span data-i="v_preparando">Preparando su video…</span></div>
         </div>
-        <div class="barra-video"><button id="v-play" aria-label="Reproducir">▶</button><span id="v-t">0:00</span><div class="pista"><i id="v-pista"></i></div><span id="v-total">0:24</span></div>
+        <div class="barra-video"><button id="v-play" aria-label="Reproducir">▶</button><span id="v-t">0:00</span><div class="pista"><i id="v-pista"></i></div><span id="v-total">0:32</span>
+          <button class="sonido" id="v-sonido" aria-label="Silenciar" aria-pressed="false">🔊</button></div>
+        <div class="acciones-video" id="v-acciones" hidden>
+          <a class="boton oro" id="v-wa" href="https://wa.me/573107897960" target="_blank" rel="noopener" data-i="v_fin_wa">Lo quiero para mi restaurante</a>
+          <button class="boton borde" id="v-bajar" hidden data-i="v_bajar">⬇ Descargar video</button>
+          <button class="boton borde" id="v-otra" hidden data-i="v_fin_otra">↺ Ver de nuevo</button>
+        </div>
       </div>
     </div>
   </div>
@@ -562,7 +528,7 @@ dialog article ul { padding-left: 20px; }
     <h4>Qué datos tratamos y para qué</h4>
     <ul><li>Nombre, teléfono, correo, nombre del restaurante y ciudad que usted nos entregue al escribirnos o al pedir una reunión.</li>
       <li>Los usamos para responderle, preparar demostraciones, enviar propuestas comerciales y prestar el servicio contratado.</li>
-      <li>Los datos que escribe en «Mire Apex en su restaurante» se quedan en su navegador: no los recibimos ni los guardamos, salvo que usted mismo nos los envíe por WhatsApp.</li></ul>
+      <li>En «Mire Apex en su restaurante», el nombre, la ciudad y el primer plato se envían a nuestro servidor solo para generar la voz del video; el audio se borra a los dos días y no guardamos esos datos. El logo, los colores y los precios no salen de su navegador.</li></ul>
     <h4>Sus derechos</h4><p>Puede conocer, actualizar, rectificar y pedir que se supriman sus datos, y revocar su autorización, escribiendo a apexcorporation@axtra.chat. Respondemos consultas en un máximo de 10 días hábiles y reclamos en un máximo de 15 días hábiles.</p>
     <h4>Seguridad y terceros</h4><p>No vendemos ni compartimos sus datos con terceros para fines publicitarios. Solo los compartimos con los proveedores que necesitamos para prestar el servicio, bajo deber de confidencialidad.</p>
   </article>
@@ -578,6 +544,7 @@ dialog article ul { padding-left: 20px; }
 </dialog>
 
 <script src="/web/orbe-saturno.js?v=2"></script>
-<script src="/web/sitio/sitio.js?v=1"></script>
+<script src="/web/sitio/video.js?v=2"></script>
+<script src="/web/sitio/sitio.js?v=3"></script>
 </body>
 </html>
