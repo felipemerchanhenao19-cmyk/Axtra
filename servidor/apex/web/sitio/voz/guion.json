@@ -1,0 +1,393 @@
+[
+ {
+  "id": "bienvenida",
+  "seccion": "#inicio",
+  "resalta": ".asistente",
+  "frases": {
+   "es": [
+    {
+     "txt": "¡Hola! ¿Cómo está? Soy el asistente de Apex Corporation.",
+     "src": "/web/sitio/voz/es/bienvenida-0.mp3",
+     "dur": 4.49
+    },
+    {
+     "txt": "En un par de minutos le muestro cómo la inteligencia artificial puede trabajar en su restaurante.",
+     "src": "/web/sitio/voz/es/bienvenida-1.mp3",
+     "dur": 4.1
+    },
+    {
+     "txt": "Usted solo mire: yo le voy explicando.",
+     "src": "/web/sitio/voz/es/bienvenida-2.mp3",
+     "dur": 1.92
+    }
+   ],
+   "en": [
+    {
+     "txt": "Hi! How are you? I'm the Apex Corporation assistant.",
+     "src": "/web/sitio/voz/en/bienvenida-0.mp3",
+     "dur": 3.41
+    },
+    {
+     "txt": "In a couple of minutes, I'll show you how artificial intelligence can work in your restaurant.",
+     "src": "/web/sitio/voz/en/bienvenida-1.mp3",
+     "dur": 4.61
+    },
+    {
+     "txt": "Just sit back and watch: I'll walk you through it.",
+     "src": "/web/sitio/voz/en/bienvenida-2.mp3",
+     "dur": 2.3
+    }
+   ],
+   "pt": [
+    {
+     "txt": "Olá! Tudo bem? Sou o assistente da Apex Corporation.",
+     "src": "/web/sitio/voz/pt/bienvenida-0.mp3",
+     "dur": 4.78
+    },
+    {
+     "txt": "Em poucos minutos, vou mostrar como a inteligência artificial pode trabalhar no seu restaurante.",
+     "src": "/web/sitio/voz/pt/bienvenida-1.mp3",
+     "dur": 5.09
+    },
+    {
+     "txt": "É só assistir: eu vou explicando.",
+     "src": "/web/sitio/voz/pt/bienvenida-2.mp3",
+     "dur": 2.14
+    }
+   ]
+  }
+ },
+ {
+  "id": "hacemos",
+  "seccion": "#hacemos",
+  "resalta": ".pilares",
+  "frases": {
+   "es": [
+    {
+     "txt": "Creamos tecnología para restaurantes.",
+     "src": "/web/sitio/voz/es/hacemos-0.mp3",
+     "dur": 1.92
+    },
+    {
+     "txt": "Un mesero virtual que atiende en la mesa, y un canal de domicilios propio, sin comisiones.",
+     "src": "/web/sitio/voz/es/hacemos-1.mp3",
+     "dur": 4.39
+    },
+    {
+     "txt": "Lo instalamos de forma remota, en toda Colombia y en otros países.",
+     "src": "/web/sitio/voz/es/hacemos-2.mp3",
+     "dur": 3.38
+    }
+   ],
+   "en": [
+    {
+     "txt": "We build technology for restaurants.",
+     "src": "/web/sitio/voz/en/hacemos-0.mp3",
+     "dur": 1.99
+    },
+    {
+     "txt": "A virtual waiter that serves at the table, and your own delivery channel, with no commissions.",
+     "src": "/web/sitio/voz/en/hacemos-1.mp3",
+     "dur": 5.04
+    },
+    {
+     "txt": "We install it remotely, anywhere in Colombia and in other countries.",
+     "src": "/web/sitio/voz/en/hacemos-2.mp3",
+     "dur": 3.96
+    }
+   ],
+   "pt": [
+    {
+     "txt": "Criamos tecnologia para restaurantes.",
+     "src": "/web/sitio/voz/pt/hacemos-0.mp3",
+     "dur": 2.28
+    },
+    {
+     "txt": "Um garçom virtual que atende na mesa e um canal de delivery próprio, sem comissões.",
+     "src": "/web/sitio/voz/pt/hacemos-1.mp3",
+     "dur": 4.58
+    },
+    {
+     "txt": "Instalamos de forma remota, em toda a Colômbia e em outros países.",
+     "src": "/web/sitio/voz/pt/hacemos-2.mp3",
+     "dur": 3.91
+    }
+   ]
+  }
+ },
+ {
+  "id": "play",
+  "seccion": "#play",
+  "resalta": "#play .telefono",
+  "frases": {
+   "es": [
+    {
+     "txt": "Este es Apex Play.",
+     "src": "/web/sitio/voz/es/play-0.mp3",
+     "dur": 0.94
+    },
+    {
+     "txt": "El cliente escanea el código QR de la mesa y yo lo atiendo: le muestro la carta con los platos en 3D y le recomiendo.",
+     "src": "/web/sitio/voz/es/play-1.mp3",
+     "dur": 5.69
+    },
+    {
+     "txt": "Tomo el pedido por voz, lo envío directo a la cocina, y hablo seis idiomas.",
+     "src": "/web/sitio/voz/es/play-2.mp3",
+     "dur": 3.86
+    }
+   ],
+   "en": [
+    {
+     "txt": "This is Apex Play.",
+     "src": "/web/sitio/voz/en/play-0.mp3",
+     "dur": 1.56
+    },
+    {
+     "txt": "Your guest scans the QR code on the table and I take care of them: I show the menu with dishes in 3D and make recommendations.",
+     "src": "/web/sitio/voz/en/play-1.mp3",
+     "dur": 7.1
+    },
+    {
+     "txt": "I take the order by voice, send it straight to the kitchen, and I speak six languages.",
+     "src": "/web/sitio/voz/en/play-2.mp3",
+     "dur": 4.8
+    }
+   ],
+   "pt": [
+    {
+     "txt": "Este é o Apex Play.",
+     "src": "/web/sitio/voz/pt/play-0.mp3",
+     "dur": 1.15
+    },
+    {
+     "txt": "O cliente escaneia o QR code da mesa e eu o atendo: mostro o cardápio com os pratos em 3D e faço recomendações.",
+     "src": "/web/sitio/voz/pt/play-1.mp3",
+     "dur": 6.98
+    },
+    {
+     "txt": "Anoto o pedido por voz, envio direto para a cozinha e falo seis idiomas.",
+     "src": "/web/sitio/voz/pt/play-2.mp3",
+     "dur": 4.32
+    }
+   ]
+  }
+ },
+ {
+  "id": "domicilios",
+  "seccion": "#domicilios",
+  "resalta": "#domicilios .telefono",
+  "frases": {
+   "es": [
+    {
+     "txt": "Y este es Apex Domicilios: su propio canal de domicilios.",
+     "src": "/web/sitio/voz/es/domicilios-0.mp3",
+     "dur": 3.19
+    },
+    {
+     "txt": "Sin pagar comisiones por cada pedido.",
+     "src": "/web/sitio/voz/es/domicilios-1.mp3",
+     "dur": 1.75
+    },
+    {
+     "txt": "Verifico los pagos por Nequi automáticamente, y su cliente sigue el pedido en vivo.",
+     "src": "/web/sitio/voz/es/domicilios-2.mp3",
+     "dur": 3.91
+    }
+   ],
+   "en": [
+    {
+     "txt": "And this is Apex Domicilios: your own delivery channel.",
+     "src": "/web/sitio/voz/en/domicilios-0.mp3",
+     "dur": 4.08
+    },
+    {
+     "txt": "No commissions on every order.",
+     "src": "/web/sitio/voz/en/domicilios-1.mp3",
+     "dur": 1.58
+    },
+    {
+     "txt": "I verify Nequi payments automatically, and your customer tracks the order live.",
+     "src": "/web/sitio/voz/en/domicilios-2.mp3",
+     "dur": 4.54
+    }
+   ],
+   "pt": [
+    {
+     "txt": "E este é o Apex Domicilios: o seu próprio canal de delivery.",
+     "src": "/web/sitio/voz/pt/domicilios-0.mp3",
+     "dur": 3.43
+    },
+    {
+     "txt": "Sem pagar comissão por pedido.",
+     "src": "/web/sitio/voz/pt/domicilios-1.mp3",
+     "dur": 1.8
+    },
+    {
+     "txt": "Verifico os pagamentos pelo Nequi automaticamente, e o seu cliente acompanha o pedido ao vivo.",
+     "src": "/web/sitio/voz/pt/domicilios-2.mp3",
+     "dur": 5.04
+    }
+   ]
+  }
+ },
+ {
+  "id": "restaurante",
+  "seccion": "#su-restaurante",
+  "resalta": ".formulario",
+  "frases": {
+   "es": [
+    {
+     "txt": "Y ahora, lo mejor.",
+     "src": "/web/sitio/voz/es/restaurante-0.mp3",
+     "dur": 1.2
+    },
+    {
+     "txt": "Escriba aquí el nombre de su restaurante y tres de sus platos.",
+     "src": "/web/sitio/voz/es/restaurante-1.mp3",
+     "dur": 2.69
+    },
+    {
+     "txt": "Le muestro cómo se vería Apex funcionando en su propio negocio.",
+     "src": "/web/sitio/voz/es/restaurante-2.mp3",
+     "dur": 2.81
+    }
+   ],
+   "en": [
+    {
+     "txt": "And now, the best part.",
+     "src": "/web/sitio/voz/en/restaurante-0.mp3",
+     "dur": 1.3
+    },
+    {
+     "txt": "Type your restaurant's name and three of your dishes here.",
+     "src": "/web/sitio/voz/en/restaurante-1.mp3",
+     "dur": 2.66
+    },
+    {
+     "txt": "I'll show you how Apex would look running in your own business.",
+     "src": "/web/sitio/voz/en/restaurante-2.mp3",
+     "dur": 2.86
+    }
+   ],
+   "pt": [
+    {
+     "txt": "E agora, o melhor.",
+     "src": "/web/sitio/voz/pt/restaurante-0.mp3",
+     "dur": 1.27
+    },
+    {
+     "txt": "Escreva aqui o nome do seu restaurante e três dos seus pratos.",
+     "src": "/web/sitio/voz/pt/restaurante-1.mp3",
+     "dur": 3.19
+    },
+    {
+     "txt": "Vou mostrar como o Apex ficaria funcionando no seu próprio negócio.",
+     "src": "/web/sitio/voz/pt/restaurante-2.mp3",
+     "dur": 3.53
+    }
+   ]
+  }
+ },
+ {
+  "id": "trabajamos",
+  "seccion": "#trabajamos",
+  "resalta": ".pasos",
+  "frases": {
+   "es": [
+    {
+     "txt": "Así trabajamos: conversamos, configuramos su carta y su voz, e instalamos en cinco a siete días hábiles.",
+     "src": "/web/sitio/voz/es/trabajamos-0.mp3",
+     "dur": 5.66
+    },
+    {
+     "txt": "Y lo acompañamos todos los días, de seis de la mañana a once de la noche.",
+     "src": "/web/sitio/voz/es/trabajamos-1.mp3",
+     "dur": 3.36
+    }
+   ],
+   "en": [
+    {
+     "txt": "Here's how we work: we talk, we set up your menu and your voice, and we install in five to seven business days.",
+     "src": "/web/sitio/voz/en/trabajamos-0.mp3",
+     "dur": 6.53
+    },
+    {
+     "txt": "And we support you every day, from six in the morning to eleven at night.",
+     "src": "/web/sitio/voz/en/trabajamos-1.mp3",
+     "dur": 4.13
+    }
+   ],
+   "pt": [
+    {
+     "txt": "É assim que trabalhamos: conversamos, configuramos seu cardápio e sua voz, e instalamos em cinco a sete dias úteis.",
+     "src": "/web/sitio/voz/pt/trabajamos-0.mp3",
+     "dur": 7.1
+    },
+    {
+     "txt": "E acompanhamos você todos os dias, das seis da manhã às onze da noite.",
+     "src": "/web/sitio/voz/pt/trabajamos-1.mp3",
+     "dur": 4.15
+    }
+   ]
+  }
+ },
+ {
+  "id": "contacto",
+  "seccion": "#contacto",
+  "resalta": ".cierre .acciones",
+  "frases": {
+   "es": [
+    {
+     "txt": "¿Hablamos de su restaurante?",
+     "src": "/web/sitio/voz/es/contacto-0.mp3",
+     "dur": 1.2
+    },
+    {
+     "txt": "Escríbanos por WhatsApp o agende una reunión, presencial o virtual.",
+     "src": "/web/sitio/voz/es/contacto-1.mp3",
+     "dur": 3.48
+    },
+    {
+     "txt": "Fue un gusto mostrarle Apex.",
+     "src": "/web/sitio/voz/es/contacto-2.mp3",
+     "dur": 1.34
+    }
+   ],
+   "en": [
+    {
+     "txt": "Shall we talk about your restaurant?",
+     "src": "/web/sitio/voz/en/contacto-0.mp3",
+     "dur": 1.2
+    },
+    {
+     "txt": "Message us on WhatsApp or book a meeting, in person or online.",
+     "src": "/web/sitio/voz/en/contacto-1.mp3",
+     "dur": 3.82
+    },
+    {
+     "txt": "It was a pleasure showing you Apex.",
+     "src": "/web/sitio/voz/en/contacto-2.mp3",
+     "dur": 1.73
+    }
+   ],
+   "pt": [
+    {
+     "txt": "Vamos falar sobre o seu restaurante?",
+     "src": "/web/sitio/voz/pt/contacto-0.mp3",
+     "dur": 1.85
+    },
+    {
+     "txt": "Fale conosco pelo WhatsApp ou agende uma reunião, presencial ou online.",
+     "src": "/web/sitio/voz/pt/contacto-1.mp3",
+     "dur": 4.25
+    },
+    {
+     "txt": "Foi um prazer mostrar a Apex para você.",
+     "src": "/web/sitio/voz/pt/contacto-2.mp3",
+     "dur": 1.99
+    }
+   ]
+  }
+ }
+]

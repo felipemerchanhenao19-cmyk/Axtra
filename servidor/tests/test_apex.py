@@ -508,3 +508,16 @@ def test_la_carta_trae_fotos_y_la_torta_en_3d(c):
     assert all(c.get(p["foto"]).status_code == 200 for p in m["menu"])                # las 5 fotos están en el servidor
     g = c.get("/web/modelos/torta.glb")
     assert g.status_code == 200 and g.content[:4] == b"glTF" and g.headers["content-type"] == "model/gltf-binary"
+
+
+def test_sitio_de_la_empresa(c):
+    r = c.get("/sitio")
+    assert r.status_code == 200 and "Apex Corporation" in r.text and "/web/sitio/sitio.js" in r.text
+    assert c.get("/", headers={"host": "apex.axtra.chat"}).text == r.text            # el subdominio apex.* abre el sitio
+    assert c.get("/", follow_redirects=False).headers["location"] == "/demo"           # el resto sigue yendo a la demo
+    guion = c.get("/web/sitio/voz/guion.json").json()
+    assert [g["id"] for g in guion][0] == "bienvenida" and {"es", "en", "pt"} <= set(guion[0]["frases"])
+    for g in guion:
+        for frases in g["frases"].values():
+            for f in frases:
+                assert c.get(f["src"]).status_code == 200 and f["dur"] > 0
