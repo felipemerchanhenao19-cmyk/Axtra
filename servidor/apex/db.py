@@ -44,6 +44,10 @@ def conn() -> sqlite3.Connection:
         if "entrega" not in {f["name"] for f in _conn.execute("PRAGMA table_info(pedidos)")}:
             _conn.execute("ALTER TABLE pedidos ADD COLUMN entrega TEXT DEFAULT ''")      # datos del domicilio
             _conn.commit()
+        if "persona" not in {f["name"] for f in _conn.execute("PRAGMA table_info(sesiones)")}:
+            _conn.execute("ALTER TABLE sesiones ADD COLUMN persona INTEGER DEFAULT 1")    # varias personas por mesa
+            _conn.execute("ALTER TABLE pedidos ADD COLUMN persona INTEGER DEFAULT 1")
+            _conn.commit()
     return _conn
 
 
@@ -84,11 +88,31 @@ def sesion_activa(rid: str, mesa: str):
                           "ORDER BY creada DESC LIMIT 1", (rid, mesa)).fetchone()
 
 
-def nueva_sesion(sid: str, rid: str, mesa: str, idioma: str = "") -> str:
+def nueva_sesion(sid: str, rid: str, mesa: str, idioma: str = "", persona: int = 1) -> str:
     secreto, ahora = secrets.token_urlsafe(24), time.time()
-    _ejecutar("INSERT INTO sesiones (id, secreto, restaurante, mesa, creada, actividad, idioma) VALUES (?,?,?,?,?,?,?)",
-              (sid, secreto, rid, mesa, ahora, ahora, idioma))
+    _ejecutar("INSERT INTO sesiones (id, secreto, restaurante, mesa, creada, actividad, idioma, persona) VALUES (?,?,?,?,?,?,?,?)",
+              (sid, secreto, rid, mesa, ahora, ahora, idioma, persona))
     return secreto
+
+
+def mesa_abierta_desde(rid: str, mesa: str) -> float:
+    """Cuándo se abrió la mesa: lo de antes es de otros clientes."""
+    f = conn().execute("SELECT cambiada FROM mesas WHERE restaurante=? AND mesa=?", (rid, mesa)).fetchone()
+    return (f["cambiada"] or 0) if f else 0
+
+
+def sesiones_mesa(rid: str, mesa: str, activas: bool = True) -> list:
+    """Las conversaciones de la mesa desde que se abrió (cada persona con su celular)."""
+    sql = "SELECT * FROM sesiones WHERE restaurante=? AND mesa=? AND creada>=?" + (" AND fin IS NULL" if activas else "")
+    return conn().execute(sql, (rid, mesa, mesa_abierta_desde(rid, mesa))).fetchall()
+
+
+def siguiente_persona(rid: str, mesa: str) -> int:
+    return max([s["persona"] or 1 for s in sesiones_mesa(rid, mesa, activas=False)], default=0) + 1
+
+
+def turnos_mesa(rid: str, mesa: str) -> int:
+    return sum(s["turnos"] for s in sesiones_mesa(rid, mesa, activas=False))
 
 
 def cambiar_idioma(sid: str, idioma: str):
@@ -160,10 +184,17 @@ def uso_mes(rid: str) -> dict:
 
 
 # ---------------- Pedidos y llamadas al mesero ----------------
-def nuevo_pedido(rid: str, mesa: str, sid: str, items: list, total: float, entrega: dict | None = None) -> int:
-    return _ejecutar("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado, entrega) VALUES (?,?,?,?,?,?,?)",
+def nuevo_pedido(rid: str, mesa: str, sid: str, items: list, total: float, entrega: dict | None = None, persona: int = 1) -> int:
+    return _ejecutar("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado, entrega, persona) VALUES (?,?,?,?,?,?,?,?)",
                      (rid, mesa, sid, json.dumps(items, ensure_ascii=False), total, time.time(),
-                      json.dumps(entrega, ensure_ascii=False) if entrega else "")).lastrowid
+                      json.dumps(entrega, ensure_ascii=False) if entrega else "", persona)).lastrowid
+
+
+def pedidos_mesa(rid: str, mesa: str) -> list:
+    """Lo que ya pidió la mesa desde que se abrió (todas las personas)."""
+    return [_pedido_dict(f) for f in conn().execute(
+        "SELECT * FROM pedidos WHERE restaurante=? AND mesa=? AND creado>=? AND estado!='cancelado' ORDER BY id",
+        (rid, mesa, mesa_abierta_desde(rid, mesa)))]
 
 
 def _pedido_dict(f) -> dict:

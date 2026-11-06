@@ -166,7 +166,8 @@ def instrucciones(r: dict, mesa: str) -> str:
         for p in r["menu"])
     dom = r.get("domicilio")
     donde = ("Atiendes pedidos A DOMICILIO" if dom
-             else f"Atiendes la mesa {mesa}")
+             else f"Atiendes la mesa {mesa}. En la mesa puede haber varias personas y cada una te habla desde su propio "
+                  "celular: atiendes SOLO a la persona de este celular; su pedido se suma al de la mesa")
     ayuda = ("dile que puede escribir al restaurante por WhatsApp" if dom
              else "ofrece llamar al mesero\n   (herramienta llamar_mesero)")
     cierre = ("""4. Tú NO envías el pedido. Cuando el cliente diga que ya terminó, usa ver_pedido, repítelo (solo platos y
@@ -262,9 +263,10 @@ def ejecutar(r: dict, s, nombre: str, args: dict) -> dict:
         if not items:
             return {"ok": False, "error": "El pedido está vacío."}
         res = resumen(r, items)
-        num = db.nuevo_pedido(r["id"], mesa, sid, items, res["total_numero"])
+        persona = s["persona"] if "persona" in s.keys() and s["persona"] else 1
+        num = db.nuevo_pedido(r["id"], mesa, sid, items, res["total_numero"], persona=persona)
         db.guardar_carrito(sid, [])
-        return {"ok": True, "pedido_numero": num, "enviado_a": "caja", **res,
+        return {"ok": True, "pedido_numero": num, "enviado_a": "caja", "persona": persona, **res,
                 "siguiente": f"Despídete: «{r['frases']['despedida']}»"}
     if nombre == "llamar_mesero":
         db.llamar_mesero(r["id"], mesa, str(args.get("motivo") or "")[:200])

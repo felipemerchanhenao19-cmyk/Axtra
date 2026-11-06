@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0b1626">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Figtree:wght@400;500;600;700;800&display=swap">
-<script src="/web/apex-voz.js?v=11"></script>
+<script src="/web/apex-voz.js?v=12"></script>
 <script src="/web/orbe-saturno.js?v=2"></script>
 <script src="/web/qrcode.js?v=2"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
@@ -93,6 +93,9 @@ canvas { display: block; width: 100%; height: 100%; }
 .linea { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 16px; padding: 12px 14px; }
 .linea b { font-size: 15px; } .linea .sub-l { color: var(--oro); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .linea .ctrl { display: flex; align-items: center; gap: 8px; grid-row: span 2; grid-column: 2; grid-row-start: 1; }
+.mesa-linea { grid-template-columns: 1fr auto; }
+.mesa-linea .platos-mesa { grid-column: 1 / -1; color: var(--suave); font-size: 13px; }
+.mesa-total { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--linea); font-weight: 800; }
 .quitar { color: var(--rojo); font-size: 13px; font-weight: 700; padding: 8px 10px; border: 1px solid rgba(255,138,128,.35); }
 .total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; padding-top: 14px; border-top: 1px dashed #2a3a52; font-size: 18px; font-weight: 800; }
 .total span:last-child { color: var(--oro); font-variant-numeric: tabular-nums; }
@@ -199,6 +202,7 @@ canvas { display: block; width: 100%; height: 100%; }
         <div><div class="mesa" id="mesa-cab" data-t="ejemplo">Ejemplo</div><div class="rest nombre-rest">Su restaurante</div></div>
         <div style="display:flex;gap:6px">
           <button class="chip on" id="sonido" aria-pressed="true" aria-label="Voz del orbe">🔊</button>
+          <button class="chip" id="la-mesa" data-t="la_mesa" hidden>👥 La mesa</button>
           <button class="chip" id="mesero" data-t="mesero">🙋 Mesero</button>
         </div>
       </div>
@@ -222,6 +226,7 @@ canvas { display: block; width: 100%; height: 100%; }
     <div class="recibo" id="recibo"></div>
     <div class="botones-fin">
       <button class="principal" id="otra-vez" data-t="mas">Pedir algo más</button>
+      <button class="chip" id="la-mesa-fin" data-t="la_mesa" hidden>👥 La mesa</button>
     </div>
   </section>
 </div>
@@ -233,7 +238,7 @@ const $ = (s) => document.querySelector(s);
 const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* ---------- Idiomas: textos de la pantalla (la carta y la voz del orbe vienen del servidor) ---------- */
 const TEXTOS = {
-  es: { locale: "es-CO", ver3d: "Ver en 3D", en_mesa: "Ver en su mesa", ejemplo: "Ejemplo", toque: "Toque el orbe", sub: "y vea la carta. Puede hablarle o pedir con botones.", qr: "Mostrar código QR",
+  es: { persona: "Persona", la_mesa: "👥 La mesa", mesa_titulo: "Lo que ha pedido la mesa", mesa_vacia: "Nadie de la mesa ha enviado su pedido todavía.", tu: "(usted)", total_mesa: "Total de la mesa", conectadas: "personas conectadas", locale: "es-CO", ver3d: "Ver en 3D", en_mesa: "Ver en su mesa", ejemplo: "Ejemplo", toque: "Toque el orbe", sub: "y vea la carta. Puede hablarle o pedir con botones.", qr: "Mostrar código QR",
         escanee: "Escanee y pruébelo", cerrar: "Cerrar", mesero: "🙋 Mesero", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DE HOY",
         su_pedido: "Su pedido", revise: "Revise antes de enviar. ¿Se equivocó? Quítelo aquí.", vacio: "Su pedido está vacío.", total: "Total",
         quitar: "Quitar", confirmar: "Confirmar pedido", seguir: "Seguir mirando la carta", oferta: (n, a, b) => `Hoy tenemos <b>oferta en ${n}</b>${a ? `: de ${a} a <b>${b}</b>` : ""}. ¿Le gustaría pedirlo?`,
@@ -243,7 +248,7 @@ const TEXTOS = {
         estados: { conectando: "Conectando…", escuchando: "🎙 Hable ahora", oyendo: "🎙 Le escucho…", pensando: "Pensando…", hablando: "", listo: "Toque el orbe para hablar", dormido: "Toque el orbe para hablar" },
         sin_mic: "Sin micrófono: pida con los botones, el orbe le sigue hablando.", sin_voz: "El sistema de voz está fallando. Por favor, seleccione lo que quiere pedir.",
         mesero_ok: "🙋 Listo, el mesero ya viene.", carga: "No se pudo cargar la carta. Revise la conexión." },
-  en: { locale: "en-US", ver3d: "View in 3D", en_mesa: "See it on your table", ejemplo: "Demo", toque: "Tap the orb", sub: "to see the menu. Talk to it or order with the buttons.", qr: "Show QR code",
+  en: { persona: "Guest", la_mesa: "👥 Table", mesa_titulo: "What the table has ordered", mesa_vacia: "No one at the table has sent an order yet.", tu: "(you)", total_mesa: "Table total", conectadas: "people connected", locale: "en-US", ver3d: "View in 3D", en_mesa: "See it on your table", ejemplo: "Demo", toque: "Tap the orb", sub: "to see the menu. Talk to it or order with the buttons.", qr: "Show QR code",
         escanee: "Scan to try it", cerrar: "Close", mesero: "🙋 Server", ver: "View order", pedir: "Order", oferta_tag: "TODAY'S DEAL",
         su_pedido: "Your order", revise: "Check before sending. Made a mistake? Remove it here.", vacio: "Your order is empty.", total: "Total",
         quitar: "Remove", confirmar: "Confirm order", seguir: "Keep browsing the menu", oferta: (n, a, b) => `Today's deal: <b>${n}</b>${a ? `, from ${a} to <b>${b}</b>` : ""}. Would you like it?`,
@@ -253,7 +258,7 @@ const TEXTOS = {
         estados: { conectando: "Connecting…", escuchando: "🎙 Speak now", oyendo: "🎙 Listening…", pensando: "Thinking…", hablando: "", listo: "Tap the orb to talk", dormido: "Tap the orb to talk" },
         sin_mic: "No microphone: order with the buttons, the orb will keep talking to you.", sin_voz: "The voice system is having trouble. Please select what you'd like to order.",
         mesero_ok: "🙋 A server is on the way.", carga: "Couldn't load the menu. Check your connection." },
-  pt: { locale: "pt-BR", ver3d: "Ver em 3D", en_mesa: "Ver na sua mesa", ejemplo: "Exemplo", toque: "Toque no orbe", sub: "e veja o cardápio. Fale com ele ou peça pelos botões.", qr: "Mostrar código QR",
+  pt: { persona: "Pessoa", la_mesa: "👥 A mesa", mesa_titulo: "O que a mesa já pediu", mesa_vacia: "Ninguém da mesa enviou o pedido ainda.", tu: "(você)", total_mesa: "Total da mesa", conectadas: "pessoas conectadas", locale: "pt-BR", ver3d: "Ver em 3D", en_mesa: "Ver na sua mesa", ejemplo: "Exemplo", toque: "Toque no orbe", sub: "e veja o cardápio. Fale com ele ou peça pelos botões.", qr: "Mostrar código QR",
         escanee: "Escaneie e experimente", cerrar: "Fechar", mesero: "🙋 Garçom", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DO DIA",
         su_pedido: "Seu pedido", revise: "Confira antes de enviar. Errou? Tire aqui.", vacio: "Seu pedido está vazio.", total: "Total",
         quitar: "Tirar", confirmar: "Confirmar pedido", seguir: "Continuar vendo o cardápio", oferta: (n, a, b) => `Hoje temos <b>oferta em ${n}</b>${a ? `: de ${a} por <b>${b}</b>` : ""}. Gostaria de pedir?`,
@@ -263,7 +268,7 @@ const TEXTOS = {
         estados: { conectando: "Conectando…", escuchando: "🎙 Fale agora", oyendo: "🎙 Ouvindo…", pensando: "Pensando…", hablando: "", listo: "Toque no orbe para falar", dormido: "Toque no orbe para falar" },
         sin_mic: "Sem microfone: peça pelos botões, o orbe continua falando com você.", sin_voz: "O sistema de voz está com falha. Por favor, selecione o que deseja pedir.",
         mesero_ok: "🙋 Pronto, o garçom já vem.", carga: "Não foi possível carregar o cardápio. Verifique a conexão." },
-  de: { locale: "de-DE", ver3d: "In 3D ansehen", en_mesa: "Auf Ihrem Tisch ansehen", ejemplo: "Beispiel", toque: "Tippen Sie auf die Kugel", sub: "und sehen Sie die Karte. Sprechen Sie oder bestellen Sie mit Tasten.", qr: "QR-Code zeigen",
+  de: { persona: "Person", la_mesa: "👥 Tisch", mesa_titulo: "Was der Tisch bestellt hat", mesa_vacia: "Am Tisch wurde noch nichts bestellt.", tu: "(Sie)", total_mesa: "Tischsumme", conectadas: "Personen verbunden", locale: "de-DE", ver3d: "In 3D ansehen", en_mesa: "Auf Ihrem Tisch ansehen", ejemplo: "Beispiel", toque: "Tippen Sie auf die Kugel", sub: "und sehen Sie die Karte. Sprechen Sie oder bestellen Sie mit Tasten.", qr: "QR-Code zeigen",
         escanee: "Scannen und ausprobieren", cerrar: "Schließen", mesero: "🙋 Kellner", ver: "Bestellung", pedir: "Bestellen", oferta_tag: "ANGEBOT DES TAGES",
         su_pedido: "Ihre Bestellung", revise: "Vor dem Senden prüfen. Vertan? Hier entfernen.", vacio: "Ihre Bestellung ist leer.", total: "Summe",
         quitar: "Entfernen", confirmar: "Bestellung bestätigen", seguir: "Weiter in der Karte", oferta: (n, a, b) => `Heute im Angebot: <b>${n}</b>${a ? `, statt ${a} nur <b>${b}</b>` : ""}. Möchten Sie es?`,
@@ -273,7 +278,7 @@ const TEXTOS = {
         estados: { conectando: "Verbinde…", escuchando: "🎙 Jetzt sprechen", oyendo: "🎙 Ich höre…", pensando: "Einen Moment…", hablando: "", listo: "Zum Sprechen auf die Kugel tippen", dormido: "Zum Sprechen auf die Kugel tippen" },
         sin_mic: "Kein Mikrofon: Bestellen Sie mit den Tasten, die Kugel spricht weiter mit Ihnen.", sin_voz: "Das Sprachsystem hat eine Störung. Bitte wählen Sie aus, was Sie bestellen möchten.",
         mesero_ok: "🙋 Ein Kellner kommt.", carga: "Die Karte konnte nicht geladen werden. Prüfen Sie die Verbindung." },
-  ru: { locale: "ru-RU", ver3d: "Смотреть в 3D", en_mesa: "Посмотреть на столе", ejemplo: "Пример", toque: "Нажмите на сферу", sub: "и откройте меню. Говорите или заказывайте кнопками.", qr: "Показать QR-код",
+  ru: { persona: "Гость", la_mesa: "👥 Стол", mesa_titulo: "Что заказал стол", mesa_vacia: "За столом ещё никто не отправил заказ.", tu: "(вы)", total_mesa: "Итого за стол", conectadas: "подключено", locale: "ru-RU", ver3d: "Смотреть в 3D", en_mesa: "Посмотреть на столе", ejemplo: "Пример", toque: "Нажмите на сферу", sub: "и откройте меню. Говорите или заказывайте кнопками.", qr: "Показать QR-код",
         escanee: "Отсканируйте и попробуйте", cerrar: "Закрыть", mesero: "🙋 Официант", ver: "Мой заказ", pedir: "Заказать", oferta_tag: "АКЦИЯ ДНЯ",
         su_pedido: "Ваш заказ", revise: "Проверьте перед отправкой. Ошиблись? Уберите здесь.", vacio: "Ваш заказ пуст.", total: "Итого",
         quitar: "Убрать", confirmar: "Подтвердить заказ", seguir: "Вернуться к меню", oferta: (n, a, b) => `Сегодня акция: <b>${n}</b>${a ? ` — ${b} вместо ${a}` : ""}. Хотите заказать?`,
@@ -283,7 +288,7 @@ const TEXTOS = {
         estados: { conectando: "Подключение…", escuchando: "🎙 Говорите", oyendo: "🎙 Слушаю…", pensando: "Думаю…", hablando: "", listo: "Нажмите на сферу, чтобы говорить", dormido: "Нажмите на сферу, чтобы говорить" },
         sin_mic: "Нет микрофона: заказывайте кнопками, сфера продолжит говорить с вами.", sin_voz: "Голосовая система не работает. Пожалуйста, выберите, что хотите заказать.",
         mesero_ok: "🙋 Официант уже идёт.", carga: "Не удалось загрузить меню. Проверьте соединение." },
-  ja: { locale: "ja-JP", ver3d: "3Dで見る", en_mesa: "テーブルで見る", ejemplo: "デモ", toque: "オーブをタップ", sub: "してメニューを表示。話しかけるか、ボタンで注文できます。", qr: "QRコードを表示",
+  ja: { persona: "ゲスト", la_mesa: "👥 テーブル", mesa_titulo: "テーブルの注文", mesa_vacia: "まだ誰も注文を送っていません。", tu: "(あなた)", total_mesa: "テーブル合計", conectadas: "人が接続中", locale: "ja-JP", ver3d: "3Dで見る", en_mesa: "テーブルで見る", ejemplo: "デモ", toque: "オーブをタップ", sub: "してメニューを表示。話しかけるか、ボタンで注文できます。", qr: "QRコードを表示",
         escanee: "スキャンしてお試しください", cerrar: "閉じる", mesero: "🙋 スタッフ", ver: "注文を見る", pedir: "注文", oferta_tag: "本日の特別価格",
         su_pedido: "ご注文", revise: "送信前にご確認ください。間違えたらここで削除できます。", vacio: "ご注文はまだありません。", total: "合計",
         quitar: "削除", confirmar: "注文を確定", seguir: "メニューに戻る", oferta: (n, a, b) => `本日は<b>${n}</b>が特別価格${a ? `：${a} → <b>${b}</b>` : ""}。いかがですか？`,
@@ -298,12 +303,12 @@ const NOMBRES_IDIOMA = { es: "Español", en: "English", pt: "Português", de: "D
 let IDIOMA = (() => { const n = (navigator.language || "es").slice(0, 2).toLowerCase(); return TEXTOS[n] ? n : "es"; })();
 const T = () => TEXTOS[IDIOMA] || TEXTOS.es;
 let menu = null, plata = (v) => "$ " + Number(v).toLocaleString("es-CO");
-let pedido = {}, ultimoPedido = null, nivel = 0, estado = "apagado";
+let pedido = {}, ultimoPedido = null, nivel = 0, estado = "apagado", PERSONA = 0;
 const pensando = () => estado === "pensando" || estado === "conectando";
 function aplicarTextos() {
   document.documentElement.lang = IDIOMA;
   document.querySelectorAll("[data-t]").forEach((e) => { const v = T()[e.dataset.t]; if (typeof v === "string") e.textContent = v; });
-  if (MESA) $("#mesa-chip").textContent = $("#mesa-cab").textContent = `${T().mesa} ${MESA}`;
+  if (MESA) $("#mesa-chip").textContent = $("#mesa-cab").textContent = `${T().mesa} ${MESA}` + (PERSONA ? ` · ${T().persona} ${PERSONA}` : "");
   const botones = Object.entries(NOMBRES_IDIOMA).map(([c, n]) => `<button data-idioma="${c}" aria-pressed="${c === IDIOMA}" lang="${c}">${n}</button>`).join("");
   $("#idiomas-entrada").innerHTML = $("#idiomas-carta").innerHTML = botones;
   $("#estado").textContent = T().estados[estado] ?? "";
@@ -383,7 +388,7 @@ orbe.onpedido = (p) => {
 };
 orbe.onsinmic = () => aviso(T().sin_mic);
 orbe.onsinvoz = () => aviso(T().sin_voz);
-orbe.onerror = (m) => aviso(/conversación activa/.test(m) ? "Esta mesa ya está en uso en otro celular. Escanee el QR de otra mesa." : m);
+orbe.onerror = (m) => aviso(/máximo de personas/.test(m) ? "Esta mesa ya tiene el máximo de personas conectadas. Pida ayuda a un mesero." : m);
 
 function aviso(t) { const a = document.createElement("div"); a.className = "aviso"; a.textContent = t; document.body.append(a); setTimeout(() => a.remove(), 4500); }
 function decir(texto, botones) {
@@ -486,7 +491,7 @@ function enviado(p) {
   cerrarHoja();
   if (!p || !p.pedido_numero) return;
   const hora = new Date().toLocaleTimeString(T().locale, { hour: "numeric", minute: "2-digit" });
-  $("#recibo").innerHTML = `<h3><span>${T().pedido_n} #${p.pedido_numero}${MESA ? ` · ${T().mesa} ${esc(MESA)}` : ""}</span><span>${hora}</span></h3>` +
+  $("#recibo").innerHTML = `<h3><span>${T().pedido_n} #${p.pedido_numero}${MESA ? ` · ${T().mesa} ${esc(MESA)}` : ""}${p.persona && MESA ? ` · ${T().persona} ${p.persona}` : ""}</span><span>${hora}</span></h3>` +
     p.platos.map((l) => `<div class="r-linea"><span>${l.cantidad} × ${esc(l.plato)}</span><span>${plata(l.cantidad * PRECIO(l.id))}</span></div>`).join("") +
     `<div class="r-total"><span>${T().total}</span><span>${plata(p.total_numero)}</span></div>`;
   pedido = {}; pintar(); mostrar("p-enviado");
@@ -500,6 +505,22 @@ $("#sonido").onclick = () => { orbe.silencio = !orbe.silencio; const on = !orbe.
   $("#sonido").textContent = on ? "🔊" : "🔇"; $("#sonido").setAttribute("aria-pressed", on); $("#sonido").classList.toggle("on", on); };
 $("#mesero").onclick = async () => { await orbe.llamarMesero().catch((e) => aviso(e.message)); aviso(T().mesero_ok); };
 $("#otra-vez").onclick = () => { mostrar("p-carta"); decir(T().que_mas); };
+/* Varias personas por mesa: cada una pide desde su celular y aquí se ve lo que ya pidió toda la mesa. */
+orbe.onsesion = (s) => { if (!MESA || !s.persona) return; PERSONA = s.persona; aplicarTextos(); $("#la-mesa").hidden = $("#la-mesa-fin").hidden = false; };
+async function verMesa() {
+  let m; try { m = await orbe.verMesa(); } catch (e) { return aviso(e.message); }
+  $(".hoja")?.remove(); $(".velo")?.remove();
+  const velo = document.createElement("div"); velo.className = "velo"; velo.onclick = cerrarHoja;
+  const hoja = document.createElement("div"); hoja.className = "hoja"; hoja.setAttribute("role", "dialog"); hoja.setAttribute("aria-label", T().mesa_titulo);
+  const lineas = m.pedidos.map((p) => `<div class="linea mesa-linea"><b>${T().persona} ${p.persona} ${p.persona === m.yo ? T().tu : ""}</b><span class="sub-l">${esc(p.total)}</span>
+      <span class="platos-mesa">${p.items.map((i) => `${i.cantidad} × ${esc(i.nombre)}`).join(" · ")}</span></div>`).join("");
+  hoja.innerHTML = `<div class="agarre"></div><h2>${T().mesa_titulo}</h2><p class="sub">${T().mesa} ${esc(MESA)} · ${m.personas} ${T().conectadas}</p>
+    <div class="lineas">${lineas || `<p class="vacio">${T().mesa_vacia}</p>`}</div>
+    ${m.pedidos.length ? `<div class="r-total mesa-total"><span>${T().total_mesa}</span><span>${esc(m.total)}</span></div>` : ""}
+    <div class="botones-fin"><button class="principal" id="cerrar-mesa">${T().cerrar}</button></div>`;
+  document.body.append(velo, hoja); $("#cerrar-mesa").onclick = cerrarHoja;
+}
+$("#la-mesa").onclick = verMesa; $("#la-mesa-fin").onclick = verMesa;
 addEventListener("pagehide", () => orbe.terminar("salió de la página"));
 
 async function cargarMenu() {

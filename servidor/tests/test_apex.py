@@ -140,11 +140,38 @@ def test_origen_no_permitido(c):
     assert ok.status_code == 204 and "X-Apex-Sesion" in ok.headers["access-control-allow-headers"]
 
 
-def test_una_sesion_por_mesa_y_retomar(c):
+def test_varias_personas_por_mesa_y_retomar(c):
     abrir(c)
     s1 = sesion(c).json()
-    assert sesion(c).status_code == 409                 # otro teléfono con la foto del QR
-    assert sesion(c, anterior={"sesion": s1["sesion"], "secreto": s1["secreto"]}).status_code == 200
+    s2 = sesion(c).json()                               # otra persona de la mesa escanea el mismo QR con su celular
+    assert s1["persona"] == 1 and s2["persona"] == 2 and s1["sesion"] != s2["sesion"]
+    otra = sesion(c, anterior={"sesion": s1["sesion"], "secreto": s1["secreto"]}).json()
+    assert otra["sesion"] == s1["sesion"] and otra["retomada"] and otra["persona"] == 1     # el mismo celular sigue donde iba
+    falsa = sesion(c, anterior={"sesion": s1["sesion"], "secreto": "inventado"}).json()
+    assert falsa["sesion"] != s1["sesion"] and falsa["persona"] == 3                        # sin el secreto no se roba la conversación
+
+
+def test_la_mesa_suma_los_pedidos_de_cada_persona(c, monkeypatch):
+    abrir(c, "3")
+    a, b = sesion(c, "3").json(), sesion(c, "3").json()
+    accion(c, a, "pedir", plato_id="ajiaco"); accion(c, b, "pedir", plato_id="bandeja")
+    assert accion(c, a, "ver").json()["pedido"]["platos"] == [{"id": "ajiaco", "plato": "Ajiaco santafereño", "cantidad": 1}]  # cada carrito es propio
+    for quien, numero in ((a, 1), (b, 2)):
+        r = accion(c, quien, "confirmar").json()
+        if r.get("oferta"):                              # el orbe ofrece una vez la oferta del día; se dice que no
+            r = accion(c, quien, "confirmar").json()
+        assert r["pedido"]["persona"] == numero
+    mesa = accion(c, b, "mesa").json()
+    assert [p["persona"] for p in mesa["pedidos"]] == [1, 2] and mesa["total_numero"] == 32000 + 38000 and mesa["personas"] == 2
+    panel = c.get("/v1/panel/demo", headers=PIN).json()
+    assert {p["persona"] for p in panel["pedidos"] if p["mesa"] == "3"} == {1, 2}
+    assert next(m for m in panel["mesas"] if m["mesa"] == "3")["personas"] == 2
+    abrir(c, "3", False); abrir(c, "3")                 # nuevos clientes en la mesa: empiezan de cero
+    nueva = sesion(c, "3").json()
+    assert nueva["persona"] == 1 and accion(c, nueva, "mesa").json()["pedidos"] == []
+    monkeypatch.setitem(config.TOPES_POR_DEFECTO, "personas_por_mesa", 1)
+    monkeypatch.setattr(config, "restaurante", lambda rid, _orig=config.restaurante: {**_orig(rid), "topes": {**_orig(rid)["topes"], "personas_por_mesa": 1}})
+    assert sesion(c, "3").status_code == 409            # tope de personas conectadas en una mesa
 
 
 def test_turno_completo_con_herramientas(c, axtra):

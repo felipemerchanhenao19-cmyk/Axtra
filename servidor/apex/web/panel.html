@@ -91,13 +91,13 @@ async function cargar() {
   const u = d.uso_mes, t = d.topes;
   $("#uso").textContent = `Este mes: ${u.conversaciones} conversaciones · ${u.pedidos} pedidos (${plata(u.ventas)}) · orbe ${plata(u.gasto_cop)} de ${plata(t.tope_cop_mes)}`;
   $("#mesas").innerHTML = d.mesas.map((m) => `<div class="mesa ${m.abierta ? "on" : ""}" data-m="${esc(m.mesa)}" data-a="${m.abierta ? 1 : 0}">
-    <b>${esc(m.mesa)}</b><small>${m.abierta ? (m.hablando ? "abierta · hablando" : "abierta") : "cerrada"}</small></div>`).join("");
+    <b>${esc(m.mesa)}</b><small>${m.abierta ? (m.hablando ? `abierta · ${m.personas || 1} ${(m.personas || 1) === 1 ? "persona" : "personas"}` : "abierta") : "cerrada"}</small></div>`).join("");
   document.querySelectorAll(".mesa").forEach((el) => el.onclick = async () => { await api("/mesa", { mesa: el.dataset.m, abierta: el.dataset.a !== "1" }); cargar(); });
   $("#llamadas").innerHTML = d.llamadas.length ? d.llamadas.map((l) => `<div class="card llamada fila"><span><b>Mesa ${esc(l.mesa)}</b> · ${hora(l.creada)} ${l.motivo ? "· " + esc(l.motivo) : ""}</span>
     <button data-l="${l.id}">Atendida</button></div>`).join("") : `<p class="muted">Ninguna.</p>`;
   document.querySelectorAll("[data-l]").forEach((b) => b.onclick = async () => { await api(`/llamada/${b.dataset.l}`, {}); cargar(); });
   $("#pedidos").innerHTML = d.pedidos.length ? d.pedidos.map((p) => `<div class="card ${p.estado === "nuevo" ? "nuevo" : ""}">
-    <div class="fila"><b>${p.entrega ? `<span class="etq">DOMICILIO</span>` : ""}#${p.id}${p.entrega ? "" : " · Mesa " + esc(p.mesa)} · ${hora(p.creado)}</b><b>${plata(p.total)}</b></div>
+    <div class="fila"><b>${p.entrega ? `<span class="etq">DOMICILIO</span>` : ""}#${p.id}${p.entrega ? "" : " · Mesa " + esc(p.mesa) + (p.persona ? " · Persona " + p.persona : "")} · ${hora(p.creado)}</b><b>${plata(p.total)}</b></div>
     <div class="muted">${p.items.map((i) => `${i.cantidad} × ${esc(i.nombre)}${i.nota ? " (" + esc(i.nota) + ")" : ""}`).join(" · ")}</div>
     ${domicilio(p)}
     <div class="fila" style="margin-top:8px"><span></span><select data-p="${p.id}">${Object.keys(ESTADOS)

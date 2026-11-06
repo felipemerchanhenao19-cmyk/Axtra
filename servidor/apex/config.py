@@ -27,7 +27,8 @@ PRECIOS_USD = {
                               "Standard": 4.0, "edge": 0.0},
 }
 
-TOPES_POR_DEFECTO = {"tope_cop_mes": 80000, "minutos_por_sesion": 15, "turnos_por_sesion": 60}
+TOPES_POR_DEFECTO = {"tope_cop_mes": 80000, "minutos_por_sesion": 15, "turnos_por_sesion": 60,
+                     "personas_por_mesa": 8, "turnos_por_mesa": 150}   # varias personas por mesa, con tope de voz por mesa
 
 FRASES_POR_DEFECTO = {
     "saludo": "Estoy a su servicio, espero su pedido; si tiene dudas, lo atenderé.",

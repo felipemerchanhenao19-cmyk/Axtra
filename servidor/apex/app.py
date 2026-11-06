@@ -195,22 +195,29 @@ def crear_sesion(p: PedidoSesion, request: Request):
         secreto = db.nueva_sesion(sid, r["id"], "domicilio" if r.get("domicilio") else "ejemplo", idioma)
         return {"sesion": sid, "secreto": secreto, "frases": _frases(r), "saludo": r["frases"]["saludo"], "ejemplo": True,
                 "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
-    limitar(f"sesion-mesa:{r['id']}:{p.mesa}", 4, 60)
+    limitar(f"sesion-mesa:{r['id']}:{p.mesa}", 12, 60)
     if p.mesa not in r.get("mesas", []):
         raise HTTPException(404, "mesa no existe")
     if not orbe.mesa_abierta(r, p.mesa):
         raise HTTPException(403, "mesa cerrada: pida al mesero que la abra")
-    activa = db.sesion_activa(r["id"], p.mesa)
-    if activa:
-        propia = p.anterior and p.anterior.get("sesion") == activa["id"] and \
-            hmac.compare_digest(str(p.anterior.get("secreto", "")), activa["secreto"])
-        if not propia:
-            raise HTTPException(409, "ya hay una conversación activa en esta mesa")
-        db.terminar_sesion(activa["id"], "reemplazada")
+    # Cada persona de la mesa pide desde su celular: su propia conversación, y todo llega al pedido de la mesa.
+    previa = db.sesion(str((p.anterior or {}).get("sesion", ""))[:64]) if p.anterior else None
+    propia = previa is not None and previa["restaurante"] == r["id"] and previa["mesa"] == p.mesa and \
+        previa["creada"] >= db.mesa_abierta_desde(r["id"], p.mesa) and \
+        hmac.compare_digest(str(p.anterior.get("secreto", "")), previa["secreto"])
+    sin_voz = db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]
+    if propia and previa["fin"] is None:                 # el mismo celular vuelve: sigue su conversación y su carrito
+        if idioma:
+            db.cambiar_idioma(previa["id"], idioma)
+        return {"sesion": previa["id"], "secreto": previa["secreto"], "frases": _frases(r), "saludo": r["frases"]["saludo"],
+                "sin_voz": sin_voz, "persona": previa["persona"] or 1, "retomada": True}
+    if len(db.sesiones_mesa(r["id"], p.mesa)) >= r["topes"]["personas_por_mesa"]:
+        raise HTTPException(409, "esta mesa ya tiene el máximo de personas conectadas")
+    persona = (previa["persona"] or 1) if propia else db.siguiente_persona(r["id"], p.mesa)   # quien vuelve conserva su número
     sid = uuid.uuid4().hex
-    secreto = db.nueva_sesion(sid, r["id"], p.mesa, idioma)
+    secreto = db.nueva_sesion(sid, r["id"], p.mesa, idioma, persona)
     return {"sesion": sid, "secreto": secreto, "frases": _frases(r), "saludo": r["frases"]["saludo"],
-            "sin_voz": db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"]}
+            "sin_voz": sin_voz, "persona": persona}
 
 
 class Credencial(BaseModel):
@@ -244,7 +251,10 @@ def _respuesta(r: dict, s, texto: str = "", frase: str = "", **extra) -> dict:
 
 
 def _puede_gastar(r: dict, s) -> bool:
-    return db.gasto_mes(r["id"]) < r["topes"]["tope_cop_mes"] and s["turnos"] < r["topes"]["turnos_por_sesion"]
+    if db.gasto_mes(r["id"]) >= r["topes"]["tope_cop_mes"] or s["turnos"] >= r["topes"]["turnos_por_sesion"]:
+        return False
+    en_mesa = s["mesa"] not in ("ejemplo", "domicilio")      # en una mesa, el tope de voz es de toda la mesa
+    return not en_mesa or db.turnos_mesa(r["id"], s["mesa"]) < r["topes"]["turnos_por_mesa"]
 
 
 @app.post("/v1/turno")
@@ -261,22 +271,31 @@ async def turno(request: Request):
         log.warning("sin voz: tope del mes o de turnos (sesión %s, %s turnos)", s["id"][:8], s["turnos"])
         return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=actual())
     db.contar_turno(s["id"])
+    t = [time.perf_counter()]                            # cuánto tarda cada paso (oír, pensar, hablar), para encontrar la demora
     try:
         texto = await asyncio.to_thread(orbe.oir, r, s["id"], audio, request.headers.get("content-type", ""))
+        t.append(time.perf_counter())
         if len(texto.strip(" .,¿?¡!")) < 2:
             return _respuesta(r, s, frase="repetir")
         res = await asyncio.to_thread(orbe.conversar, r, s, {"role": "user", "content": texto[:600]})
+        t.append(time.perf_counter())
     except orbe.SinRanura as e:
         log.warning("turno de voz falló: %s", e)
         return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=actual())
     if res.get("frase"):
         log.warning("el cerebro falló a mitad del turno; lo hecho se guardó (sesión %s)", s["id"][:8])
-    return await asyncio.to_thread(_respuesta, r, s, res["texto"], res.get("frase", ""), despedida=bool(res["confirmado"]),
-                                   pedido=res["confirmado"] or res["pedido"] or actual(), oido=texto[:600])
+    out = await asyncio.to_thread(_respuesta, r, s, res["texto"], res.get("frase", ""), despedida=bool(res["confirmado"]),
+                                  pedido=res["confirmado"] or res["pedido"] or actual(), oido=texto[:600])
+    t.append(time.perf_counter())
+    out["tiempos"] = {"oir": round(t[1] - t[0], 2), "pensar": round(t[2] - t[1], 2), "voz": round(t[3] - t[2], 2),
+                      "audio_kb": round(len(audio) / 1024)}
+    log.info("turno %s: oír %.2f s · pensar %.2f s · voz %.2f s · audio %d KB", s["id"][:8], *(t[i + 1] - t[i] for i in range(3)),
+             len(audio) // 1024)
+    return out
 
 
 class Accion(Credencial):
-    tipo: str = Field(pattern="^(pedir|quitar|confirmar|pedir_todo|mesero|ver)$")
+    tipo: str = Field(pattern="^(pedir|quitar|confirmar|pedir_todo|mesero|ver|mesa)$")
     plato_id: str = Field("", max_length=60)
     cantidad: int = Field(1, ge=1, le=20)
 
@@ -302,6 +321,8 @@ def accion(a: Accion, request: Request):
     ventas = r.get("ventas") or {}
     if a.tipo == "ver":                                  # solo el pedido real (para resincronizar la pantalla)
         return {"frase": None, "audio": None, "texto": "", "pedido": orbe.ejecutar(r, s, "ver_pedido", {})}
+    if a.tipo == "mesa":                                 # lo que ya pidió toda la mesa (para no repetir y para la cuenta)
+        return _mesa(r, s)
     if a.tipo == "mesero":
         if r.get("domicilio"):
             raise HTTPException(400, "en domicilios no hay mesero: escriba al restaurante por WhatsApp")
@@ -358,6 +379,17 @@ def accion(a: Accion, request: Request):
     except orbe.SinRanura:
         return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=pedido)
     return _respuesta(r, s, res["texto"], pedido=res["pedido"] or pedido, despedida=bool(res["confirmado"]))
+
+
+def _mesa(r: dict, s) -> dict:
+    if s["mesa"] in ("ejemplo", "domicilio"):
+        return {"mesa": None, "personas": 1, "pedidos": [], "total_numero": 0}
+    pedidos = db.pedidos_mesa(r["id"], s["mesa"])
+    total = sum(p["total"] for p in pedidos)
+    return {"mesa": s["mesa"], "yo": s["persona"] or 1, "personas": len(db.sesiones_mesa(r["id"], s["mesa"])),
+            "pedidos": [{"persona": p["persona"] or 1, "items": p["items"], "total": orbe.precio(r, p["total"]), "estado": p["estado"]}
+                        for p in pedidos],
+            "total": orbe.precio(r, total), "total_numero": total}
 
 
 class Entrega(Credencial):
@@ -485,9 +517,13 @@ def _panel(request: Request, rid: str) -> dict:
 def panel_estado(rid: str, request: Request):
     r = _panel(request, rid)
     abiertas = db.mesas(rid)
-    activas = {s["mesa"] for s in db.sesiones_abiertas() if s["restaurante"] == rid}
+    activas = defaultdict(int)
+    for s in db.sesiones_abiertas():
+        if s["restaurante"] == rid:
+            activas[s["mesa"]] += 1
     return {"restaurante": r["nombre"], "moneda": r.get("moneda", "COP"), "domicilio": bool(r.get("domicilio")),
-            "mesas": [{"mesa": m, "abierta": abiertas.get(m, False), "hablando": m in activas} for m in r["mesas"]],
+            "mesas": [{"mesa": m, "abierta": abiertas.get(m, False), "hablando": activas[m] > 0, "personas": activas[m]}
+                      for m in r["mesas"]],
             "pedidos": db.pedidos(rid), "llamadas": db.llamadas(rid),
             "uso_mes": db.uso_mes(rid), "topes": r["topes"]}
 
