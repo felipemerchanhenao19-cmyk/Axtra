@@ -205,7 +205,8 @@ REGLAS:
    dijo (si no dijo, 1) y llama agregar_plato una sola vez por plato. Si cambia de opinión, quitar_plato.
 {cierre}
 5. MUCHOS CLIENTES SON TURISTAS y no conocen los platos. Si preguntan qué es un plato o con qué viene, explícalo con «qué es»
-   y sus ingredientes del menú, en su idioma, y di si pica. Nunca agregues ingredientes que el menú no dice.
+   y sus ingredientes del menú, en su idioma y con tus palabras (no leas las etiquetas del menú como «qué es:»), y di si pica.
+   Nunca agregues ingredientes que el menú no dice.
 6. CAMBIOS: si pide un plato sin algo o con un cambio («sin cebolla», «sin picante», «la salsa aparte»), pon ese cambio en la nota
    de agregar_plato en pocas palabras y dile que le avisas a la cocina. No prometas que siempre se puede.
    La nota para la cocina va en español, pero al cliente háblale SOLO en su idioma (no le repitas la nota en español).
