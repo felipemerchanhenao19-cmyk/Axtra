@@ -301,6 +301,38 @@ def menciona_alergia(texto: str) -> bool:
     return bool(ALERGIA.search(texto or ""))
 
 
+# Cada alérgeno de la carta (siempre en español) y cómo lo dice un cliente en sus idiomas.
+ALERGENOS = {
+    "huevo": r"huevos?|\beggs?\b|\bovos?\b|\b(?:œ|oe)ufs?\b|\beier?\b|яйц|卵|たまご",
+    "lácteos": r"l[aá]cte|leche|lactosa|queso|\bdairy\b|\bmilk\b|lactose|cheese|leite|latic[ií]n|\blait\b|laitier|fromage|milch|laktose|k[äa]se|молок|лактоз|乳",
+    "gluten": r"gluten|trigo|wheat|cel[ií]ac|coeliac|\bbl[ée]\b|weizen|глютен|пшениц|グルテン|小麦",
+    "maní": r"\bman[ií]\b|cacahuat|peanut|amendoim|arachide|cacahu[eè]te|erdn[üu]ss|арахис|ピーナッツ|落花生",
+    "nueces": r"\bnuez\b|nueces|tree ?nuts?|\bnuts\b|almendra|almond|\bnoz(?:es)?\b|\bnoix\b|n[üu]sse|орех|ナッツ",
+    "mariscos": r"marisco|camar[oó]n|shellfish|shrimp|frutos do mar|camar[aã]o|fruits de mer|crevette|meeresfr[üu]cht|garnele|морепродукт|креветк|甲殻|エビ|えび",
+    "pescado": r"pescado|\bfish\b|peixe|poisson|\bfisch|рыб|魚",
+    "soya": r"\bsoya\b|\bsoja\b|\bsoy\b|\bсо[яи]\b|大豆",
+    "sésamo": r"s[ée]samo|sesame|gergelim|s[ée]same|\bsesam\b|кунжут|ごま",
+}
+_ALERGENOS = {k: re.compile(v, re.IGNORECASE) for k, v in ALERGENOS.items()}
+
+
+def datos_alergia(r: dict, texto: str) -> str:
+    """Si el cliente habla de un alérgeno, la lista exacta de la carta: qué platos lo llevan y cuáles no.
+    Así el modelo no tiene que deducirlo (en las pruebas recomendó «la bandeja sin huevo, aunque contiene huevo»)."""
+    vistos = [k for k, rx in _ALERGENOS.items() if rx.search(texto or "")]
+    if not vistos:
+        return ""
+    partes = []
+    for a in vistos:
+        con = [p["nombre"] for p in r["menu"] if "alergenos" in p and a in [x.lower() for x in p["alergenos"]]]
+        sin = [p["nombre"] for p in r["menu"] if "alergenos" in p and a not in [x.lower() for x in p["alergenos"]]]
+        dudosos = [p["nombre"] for p in r["menu"] if "alergenos" not in p]
+        partes.append(f"{a}: LO LLEVAN {', '.join(con) or 'ninguno'}; según la carta NO lo llevan {', '.join(sin) or 'ninguno'}"
+                      + (f"; sin información (que lo confirme el mesero): {', '.join(dudosos)}" if dudosos else ""))
+    return ("\n[Datos de la carta para el alérgeno que mencionó (esto no lo dijo el cliente): " + " · ".join(partes)
+            + ". Recomienda solo platos que NO lo llevan y di que el mesero lo confirma con la cocina.]")
+
+
 # ---------------- Control: el orbe no agrega nada que el cliente no pidió ----------------
 NUMEROS = {  # español, inglés, portugués, alemán y ruso (sin tildes, como quedan al normalizar)
     "un": 1, "una": 1, "uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5, "seis": 6, "siete": 7, "ocho": 8,
@@ -495,7 +527,8 @@ def conversar(r: dict, s, entrada: dict) -> dict:
     """entrada: {"role": "user", "content": ...} (lo que dijo el cliente o una acción en la pantalla). Devuelve el texto que dirá el orbe y qué pasó."""
     historial = db.historial(s["id"])
     anterior = next((m.get("content") or "" for m in reversed(historial) if m.get("role") == "assistant"), "")
-    mensajes = historial + [entrada]
+    extra = datos_alergia(r, str(entrada.get("content") or "")) if not str(entrada.get("content") or "").startswith("[Acción") else ""
+    mensajes = historial + [{**entrada, "content": entrada["content"] + extra} if extra else entrada]   # entrada sigue siendo lo que dijo
     sistema = instrucciones(r, s["mesa"])
     hechos = {"confirmado": None, "pedido": None, "frase": ""}
     agregados, hizo = set(), ""                # hizo: «agregar», «quitar» o «confirmar» si de verdad cambió el pedido
