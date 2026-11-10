@@ -454,7 +454,11 @@ def anotado(r: dict, cambios: list) -> str:
     def lista(cs):
         partes = []
         for c in cs:
-            n, nombre = int(c.get("cantidad") or 1), c["plato"]
+            try:
+                n = max(1, int(c.get("cantidad") or 1))
+            except (TypeError, ValueError):
+                n = 1
+            nombre = c["plato"]
             if n > 1:
                 nombre = f"{nombre}{n}つ" if idioma == "ja" else f"{n} {_plural(nombre, idioma)}"
             partes.append(nombre + (con_cambio if c.get("nota") else ""))
@@ -478,7 +482,9 @@ def _compacto(m: dict) -> dict:
         return m
     corto = {k: d[k] for k in ("ok", "error", "total") if k in d}
     if d.get("platos"):
-        corto["pedido"] = ", ".join(f"{p['cantidad']}× {p['plato']}" + (f" ({p['nota']})" if p.get("nota") else "") for p in d["platos"])
+        corto["pedido"] = ", ".join(f"{p.get('cantidad', 1)}× {p.get('plato') or p.get('nombre') or p.get('id', '?')}"
+                                    + (f" ({p['nota']})" if isinstance(p, dict) and p.get("nota") else "")
+                                    for p in d["platos"] if isinstance(p, dict))
     elif "platos" in d:
         corto["pedido"] = "vacío"
     return {**m, "content": json.dumps(corto, ensure_ascii=False)}
