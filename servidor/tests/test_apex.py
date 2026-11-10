@@ -618,3 +618,18 @@ def test_experimento_rapido_responde_con_frase_grabada(c, axtra):
     assert r["pedido"]["platos"][0]["id"] == "ajiaco"
     assert [x for x, _ in axtra.llamadas].count("/pensar") == 1          # una sola vuelta del cerebro
     assert c.get("/v1/menu/pruebas").status_code == 200                  # el de pruebas normal hereda la carta del demo
+
+
+def test_platos_con_otra_terminacion_y_sin_falso_buena_eleccion(c, axtra):
+    ru = config.localizar(config.restaurante("demo"), "ru")
+    bandeja = next(p for p in ru["menu"] if p["id"] == "bandeja")
+    assert orbe._nombrado(bandeja, "Здравствуйте, я хочу бандеху пайсу", "Bandeja paisa") == 1   # declinación rusa
+    torta = next(p for p in config.restaurante("demo")["menu"] if p["id"] == "torta")
+    assert orbe._nombrado(torta, "quiero una tortilla", "") is None                                # no confunde palabras
+    # El cerebro falla después de que el plato fue rechazado: no dice «buena elección» con el pedido vacío
+    abrir(c, "7")
+    s = sesion(c, "7").json()
+    axtra.oido = "hola, buenas noches"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "torta"}), "falla"]
+    r = turno(c, s).json()
+    assert r.get("sin_voz") and not r["pedido"]["platos"]

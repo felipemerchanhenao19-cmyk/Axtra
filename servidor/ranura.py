@@ -69,16 +69,26 @@ def escuchar(audio: bytes = Body(..., media_type="application/octet-stream"), id
         raise HTTPException(422, f"formato de audio desconocido (tipo «{tipo[:60]}», empieza {audio[:16].hex()}, {len(audio)} bytes)")
     if not config.GROQ_API_KEY:
         raise HTTPException(503, "falta GROQ_API_KEY")
-    try:
-        r = requests.post(GROQ_OIDO, timeout=30, headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
-                          files={"file": (f"voz.{fmt}", audio, oido._MIME[fmt])},
-                          data={"model": config.ORBE_MODELO_OIDO, "language": idioma[:5], "temperature": "0",
-                                "response_format": "verbose_json", **({"prompt": pista[:600]} if pista else {})})
-    except requests.RequestException as e:
-        raise HTTPException(502, f"Groq Whisper falló: {e}")
-    if r.status_code >= 400:          # Groq explica por qué rechazó el audio: se guarda para poder corregirlo
-        raise HTTPException(502, f"Groq Whisper falló: {r.status_code} {r.text[:200]} "
-                                 f"(audio {fmt}, {len(audio)} bytes, empieza {audio[:12].hex()})")
+    # Si el modelo principal rechaza (límite de uso de Groq o falla suelta), se intenta con Whisper turbo: tiene su propio
+    # cupo y es más rápido. Sin este respaldo, un límite de Groq deja sordos a todos los orbes.
+    modelos = list(dict.fromkeys([config.ORBE_MODELO_OIDO, "whisper-large-v3-turbo"]))
+    r, error = None, ""
+    for modelo in modelos:
+        try:
+            r = requests.post(GROQ_OIDO, timeout=20, headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
+                              files={"file": (f"voz.{fmt}", audio, oido._MIME[fmt])},
+                              data={"model": modelo, "language": idioma[:5], "temperature": "0",
+                                    "response_format": "verbose_json", **({"prompt": pista[:600]} if pista else {})})
+        except requests.RequestException as e:
+            error, r = f"Groq Whisper falló: {e}", None
+            continue
+        if r.status_code < 400:
+            break
+        error = f"Groq Whisper falló: {r.status_code} {r.text[:200]} (audio {fmt}, {len(audio)} bytes, empieza {audio[:12].hex()})"
+        if r.status_code not in (429, 500, 502, 503, 504):   # el audio está mal: otro modelo no lo arregla
+            break
+    if r is None or r.status_code >= 400:
+        raise HTTPException(502, error)
     d = r.json()
     return {"texto": (d.get("text") or "").strip(), "segundos": float(d.get("duration") or 0), "proveedor": "groq"}
 

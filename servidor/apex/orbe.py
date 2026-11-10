@@ -207,6 +207,8 @@ REGLAS:
    y sus ingredientes del menú, en su idioma, y di si pica. Nunca agregues ingredientes que el menú no dice.
 6. CAMBIOS: si pide un plato sin algo o con un cambio («sin cebolla», «sin picante», «la salsa aparte»), pon ese cambio en la nota
    de agregar_plato en pocas palabras y dile que le avisas a la cocina. No prometas que siempre se puede.
+   La nota para la cocina va en español, pero al cliente háblale SOLO en su idioma (no le repitas la nota en español).
+   Nunca digas que un plato «está listo»: di que quedó en su pedido.
 7. ALERGIAS (muy importante, la salud del cliente va primero):
    a) Responde SOLO con los alérgenos e ingredientes que dice el menú. Nunca supongas.
    b) Si el plato tiene ese alérgeno, dilo claro y ofrece otro plato que según el menú no lo lleve.
@@ -334,11 +336,22 @@ def _claves(p: dict, original: str = "") -> set:
     return out
 
 
+def _raiz_igual(w: str, k: str) -> bool:
+    """La misma palabra con otra terminación (ruso «бандеху» = «бандеха», «limonadita» = «limonada»): misma raíz
+    de al menos 5 letras y casi toda la palabra. «tortilla» no es «torta»."""
+    if len(w) < 5 or len(k) < 5:
+        return False
+    n = 0
+    while n < min(len(w), len(k)) and w[n] == k[n]:
+        n += 1
+    return n >= max(5, len(k) - 2)
+
+
 def _nombrado(p: dict, texto: str, original: str = ""):
     """Si el cliente nombró el plato, devuelve la cantidad que dijo (o 1). Si no lo nombró, None."""
     claves, palabras = _claves(p, original), _palabras(texto)
     for i, w in enumerate(palabras):
-        if w in claves or w.rstrip("s") in claves:
+        if w in claves or w.rstrip("s") in claves or any(_raiz_igual(w, k) for k in claves):
             for prev in reversed(palabras[max(0, i - 3):i]):
                 if prev.isdigit():
                     return max(1, min(20, int(prev)))
@@ -395,16 +408,16 @@ def conversar(r: dict, s, entrada: dict) -> dict:
     mensajes = historial + [entrada]
     sistema = instrucciones(r, s["mesa"])
     hechos = {"confirmado": None, "pedido": None, "frase": ""}
-    agregados = set()
+    agregados, hizo = set(), ""                # hizo: «agregar», «quitar» o «confirmar» si de verdad cambió el pedido
     texto = ""
     for _ in range(4):                       # pensar → herramientas → pensar (máximo 4 vueltas)
         try:
             m = _pensar(r, s["id"], sistema, mensajes)
         except SinRanura:
-            if not (hechos["pedido"] or hechos["confirmado"]):
-                raise                         # no alcanzó a hacer nada: falla de verdad
+            if not hizo:
+                raise                         # no alcanzó a cambiar nada: falla de verdad (no se dice «buena elección»)
             # Ya agregó, quitó o confirmó: lo hecho vale. Responde con una frase grabada (sin cerebro ni voz nueva)
-            hechos["frase"] = "despedida" if hechos["confirmado"] else "eleccion"
+            hechos["frase"] = {"confirmar": "despedida", "quitar": "quitado" if "quitado" in r["frases"] else "eleccion"}.get(hizo, "eleccion")
             texto = r["frases"][hechos["frase"]]
             mensajes.append({"role": "assistant", "content": texto})
             break
@@ -428,6 +441,8 @@ def conversar(r: dict, s, entrada: dict) -> dict:
                     salida = {**permiso, **resumen(r, db.carrito(s["id"]))}     # el pedido sigue igual
             else:
                 salida = ejecutar(r, s, f.get("name", ""), args)
+            if salida.get("ok") and f.get("name") in ("agregar_plato", "quitar_plato", "confirmar_pedido"):
+                hizo = {"agregar_plato": "agregar", "quitar_plato": "quitar", "confirmar_pedido": "confirmar"}[f["name"]]
             if f.get("name") == "confirmar_pedido" and salida.get("ok"):
                 hechos["confirmado"] = salida
             if "platos" in salida:

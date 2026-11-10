@@ -66,6 +66,20 @@ def test_oido_groq(c, monkeypatch):
     assert r == {"texto": "quiero un ajiaco", "segundos": 2.4, "proveedor": "groq"}
 
 
+def test_oido_usa_whisper_turbo_si_groq_rechaza_por_limite(c, monkeypatch):
+    monkeypatch.setattr(config, "GROQ_API_KEY", "g")
+    usados = []
+    def post(*a, **k):
+        usados.append(k["data"]["model"])
+        return R({"error": "rate limit"}, 429) if len(usados) == 1 else R({"text": "un ajiaco", "duration": 1.5})
+    monkeypatch.setattr(ranura.requests, "post", post)
+    r = c.post("/oido", content=b"\x1aE\xdf\xa3" + b"\0" * 100, headers={"Content-Type": "application/octet-stream"})
+    assert r.json()["texto"] == "un ajiaco" and usados == [config.ORBE_MODELO_OIDO, "whisper-large-v3-turbo"]
+    usados.clear()
+    monkeypatch.setattr(ranura.requests, "post", lambda *a, **k: usados.append(1) or R({"error": "audio dañado"}, 400))
+    assert c.post("/oido", content=b"\x1aE\xdf\xa3" + b"\0" * 100).status_code == 502 and len(usados) == 1   # audio malo: no reintenta
+
+
 def test_pin(c, monkeypatch):
     assert c.post("/pin", json={"restaurante": "demo", "pin": "4321"}).json()["ok"] is True
     assert c.post("/pin", json={"restaurante": "demo", "pin": "0000"}).json()["ok"] is False
