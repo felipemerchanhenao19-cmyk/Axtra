@@ -117,6 +117,7 @@ def main():
     a = argparse.ArgumentParser(); a.add_argument("--restaurante", default="demo"); a.add_argument("--escenarios", type=int, default=20)
     a.add_argument("--ritmo", type=float, default=7); a.add_argument("--salida", required=True); a.add_argument("--semilla", type=int, default=1)
     a.add_argument("--ruidos", default="none,15,8"); a.add_argument("--idiomas", default=",".join(E)); a.add_argument("--max_fallos_seguidos", type=int, default=6)
+    a.add_argument("--pausas", type=int, default=0, help="si el servidor falla seguido: pausar 10 min (hasta N veces) en vez de parar")
     o = a.parse_args(); random.seed(o.semilla)
     ruidos = [None if x == "none" else float(x) for x in o.ruidos.split(",")]
     lista = [(l, esc) for l in o.idiomas.split(",") for esc in E[l]]
@@ -143,7 +144,10 @@ def main():
                 print(f"{n:4d} {idioma} {('limpio' if snr is None else f'{snr:.0f}dB'):6s} {total:5.2f}s {'OK ' if not fallas else 'MAL'} {texto[:40]} → {(d.get('oido') or '')[:40]} {fallas[:1]}", flush=True)
                 seguidos = seguidos + 1 if codigo != 200 or d.get("sin_voz") else 0
                 if seguidos >= o.max_fallos_seguidos:
-                    print("Demasiadas fallas seguidas del servidor: paro para no saturarlo.", flush=True); return
+                    if o.pausas <= 0:
+                        print("Demasiadas fallas seguidas del servidor: paro para no saturarlo.", flush=True); return
+                    o.pausas -= 1; seguidos = 0
+                    print(f"PAUSA {time.strftime('%H:%M:%S', time.gmtime())}: el servidor rechaza; espero 10 minutos", flush=True); time.sleep(600)
                 time.sleep(o.ritmo)
             try: requests.post(API + "/v1/sesion/fin", data=json.dumps({"sesion": s["sesion"], "secreto": s["secreto"], "motivo": "prueba"}), headers=ORIGEN, verify=CA, timeout=15)
             except Exception: pass
