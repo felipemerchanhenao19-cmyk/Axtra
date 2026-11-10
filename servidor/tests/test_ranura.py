@@ -45,7 +45,42 @@ def test_cerebro_groq_y_respaldo_gemini(c, monkeypatch):
     r = c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}],
                                 "herramientas": [{"type": "function", "function": {"name": "x"}}]}).json()
     assert r["proveedor"] == "gemini" and r["mensaje"]["content"] == "Hola" and r["uso"]["entrada"] == 100
-    assert "groq" in urls[0] and "groq" in urls[1] and "generativelanguage" in urls[2]     # un reintento a Groq
+    n = 1 + len(ranura.RESPALDOS_GROQ)
+    assert all("groq" in u for u in urls[:n]) and "generativelanguage" in urls[n]     # todos los modelos de Groq y luego Gemini
+
+
+def test_cerebro_salta_el_modelo_sin_cupo_y_lo_deja_descansar(c, monkeypatch):
+    """Groq dice «se acabó el cupo de este modelo»: responde el siguiente modelo, y mientras descansa ni se le pregunta."""
+    monkeypatch.setattr(config, "GROQ_API_KEY", "g")
+    monkeypatch.setattr(config, "GEMINI_API_KEY", "")
+    monkeypatch.setattr(ranura, "_DESCANSO", {})
+    modelos = []
+
+    def post(url, json=None, headers=None, timeout=None, **kw):
+        modelos.append(json["model"])
+        if json["model"] == config.ORBE_MODELO:
+            return R({"error": {"message": "Rate limit reached for model on tokens per minute (TPM). Please try again in 7.5s."}}, 429)
+        return R({"choices": [{"message": {"content": "Hola", "tool_calls": None}}], "usage": {}})
+
+    monkeypatch.setattr(ranura.requests, "post", post)
+    pedir = lambda: c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}]}).json()
+    assert pedir()["mensaje"]["content"] == "Hola" and modelos == [config.ORBE_MODELO, ranura.RESPALDOS_GROQ[0]]
+    assert 7 < ranura._DESCANSO[config.ORBE_MODELO] - ranura.time.time() <= 7.5
+    modelos.clear(); pedir()
+    assert modelos == [ranura.RESPALDOS_GROQ[0]]                 # el que no tiene cupo descansa: no se pierde tiempo
+    monkeypatch.setattr(ranura, "_DESCANSO", {config.ORBE_MODELO: 0})
+    modelos.clear(); pedir()
+    assert modelos == [config.ORBE_MODELO, ranura.RESPALDOS_GROQ[0]]   # pasó el descanso: vuelve a intentar el principal
+
+
+def test_espera_que_pide_el_proveedor():
+    class X:
+        def __init__(self, texto, headers=None): self.text, self.headers = texto, headers or {}
+    assert ranura._espera(X("", {"retry-after": "12"})) == 12
+    assert ranura._espera(X("Please try again in 2m31.5s.")) == 151.5
+    assert ranura._espera(X("Please try again in 694ms.")) == 0.694
+    assert ranura._espera(X("Limit tokens per day (TPD): Please try again in 12m3s.")) == 723
+    assert ranura._espera(X("slow down")) == 20
 
 
 def test_voz_google_y_respaldo_gratis(c, monkeypatch):
@@ -64,6 +99,20 @@ def test_oido_groq(c, monkeypatch):
     monkeypatch.setattr(ranura.requests, "post", lambda *a, **k: R({"text": " quiero un ajiaco ", "duration": 2.4}))
     r = c.post("/oido", content=b"\x1aE\xdf\xa3" + b"\0" * 100, headers={"Content-Type": "application/octet-stream"}).json()
     assert r == {"texto": "quiero un ajiaco", "segundos": 2.4, "proveedor": "groq"}
+
+
+def test_oido_usa_whisper_turbo_si_groq_rechaza_por_limite(c, monkeypatch):
+    monkeypatch.setattr(config, "GROQ_API_KEY", "g")
+    usados = []
+    def post(*a, **k):
+        usados.append(k["data"]["model"])
+        return R({"error": "rate limit"}, 429) if len(usados) == 1 else R({"text": "un ajiaco", "duration": 1.5})
+    monkeypatch.setattr(ranura.requests, "post", post)
+    r = c.post("/oido", content=b"\x1aE\xdf\xa3" + b"\0" * 100, headers={"Content-Type": "application/octet-stream"})
+    assert r.json()["texto"] == "un ajiaco" and usados == [config.ORBE_MODELO_OIDO, "whisper-large-v3-turbo"]
+    usados.clear()
+    monkeypatch.setattr(ranura.requests, "post", lambda *a, **k: usados.append(1) or R({"error": "audio dañado"}, 400))
+    assert c.post("/oido", content=b"\x1aE\xdf\xa3" + b"\0" * 100).status_code == 502 and len(usados) == 1   # audio malo: no reintenta
 
 
 def test_pin(c, monkeypatch):
@@ -145,4 +194,4 @@ def test_voz_de_axtra_en_cada_idioma(c, monkeypatch):
     c.post("/voz", json={"texto": "hola", "axtra": True, "idioma": "es"})
     c.post("/voz", json={"texto": "hello", "axtra": True, "idioma": "en"})
     assert vistos[0]["voz"] == "es-ES-AlvaroNeural" and vistos[0]["tono"] == ranura.config.VOZ_TONO
-    assert vistos[1]["voz"] == "en-US-AndrewNeural" and vistos[1]["ritmo"] == ranura.config.VOZ_VELOCIDAD
+    assert vistos[1]["voz"] == "en-US-GuyNeural" and vistos[1]["ritmo"] == ranura.config.VOZ_VELOCIDAD

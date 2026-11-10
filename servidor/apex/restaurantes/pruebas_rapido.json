@@ -1,0 +1,8 @@
+{
+  "id": "pruebas_rapido",
+  "base": "demo",
+  "nombre": "Restaurante de pruebas (rápido)",
+  "nota": "Pruebas automáticas con los experimentos de velocidad activados, para comparar contra «pruebas».",
+  "topes": {"tope_cop_mes": 40000, "turnos_por_sesion": 60},
+  "experimentos": {"rapido": true}
+}

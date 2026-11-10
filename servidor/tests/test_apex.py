@@ -494,8 +494,33 @@ def test_si_el_cerebro_falla_despues_de_agregar_no_dice_que_fallo(c, axtra):
     axtra.oido = "dos ajiacos"
     axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), "falla"]
     r = turno(c, s).json()
-    assert not r.get("sin_voz") and r["frase"].startswith("/v1/frase/demo/eleccion?")
+    assert not r.get("sin_voz") and r["texto"] == "Anotado: 2 Ajiacos santafereños. ¿Desea algo más?" and r["audio"]
     assert _platos(r["pedido"]["platos"]) == {"Ajiaco santafereño": 2}        # la pantalla ve lo que de verdad se agregó
+
+
+def test_si_tambien_falla_la_voz_dice_la_frase_grabada_y_no_que_el_sistema_fallo(c, axtra, monkeypatch):
+    s = sesion(c, "1").json()
+    axtra.oido = "un ajiaco"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), "falla"]
+    monkeypatch.setattr(apex_app.orbe, "voz", lambda *a, **k: (_ for _ in ()).throw(apex_app.orbe.SinRanura("voz caída")))
+    r = turno(c, s).json()
+    assert not r.get("sin_voz") and r["frase"].startswith("/v1/frase/demo/eleccion?")
+
+
+def test_anotado_dice_lo_que_quedo_en_cada_idioma():
+    es = config.localizar(config.restaurante("demo"), "es")
+    assert orbe.anotado(es, [{"accion": "agregar", "plato": "Limonada de coco", "cantidad": 2},
+                             {"accion": "agregar", "plato": "Torta de chocolate", "cantidad": 1}]) == \
+        "Anotado: 2 Limonadas de coco y Torta de chocolate. ¿Desea algo más?"
+    assert orbe.anotado(es, [{"accion": "agregar", "plato": "Bandeja paisa", "cantidad": 3, "nota": "sin chicharrón"}]) == \
+        "Anotado: 3 Bandejas paisas con su cambio para la cocina. ¿Desea algo más?"
+    en = config.localizar(config.restaurante("demo"), "en")
+    assert orbe.anotado(en, [{"accion": "agregar", "plato": "Coconut lemonade", "cantidad": 2},
+                             {"accion": "agregar", "plato": "Chocolate cake", "cantidad": 1}]) == "Got it: 2 Coconut lemonades and Chocolate cake. Anything else?"
+    assert orbe.anotado(en, [{"accion": "quitar", "plato": "Chocolate cake"}]) == "Done, I removed Chocolate cake from your order. Anything else?"
+    fr = config.localizar(config.restaurante("demo"), "fr")
+    assert orbe.anotado(fr, [{"accion": "agregar", "plato": "Limonade à la noix de coco", "cantidad": 2}]).startswith("C'est noté : 2 Limonades à la")
+    assert orbe.anotado(es, []) == ""
 
 
 def test_si_falla_todo_igual_manda_el_pedido_real(c, axtra):
@@ -607,3 +632,46 @@ def test_turistas_y_alergias(c, axtra):
     pedido = next(p for p in c.get("/v1/panel/demo", headers=PIN).json()["pedidos"] if p["mesa"] == "6")
     assert "maní" in pedido["alerta"]
     assert orbe.menciona_alergia("I'm allergic to peanuts") and orbe.menciona_alergia("je suis allergique") and not orbe.menciona_alergia("sin cebolla")
+
+
+def test_experimento_rapido_responde_con_frase_grabada(c, axtra):
+    assert c.post("/v1/panel/pruebas_rapido/mesa", json={"mesa": "1", "abierta": True}, headers=PIN).status_code == 200
+    s = c.post("/v1/sesion", json={"restaurante": "pruebas_rapido", "mesa": "1"}, headers=ORIGEN).json()
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), texto("esto no se debe pedir")]
+    r = turno(c, s).json()
+    assert r["texto"] == "Anotado: Ajiaco santafereño. ¿Desea algo más?" and r["audio"]   # dice lo que anotó, sin volver a pensar
+    assert r["pedido"]["platos"][0]["id"] == "ajiaco"
+    assert [x for x, _ in axtra.llamadas].count("/pensar") == 1          # una sola vuelta del cerebro
+    # Con un cambio para la cocina, el orbe sí piensa su respuesta (reglas de cambios y alergias)
+    axtra.llamadas.clear(); axtra.oido = "un omelet ranchero sin cebolla"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "omelet", "nota": "sin cebolla"}), texto("Listo, le aviso a la cocina.")]
+    r = turno(c, s).json()
+    assert r["texto"] == "Listo, le aviso a la cocina." and [x for x, _ in axtra.llamadas].count("/pensar") == 2
+    assert {p["id"]: p.get("nota") for p in r["pedido"]["platos"]}["omelet"] == "sin cebolla"
+    assert c.get("/v1/menu/pruebas").status_code == 200                  # el de pruebas normal hereda la carta del demo
+
+
+def test_platos_con_otra_terminacion_y_sin_falso_buena_eleccion(c, axtra):
+    ru = config.localizar(config.restaurante("demo"), "ru")
+    bandeja = next(p for p in ru["menu"] if p["id"] == "bandeja")
+    assert orbe._nombrado(bandeja, "Здравствуйте, я хочу бандеху пайсу", "Bandeja paisa") == 1   # declinación rusa
+    torta = next(p for p in config.restaurante("demo")["menu"] if p["id"] == "torta")
+    assert orbe._nombrado(torta, "quiero una tortilla", "") is None                                # no confunde palabras
+    # El cerebro falla después de que el plato fue rechazado: no dice «buena elección» con el pedido vacío
+    abrir(c, "7")
+    s = sesion(c, "7").json()
+    axtra.oido = "hola, buenas noches"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "torta"}), "falla"]
+    r = turno(c, s).json()
+    assert r.get("sin_voz") and not r["pedido"]["platos"]
+
+
+def test_historial_guarda_las_herramientas_resumidas():
+    """Lo que devolvió una herramienta en turnos anteriores se guarda corto: menos tokens en cada turno."""
+    from servidor.apex import orbe
+    largo = {"role": "tool", "tool_call_id": "1", "content": json.dumps({"ok": True, "platos": [
+        {"id": "ajiaco", "plato": "Ajiaco", "cantidad": 2, "nota": "sin alcaparras"}], "total": "76 mil pesos", "total_numero": 76000})}
+    corto = json.loads(orbe._compacto(largo)["content"])
+    assert corto == {"ok": True, "total": "76 mil pesos", "pedido": "2× Ajiaco (sin alcaparras)"}
+    assert orbe._compacto({"role": "user", "content": "hola"}) == {"role": "user", "content": "hola"}
+    assert json.loads(orbe._compacto({"role": "tool", "content": json.dumps({"ok": False, "error": "no está"})})["content"]) == {"ok": False, "error": "no está"}

@@ -1,0 +1,7 @@
+{
+  "id": "pruebas",
+  "base": "demo",
+  "nombre": "Restaurante de pruebas",
+  "nota": "Solo para pruebas automáticas del asistente (costos y estadísticas aparte del demo). Igual al demo.",
+  "topes": {"tope_cop_mes": 40000, "turnos_por_sesion": 60}
+}

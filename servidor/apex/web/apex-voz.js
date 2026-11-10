@@ -224,6 +224,13 @@
 
     async _enviar() {
       const trozos = this.pcm || []; this.pcm = null; this.previo = [];
+      // Se quita el silencio del final (deja 0,25 s): el audio sube más rápido por datos móviles y Whisper no
+      // inventa palabras con el ruido del restaurante que quedaba después de la frase.
+      let quitar = Math.floor(Math.max(0, (Date.now() - this.ultimaVoz - 250) / 1000) * this.ctx.sampleRate);
+      while (quitar > 0 && trozos.length) {
+        const u = trozos[trozos.length - 1];
+        if (u.length <= quitar) { trozos.pop(); quitar -= u.length; } else { trozos[trozos.length - 1] = u.subarray(0, u.length - quitar); quitar = 0; }
+      }
       this._estado("pensando");
       const audio = wav(trozos, this.ctx.sampleRate);
       if (audio.size < 44 + HZ * 2 * 0.4) return this._escuchar();       // menos de 0,4 s: fue un ruido corto

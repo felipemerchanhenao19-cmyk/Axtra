@@ -3,7 +3,7 @@ Lo usan el servidor (voz con el nombre de cada restaurante) y produccion/sitio/v
 import re
 
 # voz de Microsoft (gratis) y velocidad por idioma: la misma del recorrido guiado
-VOCES = {"es": ("es-CO-GonzaloNeural", 1.04), "en": ("en-US-AndrewMultilingualNeural", 1.02), "pt": ("pt-BR-AntonioNeural", 1.04)}
+VOCES = {"es": ("es-CO-GonzaloNeural", 1.04), "en": ("en-US-GuyNeural", 1.02), "pt": ("pt-BR-AntonioNeural", 1.04)}
 
 _GUION = {
     "es": {"apertura": "Una noche cualquiera en {nombre}{lugar}.", "apertura_g": "Una noche cualquiera en su restaurante.", "lugar": ", en {ciudad}",
