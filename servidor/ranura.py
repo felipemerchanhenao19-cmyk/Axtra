@@ -147,7 +147,8 @@ def _chat(url: str, clave: str, modelo: str, p: Pensar, timeout: float = 15) -> 
     m = d["choices"][0]["message"]
     u = d.get("usage") or {}
     return {"mensaje": {"role": "assistant", "content": m.get("content") or "", "tool_calls": m.get("tool_calls") or []},
-            "uso": {"entrada": u.get("prompt_tokens", 0), "salida": u.get("completion_tokens", 0)}, "modelo": modelo}
+            "uso": {"entrada": u.get("prompt_tokens", 0), "salida": u.get("completion_tokens", 0),
+                    "cache": (u.get("prompt_tokens_details") or {}).get("cached_tokens", 0)}, "modelo": modelo}
 
 
 def _cerebros() -> list:
