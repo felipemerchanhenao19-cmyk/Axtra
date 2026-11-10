@@ -6,6 +6,7 @@ Para probar en tu PC:  APEX_MODO=desarrollo uvicorn servidor.apex.app:app --port
 import asyncio
 import base64
 import mimetypes
+import os
 import hashlib
 import logging
 import hmac
@@ -62,6 +63,9 @@ def _vigilante():
 @asynccontextmanager
 async def _vida(app):
     threading.Thread(target=_vigilante, daemon=True).start()
+    # Cada turno de voz espera a la ranura (oír, pensar, hablar) en un hilo. Por defecto Python da cpu+4 hilos: en el
+    # servidor (1-2 CPU) eran 5-6, así que la 7.ª persona hablando a la vez ya hacía fila. Esperar no gasta CPU: más hilos.
+    asyncio.get_running_loop().set_default_executor(ThreadPoolExecutor(int(os.getenv("APEX_HILOS", "64")), thread_name_prefix="turno"))
     yield
 
 

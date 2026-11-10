@@ -58,7 +58,8 @@ def _pensar(r: dict, sid: str, sistema: str, mensajes: list) -> dict:
     d = _ranura("/pensar", json={"sistema": sistema, "mensajes": mensajes, "herramientas": herramientas(r),
                                  "max_tokens": 300}).json()
     ent, sal = d["uso"].get("entrada", 0), d["uso"].get("salida", 0)
-    p_in, p_out = config.PRECIOS_USD["cerebro"].get(d.get("proveedor"), config.PRECIOS_USD["cerebro"]["gemini"])
+    p_in, p_out = config.PRECIOS_USD["cerebro_modelo"].get(d.get("modelo")) or \
+        config.PRECIOS_USD["cerebro"].get(d.get("proveedor"), config.PRECIOS_USD["cerebro"]["gemini"])
     db.consumo(r["id"], sid, "cerebro", d.get("proveedor", "?"), ent + sal, _cop((ent * p_in + sal * p_out) / 1e6))
     return d["mensaje"]
 
