@@ -236,7 +236,7 @@ def _sesion(sid: str, secreto: str, request: Request, abierta: bool = True):
     return s, config.localizar(r, s["idioma"] if "idioma" in s.keys() else "")
 
 
-def _respuesta(r: dict, s, texto: str = "", frase: str = "", **extra) -> dict:
+def _respuesta(r: dict, s, texto: str = "", frase: str = "", respaldo: str = "", **extra) -> dict:
     """Lo que el orbe dirá: una frase grabada (gratis, por URL) o un audio nuevo (en base64)."""
     out = {"frase": None, "audio": None, "texto": r["frases"].get(frase, "") if frase else texto, **extra}
     if frase:
@@ -246,7 +246,10 @@ def _respuesta(r: dict, s, texto: str = "", frase: str = "", **extra) -> dict:
         out["audio"] = base64.b64encode(orbe.voz(r, texto, s["id"])).decode()
     except orbe.SinRanura as e:
         log.warning("voz falló: %s", e)
-        out.update(frase=_url_frase(r, "sin_voz"), sin_voz=True, texto=r["frases"]["sin_voz"])
+        if respaldo in r["frases"]:                   # lo que iba a decir tiene una frase grabada parecida: mejor esa
+            out.update(frase=_url_frase(r, respaldo), texto=r["frases"][respaldo])
+        else:
+            out.update(frase=_url_frase(r, "sin_voz"), sin_voz=True, texto=r["frases"]["sin_voz"])
     return out
 
 
@@ -285,9 +288,10 @@ async def turno(request: Request):
     except orbe.SinRanura as e:
         log.warning("turno de voz falló: %s", e)
         return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=actual())
-    if res.get("frase") and not res.get("rapido"):
+    if res.get("corte"):
         log.warning("el cerebro falló a mitad del turno; lo hecho se guardó (sesión %s)", s["id"][:8])
-    out = await asyncio.to_thread(_respuesta, r, s, res["texto"], res.get("frase", ""), despedida=bool(res["confirmado"]),
+    out = await asyncio.to_thread(_respuesta, r, s, res["texto"], res.get("frase", ""), respaldo=res.get("respaldo", ""),
+                                  despedida=bool(res["confirmado"]),
                                   pedido=res["confirmado"] or res["pedido"] or actual(), oido=texto[:600])
     t.append(time.perf_counter())
     out["tiempos"] = {"oir": round(t[1] - t[0], 2), "pensar": round(t[2] - t[1], 2), "voz": round(t[3] - t[2], 2),

@@ -401,6 +401,71 @@ def _args(texto) -> dict:
 
 
 # ---------------- Una vuelta de conversación ----------------
+# Lo que el orbe dice cuando ya agregó o quitó platos pero no alcanza (o no necesita) volver a pensar: nombra exactamente
+# lo que quedó en el pedido. Antes decía «¡Excelente elección!» aunque solo hubiera agregado uno de los dos platos pedidos.
+ANOTADO = {  # idioma: (agregó, quitó, «y», «con su cambio»)
+    "es": ("Anotado: {}. ¿Desea algo más?", "Listo, quité {} de su pedido. ¿Algo más?", " y ", " con su cambio para la cocina"),
+    "en": ("Got it: {}. Anything else?", "Done, I removed {} from your order. Anything else?", " and ", " with your change for the kitchen"),
+    "pt": ("Anotado: {}. Deseja mais alguma coisa?", "Pronto, tirei {} do seu pedido. Mais alguma coisa?", " e ", " com a sua alteração para a cozinha"),
+    "fr": ("C'est noté : {}. Autre chose ?", "C'est fait, j'ai retiré {} de votre commande. Autre chose ?", " et ", " avec votre modification pour la cuisine"),
+    "de": ("Notiert: {}. Darf es noch etwas sein?", "Erledigt, ich habe {} aus Ihrer Bestellung entfernt. Noch etwas?", " und ", " mit Ihrer Änderung für die Küche"),
+    "it": ("Segnato: {}. Desidera altro?", "Fatto, ho tolto {} dal suo ordine. Altro?", " e ", " con la sua modifica per la cucina"),
+    "ru": ("Записал: {}. Что-нибудь ещё?", "Готово, убрал {} из заказа. Что-нибудь ещё?", " и ", " с вашим изменением для кухни"),
+    "ja": ("{}を承りました。ほかにご注文はございますか？", "{}をご注文から外しました。ほかにございますか？", "と", "（ご要望付き）"),
+}
+
+
+def _plural(nombre: str, idioma: str) -> str:
+    """Plural sencillo para decir «2 bandejas paisas» / «2 coconut lemonades». Donde no es sencillo, el nombre tal cual."""
+    if idioma in ("es", "pt", "fr"):
+        palabras, out = nombre.split(" "), []
+        for k, w in enumerate(palabras):           # «limonada de coco»: solo hasta la preposición
+            if w.lower() in ("de", "del", "con", "a", "al", "en", "da", "do", "com", "à", "au", "aux", "sans", "sin"):
+                out += palabras[k:]
+                break
+            u = w[-1:].lower()
+            if idioma == "fr" or u in "aeiouáéíóúê":
+                w += "" if u in "sxz" else "s"
+            elif u == "z":
+                w = w[:-1] + "ces"
+            elif u in "lrndj":
+                w += "es"
+            elif u != "s":
+                w += "s"
+            out.append(w)
+        return " ".join(out)
+    if idioma == "en":
+        partes = nombre.split(" ")
+        i = next((k - 1 for k, w in enumerate(partes) if w in ("with", "of", "in") and k > 0), len(partes) - 1)
+        w = partes[i]
+        partes[i] = (w[:-1] + "ies" if w.endswith("y") and w[-2:-1] not in "aeiou" else w + "es" if w.endswith(("s", "sh", "ch", "x")) else w + "s")
+        return " ".join(partes)
+    return nombre
+
+
+def anotado(r: dict, cambios: list) -> str:
+    """cambios: [{"accion": "agregar"|"quitar", "plato": nombre, "cantidad": n, "nota": ...}] de este turno."""
+    idioma = r.get("idioma", "es")
+    if idioma not in ANOTADO or not cambios:
+        return ""
+    agrego, quito, y, con_cambio = ANOTADO[idioma]
+
+    def lista(cs):
+        partes = []
+        for c in cs:
+            n, nombre = int(c.get("cantidad") or 1), c["plato"]
+            if n > 1:
+                nombre = f"{nombre}{n}つ" if idioma == "ja" else f"{n} {_plural(nombre, idioma)}"
+            partes.append(nombre + (con_cambio if c.get("nota") else ""))
+        return partes[0] if len(partes) == 1 else ", ".join(partes[:-1]) + y + partes[-1]
+
+    mas = [c for c in cambios if c["accion"] == "agregar"]
+    menos = [c for c in cambios if c["accion"] == "quitar"]
+    if mas:
+        return agrego.format(lista(mas))
+    return quito.format(lista(menos))
+
+
 def _compacto(m: dict) -> dict:
     """El resultado de una herramienta de turnos anteriores, resumido: el modelo no necesita volver a leer todo el JSON
     en cada turno (menos tokens = responde más rápido y alcanza el cupo para más mesas)."""
@@ -426,6 +491,7 @@ def conversar(r: dict, s, entrada: dict) -> dict:
     sistema = instrucciones(r, s["mesa"])
     hechos = {"confirmado": None, "pedido": None, "frase": ""}
     agregados, hizo = set(), ""                # hizo: «agregar», «quitar» o «confirmar» si de verdad cambió el pedido
+    cambios = []                               # lo que de verdad cambió en este turno, para decirlo tal cual
     texto = ""
     for _ in range(4):                       # pensar → herramientas → pensar (máximo 4 vueltas)
         try:
@@ -433,9 +499,14 @@ def conversar(r: dict, s, entrada: dict) -> dict:
         except SinRanura:
             if not hizo:
                 raise                         # no alcanzó a cambiar nada: falla de verdad (no se dice «buena elección»)
-            # Ya agregó, quitó o confirmó: lo hecho vale. Responde con una frase grabada (sin cerebro ni voz nueva)
-            hechos["frase"] = {"confirmar": "despedida", "quitar": "quitado" if "quitado" in r["frases"] else "eleccion"}.get(hizo, "eleccion")
-            texto = r["frases"][hechos["frase"]]
+            # Ya agregó, quitó o confirmó: lo hecho vale. Dice exactamente lo que quedó anotado (o, si no se puede, la frase grabada)
+            grabada = {"confirmar": "despedida", "quitar": "quitado" if "quitado" in r["frases"] else "eleccion"}.get(hizo, "eleccion")
+            texto = "" if hizo == "confirmar" else anotado(r, cambios)
+            if texto:
+                hechos["respaldo"] = grabada
+            else:
+                hechos["frase"], texto = grabada, r["frases"][grabada]
+            hechos["corte"] = True
             mensajes.append({"role": "assistant", "content": texto})
             break
         llamadas = m.get("tool_calls") or []
@@ -453,11 +524,15 @@ def conversar(r: dict, s, entrada: dict) -> dict:
                     args["cantidad"] = permiso["cantidad"]
                     salida = ejecutar(r, s, "agregar_plato", args)
                     if salida.get("ok"):
-                        agregados.add(_plato(r, args.get("plato_id", ""))["id"])
+                        p = _plato(r, args.get("plato_id", ""))
+                        agregados.add(p["id"])
+                        cambios.append({"accion": "agregar", "plato": p["nombre"], "cantidad": args["cantidad"], "nota": args.get("nota")})
                 else:
                     salida = {**permiso, **resumen(r, db.carrito(s["id"]))}     # el pedido sigue igual
             else:
                 salida = ejecutar(r, s, f.get("name", ""), args)
+                if f.get("name") == "quitar_plato" and salida.get("ok") and (p := _plato(r, args.get("plato_id", ""))):
+                    cambios.append({"accion": "quitar", "plato": p["nombre"], "cantidad": args.get("cantidad") or 1})
             if salida.get("ok") and f.get("name") in ("agregar_plato", "quitar_plato", "confirmar_pedido"):
                 hizo = {"agregar_plato": "agregar", "quitar_plato": "quitar", "confirmar_pedido": "confirmar"}[f["name"]]
             if f.get("name") == "confirmar_pedido" and salida.get("ok"):
@@ -469,11 +544,17 @@ def conversar(r: dict, s, entrada: dict) -> dict:
         # con su frase grabada (instantánea y gratis) en vez de volver a pensar y generar una voz nueva.
         nombres = [t.get("function", {}).get("name") for t in llamadas]
         salidas = [json.loads(m["content"]) for m in mensajes[-len(llamadas):]]
+        # Con un cambio para la cocina o una alergia NO: ahí el orbe debe pensar su respuesta (reglas 6 y 7).
+        delicado = any(c.get("nota") for c in cambios) or menciona_alergia(str(entrada.get("content") or ""))
         if (r.get("experimentos") or {}).get("rapido") and set(nombres) <= {"agregar_plato", "quitar_plato"} \
-                and all(x.get("ok") for x in salidas):
-            hechos["frase"] = "eleccion" if "agregar_plato" in nombres or "quitado" not in r["frases"] else "quitado"
+                and all(x.get("ok") for x in salidas) and not delicado:
+            grabada = "eleccion" if "agregar_plato" in nombres or "quitado" not in r["frases"] else "quitado"
+            texto = anotado(r, cambios)
+            if texto:
+                hechos["respaldo"] = grabada
+            else:
+                hechos["frase"], texto = grabada, r["frases"][grabada]
             hechos["rapido"] = True
-            texto = r["frases"][hechos["frase"]]
             mensajes.append({"role": "assistant", "content": texto})
             break
     if not texto:
