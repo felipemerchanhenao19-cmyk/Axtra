@@ -607,3 +607,14 @@ def test_turistas_y_alergias(c, axtra):
     pedido = next(p for p in c.get("/v1/panel/demo", headers=PIN).json()["pedidos"] if p["mesa"] == "6")
     assert "maní" in pedido["alerta"]
     assert orbe.menciona_alergia("I'm allergic to peanuts") and orbe.menciona_alergia("je suis allergique") and not orbe.menciona_alergia("sin cebolla")
+
+
+def test_experimento_rapido_responde_con_frase_grabada(c, axtra):
+    assert c.post("/v1/panel/pruebas_rapido/mesa", json={"mesa": "1", "abierta": True}, headers=PIN).status_code == 200
+    s = c.post("/v1/sesion", json={"restaurante": "pruebas_rapido", "mesa": "1"}, headers=ORIGEN).json()
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), texto("esto no se debe pedir")]
+    r = turno(c, s).json()
+    assert r["frase"] and r["frase"].startswith("/v1/frase/pruebas_rapido/eleccion") and r["audio"] is None
+    assert r["pedido"]["platos"][0]["id"] == "ajiaco"
+    assert [x for x, _ in axtra.llamadas].count("/pensar") == 1          # una sola vuelta del cerebro
+    assert c.get("/v1/menu/pruebas").status_code == 200                  # el de pruebas normal hereda la carta del demo

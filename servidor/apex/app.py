@@ -285,7 +285,7 @@ async def turno(request: Request):
     except orbe.SinRanura as e:
         log.warning("turno de voz falló: %s", e)
         return _respuesta(r, s, frase="sin_voz", sin_voz=True, pedido=actual())
-    if res.get("frase"):
+    if res.get("frase") and not res.get("rapido"):
         log.warning("el cerebro falló a mitad del turno; lo hecho se guardó (sesión %s)", s["id"][:8])
     out = await asyncio.to_thread(_respuesta, r, s, res["texto"], res.get("frase", ""), despedida=bool(res["confirmado"]),
                                   pedido=res["confirmado"] or res["pedido"] or actual(), oido=texto[:600])

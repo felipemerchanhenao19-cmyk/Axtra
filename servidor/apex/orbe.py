@@ -433,6 +433,17 @@ def conversar(r: dict, s, entrada: dict) -> dict:
             if "platos" in salida:
                 hechos["pedido"] = salida
             mensajes.append({"role": "tool", "tool_call_id": t.get("id", ""), "content": json.dumps(salida, ensure_ascii=False)})
+        # Experimento «rapido»: si en esta vuelta solo se agregaron o quitaron platos y todo salió bien, el orbe responde
+        # con su frase grabada (instantánea y gratis) en vez de volver a pensar y generar una voz nueva.
+        nombres = [t.get("function", {}).get("name") for t in llamadas]
+        salidas = [json.loads(m["content"]) for m in mensajes[-len(llamadas):]]
+        if (r.get("experimentos") or {}).get("rapido") and set(nombres) <= {"agregar_plato", "quitar_plato"} \
+                and all(x.get("ok") for x in salidas):
+            hechos["frase"] = "eleccion" if "agregar_plato" in nombres or "quitado" not in r["frases"] else "quitado"
+            hechos["rapido"] = True
+            texto = r["frases"][hechos["frase"]]
+            mensajes.append({"role": "assistant", "content": texto})
+            break
     if not texto:
         texto = r["frases"]["despedida"] if hechos["confirmado"] else "¿En qué más le puedo ayudar?"
         mensajes.append({"role": "assistant", "content": texto})
