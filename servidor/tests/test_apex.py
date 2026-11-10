@@ -675,3 +675,28 @@ def test_historial_guarda_las_herramientas_resumidas():
     assert corto == {"ok": True, "total": "76 mil pesos", "pedido": "2× Ajiaco (sin alcaparras)"}
     assert orbe._compacto({"role": "user", "content": "hola"}) == {"role": "user", "content": "hola"}
     assert json.loads(orbe._compacto({"role": "tool", "content": json.dumps({"ok": False, "error": "no está"})})["content"]) == {"ok": False, "error": "no está"}
+
+
+def test_datos_de_la_carta_para_una_alergia():
+    """El modelo recibe la lista exacta de la carta: qué platos llevan el alérgeno y cuáles no."""
+    es = config.localizar(config.restaurante("demo"), "es")
+    d = orbe.datos_alergia(es, "Soy alérgico al huevo, ¿qué me recomienda?")
+    con, sin = d.split("LO LLEVAN ")[1].split("; según la carta NO lo llevan ")
+    assert "Bandeja paisa" in con and "Omelet" in con and "Torta" in con and "Ajiaco" not in con
+    assert "Ajiaco" in sin and "Bandeja" not in sin
+    en = config.localizar(config.restaurante("demo"), "en")
+    assert "lácteos" in orbe.datos_alergia(en, "I'm lactose intolerant") and "gluten" in orbe.datos_alergia(en, "does the cake have wheat?")
+    assert orbe.datos_alergia(en, "two coconut lemonades") == ""                  # «coconut» no es «nuts»
+    assert orbe.datos_alergia(es, "quiero un omelet sin cebolla") == ""
+    ja = config.localizar(config.restaurante("demo"), "ja")
+    assert "huevo" in orbe.datos_alergia(ja, "卵アレルギーです")
+
+
+def test_la_alergia_llega_al_cerebro_con_los_datos_pero_no_cuenta_como_pedir_platos(c, axtra):
+    s = sesion(c, "1").json()
+    axtra.oido = "soy alérgico al huevo"
+    axtra.guion = [herramienta("agregar_plato", {"plato_id": "ajiaco"}), texto("Según la carta el ajiaco no lleva huevo.")]
+    r = turno(c, s).json()
+    pensado = [j["mensajes"] for x, j in axtra.llamadas if x == "/pensar"][0]
+    assert "LO LLEVAN" in pensado[-1]["content"] and pensado[-1]["content"].startswith("soy alérgico al huevo")
+    assert not r["pedido"]["platos"]          # nombrar platos en los datos no cuenta como que el cliente los pidió
