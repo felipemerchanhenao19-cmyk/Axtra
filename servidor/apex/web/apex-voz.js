@@ -79,6 +79,7 @@
       try { anterior = JSON.parse(sessionStorage.getItem(CLAVE(this.restaurante, this.mesa)) || "null"); } catch {}
       this.s = await this._post("/v1/sesion", { restaurante: this.restaurante, mesa: this.mesa, anterior, idioma: this.idioma });
       try { sessionStorage.setItem(CLAVE(this.restaurante, this.mesa), JSON.stringify(this._cred())); } catch {}
+      if (this.onsesion) this.onsesion(this.s);           // p. ej. «Persona 2»: cada persona de la mesa pide desde su celular
       if (this.s.sin_voz) this.onsinvoz();
     }
 
@@ -112,7 +113,7 @@
         this._despues();
       } catch (e) {
         this.onerror(e.status === 403 ? "La mesa está cerrada. Pida al mesero que la abra."
-                   : e.status === 409 ? "Ya hay una conversación activa en esta mesa."
+                   : e.status === 409 ? "Esta mesa ya tiene el máximo de personas conectadas."
                    : e.name === "NotAllowedError" ? "Permita el micrófono para hablar con el orbe." : "No pude iniciar el orbe: " + e.message);
         this.terminar("error al iniciar");
       }
@@ -208,14 +209,16 @@
         if (this.despedida && quieto > 10000) return this.terminar("pedido enviado");   // 4. se apaga solo
         if (!this.despedida && quieto > 45000) { this._estado("dormido"); }              // toque el orbe para seguir
       } else if (this.estado === "oyendo") {
-        if (rms > umbral) this.ultimaVoz = ahora;
-        if (ahora - this.ultimaVoz > 750 || ahora - this.inicioGrab > 12000) this._enviar();
+        // Fin de la frase: cuando la voz de quien habla (cerca del celular) baja, aunque siga el ruido del restaurante.
+        this.pico = Math.max((this.pico || umbral) * 0.997, rms);
+        if (rms > Math.max(umbral, this.pico * 0.3)) this.ultimaVoz = ahora;
+        if (ahora - this.ultimaVoz > 700 || ahora - this.inicioGrab > 7000) this._enviar();
       }
     }
 
     _grabar() {
       if (!this.proc) return;
-      this.pcm = this.previo.slice(); this.inicioGrab = this.ultimaVoz = Date.now(); this.despedida = false;
+      this.pcm = this.previo.slice(); this.inicioGrab = this.ultimaVoz = Date.now(); this.despedida = false; this.pico = 0;
       this._estado("oyendo");
     }
 
@@ -270,6 +273,8 @@
       if (!this.s) return;
       try { const r = await this._post("/v1/accion", { ...this._cred(), tipo: "ver" }); if (r.pedido) this.onpedido(r.pedido, r); } catch {}
     }
+    /* Lo que ya pidió toda la mesa (cada persona desde su celular). */
+    verMesa() { return this._post("/v1/accion", { ...this._cred(), tipo: "mesa" }); }
     /* «Quitar»: el cliente se equivocó. */
     quitarPlato(platoId, cantidad = 1) { return this._accion("quitar", { plato_id: platoId, cantidad }); }
     /* «Confirmar pedido»: la primera vez puede volver con {oferta: id} (el orbe ofrece el postre del día).

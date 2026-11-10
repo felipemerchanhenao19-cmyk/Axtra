@@ -140,11 +140,38 @@ def test_origen_no_permitido(c):
     assert ok.status_code == 204 and "X-Apex-Sesion" in ok.headers["access-control-allow-headers"]
 
 
-def test_una_sesion_por_mesa_y_retomar(c):
+def test_varias_personas_por_mesa_y_retomar(c):
     abrir(c)
     s1 = sesion(c).json()
-    assert sesion(c).status_code == 409                 # otro teléfono con la foto del QR
-    assert sesion(c, anterior={"sesion": s1["sesion"], "secreto": s1["secreto"]}).status_code == 200
+    s2 = sesion(c).json()                               # otra persona de la mesa escanea el mismo QR con su celular
+    assert s1["persona"] == 1 and s2["persona"] == 2 and s1["sesion"] != s2["sesion"]
+    otra = sesion(c, anterior={"sesion": s1["sesion"], "secreto": s1["secreto"]}).json()
+    assert otra["sesion"] == s1["sesion"] and otra["retomada"] and otra["persona"] == 1     # el mismo celular sigue donde iba
+    falsa = sesion(c, anterior={"sesion": s1["sesion"], "secreto": "inventado"}).json()
+    assert falsa["sesion"] != s1["sesion"] and falsa["persona"] == 3                        # sin el secreto no se roba la conversación
+
+
+def test_la_mesa_suma_los_pedidos_de_cada_persona(c, monkeypatch):
+    abrir(c, "3")
+    a, b = sesion(c, "3").json(), sesion(c, "3").json()
+    accion(c, a, "pedir", plato_id="ajiaco"); accion(c, b, "pedir", plato_id="bandeja")
+    assert accion(c, a, "ver").json()["pedido"]["platos"] == [{"id": "ajiaco", "plato": "Ajiaco santafereño", "cantidad": 1}]  # cada carrito es propio
+    for quien, numero in ((a, 1), (b, 2)):
+        r = accion(c, quien, "confirmar").json()
+        if r.get("oferta"):                              # el orbe ofrece una vez la oferta del día; se dice que no
+            r = accion(c, quien, "confirmar").json()
+        assert r["pedido"]["persona"] == numero
+    mesa = accion(c, b, "mesa").json()
+    assert [p["persona"] for p in mesa["pedidos"]] == [1, 2] and mesa["total_numero"] == 32000 + 38000 and mesa["personas"] == 2
+    panel = c.get("/v1/panel/demo", headers=PIN).json()
+    assert {p["persona"] for p in panel["pedidos"] if p["mesa"] == "3"} == {1, 2}
+    assert next(m for m in panel["mesas"] if m["mesa"] == "3")["personas"] == 2
+    abrir(c, "3", False); abrir(c, "3")                 # nuevos clientes en la mesa: empiezan de cero
+    nueva = sesion(c, "3").json()
+    assert nueva["persona"] == 1 and accion(c, nueva, "mesa").json()["pedidos"] == []
+    monkeypatch.setitem(config.TOPES_POR_DEFECTO, "personas_por_mesa", 1)
+    monkeypatch.setattr(config, "restaurante", lambda rid, _orig=config.restaurante: {**_orig(rid), "topes": {**_orig(rid)["topes"], "personas_por_mesa": 1}})
+    assert sesion(c, "3").status_code == 409            # tope de personas conectadas en una mesa
 
 
 def test_turno_completo_con_herramientas(c, axtra):
@@ -394,7 +421,7 @@ def test_confirmar_por_voz_trae_la_factura_completa(c, axtra):
 
 def test_carta_y_frases_en_otro_idioma(c):
     m = c.get("/v1/menu/demo?idioma=en").json()
-    assert m["idioma"] == "en" and {i["codigo"] for i in m["idiomas"]} == {"es", "en", "pt", "de", "ru", "ja"}
+    assert m["idioma"] == "en" and {i["codigo"] for i in m["idiomas"]} == {"es", "en", "fr", "pt", "de", "ru", "ja"}
     assert next(p for p in m["menu"] if p["id"] == "limonada")["nombre"] == "Coconut lemonade"
     s = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "1", "idioma": "ja"}, headers=ORIGEN).json()
     assert s["frases"]["saludo"].endswith("&idioma=ja") and "オーブ" in s["saludo"]
@@ -546,3 +573,37 @@ def test_video_del_sitio_sin_voz_y_con_limite(c, axtra):
     axtra.caido = False
     codigos = [c.post("/v1/sitio/video", json={"nombre": f"R{i}"}).status_code for i in range(6)]
     assert codigos[-1] == 429                                                                   # 6 videos cada 10 minutos por visitante
+
+
+def test_frances(c):
+    abrir(c, "5")
+    m = c.get("/v1/menu/demo?idioma=fr").json()
+    assert m["idioma"] == "fr" and any(p["nombre"] == "Limonade à la noix de coco" for p in m["menu"])
+    s = sesion(c, "5", idioma="fr").json()
+    assert s["saludo"].startswith("Bonjour")
+    assert orbe._dijo_si("oui, d'accord") and not orbe._dijo_si("non merci")
+
+
+def test_turistas_y_alergias(c, axtra):
+    abrir(c, "6")
+    s = sesion(c, "6").json()
+    sistema = orbe.instrucciones(config.localizar(config.restaurante("demo"), ""), "6")
+    assert "qué es: El plato más típico de Antioquia" in sistema and "MUCHOS CLIENTES SON TURISTAS" in sistema
+    assert "Nunca digas que un plato es seguro" in sistema and "picante: pica poco" in sistema
+    # El cliente avisa de una alergia: llega un mesero a confirmar y la alerta viaja con el pedido a la cocina
+    axtra.oido = "Soy alérgico al maní, ¿la bandeja paisa tiene maní?"
+    axtra.guion = [texto("Según la carta no lleva maní; el mesero lo confirma con la cocina.")]
+    turno(c, s)
+    llamadas = c.get("/v1/panel/demo", headers=PIN).json()["llamadas"]
+    assert any(l["mesa"] == "6" and "maní" in l["motivo"] for l in llamadas)
+    axtra.oido = "Yo soy alérgico al maní, de verdad"
+    axtra.guion = [texto("Entendido.")]
+    turno(c, s)                                           # la segunda vez no vuelve a llamar al mesero
+    assert sum("maní" in l["motivo"] for l in c.get("/v1/panel/demo", headers=PIN).json()["llamadas"]) == 1
+    accion(c, s, "pedir", plato_id="bandeja")
+    r = accion(c, s, "confirmar").json()
+    if r.get("oferta"):
+        r = accion(c, s, "confirmar").json()
+    pedido = next(p for p in c.get("/v1/panel/demo", headers=PIN).json()["pedidos"] if p["mesa"] == "6")
+    assert "maní" in pedido["alerta"]
+    assert orbe.menciona_alergia("I'm allergic to peanuts") and orbe.menciona_alergia("je suis allergique") and not orbe.menciona_alergia("sin cebolla")
