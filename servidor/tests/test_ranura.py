@@ -45,7 +45,8 @@ def test_cerebro_groq_y_respaldo_gemini(c, monkeypatch):
     r = c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}],
                                 "herramientas": [{"type": "function", "function": {"name": "x"}}]}).json()
     assert r["proveedor"] == "gemini" and r["mensaje"]["content"] == "Hola" and r["uso"]["entrada"] == 100
-    assert all("groq" in u for u in urls[:3]) and "generativelanguage" in urls[3]     # los 3 modelos de Groq y luego Gemini
+    n = 1 + len(ranura.RESPALDOS_GROQ)
+    assert all("groq" in u for u in urls[:n]) and "generativelanguage" in urls[n]     # todos los modelos de Groq y luego Gemini
 
 
 def test_cerebro_salta_el_modelo_sin_cupo_y_lo_deja_descansar(c, monkeypatch):

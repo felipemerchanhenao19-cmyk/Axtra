@@ -23,7 +23,7 @@ PRECIOS_USD = {
         "gemini": (0.30, 2.50),       # respaldo
     },
     "cerebro_modelo": {               # los modelos de respaldo cuestan distinto (USD por millón de tokens)
-        "openai/gpt-oss-120b": (0.15, 0.60), "meta-llama/llama-4-scout-17b-16e-instruct": (0.11, 0.34),
+        "openai/gpt-oss-120b": (0.15, 0.60), "meta-llama/llama-4-scout-17b-16e-instruct": (0.11, 0.34), "llama-3.3-70b-versatile": (0.59, 0.79),
         "gemini-flash-lite-latest": (0.10, 0.40),
     },
     # Google cobra según el tipo de voz (por millón de caracteres). edge = la voz gratis de Axtra.

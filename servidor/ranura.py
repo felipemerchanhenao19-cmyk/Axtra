@@ -105,7 +105,7 @@ class Pensar(BaseModel):
 # Cada modelo de Groq tiene su propio cupo por minuto y por día. Con un solo modelo, una mesa conversando agota el cupo
 # y todos los orbes quedan mudos; con varios, cuando uno se agota responde el siguiente (y después Gemini).
 RESPALDOS_GROQ = [m.strip() for m in os.getenv("ORBE_MODELOS_RESPALDO",
-                  "openai/gpt-oss-120b,meta-llama/llama-4-scout-17b-16e-instruct").split(",") if m.strip()]
+                  "openai/gpt-oss-120b,meta-llama/llama-4-scout-17b-16e-instruct,llama-3.3-70b-versatile").split(",") if m.strip()]
 RESPALDOS_GEMINI = [m.strip() for m in os.getenv("GEMINI_MODELOS_RESPALDO", "gemini-flash-lite-latest").split(",") if m.strip()]
 _DESCANSO: dict = {}          # modelo → hasta cuándo no pedirle nada (dijo que se le acabó el cupo): así no se pierde tiempo
 
