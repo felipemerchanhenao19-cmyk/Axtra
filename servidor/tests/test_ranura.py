@@ -45,7 +45,41 @@ def test_cerebro_groq_y_respaldo_gemini(c, monkeypatch):
     r = c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}],
                                 "herramientas": [{"type": "function", "function": {"name": "x"}}]}).json()
     assert r["proveedor"] == "gemini" and r["mensaje"]["content"] == "Hola" and r["uso"]["entrada"] == 100
-    assert "groq" in urls[0] and "groq" in urls[1] and "generativelanguage" in urls[2]     # un reintento a Groq
+    assert all("groq" in u for u in urls[:3]) and "generativelanguage" in urls[3]     # los 3 modelos de Groq y luego Gemini
+
+
+def test_cerebro_salta_el_modelo_sin_cupo_y_lo_deja_descansar(c, monkeypatch):
+    """Groq dice «se acabó el cupo de este modelo»: responde el siguiente modelo, y mientras descansa ni se le pregunta."""
+    monkeypatch.setattr(config, "GROQ_API_KEY", "g")
+    monkeypatch.setattr(config, "GEMINI_API_KEY", "")
+    monkeypatch.setattr(ranura, "_DESCANSO", {})
+    modelos = []
+
+    def post(url, json=None, headers=None, timeout=None, **kw):
+        modelos.append(json["model"])
+        if json["model"] == config.ORBE_MODELO:
+            return R({"error": {"message": "Rate limit reached for model on tokens per minute (TPM). Please try again in 7.5s."}}, 429)
+        return R({"choices": [{"message": {"content": "Hola", "tool_calls": None}}], "usage": {}})
+
+    monkeypatch.setattr(ranura.requests, "post", post)
+    pedir = lambda: c.post("/pensar", json={"sistema": "s", "mensajes": [{"role": "user", "content": "hola"}]}).json()
+    assert pedir()["mensaje"]["content"] == "Hola" and modelos == [config.ORBE_MODELO, ranura.RESPALDOS_GROQ[0]]
+    assert 7 < ranura._DESCANSO[config.ORBE_MODELO] - ranura.time.time() <= 7.5
+    modelos.clear(); pedir()
+    assert modelos == [ranura.RESPALDOS_GROQ[0]]                 # el que no tiene cupo descansa: no se pierde tiempo
+    monkeypatch.setattr(ranura, "_DESCANSO", {config.ORBE_MODELO: 0})
+    modelos.clear(); pedir()
+    assert modelos == [config.ORBE_MODELO, ranura.RESPALDOS_GROQ[0]]   # pasó el descanso: vuelve a intentar el principal
+
+
+def test_espera_que_pide_el_proveedor():
+    class X:
+        def __init__(self, texto, headers=None): self.text, self.headers = texto, headers or {}
+    assert ranura._espera(X("", {"retry-after": "12"})) == 12
+    assert ranura._espera(X("Please try again in 2m31.5s.")) == 151.5
+    assert ranura._espera(X("Please try again in 694ms.")) == 0.694
+    assert ranura._espera(X("Limit tokens per day (TPD): Please try again in 12m3s.")) == 723
+    assert ranura._espera(X("slow down")) == 20
 
 
 def test_voz_google_y_respaldo_gratis(c, monkeypatch):

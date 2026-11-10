@@ -7,6 +7,7 @@ Cada respuesta trae lo que costó, para llevar la cuenta por negocio.
 import base64
 import hmac
 import os
+import re
 import time
 
 import requests
@@ -101,7 +102,37 @@ class Pensar(BaseModel):
     max_tokens: int = Field(300, le=1500)
 
 
-def _chat(url: str, clave: str, modelo: str, p: Pensar) -> dict:
+# Cada modelo de Groq tiene su propio cupo por minuto y por día. Con un solo modelo, una mesa conversando agota el cupo
+# y todos los orbes quedan mudos; con varios, cuando uno se agota responde el siguiente (y después Gemini).
+RESPALDOS_GROQ = [m.strip() for m in os.getenv("ORBE_MODELOS_RESPALDO",
+                  "openai/gpt-oss-120b,meta-llama/llama-4-scout-17b-16e-instruct").split(",") if m.strip()]
+RESPALDOS_GEMINI = [m.strip() for m in os.getenv("GEMINI_MODELOS_RESPALDO", "gemini-flash-lite-latest").split(",") if m.strip()]
+_DESCANSO: dict = {}          # modelo → hasta cuándo no pedirle nada (dijo que se le acabó el cupo): así no se pierde tiempo
+
+
+class Rechazo(RuntimeError):
+    def __init__(self, codigo: int, texto: str, espera: float = 0):
+        super().__init__(f"{codigo}: {texto[:200]}")
+        self.codigo, self.espera = codigo, espera
+
+
+def _espera(r) -> float:
+    """Cuántos segundos pide el proveedor esperar antes de volver a intentar con ese modelo."""
+    try:
+        return min(3600.0, float((getattr(r, "headers", None) or {}).get("retry-after")))
+    except (TypeError, ValueError):
+        pass
+    texto = r.text or ""
+    if m := re.search(r"try again in ([\d.]+)ms", texto):
+        return float(m.group(1)) / 1000
+    if m := re.search(r"try again in (?:(\d+)h)?(?:(\d+)m(?!s))?([\d.]+)?s?", texto):
+        h, mi, se = (float(x) if x else 0 for x in m.groups())
+        if h or mi or se:
+            return min(3600.0, h * 3600 + mi * 60 + se)
+    return 600.0 if "per day" in texto or "TPD" in texto or "RPD" in texto else 20.0
+
+
+def _chat(url: str, clave: str, modelo: str, p: Pensar, timeout: float = 15) -> dict:
     cuerpo = {"model": modelo, "max_tokens": p.max_tokens + 300, "temperature": 0.4,
               "messages": [{"role": "system", "content": p.sistema}] + p.mensajes}
     if p.herramientas:
@@ -109,9 +140,9 @@ def _chat(url: str, clave: str, modelo: str, p: Pensar) -> dict:
         cuerpo["tool_choice"] = "auto"
     if "gpt-oss" in modelo:
         cuerpo["reasoning_effort"] = "low"
-    r = requests.post(url, json=cuerpo, timeout=25, headers={"Authorization": f"Bearer {clave}"})
+    r = requests.post(url, json=cuerpo, timeout=timeout, headers={"Authorization": f"Bearer {clave}"})
     if r.status_code >= 400:
-        raise RuntimeError(f"{r.status_code}: {r.text[:200]}")
+        raise Rechazo(r.status_code, r.text, _espera(r) if r.status_code == 429 else 0)
     d = r.json()
     m = d["choices"][0]["message"]
     u = d.get("usage") or {}
@@ -119,21 +150,33 @@ def _chat(url: str, clave: str, modelo: str, p: Pensar) -> dict:
             "uso": {"entrada": u.get("prompt_tokens", 0), "salida": u.get("completion_tokens", 0)}, "modelo": modelo}
 
 
+def _cerebros() -> list:
+    groq = list(dict.fromkeys([config.ORBE_MODELO, *RESPALDOS_GROQ])) if config.GROQ_API_KEY else []
+    gemini = list(dict.fromkeys([config.GEMINI_MODELO, *RESPALDOS_GEMINI])) if config.GEMINI_API_KEY else []
+    todos = [("groq", GROQ_CHAT, config.GROQ_API_KEY, m) for m in groq] + \
+            [("gemini", GEMINI_CHAT, config.GEMINI_API_KEY, m) for m in gemini]
+    ahora = time.time()
+    listos = [o for o in todos if _DESCANSO.get(o[3], 0) <= ahora]
+    return listos or todos                     # si todos descansan, se intenta igual: alguno pudo recuperarse
+
+
 @app.post("/pensar")
 def pensar(p: Pensar):
-    errores = []
-    opciones = [("groq", GROQ_CHAT, config.GROQ_API_KEY, config.ORBE_MODELO),
-                ("gemini", GEMINI_CHAT, config.GEMINI_API_KEY, config.GEMINI_MODELO)]
-    for nombre, url, clave, modelo in opciones:
-        if not clave:
-            continue
-        for intento in range(2 if nombre == "groq" else 1):     # Groq a veces rechaza una llamada suelta: un reintento
-            try:
-                return {**_chat(url, clave, modelo, p), "proveedor": nombre}
-            except (requests.RequestException, RuntimeError, KeyError, IndexError, ValueError) as e:
-                errores.append(f"{nombre}: {e}")
-                if intento == 0 and nombre == "groq":
-                    time.sleep(0.4)
+    errores, t0 = [], time.time()
+    for nombre, url, clave, modelo in _cerebros():
+        if time.time() - t0 > 20:                      # el cliente ya esperó demasiado: mejor la frase de respaldo
+            errores.append("sin tiempo para más respaldos")
+            break
+        try:
+            return {**_chat(url, clave, modelo, p, timeout=15 if not errores else 10), "proveedor": nombre}
+        except Rechazo as e:
+            errores.append(f"{modelo}: {e}")
+            if e.codigo == 429:
+                _DESCANSO[modelo] = time.time() + max(2.0, e.espera)
+            elif e.codigo in (401, 403, 404):          # modelo retirado o clave sin acceso: no insistir por un rato
+                _DESCANSO[modelo] = time.time() + 1800
+        except (requests.RequestException, KeyError, IndexError, ValueError) as e:
+            errores.append(f"{modelo}: {e}")
     raise HTTPException(502, "ningún cerebro respondió (" + "; ".join(errores) + ")")
 
 
