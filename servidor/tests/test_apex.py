@@ -633,3 +633,14 @@ def test_platos_con_otra_terminacion_y_sin_falso_buena_eleccion(c, axtra):
     axtra.guion = [herramienta("agregar_plato", {"plato_id": "torta"}), "falla"]
     r = turno(c, s).json()
     assert r.get("sin_voz") and not r["pedido"]["platos"]
+
+
+def test_historial_guarda_las_herramientas_resumidas():
+    """Lo que devolvió una herramienta en turnos anteriores se guarda corto: menos tokens en cada turno."""
+    from servidor.apex import orbe
+    largo = {"role": "tool", "tool_call_id": "1", "content": json.dumps({"ok": True, "platos": [
+        {"id": "ajiaco", "plato": "Ajiaco", "cantidad": 2, "nota": "sin alcaparras"}], "total": "76 mil pesos", "total_numero": 76000})}
+    corto = json.loads(orbe._compacto(largo)["content"])
+    assert corto == {"ok": True, "total": "76 mil pesos", "pedido": "2× Ajiaco (sin alcaparras)"}
+    assert orbe._compacto({"role": "user", "content": "hola"}) == {"role": "user", "content": "hola"}
+    assert json.loads(orbe._compacto({"role": "tool", "content": json.dumps({"ok": False, "error": "no está"})})["content"]) == {"ok": False, "error": "no está"}

@@ -401,6 +401,23 @@ def _args(texto) -> dict:
 
 
 # ---------------- Una vuelta de conversación ----------------
+def _compacto(m: dict) -> dict:
+    """El resultado de una herramienta de turnos anteriores, resumido: el modelo no necesita volver a leer todo el JSON
+    en cada turno (menos tokens = responde más rápido y alcanza el cupo para más mesas)."""
+    if m.get("role") != "tool":
+        return m
+    try:
+        d = json.loads(m.get("content") or "{}")
+    except ValueError:
+        return m
+    corto = {k: d[k] for k in ("ok", "error", "total") if k in d}
+    if d.get("platos"):
+        corto["pedido"] = ", ".join(f"{p['cantidad']}× {p['plato']}" + (f" ({p['nota']})" if p.get("nota") else "") for p in d["platos"])
+    elif "platos" in d:
+        corto["pedido"] = "vacío"
+    return {**m, "content": json.dumps(corto, ensure_ascii=False)}
+
+
 def conversar(r: dict, s, entrada: dict) -> dict:
     """entrada: {"role": "user", "content": ...} (lo que dijo el cliente o una acción en la pantalla). Devuelve el texto que dirá el orbe y qué pasó."""
     historial = db.historial(s["id"])
@@ -462,5 +479,5 @@ def conversar(r: dict, s, entrada: dict) -> dict:
     if not texto:
         texto = r["frases"]["despedida"] if hechos["confirmado"] else "¿En qué más le puedo ayudar?"
         mensajes.append({"role": "assistant", "content": texto})
-    db.guardar_historial(s["id"], mensajes)
+    db.guardar_historial(s["id"], [_compacto(m) for m in mensajes])
     return {"texto": texto, **hechos}

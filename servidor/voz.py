@@ -7,7 +7,7 @@ from . import config
 # idioma -> (código, voz nativa, código para reconocer la voz)
 IDIOMAS = {
     "ruso": ("ru", "ru-RU-DmitryNeural", "ru-RU"),
-    "ingles": ("en", "en-US-AndrewNeural", "en-US"),
+    "ingles": ("en", "en-US-GuyNeural", "en-US"),
     "frances": ("fr", "fr-FR-HenriNeural", "fr-FR"),
     "portugues": ("pt", "pt-BR-AntonioNeural", "pt-BR"),
     "aleman": ("de", "de-DE-ConradNeural", "de-DE"),
@@ -18,8 +18,8 @@ IDIOMAS = {
     "arabe": ("ar", "ar-SA-HamedNeural", "ar-SA"),
 }
 # Si una voz se demora o falla, se prueba otra del mismo idioma (medido: en-US-AndrewNeural a veces tarda 16 s
-# y en-US-AndrewMultilingualNeural deja de responder; GuyNeural y ChristopherNeural responden en medio segundo).
-RESPALDOS = {"en-US-AndrewNeural": ["en-US-GuyNeural", "en-US-ChristopherNeural"],
+# y en-US-AndrewMultilingualNeural 5 s; GuyNeural y ChristopherNeural responden en ~1 s: Guy es la voz en inglés).
+RESPALDOS = {"en-US-GuyNeural": ["en-US-ChristopherNeural", "en-US-BrianNeural"], "en-US-AndrewNeural": ["en-US-GuyNeural", "en-US-ChristopherNeural"],
              "en-US-AndrewMultilingualNeural": ["en-US-GuyNeural", "en-US-ChristopherNeural"],
              "es-CO-GonzaloNeural": ["es-CO-SalomeNeural", "es-MX-JorgeNeural"], "es-ES-AlvaroNeural": ["es-ES-ElviraNeural", "es-MX-JorgeNeural"],
              "fr-FR-HenriNeural": ["fr-FR-DeniseNeural"], "pt-BR-AntonioNeural": ["pt-BR-FranciscaNeural"],

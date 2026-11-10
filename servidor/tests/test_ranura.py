@@ -193,4 +193,4 @@ def test_voz_de_axtra_en_cada_idioma(c, monkeypatch):
     c.post("/voz", json={"texto": "hola", "axtra": True, "idioma": "es"})
     c.post("/voz", json={"texto": "hello", "axtra": True, "idioma": "en"})
     assert vistos[0]["voz"] == "es-ES-AlvaroNeural" and vistos[0]["tono"] == ranura.config.VOZ_TONO
-    assert vistos[1]["voz"] == "en-US-AndrewNeural" and vistos[1]["ritmo"] == ranura.config.VOZ_VELOCIDAD
+    assert vistos[1]["voz"] == "en-US-GuyNeural" and vistos[1]["ritmo"] == ranura.config.VOZ_VELOCIDAD
