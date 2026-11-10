@@ -48,6 +48,10 @@ def conn() -> sqlite3.Connection:
             _conn.execute("ALTER TABLE sesiones ADD COLUMN persona INTEGER DEFAULT 1")    # varias personas por mesa
             _conn.execute("ALTER TABLE pedidos ADD COLUMN persona INTEGER DEFAULT 1")
             _conn.commit()
+        if "alerta" not in {f["name"] for f in _conn.execute("PRAGMA table_info(sesiones)")}:
+            _conn.execute("ALTER TABLE sesiones ADD COLUMN alerta TEXT DEFAULT ''")     # alergias que mencionó el cliente
+            _conn.execute("ALTER TABLE pedidos ADD COLUMN alerta TEXT DEFAULT ''")
+            _conn.commit()
     return _conn
 
 
@@ -184,10 +188,29 @@ def uso_mes(rid: str) -> dict:
 
 
 # ---------------- Pedidos y llamadas al mesero ----------------
-def nuevo_pedido(rid: str, mesa: str, sid: str, items: list, total: float, entrega: dict | None = None, persona: int = 1) -> int:
-    return _ejecutar("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado, entrega, persona) VALUES (?,?,?,?,?,?,?,?)",
+def nuevo_pedido(rid: str, mesa: str, sid: str, items: list, total: float, entrega: dict | None = None, persona: int = 1,
+                 alerta: str = "") -> int:
+    return _ejecutar("INSERT INTO pedidos (restaurante, mesa, sesion, items, total, creado, entrega, persona, alerta) "
+                     "VALUES (?,?,?,?,?,?,?,?,?)",
                      (rid, mesa, sid, json.dumps(items, ensure_ascii=False), total, time.time(),
-                      json.dumps(entrega, ensure_ascii=False) if entrega else "", persona)).lastrowid
+                      json.dumps(entrega, ensure_ascii=False) if entrega else "", persona, (alerta or "")[:400])).lastrowid
+
+
+def anotar_alerta(sid: str, texto: str) -> bool:
+    """Guarda lo que dijo el cliente sobre alergias (se suma a lo anterior). Devuelve True si es la primera vez."""
+    f = sesion(sid)
+    if not f:
+        return False
+    previa = f["alerta"] or ""
+    if texto[:160] in previa:
+        return False
+    _ejecutar("UPDATE sesiones SET alerta=? WHERE id=?", ((previa + " · " if previa else "") + texto[:160], sid))
+    return not previa
+
+
+def alerta(sid: str) -> str:
+    f = sesion(sid)
+    return (f["alerta"] or "") if f else ""
 
 
 def pedidos_mesa(rid: str, mesa: str) -> list:

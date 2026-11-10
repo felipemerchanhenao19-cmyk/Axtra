@@ -30,6 +30,7 @@ button.prim { background:var(--c2); color:#04121c; border:0; font-weight:600; }
 .etq { font-size:12px; font-weight:700; letter-spacing:.06em; color:#04121c; background:var(--c2); border-radius:6px; padding:2px 7px; margin-right:6px; }
 #login { max-width:320px; margin:20vh auto; text-align:center; }
 #login input { width:100%; text-align:center; font-size:22px; letter-spacing:.3em; margin:14px 0; }
+.alerta-alergia { margin-top: 6px; padding: 8px 10px; border-radius: 10px; background: #5a1414; color: #ffd6d6; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -99,6 +100,7 @@ async function cargar() {
   $("#pedidos").innerHTML = d.pedidos.length ? d.pedidos.map((p) => `<div class="card ${p.estado === "nuevo" ? "nuevo" : ""}">
     <div class="fila"><b>${p.entrega ? `<span class="etq">DOMICILIO</span>` : ""}#${p.id}${p.entrega ? "" : " · Mesa " + esc(p.mesa) + (p.persona ? " · Persona " + p.persona : "")} · ${hora(p.creado)}</b><b>${plata(p.total)}</b></div>
     <div class="muted">${p.items.map((i) => `${i.cantidad} × ${esc(i.nombre)}${i.nota ? " (" + esc(i.nota) + ")" : ""}`).join(" · ")}</div>
+    ${p.alerta ? `<div class="alerta-alergia">⚠ Alergia: ${esc(p.alerta)} — confirme con la cocina</div>` : ""}
     ${domicilio(p)}
     <div class="fila" style="margin-top:8px"><span></span><select data-p="${p.id}">${Object.keys(ESTADOS)
       .filter((e) => p.entrega || e !== "en_camino")

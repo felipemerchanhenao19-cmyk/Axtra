@@ -421,7 +421,7 @@ def test_confirmar_por_voz_trae_la_factura_completa(c, axtra):
 
 def test_carta_y_frases_en_otro_idioma(c):
     m = c.get("/v1/menu/demo?idioma=en").json()
-    assert m["idioma"] == "en" and {i["codigo"] for i in m["idiomas"]} == {"es", "en", "pt", "de", "ru", "ja"}
+    assert m["idioma"] == "en" and {i["codigo"] for i in m["idiomas"]} == {"es", "en", "fr", "pt", "de", "ru", "ja"}
     assert next(p for p in m["menu"] if p["id"] == "limonada")["nombre"] == "Coconut lemonade"
     s = c.post("/v1/sesion", json={"restaurante": "demo", "mesa": "1", "idioma": "ja"}, headers=ORIGEN).json()
     assert s["frases"]["saludo"].endswith("&idioma=ja") and "オーブ" in s["saludo"]
@@ -573,3 +573,37 @@ def test_video_del_sitio_sin_voz_y_con_limite(c, axtra):
     axtra.caido = False
     codigos = [c.post("/v1/sitio/video", json={"nombre": f"R{i}"}).status_code for i in range(6)]
     assert codigos[-1] == 429                                                                   # 6 videos cada 10 minutos por visitante
+
+
+def test_frances(c):
+    abrir(c, "5")
+    m = c.get("/v1/menu/demo?idioma=fr").json()
+    assert m["idioma"] == "fr" and any(p["nombre"] == "Limonade à la noix de coco" for p in m["menu"])
+    s = sesion(c, "5", idioma="fr").json()
+    assert s["saludo"].startswith("Bonjour")
+    assert orbe._dijo_si("oui, d'accord") and not orbe._dijo_si("non merci")
+
+
+def test_turistas_y_alergias(c, axtra):
+    abrir(c, "6")
+    s = sesion(c, "6").json()
+    sistema = orbe.instrucciones(config.localizar(config.restaurante("demo"), ""), "6")
+    assert "qué es: El plato más típico de Antioquia" in sistema and "MUCHOS CLIENTES SON TURISTAS" in sistema
+    assert "Nunca digas que un plato es seguro" in sistema and "picante: pica poco" in sistema
+    # El cliente avisa de una alergia: llega un mesero a confirmar y la alerta viaja con el pedido a la cocina
+    axtra.oido = "Soy alérgico al maní, ¿la bandeja paisa tiene maní?"
+    axtra.guion = [texto("Según la carta no lleva maní; el mesero lo confirma con la cocina.")]
+    turno(c, s)
+    llamadas = c.get("/v1/panel/demo", headers=PIN).json()["llamadas"]
+    assert any(l["mesa"] == "6" and "maní" in l["motivo"] for l in llamadas)
+    axtra.oido = "Yo soy alérgico al maní, de verdad"
+    axtra.guion = [texto("Entendido.")]
+    turno(c, s)                                           # la segunda vez no vuelve a llamar al mesero
+    assert sum("maní" in l["motivo"] for l in c.get("/v1/panel/demo", headers=PIN).json()["llamadas"]) == 1
+    accion(c, s, "pedir", plato_id="bandeja")
+    r = accion(c, s, "confirmar").json()
+    if r.get("oferta"):
+        r = accion(c, s, "confirmar").json()
+    pedido = next(p for p in c.get("/v1/panel/demo", headers=PIN).json()["pedidos"] if p["mesa"] == "6")
+    assert "maní" in pedido["alerta"]
+    assert orbe.menciona_alergia("I'm allergic to peanuts") and orbe.menciona_alergia("je suis allergique") and not orbe.menciona_alergia("sin cebolla")

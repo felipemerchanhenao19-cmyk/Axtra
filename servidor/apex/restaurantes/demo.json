@@ -36,7 +36,9 @@
         "huevo"
       ],
       "foto": "/web/fotos/bandeja.jpg",
-      "foto_completa": true
+      "foto_completa": true,
+      "explicacion": "El plato más típico de Antioquia: un plato grande y abundante con varias porciones juntas, para alguien con mucha hambre.",
+      "picante": 0
     },
     {
       "id": "ajiaco",
@@ -47,7 +49,9 @@
       "alergenos": [
         "lácteos"
       ],
-      "foto": "/web/fotos/ajiaco.jpg"
+      "foto": "/web/fotos/ajiaco.jpg",
+      "explicacion": "Sopa tradicional de Bogotá, espesa y cremosa; se le agrega la crema y las alcaparras al gusto.",
+      "picante": 0
     },
     {
       "id": "omelet",
@@ -58,7 +62,9 @@
       "alergenos": [
         "huevo"
       ],
-      "foto": "/web/fotos/omelet.jpg"
+      "foto": "/web/fotos/omelet.jpg",
+      "explicacion": "Tortilla de huevo con verduras y salsa ranchera de tomate, suave.",
+      "picante": 1
     },
     {
       "id": "limonada",
@@ -69,7 +75,9 @@
       "alergenos": [
         "lácteos"
       ],
-      "foto": "/web/fotos/limonada.jpg"
+      "foto": "/web/fotos/limonada.jpg",
+      "explicacion": "Bebida colombiana de limón licuado con leche de coco, como un batido frío y refrescante.",
+      "picante": 0
     },
     {
       "id": "torta",
@@ -85,7 +93,9 @@
         "gluten"
       ],
       "foto": "/web/fotos/torta.jpg",
-      "modelo3d": "/web/modelos/torta.glb"
+      "modelo3d": "/web/modelos/torta.glb",
+      "explicacion": "Postre de chocolate en capas.",
+      "picante": 0
     }
   ],
   "topes": {
@@ -167,6 +177,50 @@
         "sin_voz": "Hi, the voice system is having trouble. Please select what you'd like to order."
       },
       "restaurante": "Your restaurant"
+    },
+    "fr": {
+      "nombre": "Français",
+      "grupos": {
+        "Platos fuertes": "Plats principaux",
+        "Bebidas": "Boissons",
+        "Postre del día": "Dessert du jour"
+      },
+      "menu": {
+        "bandeja": {
+          "nombre": "Bandeja paisa",
+          "descripcion": "Haricots rouges, riz, couenne de porc frite, viande hachée, œuf, banane plantain mûre, arepa et avocat."
+        },
+        "ajiaco": {
+          "nombre": "Ajiaco de Bogotá",
+          "descripcion": "Soupe de poulet aux trois pommes de terre et guascas, avec crème, câpres et avocat."
+        },
+        "omelet": {
+          "nombre": "Omelette ranchera",
+          "descripcion": "Trois œufs avec tomate, oignon, poivron et sauce ranchera."
+        },
+        "limonada": {
+          "nombre": "Limonade à la noix de coco",
+          "descripcion": "Crémeuse, bien fraîche, préparée à la minute."
+        },
+        "torta": {
+          "nombre": "Gâteau au chocolat",
+          "descripcion": "Moelleux, en couches, avec crème au chocolat et cacao. En promotion aujourd'hui."
+        }
+      },
+      "frases": {
+        "saludo": "Bonjour et bienvenue ! Touchez l'orbe et dites-moi ce qui vous fait envie, ou commandez avec les boutons.",
+        "eleccion": "Excellent choix ! Vous allez adorer !",
+        "sugerir": "Très bon choix ! Une limonade à la noix de coco bien fraîche avec ça ?",
+        "quitado": "C'est fait ! Je l'ai retiré de votre commande.",
+        "oferta": "Un instant avant d'envoyer ! Aujourd'hui, le gâteau au chocolat est en promotion. Ça vous tente ?",
+        "enviado": "Parfait ! Votre commande est partie à la caisse. Bon appétit !",
+        "despedida": "Parfait ! Votre commande est partie à la caisse. Bon appétit !",
+        "repetir": "Oups, je n'ai pas bien entendu ! Vous pouvez répéter ?",
+        "vacio": "Vous n'avez encore rien choisi ! Qu'est-ce qui vous ferait plaisir ?",
+        "mesero": "Bien sûr ! Un serveur arrive tout de suite.",
+        "sin_voz": "Bonjour, le système vocal rencontre un problème. Veuillez choisir ce que vous souhaitez commander."
+      },
+      "restaurante": "Votre restaurant"
     },
     "pt": {
       "nombre": "Português",

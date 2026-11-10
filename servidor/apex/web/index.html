@@ -258,6 +258,16 @@ const TEXTOS = {
         estados: { conectando: "Connecting…", escuchando: "🎙 Speak now", oyendo: "🎙 Listening…", pensando: "Thinking…", hablando: "", listo: "Tap the orb to talk", dormido: "Tap the orb to talk" },
         sin_mic: "No microphone: order with the buttons, the orb will keep talking to you.", sin_voz: "The voice system is having trouble. Please select what you'd like to order.",
         mesero_ok: "🙋 A server is on the way.", carga: "Couldn't load the menu. Check your connection." },
+  fr: { persona: "Personne", la_mesa: "👥 La table", mesa_titulo: "Ce que la table a commandé", mesa_vacia: "Personne à la table n'a encore envoyé de commande.", tu: "(vous)", total_mesa: "Total de la table", conectadas: "personnes connectées", locale: "fr-FR", ver3d: "Voir en 3D", en_mesa: "Voir sur votre table", ejemplo: "Démo", toque: "Touchez l'orbe", sub: "pour voir la carte. Parlez-lui ou commandez avec les boutons.", qr: "Afficher le code QR",
+        escanee: "Scannez pour l'essayer", cerrar: "Fermer", mesero: "🙋 Serveur", ver: "Voir la commande", pedir: "Commander", oferta_tag: "OFFRE DU JOUR",
+        su_pedido: "Votre commande", revise: "Vérifiez avant d'envoyer. Une erreur ? Retirez-la ici.", vacio: "Votre commande est vide.", total: "Total",
+        quitar: "Retirer", confirmar: "Confirmer la commande", seguir: "Continuer à voir la carte", oferta: (n, a, b) => `Offre du jour : <b>${n}</b>${a ? `, de ${a} à <b>${b}</b>` : ""}. Vous le voulez ?`,
+        si_agregarlo: "Oui, l'ajouter", no_enviar: "Non, envoyer ainsi", enviado: "Commande envoyée à la caisse !", enviado_sub: "Votre serveur vous l'apporte dans quelques minutes.",
+        pedido_n: "Commande", mas: "Commander autre chose", si_agregar: "Oui, l'ajouter", no_gracias: "Non, merci", listo_ver: "D'accord. Quand vous avez fini, touchez «Voir la commande».",
+        que_mas: "Qu'est-ce que je vous apporte d'autre ?", usted: "Vous", momento: "Un instant…", mesa: "Table",
+        estados: { conectando: "Connexion…", escuchando: "🎙 Parlez maintenant", oyendo: "🎙 Je vous écoute…", pensando: "Je réfléchis…", hablando: "", listo: "Touchez l'orbe pour parler", dormido: "Touchez l'orbe pour parler" },
+        sin_mic: "Pas de micro : commandez avec les boutons, l'orbe continuera de vous parler.", sin_voz: "Le système vocal rencontre un problème. Veuillez choisir ce que vous souhaitez commander.",
+        mesero_ok: "🙋 Un serveur arrive.", carga: "Impossible de charger la carte. Vérifiez votre connexion." },
   pt: { persona: "Pessoa", la_mesa: "👥 A mesa", mesa_titulo: "O que a mesa já pediu", mesa_vacia: "Ninguém da mesa enviou o pedido ainda.", tu: "(você)", total_mesa: "Total da mesa", conectadas: "pessoas conectadas", locale: "pt-BR", ver3d: "Ver em 3D", en_mesa: "Ver na sua mesa", ejemplo: "Exemplo", toque: "Toque no orbe", sub: "e veja o cardápio. Fale com ele ou peça pelos botões.", qr: "Mostrar código QR",
         escanee: "Escaneie e experimente", cerrar: "Fechar", mesero: "🙋 Garçom", ver: "Ver pedido", pedir: "Pedir", oferta_tag: "OFERTA DO DIA",
         su_pedido: "Seu pedido", revise: "Confira antes de enviar. Errou? Tire aqui.", vacio: "Seu pedido está vazio.", total: "Total",
@@ -299,7 +309,7 @@ const TEXTOS = {
         sin_mic: "マイクなし：ボタンでご注文ください。オーブは話し続けます。", sin_voz: "音声システムに不具合が発生しています。ご注文の品をお選びください。",
         mesero_ok: "🙋 スタッフが参ります。", carga: "メニューを読み込めませんでした。接続をご確認ください。" },
 };
-const NOMBRES_IDIOMA = { es: "Español", en: "English", pt: "Português", de: "Deutsch", ru: "Русский", ja: "日本語" };
+const NOMBRES_IDIOMA = { es: "Español", en: "English", fr: "Français", pt: "Português", de: "Deutsch", ru: "Русский", ja: "日本語" };
 let IDIOMA = (() => { const n = (navigator.language || "es").slice(0, 2).toLowerCase(); return TEXTOS[n] ? n : "es"; })();
 const T = () => TEXTOS[IDIOMA] || TEXTOS.es;
 let menu = null, plata = (v) => "$ " + Number(v).toLocaleString("es-CO");

@@ -277,6 +277,9 @@ async def turno(request: Request):
         t.append(time.perf_counter())
         if len(texto.strip(" .,¿?¡!")) < 2:
             return _respuesta(r, s, frase="repetir")
+        if orbe.menciona_alergia(texto):                 # alergia: queda en el pedido y, en una mesa, llega un mesero a confirmar
+            if db.anotar_alerta(s["id"], texto[:160]) and s["mesa"] != "domicilio":
+                db.llamar_mesero(r["id"], s["mesa"], f"Alergia: «{texto[:140]}»")
         res = await asyncio.to_thread(orbe.conversar, r, s, {"role": "user", "content": texto[:600]})
         t.append(time.perf_counter())
     except orbe.SinRanura as e:
@@ -432,7 +435,7 @@ def domicilio(e: Entrega, request: Request):
                "zona": zona["nombre"], "envio": zona["costo"], "subtotal": res["total_numero"], "pago": e.pago,
                "notas": e.notas.strip(), "seguimiento": secrets.token_urlsafe(12)}
     total = res["total_numero"] + zona["costo"]
-    num = db.nuevo_pedido(r["id"], "domicilio", s["id"], items, total, entrega)
+    num = db.nuevo_pedido(r["id"], "domicilio", s["id"], items, total, entrega, alerta=db.alerta(s["id"]))
     db.guardar_carrito(s["id"], [])
     frase = "enviado" if "enviado" in r["frases"] else "despedida"
     _anotar(r, s, "Envió el pedido a domicilio.", frase)
