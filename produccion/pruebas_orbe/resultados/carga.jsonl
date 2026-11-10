@@ -1,0 +1,5 @@
+{"personas": 200, "hilos": 6, "cupo": 0, "turnos": 800, "ok": 799, "mediana": 21.084715127944946, "p90": 36.79297089576721, "codigos": {"200": 799, "ReadError": 1}}
+{"personas": 200, "hilos": 64, "cupo": 0, "turnos": 800, "ok": 800, "mediana": 1.2705824375152588, "p90": 1.8583369255065918, "codigos": {"200": 800}}
+{"personas": 200, "hilos": 64, "cupo": 8000, "turnos": 800, "ok": 5, "mediana": 2.454613447189331, "p90": 2.561631679534912, "codigos": {"sin_voz": 795, "200": 5}}
+{"personas": 200, "hilos": 64, "cupo": 32000, "turnos": 800, "ok": 16, "mediana": 1.710855484008789, "p90": 2.6652681827545166, "codigos": {"200": 16, "sin_voz": 784}}
+{"personas": 200, "hilos": 64, "cupo": 250000, "turnos": 800, "ok": 125, "mediana": 1.5974111557006836, "p90": 1.9587314128875732, "codigos": {"200": 125, "sin_voz": 675}}
