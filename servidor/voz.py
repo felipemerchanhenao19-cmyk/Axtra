@@ -17,6 +17,13 @@ IDIOMAS = {
     "coreano": ("ko", "ko-KR-InJoonNeural", "ko-KR"),
     "arabe": ("ar", "ar-SA-HamedNeural", "ar-SA"),
 }
+# Si una voz se demora o falla, se prueba otra del mismo idioma (medido: en-US-AndrewNeural a veces tarda 16 s
+# y en-US-AndrewMultilingualNeural deja de responder; GuyNeural y ChristopherNeural responden en medio segundo).
+RESPALDOS = {"en-US-AndrewNeural": ["en-US-GuyNeural", "en-US-ChristopherNeural"],
+             "en-US-AndrewMultilingualNeural": ["en-US-GuyNeural", "en-US-ChristopherNeural"],
+             "es-CO-GonzaloNeural": ["es-CO-SalomeNeural", "es-MX-JorgeNeural"], "es-ES-AlvaroNeural": ["es-ES-ElviraNeural", "es-MX-JorgeNeural"],
+             "fr-FR-HenriNeural": ["fr-FR-DeniseNeural"], "pt-BR-AntonioNeural": ["pt-BR-FranciscaNeural"],
+             "de-DE-ConradNeural": ["de-DE-KatjaNeural"], "ru-RU-DmitryNeural": ["ru-RU-SvetlanaNeural"], "ja-JP-KeitaNeural": ["ja-JP-NanamiNeural"]}
 NOMBRES = {"ruso": "ruso", "ingles": "inglés", "frances": "francés", "portugues": "portugués", "aleman": "alemán",
            "italiano": "italiano", "japones": "japonés", "chino": "chino mandarín", "coreano": "coreano",
            "arabe": "árabe"}
@@ -46,11 +53,24 @@ def sintetizar(texto: str, idioma: str = None, lento: bool = False, voz: str = N
     else:
         voz, velocidad, tono = config.VOZ_AXTRA, ("-25%" if lento else config.VOZ_VELOCIDAD), config.VOZ_TONO
 
-    async def _run():
+    async def _una(nombre: str) -> bytes:
         audio = bytearray()
-        async for trozo in edge_tts.Communicate(texto, voz, rate=velocidad, pitch=tono).stream():
+        async for trozo in edge_tts.Communicate(texto, nombre, rate=velocidad, pitch=tono).stream():
             if trozo["type"] == "audio":
                 audio.extend(trozo["data"])
+        if not audio:
+            raise RuntimeError("sin audio")
         return bytes(audio)
+
+    async def _run():
+        # El servicio de voz a veces se demora (hasta 16 s medidos en inglés) o no responde: cada intento tiene un límite
+        # y, si falla, se prueba otra voz del mismo idioma.
+        error = None
+        for nombre, limite in [(voz, 5), *[(v, 6) for v in RESPALDOS.get(voz, [])], (voz, 8)]:
+            try:
+                return await asyncio.wait_for(_una(nombre), limite)
+            except Exception as e:
+                error = e
+        raise RuntimeError(f"voz no disponible: {error}")
 
     return asyncio.run(_run())
