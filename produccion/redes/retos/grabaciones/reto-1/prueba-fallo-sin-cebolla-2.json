@@ -1,0 +1,173 @@
+[
+ {
+  "cliente": "Buenas noches. Quiero una bandeja paisa.",
+  "frase": null,
+  "texto": "¡Excelente elección! ¿Le gustaría acompañar su bandeja paisa con una refrescante Limonada de coco? Y hoy la Torta de chocolate está en oferta, ¿la quiere probar?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "agregado": "Bandeja paisa",
+   "platos": [
+    {
+     "id": "bandeja",
+     "plato": "Bandeja paisa",
+     "cantidad": 1
+    }
+   ],
+   "total": "38 mil pesos",
+   "total_numero": 38000
+  },
+  "oido": "Buenas noches. Quiero una bandeja paisa.",
+  "tiempos": {
+   "oir": 0.25,
+   "pensar": 1.1,
+   "voz": 2.17,
+   "audio_kb": 122
+  },
+  "audio": true
+ },
+ {
+  "cliente": "No, espere. Mejor cámbiemela por un ajiaco.",
+  "frase": null,
+  "texto": "¿Le acompañamos el ajiaco con una Limonada de coco? Además, la Torta de chocolate está en oferta hoy, ¿le antoja?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "agregado": "Ajiaco santafereño",
+   "platos": [
+    {
+     "id": "ajiaco",
+     "plato": "Ajiaco santafereño",
+     "cantidad": 1
+    }
+   ],
+   "total": "32 mil pesos",
+   "total_numero": 32000
+  },
+  "oido": "No, espere. Mejor cámbiemela por un Ajiaco.",
+  "tiempos": {
+   "oir": 0.25,
+   "pensar": 1.41,
+   "voz": 1.56,
+   "audio_kb": 144
+  },
+  "audio": true
+ },
+ {
+  "cliente": "Al ajiaco no le ponga cebolla, por favor.",
+  "frase": null,
+  "texto": "Anotado: Ajiaco santafereño con su cambio para la cocina. ¿Desea algo más?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "platos": [],
+   "total": "0 pesos",
+   "total_numero": 0
+  },
+  "oido": "Al Ajiaco no le ponga cebolla, por favor.",
+  "tiempos": {
+   "oir": 0.25,
+   "pensar": 1.4,
+   "voz": 1.2,
+   "audio_kb": 104
+  },
+  "audio": true
+ },
+ {
+  "cliente": "¿Sabe qué? Mejor vuelva a la bandeja paisa, pero sin chicharrón. Y quite el ajiaco.",
+  "frase": null,
+  "texto": "¿Le acompañamos la bandeja paisa con una Limonada de coco? Y la Torta de chocolate está en oferta, ¿la desea también?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "agregado": "Bandeja paisa",
+   "platos": [
+    {
+     "id": "bandeja",
+     "plato": "Bandeja paisa",
+     "cantidad": 1,
+     "nota": "sin chicharrón"
+    }
+   ],
+   "total": "38 mil pesos",
+   "total_numero": 38000
+  },
+  "oido": "¿Sabe qué? Mejor vuelva la bandeja paisa, pero sin chicharrón. Y quite el Ajiaco.",
+  "tiempos": {
+   "oir": 0.28,
+   "pensar": 21.96,
+   "voz": 1.68,
+   "audio_kb": 215
+  },
+  "audio": true
+ },
+ {
+  "cliente": "Y de tomar, una limonada de coco.",
+  "frase": null,
+  "texto": "¿Le gustaría añadir la Torta de chocolate en oferta antes de confirmar su pedido?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "agregado": "Limonada de coco",
+   "platos": [
+    {
+     "id": "bandeja",
+     "plato": "Bandeja paisa",
+     "cantidad": 1,
+     "nota": "sin chicharrón"
+    },
+    {
+     "id": "limonada",
+     "plato": "Limonada de coco",
+     "cantidad": 1
+    }
+   ],
+   "total": "50 mil pesos",
+   "total_numero": 50000
+  },
+  "oido": "y Etomar, una limonada de coco.",
+  "tiempos": {
+   "oir": 0.29,
+   "pensar": 0.87,
+   "voz": 1.33,
+   "audio_kb": 92
+  },
+  "audio": true
+ },
+ {
+  "cliente": "No, eso es todo. Confirme el pedido.",
+  "frase": null,
+  "texto": "¡Perfecto! Su pedido ya va para la caja. ¡Que lo disfrute muchísimo!",
+  "despedida": true,
+  "pedido": {
+   "ok": true,
+   "pedido_numero": 76,
+   "enviado_a": "caja",
+   "persona": 1,
+   "platos": [
+    {
+     "id": "bandeja",
+     "plato": "Bandeja paisa",
+     "cantidad": 1,
+     "nota": "sin chicharrón"
+    },
+    {
+     "id": "limonada",
+     "plato": "Limonada de coco",
+     "cantidad": 1
+    }
+   ],
+   "total": "50 mil pesos",
+   "total_numero": 50000,
+   "siguiente": "Despídete: «¡Perfecto! Su pedido ya va para la caja. ¡Que lo disfrute muchísimo!»"
+  },
+  "oido": "No, eso es todo. Confirme el pedido.",
+  "tiempos": {
+   "oir": 0.29,
+   "pensar": 17.5,
+   "voz": 0.34,
+   "audio_kb": 125
+  },
+  "audio": true
+ }
+]

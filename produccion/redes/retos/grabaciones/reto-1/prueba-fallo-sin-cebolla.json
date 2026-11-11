@@ -1,0 +1,136 @@
+[
+ {
+  "cliente": "Buenas noches. Quiero una bandeja paisa.",
+  "frase": null,
+  "texto": "Bandeja paisa, 1 unidad. ¿Confirma?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "platos": [
+    {
+     "id": "bandeja",
+     "plato": "Bandeja paisa",
+     "cantidad": 1
+    }
+   ],
+   "total": "38 mil pesos",
+   "total_numero": 38000
+  },
+  "oido": "Buenas noches. Quiero una bandeja paisa.",
+  "tiempos": {
+   "oir": 0.27,
+   "pensar": 3.14,
+   "voz": 1.03,
+   "audio_kb": 122
+  },
+  "audio": true
+ },
+ {
+  "cliente": "No, espere. Mejor cámbiemela por un ajiaco.",
+  "frase": null,
+  "texto": "Ajiaco santafereño, 1 unidad. ¿Le gustaría probar la torta de chocolate en oferta hoy?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "agregado": "Ajiaco santafereño",
+   "platos": [
+    {
+     "id": "ajiaco",
+     "plato": "Ajiaco santafereño",
+     "cantidad": 1
+    }
+   ],
+   "total": "32 mil pesos",
+   "total_numero": 32000
+  },
+  "oido": "No, espere. Mejor cámbiemela por un Ajiaco.",
+  "tiempos": {
+   "oir": 0.28,
+   "pensar": 1.36,
+   "voz": 1.72,
+   "audio_kb": 144
+  },
+  "audio": true
+ },
+ {
+  "cliente": "El ajiaco que sea sin cebolla, por favor.",
+  "frase": null,
+  "texto": "Listo, quité Ajiaco santafereño de su pedido. ¿Algo más?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "platos": [],
+   "total": "0 pesos",
+   "total_numero": 0
+  },
+  "oido": "El Ajiaco que sea sin cebolla, por favor.",
+  "tiempos": {
+   "oir": 0.26,
+   "pensar": 1.48,
+   "voz": 0.59,
+   "audio_kb": 107
+  },
+  "audio": true
+ },
+ {
+  "cliente": "¿Sabe qué? Mejor vuelva a la bandeja paisa, pero sin chicharrón. Y quite el ajiaco.",
+  "frase": null,
+  "texto": "Bandeja paisa, 1 unidad sin chicharrón. ¿Le gustaría la torta de chocolate en oferta hoy?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "agregado": "Bandeja paisa",
+   "platos": [
+    {
+     "id": "bandeja",
+     "plato": "Bandeja paisa",
+     "cantidad": 1,
+     "nota": "sin chicharrón"
+    }
+   ],
+   "total": "38 mil pesos",
+   "total_numero": 38000
+  },
+  "oido": "¿Sabe qué? Mejor vuelva la bandeja paisa, pero sin chicharrón. Y quite el Ajiaco.",
+  "tiempos": {
+   "oir": 0.33,
+   "pensar": 20.39,
+   "voz": 1.48,
+   "audio_kb": 215
+  },
+  "audio": true
+ },
+ {
+  "cliente": "Y de tomar, una limonada de coco. Eso es todo, confirme el pedido.",
+  "frase": null,
+  "texto": "Anotado: Limonada de coco. ¿Desea algo más?",
+  "despedida": false,
+  "pedido": {
+   "ok": true,
+   "agregado": "Limonada de coco",
+   "platos": [
+    {
+     "id": "bandeja",
+     "plato": "Bandeja paisa",
+     "cantidad": 1,
+     "nota": "sin chicharrón"
+    },
+    {
+     "id": "limonada",
+     "plato": "Limonada de coco",
+     "cantidad": 1
+    }
+   ],
+   "total": "50 mil pesos",
+   "total_numero": 50000
+  },
+  "oido": "y de tomar una limonada de coco. Eso es todo, confirme el pedido.",
+  "tiempos": {
+   "oir": 0.29,
+   "pensar": 0.98,
+   "voz": 0.59,
+   "audio_kb": 176
+  },
+  "audio": true
+ }
+]
