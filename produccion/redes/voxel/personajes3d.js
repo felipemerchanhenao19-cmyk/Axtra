@@ -254,7 +254,7 @@ function orbi3d(r = 0.2) {
     gr.addColorStop(0, "#bff3ff"); gr.addColorStop(0.32, "#5fd0ff"); gr.addColorStop(0.55, "#2a9fe0"); gr.addColorStop(0.8, "#0b3d91"); gr.addColorStop(1, "#061a3d");
     g.fillStyle = gr; g.fillRect(0, 0, 1024, 512);
     const piensa = estado === "piensa", oye = estado === "escucha", habla = estado === "habla";
-    const parpadeo = (t % 3.7) < 0.13 && !piensa, ap = parpadeo ? 0.1 : oye ? 1.15 : 1;
+    const parpadeo = ((t % 3.7) < 0.13 && !piensa) || estado === "dormido", ap = parpadeo ? 0.1 : oye ? 1.15 : 1;
     const mx = piensa ? R * 0.06 : Math.sin(t * 0.55) * R * 0.05, my = piensa ? -R * 0.07 : Math.sin(t * 0.37) * R * 0.02;
     const ey = CY - R * 0.1, sep = R * 0.33;
     [-1, 1].forEach((s) => {
@@ -282,7 +282,8 @@ function orbi3d(r = 0.2) {
       const nace = s.nace ?? 1, extra = s.estado === "habla" ? (s.voz || 0) : s.estado === "escucha" ? 0.3 : 0;
       raiz.visible = nace > 0.001; raiz.position.set(s.x, s.y + Math.sin(t * 1.6 + (s.fase || 0)) * 0.03, s.z);
       cuerpo.rotation.y = s.rot || 0; const k = (0.2 + 0.8 * suave(nace)) * (1 + 0.035 * Math.sin(t * 1.8) + extra * 0.1); cuerpo.scale.setScalar(k);
-      esfera.material.opacity = 1; halo.material.opacity = (0.6 + extra * 0.5) * nace; luz.intensity = (1.0 + extra * 1.2) * nace * (s.luz ?? 1);
+      if (s.tinte) { const c = new THREE.Color(s.tinte[0], s.tinte[1], s.tinte[2]); esfera.material.emissive.setRGB(1, 1, 1).lerp(c, 0.45); esfera.material.color.setRGB(1, 1, 1).lerp(c, 0.55); halo.material.color.copy(c); luz.color.copy(c); }
+      esfera.material.emissiveIntensity = s.brillo ?? 0.75; esfera.material.opacity = 1; halo.material.opacity = (0.6 + extra * 0.5) * nace; luz.intensity = (1.0 + extra * 1.2) * nace * (s.luz ?? 1);
       anillo.rotation.z = -0.22 + 0.06 * Math.sin(t * 1.3);
       const giro = s.estado === "piensa" ? 2.6 : 0.9, a = t * giro; punto.position.set(Math.cos(a) * r * 1.32, 0, Math.sin(a) * r * 1.32);
       const pos = chispas.geometry.attributes.position; chispas.visible = nace < 1;

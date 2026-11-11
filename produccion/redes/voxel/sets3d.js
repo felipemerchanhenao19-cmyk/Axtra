@@ -225,3 +225,58 @@ function sala(escena) {
   U.paso = (tt, e = {}) => { U.ciudad.userData.paso(tt, e.rayo || 0); };
   return S;
 }
+
+// ---------- «Órbita»: el espacio profundo. Estrellas, nebulosa que cambia de color con la luz de la escena,
+// y las «mesas» como estrellas apagadas alrededor del asistente que se encienden y forman una constelación.
+function espacio(escena) {
+  const E = new THREE.Group(); escena.add(E); E.position.set(0, 0, -90); const U = {}, r = semilla(77);
+  // campo de estrellas en tres capas (cerca, medio, lejos)
+  U.capas = [[900, 30, 0.05], [500, 16, 0.07], [160, 9, 0.11]].map(([n, R, tam]) => { const pos = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { const a = r() * PI * 2, b = Math.acos(2 * r() - 1), d = R * (0.6 + 0.4 * r()); pos.set([Math.sin(b) * Math.cos(a) * d, Math.cos(b) * d + 1.6, Math.sin(b) * Math.sin(a) * d], i * 3); }
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const m = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xdfe8ff, size: tam, sizeAttenuation: true, transparent: true, opacity: 0.9, depthWrite: false, fog: false })); E.add(m); return m; });
+  // nebulosa: velos de luz detrás del asistente
+  U.velos = [[-2.5, 2.6, -7, 11], [3.2, 0.6, -9, 13], [0, 1.6, -5, 7], [-4, -0.5, -11, 12], [2, 3.5, -12, 10]].map(([x, y, z, s], i) => {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: texturaRadial("rgba(255,255,255,0.5)", "rgba(255,255,255,0)"), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false, opacity: 0.28 }));
+    sp.position.set(x, y, z); sp.scale.set(s, s * 0.7, 1); E.add(sp); return sp; });
+  U.aura = new THREE.Sprite(new THREE.SpriteMaterial({ map: texturaRadial('rgba(255,255,255,0.9)', 'rgba(255,255,255,0)'), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false })); U.aura.position.set(0, 1.6, -0.6); U.aura.scale.setScalar(5.2); E.add(U.aura);
+  // polvo que flota cerca de la cámara
+  const np = 140, pp = new Float32Array(np * 3); U.polvoBase = []; for (let i = 0; i < np; i++) U.polvoBase.push([(r() - 0.5) * 9, r() * 4.5 - 0.6, (r() - 0.5) * 9, r() * 6]);
+  const gp = new THREE.BufferGeometry(); gp.setAttribute("position", new THREE.BufferAttribute(pp, 3));
+  U.polvo = new THREE.Points(gp, new THREE.PointsMaterial({ color: 0xbfe6ff, size: 0.022, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending, fog: false })); E.add(U.polvo);
+  // las mesas: 20 estrellas en dos anillos inclinados alrededor del asistente
+  U.mesas = []; const glow = texturaRadial("rgba(255,255,255,1)", "rgba(255,255,255,0)");
+  for (let i = 0; i < 20; i++) { const anillo = i % 2, a = (i / 20) * PI * 2 + anillo * 0.16, R = anillo ? 2.55 : 1.85, inc = anillo ? -0.42 : 0.3;
+    const x = Math.cos(a) * R, z = Math.sin(a) * R, y = 1.6 + Math.sin(a + anillo) * R * Math.sin(inc);
+    const nucleo = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 8), new THREE.MeshBasicMaterial({ color: 0x3a4658, fog: false })); nucleo.position.set(x, y, z); E.add(nucleo);
+    const brillo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0, fog: false })); brillo.position.set(x, y, z); E.add(brillo);
+    U.mesas.push({ nucleo, brillo, p: new THREE.Vector3(x, y, z) }); }
+  // líneas de la constelación (de cada estrella a la siguiente del mismo anillo)
+  const lp = new Float32Array(20 * 6); U.mesas.forEach((m, i) => { const sig = U.mesas[(i + 2) % 20].p; lp.set([m.p.x, m.p.y, m.p.z, sig.x, sig.y, sig.z], i * 6); });
+  const gl = new THREE.BufferGeometry(); gl.setAttribute("position", new THREE.BufferAttribute(lp, 3));
+  U.lineas = new THREE.LineSegments(gl, new THREE.LineBasicMaterial({ color: 0xffd98a, transparent: true, opacity: 0, fog: false })); E.add(U.lineas);
+  // cometa (la comisión): pasa y se lleva la luz
+  U.cometa = new THREE.Group(); const cab = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: 0xff5a4a, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false })); cab.scale.setScalar(0.9); U.cometa.add(cab);
+  for (let k = 1; k < 14; k++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glow, color: 0xff3a2a, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.5 * (1 - k / 14), fog: false })); s.scale.setScalar(0.7 * (1 - k / 16)); s.position.set(k * 0.22, k * 0.06, 0); U.cometa.add(s); }
+  U.cometa.visible = false; E.add(U.cometa);
+  // luces de la escena: principal y contraluz, cambian de color con «luz»
+  U.principal = new THREE.DirectionalLight(0x88ccff, 2.2); U.principal.position.set(-3, 4, 4); U.principal.target.position.set(0, 1.6, 0); E.add(U.principal); E.add(U.principal.target);
+  U.contra = new THREE.DirectionalLight(0x88ccff, 3.0); U.contra.position.set(3, 2.5, -5); U.contra.target.position.set(0, 1.6, 0); E.add(U.contra); E.add(U.contra.target);
+  E.userData = U; const blanco = new THREE.Color(1, 1, 1), tmp = new THREE.Color();
+  U.paso = (tt, e = {}) => {
+    const c = e.luz ? tmp.setRGB(e.luz[0], e.luz[1], e.luz[2]) : tmp.setRGB(0.35, 0.7, 1), I = e.luz && e.luz[3] !== undefined ? e.luz[3] : 1;
+    U.principal.color.copy(c); U.contra.color.copy(c); U.principal.intensity = 2.2 * I; U.contra.intensity = 3.0 * I;
+    U.velos.forEach((v, i) => { v.material.color.copy(c); v.material.opacity = (0.42 + 0.1 * Math.sin(tt * 0.5 + i * 2)) * I; v.material.rotation = tt * 0.02 * (i % 2 ? 1 : -1); });
+    U.aura.material.color.copy(c); U.aura.material.opacity = 0.5 * I * (0.9 + 0.1 * Math.sin(tt * 1.3)); U.polvo.material.color.copy(c).lerp(blanco, 0.5);
+    U.capas.forEach((m, i) => { m.rotation.y = tt * 0.006 * (i + 1); m.material.opacity = 0.55 + 0.35 * I; });
+    const pos = U.polvo.geometry.attributes.position; U.polvoBase.forEach(([x, y, z, f], i) => pos.setXYZ(i, x + Math.sin(tt * 0.2 + f) * 0.3, y + ((tt * 0.05 + f) % 1) * 0.6, z + Math.cos(tt * 0.17 + f) * 0.3)); pos.needsUpdate = true;
+    const lit = (e.mesas || 0) * 20, al = e.alerta || 0;
+    U.mesas.forEach((m, i) => { const k = cl(lit - i), pulso = 0.5 + 0.5 * Math.sin(tt * 9 + i * 1.7);
+      m.nucleo.material.color.setRGB(0.23 + k * 0.77 + al * (1 - k) * 0.7 * pulso, 0.27 + k * 0.6 - al * (1 - k) * 0.1, 0.35 + k * 0.25 - al * (1 - k) * 0.2);
+      m.brillo.material.color.setRGB(1, lerp(0.2, 0.7, k), lerp(0.15, 0.25, k)); m.brillo.material.opacity = Math.max(k * (0.5 + 0.15 * Math.sin(tt * 3 + i)), al * (1 - k) * 0.55 * pulso);
+      m.brillo.scale.setScalar(0.22 + k * 0.38 + (k > 0 && k < 1 ? 0.9 * Math.sin(k * PI) : 0)); m.nucleo.scale.setScalar(1 + k * 0.8); });
+    U.lineas.material.opacity = 0.45 * cl((e.mesas || 0) * 1.6 - 0.5);
+    if (e.cometa) { U.cometa.visible = true; U.cometa.position.set(e.cometa[0], e.cometa[1], e.cometa[2]); } else U.cometa.visible = false;
+  };
+  return E;
+}

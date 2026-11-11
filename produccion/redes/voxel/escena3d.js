@@ -7,7 +7,7 @@ REN.toneMapping = THREE.ACESFilmicToneMapping; REN.toneMappingExposure = 1.35; R
 const ESC = new THREE.Scene(); ESC.background = new THREE.Color(0x060504); ESC.fog = new THREE.FogExp2(0x0a0806, 0.02);
 const CAM = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 90);
 const RELLENO = new THREE.DirectionalLight(0xffe6cc, 0.55); ESC.add(RELLENO); ESC.add(RELLENO.target);   // luz suave desde la cámara para leer las caras
-const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC) };
+const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC) };
 const ACT = {}, ORBIS = {};
 Object.entries(EP.elenco).forEach(([id, cfg]) => { ACT[id] = persona(cfg); ESC.add(ACT[id].raiz); });
 const EXTRAS = (EP.extras || []).map((x, i) => { const P = persona({ semilla: 100 + i, ...x.cfg }); ESC.add(P.raiz); return { P, x }; });
@@ -59,12 +59,14 @@ function render(t) {
   const PL = EP.planos, LP = LINEA.planos; let i = LP.findIndex((L) => t < L.fin); if (i < 0) i = LP.length - 1;
   const pl = PL[i], L = LP[i], tt = t - L.ini, dur = L.fin - L.ini, p = cl(tt / dur);
   Object.entries(SETS).forEach(([n, s]) => { s.visible = n === pl.set; });
+  ESC.background.set(pl.set === "espacio" ? 0x01030a : 0x060504);
   const o = origen(pl.set), est = pl.e || {};
   // estado del escenario: rayos, pantallas, comandas
   let rayo = 0; (est.rayos || []).forEach(([k, d]) => { const r0 = tClave(k, L), x = tt - r0; if (x >= 0 && x < (d || 0.6)) rayo = Math.max(rayo, (x < 0.08 || (x > 0.18 && x < 0.26) ? 1 : 0.35) * (1 - x / (d || 0.6))); });
   const eTab = discreto(est.tablet || {}, tt, L)[1], ePort = discreto(est.portatil || {}, tt, L)[1];
   const qrLuz = {}; Object.entries(est.qrLuz || {}).forEach(([n, s]) => { qrLuz[n] = continuo(s, tt, L)[0]; });
-  SETS[pl.set].userData.paso(t, { lapRot: est.lapRot !== undefined ? continuo(est.lapRot, tt, L)[0] : undefined, rayo, comandas: est.comandas, tablet: eTab, portatil: ePort, qrLuz, rojo: discreto(est.rojo || false, tt, L)[1] });
+  SETS[pl.set].userData.paso(t, { lapRot: est.lapRot !== undefined ? continuo(est.lapRot, tt, L)[0] : undefined, rayo, comandas: est.comandas, tablet: eTab, portatil: ePort, qrLuz, rojo: discreto(est.rojo || false, tt, L)[1], luz: est.luz ? continuo(est.luz, tt, L)[0] : null, mesas: continuo(est.mesas ?? 0, tt, L)[0], alerta: continuo(est.alerta ?? 0, tt, L)[0], cometa: est.cometa ? continuo(est.cometa, tt, L)[0] : null });
+  const tinte = est.luz ? continuo(est.luz, tt, L)[0] : null;
   // cámara (claves [x,y,z, tx,ty,tz, fov]) con cámara en mano
   const [c] = continuo(pl.cam.map((k, j) => k.length === 8 ? k : [j === 0 ? 0 : dur * j / (pl.cam.length - 1), ...k]), tt, L);
   const mano = pl.mano ?? 0.012, hx = mano * (Math.sin(t * 1.1) + 0.5 * Math.sin(t * 2.7)), hy = mano * Math.cos(t * 0.9);
@@ -96,13 +98,14 @@ function render(t) {
     const v = d.voz !== false ? voz("orbi", t) : 0, [s0, s1] = discreto(d.estado || "reposo", tt, L);
     const P0 = new THREE.Vector3(d.pos[0] + o.x, d.pos[1], d.pos[2] + o.z), [m0, m1, km] = discreto(d.mira || "cam", tt, L);
     const yaw = (m) => { const T = m === "cam" ? CAM.position : posMundo(m, pl, tt, L); return T ? yawHacia(P0, T) : 0; };
-    O.animar({ x: P0.x, y: P0.y, z: P0.z, rot: lerp(yaw(m0), yaw(m1), km), nace, estado: v > 0.02 ? "habla" : s1, voz: v, fase: j * 1.3, luz: d.luz }, t);
+    O.animar({ x: P0.x, y: P0.y, z: P0.z, rot: lerp(yaw(m0), yaw(m1), km), nace, estado: v > 0.02 ? "habla" : s1, voz: v, fase: j * 1.3, luz: d.luz, tinte, brillo: d.brillo !== undefined ? continuo(d.brillo, tt, L)[0] : undefined }, t);
   });
   REN.render(ESC, CAM);
   // color de cine, viñeta, subtítulos, título, negro y destellos
   $("#lienzo").style.filter = pl.grado || "contrast(1.08) saturate(1.06)";
   const linea = L.lineas.find((l) => t >= l.ini - 0.05 && t < l.fin + 0.25), sub = $("#sub");
   const extra = linea && ((pl.lineas || [])[L.lineas.indexOf(linea)] || [])[3]; sub.textContent = linea ? (extra && extra.sub) || linea.txt : "";   // «sub»: traducción de las líneas en inglés sub.style.opacity = linea ? 1 : 0;
+  sub.style.top = (pl.subY || EP.subY || 560) + "px";
   const ti = $("#titulo");
   if (pl.titulo) { const a = cl((tt - 0.4) / 0.6) * cl((dur - 0.4 - tt) / 0.5); ti.innerHTML = `<small>${pl.titulo[0]}</small><b>${pl.titulo[1] || ""}</b>`; ti.style.opacity = a; } else ti.style.opacity = 0;
   let negro = 0; if (pl.trans === "negro") negro = Math.max(negro, 1 - cl(tt / 0.6)); if (PL[i + 1] && PL[i + 1].trans === "negro") negro = Math.max(negro, cl((tt - dur + 0.45) / 0.45));

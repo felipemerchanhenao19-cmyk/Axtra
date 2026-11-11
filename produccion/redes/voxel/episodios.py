@@ -100,6 +100,13 @@ VIL = [0.3, -0.9]; NOC = [-0.45, 1.7]; FER = [1.15, 1.8]; ORB = [-0.35, 1.85, 0.
 VILLANO = dict(pos=VIL, rot=0, mira="cam", emo="serio", gesto="reposo")
 HEROES = {"noche": dict(pos=NOC, rot=164, mira="comision", emo="serio", gesto="reposo"), "ferro": dict(pos=FER, rot=197, mira="comision", emo="neutro", gesto="reposo")}
 
+# ═══ «Órbita»: el asistente solo, en el universo. Luz por frase: azul (problema), rojo (lo que se pierde), oro (solución).
+AZUL = [0.3, 0.65, 1.0]; ROJO = [1.0, 0.25, 0.2]; ORO = [1.0, 0.6, 0.15]
+ORBITA_VOZ = {"orbi": dict(voz=("es-CO-SalomeNeural", "-3%", "+0Hz"))}
+def OJO(dist, giro=0, alt=0.0, fov=38):   # cámara alrededor del asistente (está en 0, 1.6, 0)
+    a = radians(giro); return [sin(a) * dist, 1.6 + alt, cos(a) * dist, 0, 1.6, 0, fov]
+def ASIS(**k): return {"a": dict(dict(pos=[0, 1.6, 0], r=0.5, mira="cam", luz=1.6), **k)}
+
 # convocatoria: equipo de traje, estilo juguete de bloques
 TRAJES = {
     "director": dict(juguete=True, piel="#c48a64", pelo="#5e5a56", cejas="#2a2826", saco="#14213a", camisa="#f4f2ee", corbata="#5a1a24", pantalon="#14213a", zapatos="#0b0b0d", semilla=21, alto=1.02),
@@ -1069,5 +1076,36 @@ EPISODIOS = {
         actores={**BAR, "jairo": dict(pos=JAIRO, gesto="baja", mira="brayan", emo=[[0, "duda"], ["l2", "cansado"]]), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="feliz")},
         lineas=[L("jairo", "¿Y quién lo atendió?", 0.2), L("brayan", "Yo le llevé el plato.", 0.3), L("brayan", "Rapidísimo, eso sí.", 0.6)]),
    CIERRE_PLAY("Cada mesa atendida como la del crítico.", "Un asistente de IA que recomienda y toma el pedido."),
+  ]),
+ # ═══════════ «Órbita» ═══════════
+ "orbita-nunca-duermo": dict(producto="play", subY=1400, reparto=ORBITA_VOZ, elenco={}, extras=[], gancho=["Hay alguien en su restaurante que nunca duerme", "", 3.0],
+  copy="Veinte mesas. Un solo mesero. Y alguien que nunca duerme. ✨ Apex Play",
+  hashtags="#InteligenciaArtificial #Restaurantes #Tecnologia #Emprendedores #Colombia",
+  planos=[
+   dict(set="espacio", grado="saturate(1.7) contrast(1.12) brightness(1.03)", musica="misterio", min=2.8, relleno=0.1, mano=0.004, fx=[dict(tipo="pum", p=0.0), dict(tipo="destello", p=0.45)],
+        cam=[OJO(4.6, -8, 0.1), OJO(3.9, -3, 0.05)], e=dict(luz=[[0, *AZUL, 0.1], [1.2, *AZUL, 0.2], [2.0, *AZUL, 1.0]]),
+        orbis=ASIS(nace=[0.2, 1.5], estado=[[0, "dormido"], [1.9, "reposo"]], brillo=[[0, 0.15], [1.4, 0.2], [2.1, 0.75]])),
+   dict(set="espacio", grado="saturate(1.7) contrast(1.12) brightness(1.03)", musica="misterio", cola=0.3, relleno=0.1, mano=0.004,
+        cam=[OJO(3.9, -3, 0.05), OJO(3.5, 10, 0.0)], e=dict(luz=[[0, *AZUL, 1.0]]), orbis=ASIS(),
+        lineas=[L("orbi", "Son las ocho de la noche. Su restaurante está lleno.", 0.2)]),
+   dict(set="espacio", grado="saturate(1.7) contrast(1.12) brightness(1.03)", musica="tension", cola=0.5, relleno=0.1, mano=0.01,
+        cam=[OJO(6.4, 24, 1.5, 44), OJO(7.2, 38, 1.9, 44)],
+        e=dict(luz=[[0, *AZUL, 1.0], ["l1-0.2", *AZUL, 1.0], ["l1+0.3", *ROJO, 1.1]], alerta=[[0, 0], ["l1-0.1", 0], ["l1+0.4", 1]]),
+        orbis=ASIS(estado=[[0, "reposo"], ["f1", "piensa"]]),
+        lineas=[L("orbi", "Veinte mesas.", 0.3), L("orbi", "Un solo mesero.", 0.5)]),
+   dict(set="espacio", grado="saturate(1.7) contrast(1.12) brightness(1.03)", musica="heroe", cola=0.9, relleno=0.1, trans="flash", fx=[dict(tipo="destello", p=0.1), dict(tipo="destello", p=0.35), dict(tipo="destello", p=0.6), dict(tipo="destello", p=0.85)],
+        cam=[OJO(7.0, 40, 1.8, 44), OJO(5.6, 75, 1.0, 42)],
+        e=dict(luz=[[0, *ORO, 1.3], [0.6, *ORO, 1.0]], alerta=[[0, 1], [0.3, 1], ["f1+0.6", 0]], mesas=[[0, 0], [0.4, 0], ["f1+0.7", 1]]),
+        orbis=ASIS(),
+        lineas=[L("orbi", "Yo las atiendo todas.", 0.5), L("orbi", "Al mismo tiempo.", 0.3)]),
+   dict(set="espacio", grado="saturate(1.7) contrast(1.12) brightness(1.03)", musica="esperanza", cola=0.5, relleno=0.1, mano=0.004,
+        cam=[OJO(3.9, 80, 0.05), OJO(3.4, 112, 0.0)], e=dict(luz=[[0, *ORO, 1.0]], mesas=1),
+        orbis=ASIS(),
+        lineas=[L("orbi", "No me canso.", 0.2), L("orbi", "No me equivoco.", 0.3), L("orbi", "Y hablo seis idiomas.", 0.3)]),
+   dict(set="espacio", grado="saturate(1.7) contrast(1.12) brightness(1.03)", musica="pelicula", min=6.0, relleno=0.1, trans="negro",
+        cam=[OJO(7.5, 120, 1.6, 44), OJO(9.5, 140, 2.2, 44)], e=dict(luz=[[0, *ORO, 0.9], [3, *AZUL, 0.9]], mesas=1),
+        orbis=ASIS(voz=False),
+        final=dict(marca="Apex Play", frase="Un asistente de IA en cada mesa.", desde=0.8,
+                   detalle="Cotización según sus mesas y su carta<br>Clientes nuevos: 50 % de descuento")),
   ]),
 }
