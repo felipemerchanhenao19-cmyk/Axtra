@@ -41,3 +41,14 @@ html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; 
 #final.marca .frase { font: 800 italic 76px/1.08 "Playfair", Georgia, serif; color: #fff; } #final.marca .frase i { color: #7fb2ea; }
 #final.marca .unase { display: inline-block; margin-top: 34px; border: 3px solid #fff; padding: 18px 36px; font: 700 34px/1 "Figtree"; letter-spacing: .32em; color: #fff; }
 #final.marca { top: 760px; }
+
+/* «Estación»: bloom suave y tipografía de cine (sin cajas, sin caricatura) */
+#bloom { position: absolute; inset: 0; width: 1080px; height: 1920px; mix-blend-mode: screen; opacity: 0; z-index: 4; pointer-events: none; }
+body.cine #sub { font: 600 46px/1.3 "Figtree"; letter-spacing: .005em; color: #eef2f6; text-shadow: 0 2px 22px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.8); }
+body.cine #gancho span { font: 400 72px/1.12 "Italiana", Georgia, serif; color: #f3ede4; background: none; box-shadow: none; padding: 0; text-shadow: 0 2px 30px rgba(0,0,0,.9); }
+body.cine #gancho small { font: 700 24px/1 "Figtree"; letter-spacing: .42em; color: #e8a04a; margin-top: 34px; }
+body.cine #titulo small { color: #e8a04a; letter-spacing: .42em; font-size: 24px; } body.cine #titulo b { font-size: 76px; color: #f3ede4; }
+body.cine #grano { opacity: .09; }
+body.cine #final .logo i.pin { display: none; } body.cine #final .frase { font-size: 60px; } body.cine #final .detalle { color: #e8b47a; }
+body.cine #sub { background: radial-gradient(ellipse 60% 50% at center, rgba(3,5,8,.82) 0%, rgba(3,5,8,.55) 45%, rgba(3,5,8,0) 75%); padding: 46px 10px; margin-top: -46px; }
+body.cine #sub { left: 110px; right: 110px; padding: 20px 28px; margin-top: 0; border-radius: 20px; background: rgba(4,6,10,.62); backdrop-filter: blur(8px); } body.cine #sub:empty { background: none; backdrop-filter: none; }

@@ -44,12 +44,13 @@ def playfair():
 def pagina(ep, lin, W):
     leer = lambda p: open(p).read()
     html = f'''<!doctype html><html><head><meta charset="utf-8">{leer(RAIZ + "produccion/videos/fuentes.html")}{playfair()}<style>{leer(AQUI + "estilo.css")}</style></head><body>
-<canvas id="lienzo" width="1080" height="1920"></canvas><div id="vineta"></div><canvas id="grano" width="360" height="640"></canvas>
+<canvas id="lienzo" width="1080" height="1920"></canvas><canvas id="bloom" width="270" height="480"></canvas><div id="vineta"></div><canvas id="grano" width="360" height="640"></canvas>
 <div id="titulo"></div><div id="gancho"></div><div id="info"></div><div id="sub"></div><div id="cortina"></div><div id="final"></div><div id="nota"></div><div id="blanco"></div><div id="negro"></div>
 <script src="file://{THREE}"></script>
 <script>const EP = {json.dumps(ep, ensure_ascii=False)}; const LINEA = {json.dumps(lin, ensure_ascii=False)};
 {leer(AQUI + "personajes3d.js")}
 {leer(AQUI + "sets3d.js")}
+{leer(AQUI + "estacion3d.js")}
 {leer(AQUI + "escena3d.js")}</script></body></html>'''
     open(W + "cuadro.html", "w").write(html)
     shutil.copytree(RAIZ + "produccion/redes/pelicula/fotos", W + "fotos", dirs_exist_ok=True)
