@@ -143,3 +143,8 @@ python hacer.py <capítulo|todos>            # video final
 PRUEBA=planos python hacer.py <capítulo>    # un cuadro por plano para revisar
 ```
 Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft (edge-tts) y la música es sintetizada.
+
+## Corporativo «Estación» (48 s, realista, sin caricaturas)
+- **apex-estacion.mp4**: puesto de trabajo en metal oscuro y vidrio, pantallas OLED con Apex Play (conversación de mesa → pedido a cocina), Apex Domicilios ($ 0 de comisión, comprobante verificado), carta digital y operación en tiempo real.
+- Descripción: «Software e inteligencia artificial para restaurantes. Apex Play atiende cada mesa; Apex Domicilios le da su canal directo, sin comisiones.»
+- Hashtags: #InteligenciaArtificial #Restaurantes #Software #Tecnologia #Colombia
