@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Escáner Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fondo: #0a1120; --panel: #111a2b; --panel-2: #18243a; --linea: rgba(191,155,95,.24); --linea-suave: rgba(246,241,231,.08);
+  --oro: #bf9b5f; --oro-claro: #dcc08c; --crema: #f6f1e7; --suave: #9aa6ba; --tenue: #6f7b90;
+  --alto: #dcc08c; --medio: #8fb3d9; --bajo: #6f7b90; --bien: #5fbf8f; --mal: #d9826f;
+  --titulo: "Playfair Display", Georgia, serif; --cuerpo: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+body { background: var(--fondo); color: var(--crema); font-family: var(--cuerpo); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--oro-claro); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 2px; border-radius: 6px; }
+.envoltura { width: min(1180px, 100%); margin-inline: auto; padding: max(18px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom)); display: grid; gap: 18px; }
+.ceja { font-size: 11.5px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--oro); }
+h1 { font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; text-wrap: balance; }
+h2 { font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
+.cabeza { display: grid; gap: 6px; padding-bottom: 4px; }
+.cabeza p { color: var(--suave); max-width: 62ch; }
+.bloque { background: var(--panel); border: 1px solid var(--linea-suave); border-radius: 16px; padding: 16px; display: grid; gap: 12px; }
+.fila { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.campo { display: grid; gap: 4px; flex: 1 1 150px; min-width: 0; }
+.campo label, .etq { font-size: 12px; font-weight: 600; color: var(--suave); }
+input[type=text], input[type=search], input[type=date], select, textarea {
+  width: 100%; background: var(--panel-2); border: 1px solid var(--linea-suave); border-radius: 10px; padding: 10px 12px; min-height: 42px; }
+textarea { min-height: 70px; resize: vertical; }
+input:focus, select:focus, textarea:focus { border-color: var(--oro); outline: none; }
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 10px 18px; border-radius: 999px;
+  font-weight: 700; border: 1px solid var(--linea); background: transparent; cursor: pointer; white-space: nowrap; }
+.boton.oro { background: linear-gradient(135deg, var(--oro-claro), var(--oro)); color: #111a2b; border: 0; }
+.boton:disabled { opacity: .5; cursor: wait; }
+.boton.chico { min-height: 34px; padding: 6px 12px; font-size: 13px; font-weight: 600; }
+.escaneos { display: grid; gap: 6px; font-size: 13px; color: var(--suave); }
+.escaneos .e { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.punto { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--tenue); flex: none; transform: translateY(-1px); }
+.punto.trabajando { background: var(--oro-claro); animation: latir 1.2s infinite; }
+.punto.listo { background: var(--bien); } .punto.error { background: var(--mal); }
+@keyframes latir { 50% { opacity: .3; } }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.cifra { background: var(--panel); border: 1px solid var(--linea-suave); border-radius: 14px; padding: 12px 14px; }
+.cifra b { display: block; font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.cifra span { font-size: 12px; color: var(--suave); }
+.check { display: inline-flex; gap: 8px; align-items: center; min-height: 42px; color: var(--suave); font-size: 13px; cursor: pointer; }
+.rango { display: flex; gap: 10px; align-items: center; } .rango input { flex: 1; accent-color: var(--oro); } .rango output { font-variant-numeric: tabular-nums; min-width: 2ch; }
+.barra-lista { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.barra-lista p { color: var(--suave); font-size: 13px; }
+.lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 12px; }
+.tarjeta { background: var(--panel); border: 1px solid var(--linea-suave); border-radius: 16px; padding: 14px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.tarjeta.abierta { border-color: var(--linea); }
+.t-cab { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; cursor: pointer; }
+.nota { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 17px; font-variant-numeric: tabular-nums;
+  border: 2px solid var(--tenue); color: var(--suave); }
+.nota.alta { border-color: var(--oro-claro); color: var(--oro-claro); background: rgba(220,192,140,.08); }
+.nota.media { border-color: var(--crema); color: var(--crema); }
+.t-cab h3 { font-size: 16.5px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.t-cab .sub { font-size: 12.5px; color: var(--suave); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 11.5px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--linea-suave); color: var(--suave); }
+.chip.alto { color: var(--alto); border-color: rgba(220,192,140,.4); } .chip.medio { color: var(--medio); border-color: rgba(143,179,217,.35); }
+.chip.estado { color: var(--crema); border-color: var(--linea); }
+.datos { display: grid; gap: 6px; font-size: 13.5px; }
+.datos .d { display: grid; grid-template-columns: 92px 1fr; gap: 8px; } .datos .d > span:first-child { color: var(--tenue); font-size: 12px; padding-top: 1px; }
+.datos .d > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.registro { border-top: 1px solid var(--linea-suave); padding-top: 10px; }
+.aviso { font-size: 12px; color: var(--tenue); }
+.acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.seguimiento { display: grid; gap: 8px; border-top: 1px solid var(--linea-suave); padding-top: 10px; }
+.seguimiento .fila .campo { flex-basis: 130px; }
+.guardado { font-size: 12px; color: var(--bien); min-height: 1em; }
+.vacio { text-align: center; color: var(--suave); padding: 40px 16px; border: 1px dashed var(--linea); border-radius: 16px; }
+.pie { font-size: 12px; color: var(--tenue); max-width: 80ch; }
+.error-msj { color: var(--mal); font-size: 13px; }
+</style>
+</head>
+<body>
+<main class="envoltura">
+  <header class="cabeza">
+    <span class="ceja">Apex · Prospectos</span>
+    <h1>Escáner de restaurantes</h1>
+    <p>El agente busca los restaurantes de una ciudad, mide cuántos hoteles y atracciones tienen cerca y, en Colombia, los cruza con el registro mercantil. Usted ve primero los que más le sirven a Apex Play.</p>
+  </header>
+
+  <section class="bloque" aria-labelledby="t-escanear">
+    <h2 id="t-escanear">Nuevo escaneo</h2>
+    <form class="fila" id="f-escanear">
+      <div class="campo"><label for="e-ciudad">Ciudad</label><input type="text" id="e-ciudad" required maxlength="80" placeholder="Cartagena" autocomplete="off"></div>
+      <div class="campo"><label for="e-pais">País</label><input type="text" id="e-pais" required maxlength="60" value="Colombia" autocomplete="off"></div>
+      <button class="boton oro" id="b-escanear">Escanear</button>
+    </form>
+    <p class="error-msj" id="e-error" hidden></p>
+    <div class="escaneos" id="escaneos" aria-live="polite"></div>
+  </section>
+
+  <section class="cifras" id="cifras" aria-label="Resumen"></section>
+
+  <section class="bloque" aria-labelledby="t-filtros">
+    <h2 id="t-filtros">Filtrar</h2>
+    <div class="fila">
+      <div class="campo"><label for="f-pais">País</label><select id="f-pais"></select></div>
+      <div class="campo"><label for="f-ciudad">Ciudad</label><select id="f-ciudad"></select></div>
+      <div class="campo"><label for="f-nicho">Nicho</label><select id="f-nicho"></select></div>
+      <div class="campo"><label for="f-tipo">Tipo</label><select id="f-tipo"></select></div>
+      <div class="campo"><label for="f-flujo">Flujo de turistas</label><select id="f-flujo"></select></div>
+      <div class="campo"><label for="f-estado">Seguimiento</label><select id="f-estado"></select></div>
+    </div>
+    <div class="fila">
+      <div class="campo" style="flex-basis:220px"><label for="f-texto">Buscar</label><input type="search" id="f-texto" placeholder="Nombre, razón social o dirección"></div>
+      <div class="campo"><label for="f-minimo">Puntaje mínimo</label><div class="rango"><input type="range" id="f-minimo" min="0" max="90" step="5" value="0"><output id="o-minimo">0</output></div></div>
+      <label class="check"><input type="checkbox" id="f-contacto"> Solo con forma de contacto</label>
+    </div>
+  </section>
+
+  <div class="barra-lista">
+    <p id="conteo">Cargando…</p>
+    <a class="boton chico" id="b-csv" href="/api/prospectos.csv">Descargar tabla (CSV)</a>
+  </div>
+  <section class="lista" id="lista" aria-live="polite"></section>
+  <div style="text-align:center"><button class="boton" id="b-mas" hidden>Ver más</button></div>
+
+  <p class="pie">Fuentes: OpenStreetMap (© colaboradores de OpenStreetMap, licencia ODbL) y el registro mercantil público de Confecámaras (datos.gov.co).
+    Solo datos públicos de negocios: no se guardan cédulas ni se investigan personas (Ley 1581 de 2012). El representante legal de una sociedad se consulta en el RUES con su NIT.
+    El flujo es un estimado por la cantidad de hoteles y atracciones a 400 m, no un conteo de clientes.</p>
+</main>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const ESTADOS = { nuevo: "Nuevo", contactado: "Contactado", demo: "Demo hecha", piloto: "Piloto", cliente: "Cliente", descartado: "Descartado" };
+  const FLUJO = { alto: "Alto", medio: "Medio", bajo: "Bajo" };
+  const POR_PAGINA = 60;
+  let datos = [], mostrados = 0, abierta = null;
+
+  async function api(ruta, opts = {}) {
+    const r = await fetch(ruta, { credentials: "same-origin", headers: { "Content-Type": "application/json" }, ...opts });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.detail || `error ${r.status}`);
+    return d;
+  }
+  const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const enlace = (u) => /^https?:\/\//i.test(u) ? u : "https://" + u;
+
+  /* ---------- filtros ---------- */
+  const filtros = ["pais", "ciudad", "nicho", "tipo", "flujo", "estado"];
+  function llenar(sel, opciones, todos, etiqueta = (v) => v) {
+    const actual = sel.value;
+    sel.innerHTML = `<option value="">${todos}</option>` + opciones.map((o) => `<option value="${esc(o.valor ?? o)}">${esc(etiqueta(o.valor ?? o))}${o.n ? ` (${o.n})` : ""}</option>`).join("");
+    if ([...sel.options].some((o) => o.value === actual)) sel.value = actual;
+  }
+  async function cargarOpciones() {
+    const o = await api("/api/prospectos/opciones");
+    llenar($("#f-pais"), o.paises, "Todos");
+    llenar($("#f-ciudad"), o.ciudades.filter((c) => !$("#f-pais").value || c.pais === $("#f-pais").value), "Todas");
+    llenar($("#f-nicho"), o.nichos, "Todos"); llenar($("#f-tipo"), o.tipos, "Todos");
+    llenar($("#f-flujo"), o.flujos, "Todos", (v) => FLUJO[v] || v);
+    llenar($("#f-estado"), o.estados, "Todos", (v) => ESTADOS[v] || v);
+  }
+  function consulta() {
+    const q = new URLSearchParams();
+    for (const f of filtros) if ($("#f-" + f).value) q.set(f, $("#f-" + f).value);
+    if (+$("#f-minimo").value) q.set("minimo", $("#f-minimo").value);
+    if ($("#f-contacto").checked) q.set("contacto", "1");
+    if ($("#f-texto").value.trim()) q.set("texto", $("#f-texto").value.trim());
+    return q.toString();
+  }
+
+  /* ---------- lista ---------- */
+  async function cargar() {
+    const q = consulta();
+    $("#b-csv").href = "/api/prospectos.csv" + (q ? "?" + q : "");
+    try { datos = await api("/api/prospectos" + (q ? "?" + q : "")); }
+    catch (e) { $("#conteo").textContent = "No se pudo cargar: " + e.message; return; }
+    mostrados = 0; $("#lista").innerHTML = ""; resumen(); mas();
+  }
+  function resumen() {
+    const n = datos.length, c = (f) => datos.filter(f).length;
+    $("#conteo").textContent = n ? `${n.toLocaleString("es-CO")} restaurantes · ordenados por puntaje` : "";
+    $("#cifras").innerHTML = [[n, "restaurantes"], [c((d) => d.flujo === "alto"), "con flujo alto de turistas"],
+      [c((d) => d.telefono || d.web || d.instagram || d.email), "con forma de contacto"], [c((d) => d.razon_social), "cruzados con el registro"],
+      [c((d) => d.estado !== "nuevo"), "en seguimiento"]].filter(([v, t], i) => i < 4 || v)
+      .map(([v, t]) => `<div class="cifra"><b>${v.toLocaleString("es-CO")}</b><span>${t}</span></div>`).join("");
+    if (!n) $("#lista").innerHTML = `<div class="vacio">Todavía no hay restaurantes con estos filtros.<br>Escriba una ciudad arriba y toque «Escanear».</div>`;
+  }
+  function mas() {
+    const trozo = datos.slice(mostrados, mostrados + POR_PAGINA);
+    $("#lista").insertAdjacentHTML("beforeend", trozo.map(tarjeta).join(""));
+    mostrados += trozo.length; $("#b-mas").hidden = mostrados >= datos.length;
+  }
+  function tarjeta(d) {
+    const clase = d.puntaje >= 65 ? "alta" : d.puntaje >= 45 ? "media" : "";
+    const sub = [d.nicho, d.tipo, d.ciudad].filter(Boolean).join(" · ");
+    const chips = [`<span class="chip ${d.flujo}">Flujo ${FLUJO[d.flujo] || d.flujo}</span>`,
+      d.estado !== "nuevo" ? `<span class="chip estado">${ESTADOS[d.estado]}</span>` : "",
+      ...(d.razones || []).map((r) => `<span class="chip">${esc(r)}</span>`)].join("");
+    return `<article class="tarjeta" data-id="${esc(d.id)}">
+      <div class="t-cab" role="button" tabindex="0" aria-expanded="false"><div class="nota ${clase}" title="Puntaje de 0 a 100">${d.puntaje}</div>
+        <div><h3>${esc(d.nombre)}</h3><div class="sub">${esc(sub)}</div></div></div>
+      <div class="chips">${chips}</div>
+      <div class="detalle" hidden></div></article>`;
+  }
+  function detalle(d) {
+    const fila = (t, v) => v ? `<div class="d"><span>${t}</span><span>${v}</span></div>` : "";
+    const ig = d.instagram ? (d.instagram.startsWith("http") ? d.instagram : "https://instagram.com/" + d.instagram.replace(/^@/, "")) : "";
+    const buscarMapa = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.nombre + " " + d.ciudad)}`;
+    const buscarIg = `https://www.google.com/search?q=${encodeURIComponent(d.nombre + " " + d.ciudad + " instagram")}`;
+    const video = `https://api.axtra.chat/sitio?nombre=${encodeURIComponent(d.nombre)}&ciudad=${encodeURIComponent(d.ciudad)}&tipo=${encodeURIComponent(d.nicho === "Sin dato" ? "" : d.nicho)}#su-restaurante`;
+    const registro = d.razon_social ? `<div class="datos registro">
+        ${fila("Razón social", esc(d.razon_social))}${fila("NIT", esc(d.nit))}${fila("Renovó", esc(d.renovado))}
+        ${fila("Coincidencia", `${Math.round(d.confianza * 100)} %${d.confianza < 1 ? " · verifique que sea el mismo negocio" : ""}`)}
+        <p class="aviso">El representante legal aparece en el RUES buscando el NIT.</p>
+        <div class="acciones"><button class="boton chico" data-copiar="${esc(d.nit)}">Copiar NIT</button><a class="boton chico" href="https://www.rues.org.co/" target="_blank" rel="noopener">Abrir RUES</a></div></div>`
+      : (d.pais === "Colombia" ? `<p class="aviso registro">Sin sociedad en el registro con este nombre (puede ser de una persona natural o tener otro nombre legal).</p>` : "");
+    return `<div class="datos">
+        ${fila("Teléfono", d.telefono ? `<a href="tel:${esc(d.telefono.replace(/[^\d+]/g, ""))}">${esc(d.telefono)}</a>` : "")}
+        ${fila("Web", d.web ? `<a href="${esc(enlace(d.web))}" target="_blank" rel="noopener">${esc(d.web.replace(/^https?:\/\//, ""))}</a>` : "")}
+        ${fila("Instagram", ig ? `<a href="${esc(ig)}" target="_blank" rel="noopener">${esc(d.instagram)}</a>` : "")}
+        ${fila("Correo", d.email ? esc(d.email) : "")}
+        ${fila("Dirección", esc(d.direccion))}${fila("Horario", esc(d.horario))}${fila("Cocina", esc(d.cocina))}
+        ${fila("Turismo", `${d.turismo} hoteles y atracciones a 400 m`)}
+      </div>${registro}
+      <div class="acciones">
+        <a class="boton chico" href="${buscarMapa}" target="_blank" rel="noopener">Ver en el mapa y reseñas</a>
+        <a class="boton chico" href="${buscarIg}" target="_blank" rel="noopener">Buscar su Instagram</a>
+        <a class="boton chico" href="${esc(video)}" target="_blank" rel="noopener">Hacerle su video</a>
+      </div>
+      <div class="seguimiento">
+        <div class="fila">
+          <div class="campo"><label>Seguimiento</label><select data-campo="estado">${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}" ${k === d.estado ? "selected" : ""}>${v}</option>`).join("")}</select></div>
+          <div class="campo"><label>Próximo contacto</label><input type="date" data-campo="siguiente" value="${esc(d.siguiente)}"></div>
+        </div>
+        <div class="campo"><label>Notas (con quién habló, qué le dijeron)</label><textarea data-campo="notas" maxlength="4000">${esc(d.notas)}</textarea></div>
+        <div class="guardado" aria-live="polite"></div>
+      </div>`;
+  }
+
+  $("#lista").addEventListener("click", async (e) => {
+    const copiar = e.target.closest("[data-copiar]");
+    if (copiar) {
+      try { await navigator.clipboard.writeText(copiar.dataset.copiar); copiar.textContent = "NIT copiado"; } catch { copiar.textContent = copiar.dataset.copiar; }
+      return;
+    }
+    const cab = e.target.closest(".t-cab"); if (cab) abrir(cab.closest(".tarjeta"));
+  });
+  $("#lista").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("t-cab")) { e.preventDefault(); abrir(e.target.closest(".tarjeta")); } });
+  function abrir(t) {
+    const d = datos.find((x) => x.id === t.dataset.id), det = $(".detalle", t), ya = !det.hidden;
+    if (!ya && !det.innerHTML) det.innerHTML = detalle(d);
+    det.hidden = ya; t.classList.toggle("abierta", !ya); $(".t-cab", t).setAttribute("aria-expanded", String(!ya));
+  }
+  let espera = {};
+  $("#lista").addEventListener("input", (e) => {
+    const campo = e.target.dataset.campo; if (!campo) return;
+    const t = e.target.closest(".tarjeta"), id = t.dataset.id;
+    clearTimeout(espera[id]);
+    espera[id] = setTimeout(async () => {
+      const cuerpo = {}; t.querySelectorAll("[data-campo]").forEach((el) => (cuerpo[el.dataset.campo] = el.value));
+      try {
+        const d = await api("/api/prospectos/" + encodeURIComponent(id), { method: "PATCH", body: JSON.stringify(cuerpo) });
+        Object.assign(datos.find((x) => x.id === id), d); $(".guardado", t).textContent = "Guardado";
+        setTimeout(() => ($(".guardado", t).textContent = ""), 1500);
+      } catch (err) { $(".guardado", t).textContent = "No se guardó: " + err.message; }
+    }, e.target.tagName === "SELECT" || e.target.type === "date" ? 0 : 700);
+  });
+
+  /* ---------- escanear ---------- */
+  let sondeo = null;
+  async function verEscaneos() {
+    let lista = [];
+    try { lista = await api("/api/prospectos/escaneos"); } catch { return; }
+    const hora = (t) => new Date(t * 1000).toLocaleString("es-CO", { dateStyle: "short", timeStyle: "short" });
+    $("#escaneos").innerHTML = lista.slice(0, 5).map((e) => `<div class="e"><span class="punto ${e.estado}"></span>
+      <b>${esc(e.ciudad)}, ${esc(e.pais)}</b><span>${hora(e.inicio)}</span><span style="flex-basis:100%;padding-left:16px">${esc(e.mensaje || "")}</span></div>`).join("");
+    const trabajando = lista.some((e) => e.estado === "trabajando");
+    $("#b-escanear").disabled = trabajando; $("#b-escanear").textContent = trabajando ? "Escaneando…" : "Escanear";
+    if (trabajando && !sondeo) sondeo = setInterval(verEscaneos, 4000);
+    if (!trabajando && sondeo) { clearInterval(sondeo); sondeo = null; await cargarOpciones(); await cargar(); }
+  }
+  $("#f-escanear").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("#e-error").hidden = true;
+    try { await api("/api/prospectos/escanear", { method: "POST", body: JSON.stringify({ ciudad: $("#e-ciudad").value, pais: $("#e-pais").value }) }); }
+    catch (err) { $("#e-error").textContent = err.message; $("#e-error").hidden = false; }
+    verEscaneos();
+  });
+
+  for (const f of filtros) $("#f-" + f).addEventListener("change", async () => { if (f === "pais") await cargarOpciones(); cargar(); });
+  $("#f-contacto").addEventListener("change", cargar);
+  $("#f-minimo").addEventListener("input", () => ($("#o-minimo").value = $("#f-minimo").value));
+  $("#f-minimo").addEventListener("change", cargar);
+  let tecla; $("#f-texto").addEventListener("input", () => { clearTimeout(tecla); tecla = setTimeout(cargar, 350); });
+  $("#b-mas").addEventListener("click", mas);
+
+  (async () => { try { await cargarOpciones(); } catch (e) { $("#conteo").textContent = "No se pudo cargar: " + e.message; return; } await cargar(); verEscaneos(); })();
+})();
+</script>
+</body>
+</html>

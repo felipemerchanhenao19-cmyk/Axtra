@@ -357,5 +357,12 @@
 
   aplicarIdioma(idioma); actualizarControles();
   requestAnimationFrame(cuadro);
+  // Llega del escáner de prospectos con ?nombre=…&ciudad=…&tipo=…: el formulario del video queda listo para ese restaurante
+  (() => {
+    const q = new URLSearchParams(location.search), f = document.getElementById("form-sim");
+    if (!f || !q.get("nombre")) return;
+    for (const k of ["nombre", "ciudad", "tipo"]) if (q.get(k) && f.elements[k]) f.elements[k].value = q.get(k).slice(0, f.elements[k].maxLength || 40);
+    setTimeout(() => document.getElementById("su-restaurante")?.scrollIntoView({ behavior: "smooth" }), 400);
+  })();
   window.ApexSitio = { iniciar, pausar, seguir, terminar, aplicarIdioma, generarVideo, video, estado: () => ({ ...R, idioma, video: video.estado }) };
 })();
