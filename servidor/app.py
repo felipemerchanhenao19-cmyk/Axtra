@@ -249,6 +249,76 @@ def negocios(u: str = Depends(usuario)):
     return out
 
 
+# ---------------- Escáner de prospectos de Apex (solo con la sesión de Felipe) ----------------
+class Escaneo(BaseModel):
+    ciudad: str = Field(min_length=2, max_length=80)
+    pais: str = Field("Colombia", min_length=2, max_length=60)
+
+
+class Seguimiento(BaseModel):
+    estado: str | None = Field(None, max_length=20)
+    notas: str | None = Field(None, max_length=4000)
+    siguiente: str | None = Field(None, max_length=20)
+
+
+@app.post("/api/prospectos/escanear")
+def prospectos_escanear(e: Escaneo, u: str = Depends(usuario)):
+    from . import prospectos
+    try:
+        return {"escaneo": prospectos.escanear_en_fondo(e.ciudad.strip(), e.pais.strip())}
+    except RuntimeError as err:
+        raise HTTPException(409, str(err))
+
+
+@app.get("/api/prospectos/escaneos")
+def prospectos_escaneos(u: str = Depends(usuario)):
+    from . import prospectos
+    return prospectos.escaneos()
+
+
+@app.get("/api/prospectos/opciones")
+def prospectos_opciones(u: str = Depends(usuario)):
+    from . import prospectos
+    return prospectos.opciones()
+
+
+def _filtros(request: Request) -> dict:
+    q = request.query_params
+    return {"pais": q.get("pais", ""), "ciudad": q.get("ciudad", ""), "nicho": q.get("nicho", ""), "tipo": q.get("tipo", ""),
+            "flujo": q.get("flujo", ""), "estado": q.get("estado", ""), "texto": q.get("texto", "")[:80],
+            "minimo": int(q.get("minimo") or 0) if (q.get("minimo") or "0").isdigit() else 0, "contacto": q.get("contacto") == "1"}
+
+
+@app.get("/api/prospectos")
+def prospectos_lista(request: Request, u: str = Depends(usuario)):
+    from . import prospectos
+    return prospectos.buscar(**_filtros(request))
+
+
+@app.get("/api/prospectos.csv")
+def prospectos_csv(request: Request, u: str = Depends(usuario)):
+    import csv, io
+    from . import prospectos
+    campos = ["puntaje", "nombre", "ciudad", "pais", "nicho", "tipo", "flujo", "turismo", "telefono", "web", "instagram", "email",
+              "direccion", "horario", "razon_social", "nit", "renovado", "confianza", "estado", "siguiente", "notas", "lat", "lon"]
+    b = io.StringIO(); w = csv.DictWriter(b, fieldnames=campos, extrasaction="ignore"); w.writeheader()
+    for f in prospectos.buscar(**_filtros(request), limite=20000):
+        w.writerow(f)
+    return Response("\ufeff" + b.getvalue(), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": 'attachment; filename="prospectos-apex.csv"'})
+
+
+@app.patch("/api/prospectos/{pid}")
+def prospectos_seguimiento(pid: str, s: Seguimiento, u: str = Depends(usuario)):
+    from . import prospectos
+    try:
+        return prospectos.seguimiento(pid, s.estado, s.notas, s.siguiente)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    except KeyError:
+        raise HTTPException(404, "no existe")
+
+
 # ---------------- La app del celular ----------------
 APP_DIR = config.BASE / "app_movil"
 if APP_DIR.is_dir():

@@ -552,7 +552,7 @@ def conversar(r: dict, s, entrada: dict) -> dict:
             break
         llamadas = m.get("tool_calls") or []
         if not llamadas:
-            texto = (m.get("content") or "").strip()
+            texto = re.sub(r"[*_`#]+", "", m.get("content") or "").strip()   # sin **negritas** en la pantalla
             mensajes.append({"role": "assistant", "content": texto})
             break
         mensajes.append({"role": "assistant", "content": m.get("content") or "", "tool_calls": llamadas})
