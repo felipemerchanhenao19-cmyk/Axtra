@@ -72,4 +72,5 @@ Pruebas automáticas: `python -m pytest servidor/tests`
 - `idiomas.py`: lecciones, pronunciación y progreso.
 - `app_movil/`: la app del celular (página instalable, funciona en el A32).
 - `contexto.py`: tus datos del PC para los cerebros de pago. `recordatorios.py` y `push.py`: recordatorios y notificaciones.
+- `galicia/`: el asistente contable de la Hacienda La Galicia (bot de Telegram con Groq). Guía en `galicia/LEEME.md`.
 - `Dockerfile` y `despliegue/`: para publicarlo (guía en `despliegue/DESPLIEGUE.md`).
