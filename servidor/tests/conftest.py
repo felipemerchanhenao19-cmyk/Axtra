@@ -13,3 +13,8 @@ os.environ["APEX_DATOS"] = tempfile.mkdtemp(prefix="apex_pruebas_")
 os.environ["APEX_PIN_DEMO"] = "4321"
 os.environ["APEX_MODO"] = ""
 os.environ["GOOGLE_TTS_API_KEY"] = ""
+
+# Galicia (asistente de la hacienda): base de datos temporal, dos usuarios de Telegram de prueba
+os.environ["GALICIA_DATOS"] = tempfile.mkdtemp(prefix="galicia_pruebas_")
+os.environ["GALICIA_USUARIOS"] = "111:Carlos,222:María"
+os.environ["GALICIA_TELEGRAM_TOKEN"] = "prueba"

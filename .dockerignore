@@ -6,3 +6,4 @@ servidor/datos/
 **/__pycache__
 servidor/apex.env
 servidor/apex/datos/
+servidor/galicia/datos/

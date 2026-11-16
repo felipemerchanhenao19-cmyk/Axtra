@@ -34,6 +34,20 @@ services:
     depends_on:
       - axtra
 
+  # Galicia: asistente contable de la Hacienda La Galicia. Es un bot de Telegram: solo hace conexiones de salida
+  # (Telegram y Groq), así que no necesita puertos ni pasar por el túnel.
+  galicia:
+    build:
+      context: ../..
+      dockerfile: servidor/Dockerfile
+    command: ["python", "-m", "servidor.galicia"]
+    env_file: ../.env              # usa GROQ_API_KEY y las GALICIA_*
+    environment:
+      - GALICIA_DATOS=/galicia_datos
+    volumes:
+      - galicia_datos:/galicia_datos
+    restart: unless-stopped
+
   tunel:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run
@@ -45,3 +59,4 @@ services:
 volumes:
   axtra_datos:
   apex_datos:
+  galicia_datos:

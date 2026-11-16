@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Copia de seguridad diaria: datos de Axtra (conversaciones, memoria, progreso) y de Apex Play (pedidos, uso).
+# Copia de seguridad diaria: datos de Axtra (conversaciones, memoria, progreso), de Apex Play (pedidos, uso)
+# y de Galicia (la contabilidad de la hacienda, con las fotos de las facturas).
 # Guarda las últimas 14 de cada uno.
 set -euo pipefail
 DESTINO=/opt/axtra-respaldos
 mkdir -p "$DESTINO"
-for NOMBRE in axtra apex; do
+for NOMBRE in axtra apex galicia; do
   VOL=$(docker volume ls -q | grep "${NOMBRE}_datos$" | head -1 || true)
   [ -n "$VOL" ] || continue
   docker run --rm -v "$VOL":/datos:ro -v "$DESTINO":/respaldo alpine \
