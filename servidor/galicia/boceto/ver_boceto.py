@@ -1,4 +1,4 @@
-"""Abre el boceto de la Hacienda La Galicia en el navegador: http://localhost:8000
+"""Abre la página de la Hacienda La Galicia en el navegador: http://localhost:8000
 
 Desde la carpeta de Axtra:   python servidor/galicia/boceto/ver_boceto.py
 Para cerrarlo: Ctrl+C en la terminal.
