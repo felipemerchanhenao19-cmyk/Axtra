@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Contenido Apex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fondo: #0a1120; --panel: #111a2b; --panel-2: #18243a; --linea: rgba(191,155,95,.24); --linea-suave: rgba(246,241,231,.08);
+  --oro: #bf9b5f; --oro-claro: #dcc08c; --crema: #f6f1e7; --suave: #9aa6ba; --tenue: #6f7b90; --bien: #5fbf8f; --mal: #d9826f; --azul: #8fb3d9;
+  --titulo: "Playfair Display", Georgia, serif; --cuerpo: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+body { background: var(--fondo); color: var(--crema); font-family: var(--cuerpo); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--oro-claro); }
+:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 2px; border-radius: 6px; }
+.envoltura { width: min(980px, 100%); margin-inline: auto; padding: max(18px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom)); display: grid; gap: 18px; }
+.ceja { font-size: 11.5px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--oro); }
+h1 { font-family: var(--titulo); font-style: italic; font-weight: 400; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; }
+h2 { font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--suave); }
+.cabeza { display: grid; gap: 6px; } .cabeza p { color: var(--suave); max-width: 62ch; }
+.bloque { background: var(--panel); border: 1px solid var(--linea-suave); border-radius: 16px; padding: 16px; display: grid; gap: 12px; }
+.redes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.red { display: grid; gap: 6px; align-content: start; }
+.red b { font-size: 16px; } .red p { font-size: 13px; color: var(--suave); }
+.punto { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; background: var(--mal); }
+.punto.si { background: var(--bien); }
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 8px 16px; border-radius: 999px;
+  font-weight: 700; border: 1px solid var(--linea); background: transparent; cursor: pointer; white-space: nowrap; text-decoration: none; color: var(--crema); }
+.boton.oro { background: linear-gradient(135deg, var(--oro-claro), var(--oro)); color: #111a2b; border: 0; }
+.boton.chico { min-height: 34px; padding: 5px 12px; font-size: 13px; font-weight: 600; }
+.boton:disabled { opacity: .45; cursor: default; }
+.barra { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.barra p { color: var(--suave); font-size: 13px; }
+.dia { display: grid; gap: 10px; }
+.dia h3 { font-size: 14px; font-weight: 700; color: var(--oro-claro); padding-top: 6px; }
+.dia h3::first-letter { text-transform: uppercase; }
+.pieza { background: var(--panel); border: 1px solid var(--linea-suave); border-radius: 16px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.pieza.aprobada { border-color: rgba(95,191,143,.45); } .pieza.publicada { opacity: .75; } .pieza.descartada { opacity: .45; }
+.p-cab { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 12px; align-items: start; cursor: pointer; }
+@media (max-width: 600px) { .p-cab .chips { grid-column: 1 / -1; justify-content: flex-start; } }
+.hora { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--suave); padding-top: 2px; }
+.p-cab h4 { font-size: 16px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.p-cab .gancho { font-size: 13.5px; color: var(--suave); }
+.chip { font-size: 11.5px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--linea-suave); color: var(--suave); white-space: nowrap; }
+.chip.aprobada { color: var(--bien); border-color: rgba(95,191,143,.4); } .chip.publicada { color: var(--azul); border-color: rgba(143,179,217,.4); }
+.chip.error { color: var(--mal); border-color: rgba(217,130,111,.4); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.detalle { display: grid; gap: 12px; border-top: 1px solid var(--linea-suave); padding-top: 12px; }
+.cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 16px; }
+@media (max-width: 720px) { .cuerpo { grid-template-columns: 1fr; } .vista { order: -1; } }
+.vista { display: grid; gap: 8px; align-content: start; justify-items: center; }
+.vista video { width: 100%; max-width: 240px; aspect-ratio: 9 / 16; border-radius: 14px; background: #000; border: 1px solid var(--linea-suave); }
+.vista .vacio { width: 100%; max-width: 240px; aspect-ratio: 9 / 16; border-radius: 14px; border: 1px dashed var(--linea); display: grid; place-items: center;
+  text-align: center; color: var(--suave); font-size: 13px; padding: 16px; }
+.escena { display: grid; gap: 6px; background: var(--panel-2); border-radius: 12px; padding: 10px; }
+.escena .fila { display: flex; gap: 8px; flex-wrap: wrap; }
+label, .etq { font-size: 12px; font-weight: 600; color: var(--suave); }
+input[type=text], input[type=datetime-local], select, textarea { width: 100%; background: var(--fondo); border: 1px solid var(--linea-suave); border-radius: 10px; padding: 8px 10px; min-height: 38px; }
+textarea { resize: vertical; min-height: 60px; }
+.escena select { width: auto; flex: 1 1 140px; } .escena input { flex: 2 1 180px; width: auto; }
+.campo { display: grid; gap: 4px; min-width: 0; }
+.acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.aviso { font-size: 13px; color: var(--mal); }
+.ok { font-size: 13px; color: var(--bien); }
+.pie { font-size: 12px; color: var(--tenue); max-width: 80ch; }
+</style>
+</head>
+<body>
+<main class="envoltura">
+  <header class="cabeza">
+    <span class="ceja">Apex · Redes</span>
+    <h1>Agente de contenido</h1>
+    <p>El agente escribe y arma los videos de TikTok e Instagram, dos al día. Usted los mira, los cambia si quiere y los aprueba: solo lo aprobado se publica, a su hora.</p>
+  </header>
+
+  <section class="bloque" aria-labelledby="t-redes">
+    <h2 id="t-redes">Cuentas</h2>
+    <div class="redes">
+      <div class="red"><b><span class="punto" id="p-ig"></span>Instagram</b><p id="t-ig"></p></div>
+      <div class="red"><b><span class="punto" id="p-tt"></span>TikTok</b><p id="t-tt"></p>
+        <a class="boton chico" id="b-tt" href="/api/contenido/tiktok/conectar" hidden>Conectar TikTok</a></div>
+    </div>
+  </section>
+
+  <div class="barra">
+    <p id="resumen">Cargando…</p>
+    <button class="boton" id="b-proponer">Proponer 7 días más</button>
+  </div>
+  <p class="aviso" id="error-general" hidden></p>
+  <section id="calendario" aria-live="polite"></section>
+
+  <p class="pie">Los videos se arman con la voz de Apex, pantallas reales del demo y el orbe. En TikTok llegan como borrador a su bandeja: ábralos en la app, póngales el sonido del momento si quiere y publíquelos (TikTok no deja publicar en público a una aplicación hasta que pasa su revisión). En Instagram se publican solos a la hora programada. El agente no copia videos de otras cuentas.</p>
+</main>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const VISUALES = { portada_es: "Portada del menú", carta_es: "Carta en español", pedido_es: "Haciendo un pedido", idiomas: "Cambio de idioma",
+    carta_en: "Carta en inglés", orbe: "El orbe", texto: "Texto grande" };
+  const ESTADO = { propuesta: "Por aprobar", aprobada: "Aprobada", publicada: "Publicada", error: "Con error", descartada: "Descartada" };
+  let piezas = [], abierta = null, sondeo = null;
+
+  async function api(ruta, opts = {}) {
+    const r = await fetch(ruta, { credentials: "same-origin", headers: { "Content-Type": "application/json" }, ...opts });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.detail || `error ${r.status}`);
+    return d;
+  }
+
+  async function cargar() {
+    let d;
+    try { d = await api("/api/contenido"); } catch (e) { $("#resumen").textContent = "No se pudo cargar: " + e.message; return; }
+    piezas = d.piezas;
+    $("#p-ig").classList.toggle("si", d.instagram); $("#p-tt").classList.toggle("si", d.tiktok);
+    $("#t-ig").textContent = d.instagram ? "Conectada: los Reels aprobados se publican solos a su hora."
+      : "Falta conectarla: se necesita la cuenta profesional de Instagram unida a una página de Facebook y su token en el servidor.";
+    $("#t-tt").textContent = d.tiktok ? "Conectada: los videos llegan como borrador a su bandeja de TikTok."
+      : d.tiktok_app ? "Toque «Conectar TikTok» e inicie sesión con la cuenta de Apex." : "Falta crear la aplicación en TikTok for Developers y poner sus claves en el servidor.";
+    $("#b-tt").hidden = d.tiktok || !d.tiktok_app;
+    const n = (e) => piezas.filter((p) => p.estado === e).length;
+    $("#resumen").textContent = `${n("propuesta")} por aprobar · ${n("aprobada")} aprobados · ${n("publicada")} publicados`;
+    pintar();
+    const armando = piezas.some((p) => (p.error || "").startsWith("armando"));
+    if (armando && !sondeo) sondeo = setInterval(cargar, 5000);
+    if (!armando && sondeo) { clearInterval(sondeo); sondeo = null; }
+  }
+
+  function pintar() {
+    const dias = {};
+    for (const p of piezas) (dias[p.hora_colombia.slice(0, 10)] ||= []).push(p);
+    const fecha = (d) => new Date(d + "T12:00:00-05:00").toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+    $("#calendario").innerHTML = Object.entries(dias).map(([d, ps]) => `<div class="dia"><h3>${fecha(d)}</h3>${ps.map(tarjeta).join("")}</div>`).join("")
+      || `<div class="bloque">Todavía no hay videos en el calendario.</div>`;
+    if (abierta) { const t = $(`.pieza[data-id="${abierta}"]`); if (t) abrir(t, true); }
+  }
+
+  function tarjeta(p) {
+    const chips = [`<span class="chip ${p.estado}">${ESTADO[p.estado] || p.estado}</span>`, `<span class="chip">${esc(p.pilar)}</span>`,
+      p.ig_enlace ? `<a class="chip publicada" href="${esc(p.ig_enlace)}" target="_blank" rel="noopener">Ver en Instagram</a>` : ""].join("");
+    return `<article class="pieza ${p.estado}" data-id="${p.id}">
+      <div class="p-cab" role="button" tabindex="0"><span class="hora">${p.hora_colombia.slice(11)}</span>
+        <div><h4>${esc(p.titulo)}</h4><div class="gancho">${esc(p.gancho)}</div></div><div class="chips">${chips}</div></div>
+      ${p.error && !p.error.startsWith("armando") ? `<p class="aviso">${esc(p.error)}</p>` : ""}
+      <div class="detalle" hidden></div></article>`;
+  }
+
+  function detalle(p) {
+    const armando = (p.error || "").startsWith("armando");
+    const vista = p.video ? `<video controls playsinline preload="metadata" src="/api/contenido/${p.id}/video?v=${esc(p.video.slice(0, 8))}#t=1.5"></video>`
+      : `<div class="vacio">${armando ? "Armando el video… tarda menos de un minuto." : "Todavía no tiene video."}</div>`;
+    const escenas = p.escenas.map((e, i) => `<div class="escena" data-i="${i}">
+        <div class="fila"><select data-e="visual" aria-label="Imagen de la escena ${i + 1}">${Object.entries(VISUALES).map(([k, v]) => `<option value="${k}" ${k === e.visual ? "selected" : ""}>${v}</option>`).join("")}</select>
+          <input type="text" data-e="texto" placeholder="Texto en pantalla (si es «Texto grande»)" value="${esc(e.texto || "")}" ${e.visual === "texto" ? "" : "hidden"}></div>
+        <textarea data-e="voz" aria-label="Lo que dice la voz en la escena ${i + 1}">${esc(e.voz)}</textarea></div>`).join("");
+    return `<div class="cuerpo">
+        <div class="detalle" style="border:0;padding:0">
+          <div class="campo"><label>Gancho (aparece arriba los primeros segundos)</label><input type="text" data-c="gancho" maxlength="70" value="${esc(p.gancho)}"></div>
+          <div class="campo"><span class="etq">Guion: lo que dice la voz y qué se ve</span>${escenas}</div>
+          <div class="campo"><label>Texto de la publicación</label><textarea data-c="descripcion">${esc(p.descripcion)}</textarea></div>
+          <div class="campo"><label>Hashtags</label><input type="text" data-c="hashtags" value="${esc(p.hashtags.join(" "))}"></div>
+          <div class="campo"><label>Fecha y hora (Colombia)</label><input type="datetime-local" data-c="hora" value="${esc(p.hora_colombia.replace(" ", "T"))}"></div>
+        </div>
+        <div class="vista">${vista}</div>
+      </div>
+      <div class="acciones">
+        <button class="boton chico" data-accion="guardar">Guardar cambios</button>
+        <button class="boton chico" data-accion="video" ${armando ? "disabled" : ""}>${p.video ? "Rehacer video" : "Armar video"}</button>
+        ${p.estado === "aprobada" ? `<button class="boton chico" data-accion="desaprobar">Quitar aprobación</button>`
+          : p.estado !== "publicada" ? `<button class="boton oro chico" data-accion="aprobar">Aprobar</button>` : ""}
+        ${p.estado !== "publicada" ? `<button class="boton chico" data-accion="publicar">Publicar ahora</button>` : ""}
+        ${p.estado !== "descartada" && p.estado !== "publicada" ? `<button class="boton chico" data-accion="descartar">Descartar</button>` : ""}
+      </div><p class="ok" aria-live="polite"></p>`;
+  }
+
+  function abrir(t, forzar = false) {
+    const p = piezas.find((x) => x.id == t.dataset.id), det = $(".detalle", t);
+    const ya = !det.hidden && !forzar;
+    if (!ya) det.innerHTML = detalle(p);
+    det.hidden = ya; abierta = ya ? null : p.id;
+  }
+
+  $("#calendario").addEventListener("click", async (e) => {
+    const cab = e.target.closest(".p-cab"); if (cab) return abrir(cab.closest(".pieza"));
+    const b = e.target.closest("[data-accion]"); if (!b) return;
+    const t = b.closest(".pieza"), id = t.dataset.id, msj = $(".ok", t);
+    b.disabled = true;
+    try {
+      const a = b.dataset.accion;
+      if (a === "guardar") { await api(`/api/contenido/${id}`, { method: "PATCH", body: JSON.stringify(cambios(t)) }); msj.textContent = "Guardado. Si cambió el guion, toque «Armar video»."; }
+      if (a === "video") { await api(`/api/contenido/${id}`, { method: "PATCH", body: JSON.stringify(cambios(t)) }); await api(`/api/contenido/${id}/video`, { method: "POST" }); }
+      if (a === "aprobar") await api(`/api/contenido/${id}`, { method: "PATCH", body: JSON.stringify({ ...cambios(t), estado: "aprobada" }) });
+      if (a === "desaprobar") await api(`/api/contenido/${id}`, { method: "PATCH", body: JSON.stringify({ estado: "propuesta" }) });
+      if (a === "descartar") await api(`/api/contenido/${id}`, { method: "PATCH", body: JSON.stringify({ estado: "descartada" }) });
+      if (a === "publicar") { await api(`/api/contenido/${id}/publicar`, { method: "POST" }); msj.textContent = "Publicando… tarda unos minutos."; }
+      await cargar();
+    } catch (err) { msj.textContent = ""; msj.insertAdjacentHTML("afterend", `<p class="aviso">${esc(err.message)}</p>`); b.disabled = false; }
+  });
+  $("#calendario").addEventListener("change", (e) => {
+    if (e.target.dataset.e === "visual") $("[data-e=texto]", e.target.closest(".escena")).hidden = e.target.value !== "texto";
+  });
+  $("#calendario").addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("p-cab")) { e.preventDefault(); abrir(e.target.closest(".pieza")); } });
+
+  function cambios(t) {
+    const c = { gancho: $("[data-c=gancho]", t).value, descripcion: $("[data-c=descripcion]", t).value,
+      hashtags: $("[data-c=hashtags]", t).value.split(/[\s,]+/).filter(Boolean),
+      escenas: [...t.querySelectorAll(".escena")].map((s) => ({ voz: $("[data-e=voz]", s).value, visual: $("[data-e=visual]", s).value, texto: $("[data-e=texto]", s).value })) };
+    const h = $("[data-c=hora]", t).value; if (h) c.hora = h.replace("T", " ").slice(0, 16);
+    return c;
+  }
+
+  $("#b-proponer").addEventListener("click", async (e) => {
+    e.target.disabled = true; e.target.textContent = "Pensando ideas…";
+    try { const r = await api("/api/contenido/proponer", { method: "POST" }); $("#error-general").hidden = true; await cargar();
+      e.target.textContent = `${r.nuevas.length} ideas nuevas`; }
+    catch (err) { $("#error-general").textContent = err.message; $("#error-general").hidden = false; e.target.textContent = "Proponer 7 días más"; }
+    e.target.disabled = false;
+  });
+  cargar();
+})();
+</script>
+</body>
+</html>
