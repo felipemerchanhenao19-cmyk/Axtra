@@ -3,6 +3,7 @@
 Para probar en tu PC:  AXTRA_MODO=desarrollo uvicorn servidor.app:app --reload
 En el servidor:        uvicorn servidor.app:app --host 0.0.0.0 --port 8080   (detrás de Cloudflare Access)
 """
+import os
 import re
 from contextlib import asynccontextmanager
 
@@ -20,6 +21,9 @@ from .proveedores import NoDisponible
 @asynccontextmanager
 async def _vida(app):
     recordatorios.iniciar_vigilante()   # entrega los recordatorios a su hora
+    if os.getenv("CONTENIDO_AGENTE", "1") == "1":
+        from . import contenido
+        contenido.iniciar_vigilante()   # arma y publica los videos aprobados a su hora
     yield
 
 
@@ -317,6 +321,129 @@ def prospectos_seguimiento(pid: str, s: Seguimiento, u: str = Depends(usuario)):
         raise HTTPException(422, str(e))
     except KeyError:
         raise HTTPException(404, "no existe")
+
+
+# ---------------- Agente de contenido (TikTok e Instagram), solo con la sesión de Felipe ----------------
+class CambioPieza(BaseModel):
+    estado: str | None = Field(None, max_length=20)
+    gancho: str | None = Field(None, max_length=70)
+    titulo: str | None = Field(None, max_length=80)
+    descripcion: str | None = Field(None, max_length=1500)
+    hashtags: list[str] | None = None
+    escenas: list[dict] | None = None
+    hora: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")   # hora de Colombia
+
+
+def _hilo(fn, *args):
+    import threading
+    threading.Thread(target=fn, args=args, daemon=True).start()
+
+
+@app.get("/api/contenido")
+def contenido_lista(u: str = Depends(usuario)):
+    import time as _t
+    from . import contenido
+    contenido.sembrar()
+    return {"piezas": contenido.piezas(desde=_t.time() - 3 * 86400), "instagram": contenido.instagram_listo(),
+            "tiktok": contenido.tiktok_listo(), "tiktok_app": bool(os.getenv("TIKTOK_CLIENT_KEY"))}
+
+
+@app.patch("/api/contenido/{pid}")
+def contenido_cambiar(pid: int, c: CambioPieza, u: str = Depends(usuario)):
+    import datetime as _dt
+    from . import contenido
+    campos = {k: v for k, v in c.model_dump().items() if v is not None and k != "hora"}
+    if c.hora:
+        campos["cuando"] = _dt.datetime.strptime(c.hora, "%Y-%m-%d %H:%M").replace(tzinfo=contenido.COLOMBIA).timestamp()
+    try:
+        return contenido.actualizar(pid, **campos)
+    except KeyError:
+        raise HTTPException(404, "no existe")
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.post("/api/contenido/{pid}/video")
+def contenido_video(pid: int, u: str = Depends(usuario)):
+    from . import contenido
+    try:
+        contenido.pieza(pid)
+    except KeyError:
+        raise HTTPException(404, "no existe")
+    contenido.actualizar(pid, error="armando el video…")
+
+    def armar():
+        try:
+            contenido.armar_video(pid)
+        except Exception as e:
+            contenido.actualizar(pid, error=f"no se pudo armar el video: {e}"[:400])
+    _hilo(armar)
+    return {"ok": True}
+
+
+@app.get("/api/contenido/{pid}/video")
+def contenido_ver_video(pid: int, u: str = Depends(usuario)):
+    from . import contenido
+    try:
+        p = contenido.pieza(pid)
+    except KeyError:
+        raise HTTPException(404, "no existe")
+    f = contenido.carpeta_videos() / (p["video"] or "_")
+    if not p["video"] or not f.exists():
+        raise HTTPException(404, "todavía no tiene video")
+    return FileResponse(f, media_type="video/mp4")
+
+
+@app.post("/api/contenido/{pid}/publicar")
+def contenido_publicar(pid: int, u: str = Depends(usuario)):
+    from . import contenido
+    try:
+        if contenido.pieza(pid)["estado"] != "aprobada":
+            contenido.actualizar(pid, estado="aprobada")
+    except KeyError:
+        raise HTTPException(404, "no existe")
+    _hilo(contenido.publicar, pid)
+    return {"ok": True}
+
+
+@app.post("/api/contenido/proponer")
+def contenido_proponer(u: str = Depends(usuario)):
+    from . import contenido
+    try:
+        return {"nuevas": contenido.proponer(7, enrutador())}
+    except Exception as e:
+        raise HTTPException(502, f"no se pudieron proponer ideas: {e}")
+
+
+TIKTOK_VUELTA = os.getenv("TIKTOK_REDIRECT", "https://axtra.chat/api/contenido/tiktok/vuelta")
+
+
+@app.get("/api/contenido/tiktok/conectar")
+def tiktok_conectar(u: str = Depends(usuario)):
+    import secrets as _s
+    from urllib.parse import urlencode
+    from fastapi.responses import RedirectResponse
+    from . import contenido
+    if not os.getenv("TIKTOK_CLIENT_KEY"):
+        raise HTTPException(503, "falta TIKTOK_CLIENT_KEY en el .env del servidor")
+    estado = contenido.ajuste("tiktok_estado_oauth", _s.token_urlsafe(16))
+    return RedirectResponse("https://www.tiktok.com/v2/auth/authorize/?" + urlencode({
+        "client_key": os.getenv("TIKTOK_CLIENT_KEY"), "scope": "user.info.basic,video.upload", "response_type": "code",
+        "redirect_uri": TIKTOK_VUELTA, "state": estado}))
+
+
+@app.get("/api/contenido/tiktok/vuelta")
+def tiktok_vuelta(code: str = "", state: str = "", u: str = Depends(usuario)):
+    import hmac as _h
+    from fastapi.responses import RedirectResponse
+    from . import contenido
+    if not code or not state or not _h.compare_digest(state, contenido.ajuste("tiktok_estado_oauth") or "-"):
+        raise HTTPException(400, "la conexión con TikTok no es válida; intente de nuevo")
+    try:
+        contenido.tiktok_conectar(code, TIKTOK_VUELTA)
+    except RuntimeError as e:
+        raise HTTPException(502, str(e))
+    return RedirectResponse("/contenido.html?tiktok=ok")
 
 
 # ---------------- La app del celular ----------------

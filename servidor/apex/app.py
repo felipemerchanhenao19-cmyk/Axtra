@@ -594,6 +594,19 @@ def domicilios():
     return _pagina("domicilios.html")
 
 
+@app.get("/v1/contenido/{nombre}")
+def video_contenido(nombre: str):
+    """Los videos del agente de contenido: Instagram los descarga de aquí para publicarlos (nombre imposible de adivinar)."""
+    import re as _re
+    from fastapi.responses import FileResponse
+    if not _re.fullmatch(r"[a-f0-9]{32}\.mp4", nombre):
+        raise HTTPException(404, "no existe")
+    f = config.DATA_DIR / "contenido" / nombre
+    if not f.exists():
+        raise HTTPException(404, "no existe")
+    return FileResponse(f, media_type="video/mp4")
+
+
 @app.get("/sitio")
 def sitio():
     """Sitio oficial de Apex Corporation, con el asistente que guía el recorrido."""
