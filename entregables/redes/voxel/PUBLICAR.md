@@ -148,3 +148,19 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **apex-estacion.mp4**: puesto de trabajo en metal oscuro y vidrio, pantallas OLED con Apex Play (conversación de mesa → pedido a cocina), Apex Domicilios ($ 0 de comisión, comprobante verificado), carta digital y operación en tiempo real.
 - Descripción: «Software e inteligencia artificial para restaurantes. Apex Play atiende cada mesa; Apex Domicilios le da su canal directo, sin comisiones.»
 - Hashtags: #InteligenciaArtificial #Restaurantes #Software #Tecnologia #Colombia
+
+## Temporada 4: formatos de tendencia
+### «Yo solito»: figuras de vinil, «Basado en hechos reales» (31 s, Apex Play)
+- **Instagram (Reels):** «"Yo solito atiendo las doce mesas. Y de memoria." 🫠 Basado en hechos reales. ¿Conoce a un Brayan? Etiquételo 👇»
+  Hashtags: #BasadoEnHechosReales #Meseros #Restaurantes #InteligenciaArtificial #Humor
+- **TikTok:** «Todo restaurante tiene un Brayan 😭 #basadoenhechosreales #meseros #restaurantes #humor #ia»
+  - En TikTok el video sube **sin música** (yo-solito-sin-musica.mp4) y se le agrega un audio en tendencia a volumen bajo, entre 10 % y 15 %, para que se escuchen las voces.
+- **Portada:** el cuadro de don Jairo con el recibo larguísimo (segundo 7).
+- **Comentario fijado:** «¿Cuántos reclamos tenía la lista de su restaurante? 😅»
+- **Horario sugerido:** de 12:00 a 13:30 o de 19:00 a 21:00, hora de Colombia, de lunes a jueves.
+
+### «POV: viernes 8 p. m.» (25 s, Apex Play)
+- «POV: viernes, 8 p. m., y entran veinte personas. 😳 ¿Quién atiende?» · #POV #Animacion3D #Restaurantes #Meseros #Colombia
+
+### «El millón de domicilios», stop-motion (35 s, Apex Domicilios)
+- «Vendimos un millón en domicilios. La aplicación también. 🧱» · #StopMotion #Animacion #Domicilios #Restaurantes #Emprendedores
