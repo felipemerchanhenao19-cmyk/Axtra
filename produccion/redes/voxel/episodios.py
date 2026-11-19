@@ -171,6 +171,9 @@ VINILES = {
 JF = [1.3, -3.0]; BF = [-0.6, -1.8]
 CINE_V = "contrast(1.1) saturate(1.1) brightness(1.03)"
 
+BT7 = [-1.55, 0.95]   # Brayan junto a la mesa 7
+CLI7 = [[0, -0.5, 1.62, -1.5, -2.6, 1.42, 1.35, 40], [0.22, -1.45, 1.5, -0.3, -2.6, 1.44, 1.35, 34], [9, -1.55, 1.5, -0.2, -2.6, 1.44, 1.35, 33]]   # «zoom» de golpe al cliente
+
 EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
  "mesa-siete": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
@@ -1283,5 +1286,44 @@ EPISODIOS = {
         actores={"jairo": dict(pos=JF, rot=-36, mira="brayan", gesto="cruzado"), "brayan": dict(pos=BF, rot=100, mira=[[0, "jairo"], ["l1", "cam"]], gesto="bandeja", emo=[[0, "neutro"], ["l1", "triste"]])},
         lineas=[L("brayan", "Llevo los platos.", 0.2), L("brayan", "…Yo solito.", 0.6)]),
    CIERRE_PLAY("Que nadie tenga que atender de memoria.", "Un asistente de IA toma el pedido de cada mesa."),
+  ]),
+
+ "sin-cebolla-vinil": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, subY=1150, reparto=dict(REPARTO, cocina=dict(voz=("es-MX-JorgeNeural", "+6%", "-6Hz"), fx="radio"),
+       cocina2=dict(voz=("es-CO-GonzaloNeural", "+10%", "+8Hz"), fx="radio")), elenco=VINILES, extras=EXTRAS,
+  gancho=["Tercera vez que pide «sin cebolla»…", "Basado en hechos reales", 2.6],
+  copy="Tercera vez que pide «sin cebolla». La cuarta… no se la esperaba nadie. 🧅 Basado en hechos reales.",
+  hashtags="#BasadoEnHechosReales #SinCebolla #Meseros #Restaurantes #Humor",
+  planos=[
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.2, fx=PUM, sinExtras=[6], mano=0.01, cam=CLI7,
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="serio"), "brayan": dict(pos=BT7, rot=-66, mira="cliente", emo="neutro")},
+        lineas=[L("cliente", "Sin cebolla, por favor.", 0.15)]),
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.2, mano=0.008, sinExtras=[6], cam=[cerca(BT7, -66, 2.5, 28, 0.0, 34, 1.74), cerca(BT7, -66, 2.25, 26, 0.0, 34, 1.74)],
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan"), "brayan": dict(pos=BT7, rot=-66, mira="cliente", emo="serio", gesto="celular")},
+        lineas=[L("brayan", "Sin cebolla. Anotado.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.4, mano=0.012, fx=[dict(tipo="pum", p=0.05)], cam=[[-1.2, 1.35, -1.35, -1.55, 1.72, 0.95, 40], [-1.3, 1.32, -1.15, -1.55, 1.74, 0.95, 36]],
+        actores={"brayan": dict(pos=BT7, rot=[[0, -66], [0.3, 189]], mira=[[0, 0], [0.3, -10]], miraY=-0.12, emo="serio", gesto="mano_arriba")},
+        lineas=[L("brayan", "¡Cocina! ¡Sin cebolla!", 0.25), L("cocina", "¡Sin cebolla!", 0.15), L("cocina2", "¿¡Con cebolla!?", 0.1), L("brayan", "¡SIN!", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.9, sinExtras=[6], mano=0.004, cam=[[-1.5, 1.5, -0.25, -2.6, 1.3, 1.1, 36], [-1.6, 1.46, -0.05, -2.6, 1.28, 1.1, 32]],
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira=0, miraY=[[0, 0], [0.4, 0.35], ["l0", 0.35], ["f0+0.2", 0]], emo=[[0, "neutro"], ["l0", "serio"]]),
+                 "brayan": dict(pos=BT7, rot=-66, mira="cliente", gesto="bandeja", emo=[[0, "feliz"], ["f0", "sorpresa"]])},
+        lineas=[L("cliente", "…Tiene cebolla.", 1.2)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.6, fx=[dict(tipo="pum", p=0.0)], mano=0.01,
+        cam=[[0, 1.0, 1.85, -2.6, 1.0, 1.78, -4.3, 40], [0.25, 1.0, 1.8, -2.9, 1.0, 1.78, -4.3, 36], [9, 1.0, 1.8, -2.95, 1.0, 1.78, -4.3, 33]],
+        actores={"jairo": dict(pos=JAIRO, gesto="cabeza", mira=0, emo="cansado"), "brayan": dict(pos=BRAYAN, rot=180)},
+        lineas=[L("jairo", "Brayan…", 0.45)]),
+   dict(set="restaurante", grado=CINE_V, musica="esperanza", cola=0.4, fx=[dict(tipo="destello", p=0.05)], cam=LADO7, sinExtras=[6],
+        e=dict(qrLuz={"7": [[0, 0], [0.2, 1.0], [1.6, 0.2]]}), orbis={"o7": dict(pos=O7, nace=[0.05, 0.7], mira=[[0, "cam"], [0.8, "cliente"]])},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo=[[0, "sorpresa"], ["f0", "feliz"]])},
+        lineas=[L("orbi", "Listo: sin cebolla. Ya está en la cocina… en mayúsculas.", 0.6)]),
+   dict(set="restaurante", grado=CINE_V, musica="esperanza", cola=0.2, sinExtras=[6], cam=[[-1.5, 1.5, -0.25, -2.6, 1.38, 1.2, 36], [-1.55, 1.48, -0.15, -2.6, 1.4, 1.25, 34]],
+        orbis={"o7": dict(pos=O7, voz=False, luz=0.5)},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"), "brayan": dict(pos=BT7, rot=-66, mira="cliente", gesto="bandeja", emo="feliz")},
+        lineas=[L("cliente", "¡Perfecto! Muchas gracias.", 0.3), L("cliente", "Oiga… ¿y si le ponen un poquito de cebolla?", 0.5)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=1.2, mano=0.004, fx=[dict(tipo="pum", p=0.02)], cam=[[-0.25, 1.75, 2.9, -1.9, 1.5, 0.9, 40], [-0.3, 1.72, 2.75, -1.9, 1.5, 0.9, 40]],
+        orbis={"o7": dict(pos=O7, luz=0.5, mira="cam")},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"),
+                 "brayan": dict(pos=BT7, rot=[[0, -66], [0.5, -66], [1.2, 20]], mira=[[0, "cliente"], [0.5, "cliente"], [1.1, "cam"]], gesto="bandeja", emo=[[0, "sorpresa"], [1.0, "cansado"]])},
+        lineas=[L("orbi", "…Anotado.", 1.8)]),
+   CIERRE_PLAY("Cada pedido, exactamente como lo pidieron.", "Las notas de cada mesa llegan claras a la cocina.", sinExtras=[6]),
   ]),
 }
