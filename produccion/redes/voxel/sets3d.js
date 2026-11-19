@@ -3,7 +3,7 @@
 function texCanvas(w, h, dibujo, rep = [1, 1], pixel = true) {
   const c = document.createElement("canvas"); c.width = w; c.height = h; dibujo(c.getContext("2d"), w, h);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rep[0], rep[1]);
-  if (pixel) { t.magFilter = THREE.NearestFilter; } t.anisotropy = 4; t.userData = { c, dibujo }; return t;
+  if (pixel && !(typeof LISO !== "undefined" && LISO)) { t.magFilter = THREE.NearestFilter; } t.anisotropy = 4; t.userData = { c, dibujo }; return t;
 }
 function plano(w, h, material, x, y, z, rx = 0, ry = 0, padre) {
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), material); m.position.set(x, y, z); m.rotation.set(rx, ry, 0); m.receiveShadow = true; padre.add(m); return m;

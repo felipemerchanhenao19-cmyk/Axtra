@@ -160,6 +160,17 @@ LADRILLO["jairo"]["bigoteDibujo"] = "#4a4440"
 def ORBIS_EN_CADENA(t0=0.2, paso=0.35):
     return {n: dict(pos=p, nace=[t0 + i * paso, t0 + i * paso + 0.6], voz=(n == "o7")) for i, (n, p) in enumerate((("o7", O7), ("o4", O4), ("o9", O9), ("o2", O2)))}
 
+# ═══ «Basado en hechos reales»: figuras 3D de vinil (cabeza grande, pelo esculpido), desenfoque de cine, subtítulos de 3 palabras (Instagram y TikTok)
+VINILES = {
+    "jairo": dict(piel="#e3b08c", pelo="#cfcac3", cejas="#bdb7ae", bigote="#d8d3cc", narizGrande=True, camisa="#efe9dd", delantal="#3b2a22", pantalon="#2a2f3a",
+                  iris="#3a2a1a", peinado="normal", semilla=1, alto=1.0),
+    "brayan": dict(piel="#cc9672", pelo="#151111", cejas="#151111", peinado="copete", bigoteFino="#1a1210", camisa="#f4f1ea", chaleco="#1d2127", corbatin="#121212",
+                   pantalon="#1b1e24", iris="#2a1a10", semilla=2, alto=0.97),
+    "cliente": dict(ELENCO["cliente"], iris="#2a1a10"),
+}
+JF = [1.3, -3.0]; BF = [-0.6, -1.8]
+CINE_V = "contrast(1.1) saturate(1.1) brightness(1.03)"
+
 EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
  "mesa-siete": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
@@ -1243,5 +1254,34 @@ EPISODIOS = {
         actores={"marcela": dict(pos=MAR, rot=180, sentado=True, mira="jairo", emo="neutro"), "jairo": dict(pos=JPIE, rot=-25, mira=-60, emo=[[0, "duda"], ["l2", "feliz"]])},
         lineas=[L("jairo", "¿Y el link lava los platos?", 0.2), L("orbi", "No.", 0.3), L("jairo", "…Igual me sirve.", 0.4)]),
    CIERRE_DOM("El millón es suyo.", "Su propio link de pedidos, sin comisión por pedido."),
+  ]),
+
+ # ═══════════ «Basado en hechos reales» · vinil ═══════════
+ "yo-solito": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, subY=1150, reparto=REPARTO, elenco=VINILES, extras=EXTRAS,
+  gancho=["El mesero que atendía doce mesas… de memoria", "Basado en hechos reales", 3.0],
+  copy="«Yo solito atiendo las doce mesas. Y de memoria.» 🫠 Basado en hechos reales.",
+  hashtags="#BasadoEnHechosReales #Meseros #Restaurantes #InteligenciaArtificial #Humor",
+  planos=[
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.3, fx=PUM, mano=0.008, cam=[cerca(BF, 100, 2.7, -22, 0.02, 34, 1.74), cerca(BF, 100, 2.45, -20, 0.02, 34, 1.74)],
+        actores={"jairo": dict(pos=JF, rot=-36, mira="brayan", emo="neutro"), "brayan": dict(pos=BF, rot=100, mira="jairo", emo="feliz", gesto="cadera", inclina=-0.04)},
+        lineas=[L("brayan", "Don Jairo, yo solito atiendo las doce mesas.", 0.1), L("brayan", "Y de memoria.", 0.25)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.5, mano=0.008, cam=[cerca(JF, -36, 3.4, 22, -0.1, 40, 1.3), cerca(JF, -36, 3.1, 20, -0.08, 40, 1.3)],
+        actores={"jairo": dict(pos=JF, rot=-36, mira="brayan", emo=[[0, "duda"], ["l1", "serio"]], gesto="recibo", rollo=[[0, 0.05], ["l1-0.2", 0.05], ["f1+0.2", 1.0]]),
+                 "brayan": dict(pos=BF, rot=100, mira="jairo", emo="feliz")},
+        lineas=[L("jairo", "¿De memoria?", 0.3), L("jairo", "Esta es la lista de reclamos de hoy.", 0.3)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.6, mano=0.008, cam=[cerca(BF, 100, 2.4, -18, 0.02, 32, 1.74), cerca(BF, 100, 2.2, -16, 0.02, 32, 1.74)],
+        actores={"jairo": dict(pos=JF, rot=-36, mira="brayan", gesto="recibo", rollo=1.0), "brayan": dict(pos=BF, rot=100, mira=[[0, "jairo"], [0.7, -25]], miraY=[[0, 0], [0.7, 0.18]], emo=[[0, "sorpresa"], [0.7, "triste"]])},
+        lineas=[L("brayan", "…Son poquitos.", 0.7)]),
+   dict(set="restaurante", grado=CINE_V, musica="esperanza", cola=0.5, fx=[dict(tipo="destello", p=0.05)], cam=LADO7,
+        e=dict(qrLuz={"7": [[0, 0], [0.2, 1.0], [1.6, 0.2]]}), orbis={"o7": dict(pos=O7, nace=[0.05, 0.7], mira=[[0, "cam"], [0.8, "cliente"]])},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo=[[0, "sorpresa"], ["f0", "feliz"]])},
+        lineas=[L("orbi", "Mesa siete: ajiaco sin alcaparras y dos limonadas. Ya están en la cocina.", 0.6)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.3, mano=0.008, cam=[cerca(JF, -36, 2.6, 20, 0.02, 34, 1.74), cerca(JF, -36, 2.35, 18, 0.02, 34, 1.74)],
+        actores={"jairo": dict(pos=JF, rot=-36, mira="brayan", emo="serio", gesto="cruzado"), "brayan": dict(pos=BF, rot=100, mira="jairo", gesto="bandeja", emo="neutro")},
+        lineas=[L("jairo", "¿Y usted qué hace, Brayan?", 0.2)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=1.1, mano=0.008, cam=[cerca(BF, 100, 3.1, -20, -0.25, 38, 1.42), cerca(BF, 100, 2.8, -18, -0.22, 38, 1.42)],
+        actores={"jairo": dict(pos=JF, rot=-36, mira="brayan", gesto="cruzado"), "brayan": dict(pos=BF, rot=100, mira=[[0, "jairo"], ["l1", "cam"]], gesto="bandeja", emo=[[0, "neutro"], ["l1", "triste"]])},
+        lineas=[L("brayan", "Llevo los platos.", 0.2), L("brayan", "…Yo solito.", 0.6)]),
+   CIERRE_PLAY("Que nadie tenga que atender de memoria.", "Un asistente de IA toma el pedido de cada mesa."),
   ]),
 }

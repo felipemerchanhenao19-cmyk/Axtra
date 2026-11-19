@@ -9,7 +9,7 @@ const RUIDO = (() => { const c = document.createElement("canvas"); c.width = c.h
   for (let i = 0; i < 256; i++) { const v = 205 + Math.floor(r() * 50); g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(i % 16, Math.floor(i / 16), 1, 1); }
   const t = new THREE.CanvasTexture(c); t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.colorSpace = THREE.SRGBColorSpace; return t; })();
 function mat(color, o = {}) {
-  return new THREE.MeshStandardMaterial({ color, map: o.liso ? null : RUIDO, roughness: o.r ?? 0.85, metalness: o.m ?? 0, emissive: o.e ?? 0, emissiveIntensity: o.ei ?? 1,
+  return new THREE.MeshStandardMaterial({ color, map: (o.liso || (typeof LISO !== "undefined" && LISO)) ? null : RUIDO, roughness: o.r ?? 0.85, metalness: o.m ?? 0, emissive: o.e ?? 0, emissiveIntensity: o.ei ?? 1,
     transparent: o.op !== undefined, opacity: o.op ?? 1 });
 }
 const MAT = (...a) => mat(...a);
@@ -86,6 +86,7 @@ function emblema(tipo, color = "#f2c84a") {
 
 // ---------- Persona de bloques
 function persona(cfg) {
+  if (cfg.vinil || (typeof VINIL !== "undefined" && VINIL)) return personaVinil(cfg);
   const c = Object.assign({ piel: "#c98d6b", sombraPiel: "#b47a5a", pelo: "#2b1d16", cejas: "#2b1d16", camisa: "#e7e1d6", pantalon: "#2c3442", zapatos: "#1a1a1a", alto: 1 }, cfg);
   // estilo juguete de bloques: plástico liso y brillante, cabeza cilíndrica con botón, ojos de punto
   const mat = c.juguete ? (col, o = {}) => MAT(col, { liso: true, r: 0.3, ...o }) : MAT;
@@ -192,6 +193,8 @@ const GESTOS = {
   rendido: { bi: [0.15, -0.15], bd: [0.15, 0.15], torso: 0.18 },
   mano_arriba: { bi: [-0.9, -0.1], bd: [-2.9, -0.15] },
   teclea: { bi: [-1.0, -0.15], bd: [-1.0, 0.15], torso: 0.1 },
+  recibo: { bi: [0.05, -0.08], bd: [-1.55, 0.05], obj: "recibo" },
+  bandeja: { bi: [-0.9, -0.05], bd: [-1.15, -0.4], obj: "bandeja" },
 };
 
 function animarPersona(P, s, t) {
@@ -222,6 +225,8 @@ function animarPersona(P, s, t) {
   cuello.rotation.x = (s.miraY || 0) + habla * 0.05 * Math.sin(t * 7 + f) + Math.sin(t * 0.7 + f) * 0.015;
   cuello.rotation.z = Math.sin(t * 0.5 + f) * 0.02 + (s.ladea || 0);
   const mx = Math.sin(t * 0.45 + f) * 0.3 + (s.ojosX || 0), parp = ((t + f) % (3.2 + (f % 1.5))) < 0.12;
+  if (objetos.recibo) { objetos.recibo.rotation.x = -(brazos[1].rotation.x + torso.rotation.x); objetos.recibo.scale.y = Math.max(0.05, s.rollo ?? 1); }
+  if (objetos.bandeja) objetos.bandeja.rotation.x = -(brazos[1].rotation.x + torso.rotation.x);
   P.cara({ emo: s.emo, emo2: s.emo2, mezcla: s.mezcla, voz: habla, parpadeo: parp && s.emo !== "cerrados", mx, my: s.ojosY || 0, sonrisa: s.sonrisa });
 }
 

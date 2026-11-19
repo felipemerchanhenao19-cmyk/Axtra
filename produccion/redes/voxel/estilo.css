@@ -52,3 +52,10 @@ body.cine #grano { opacity: .09; }
 body.cine #final .logo i.pin { display: none; } body.cine #final .frase { font-size: 60px; } body.cine #final .detalle { color: #e8b47a; }
 body.cine #sub { background: radial-gradient(ellipse 60% 50% at center, rgba(3,5,8,.82) 0%, rgba(3,5,8,.55) 45%, rgba(3,5,8,0) 75%); padding: 46px 10px; margin-top: -46px; }
 body.cine #sub { left: 110px; right: 110px; padding: 20px 28px; margin-top: 0; border-radius: 20px; background: rgba(4,6,10,.62); backdrop-filter: blur(8px); } body.cine #sub:empty { background: none; backdrop-filter: none; }
+
+/* «vinil» / TikTok: subtítulos grandes de 2 o 3 palabras, sin caja */
+body.vinil #sub { font: 900 92px/1.05 "Figtree"; letter-spacing: -1px; color: #fff; left: 70px; right: 70px;
+  text-shadow: 0 0 2px #000, 0 4px 0 rgba(0,0,0,.55), 0 0 30px rgba(0,0,0,.75); -webkit-text-stroke: 3px rgba(0,0,0,.65); paint-order: stroke fill; }
+body.vinil #gancho span { font: 900 70px/1.18 "Figtree"; color: #fff; background: none; box-shadow: none; padding: 0; text-shadow: 0 0 2px #000, 0 4px 0 rgba(0,0,0,.5), 0 0 34px rgba(0,0,0,.8); -webkit-text-stroke: 3px rgba(0,0,0,.6); paint-order: stroke fill; }
+body.vinil #gancho small { color: #ffd27a; font-size: 30px; letter-spacing: .3em; }
+body.vinil #grano { opacity: .05; }
