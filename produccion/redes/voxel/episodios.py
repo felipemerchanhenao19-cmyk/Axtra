@@ -154,6 +154,12 @@ def CIERRE_DOM(frase, detalle):
 PEDIDO7 = ["Mesa 7 · 8:04 p. m.", "2 × Bandeja paisa · 1 × Limonada de coco"]
 PEDIDO4 = ["Mesa 4 · 8:05 p. m.", "1 × Ajiaco · 2 × Limonada de coco"]
 
+# ═══ Temporada 4 · formatos de tendencia: «POV» de bloques (10-20 s) y «stop-motion» de figuras de bloques (12 cuadros por segundo)
+LADRILLO = {k: dict(ELENCO[k], juguete=True) for k in ("jairo", "brayan", "marcela")}
+LADRILLO["jairo"]["bigoteDibujo"] = "#4a4440"
+def ORBIS_EN_CADENA(t0=0.2, paso=0.35):
+    return {n: dict(pos=p, nace=[t0 + i * paso, t0 + i * paso + 0.6], voz=(n == "o7")) for i, (n, p) in enumerate((("o7", O7), ("o4", O4), ("o9", O9), ("o2", O2)))}
+
 EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
  "mesa-siete": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
@@ -1189,5 +1195,53 @@ EPISODIOS = {
         cam=[[0, 2.35, 3.7, 0, 1.3, -0.1, 34], [0.45, 2.6, 4.5, 0, 1.3, -0.1, 34]], e=dict(holo=1, flujo=1, play=1, dom=1, menu=1, ana=1, luz=[[0, 1], [3, 0.7]]),
         final=dict(marca="Apex Corporation", frase="Tecnología que trabaja por su restaurante.", desde=0.5,
                    detalle="Apex Play · Apex Domicilios<br>Clientes nuevos: 50 % de descuento")),
+  ]),
+
+ # ═══════════ Temporada 4 · «POV» y «stop-motion» ═══════════
+ "pov-viernes": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS, gancho=["POV: viernes, 8 p. m.", "y entran veinte personas"],
+  copy="POV: viernes, 8 p. m., y entran veinte personas. 😳 ¿Quién atiende? Turno de noche",
+  hashtags="#POV #Animacion3D #Restaurantes #Meseros #Colombia",
+  planos=[
+   dict(set="restaurante", musica="tension", cola=0.2, fx=PUM, mano=0.02, cam=[cerca(BRAYAN, 180, 1.7, -10, y=1.68), cerca(BRAYAN, 180, 1.95, -10, y=1.68)],
+        actores={**BAR, "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo="sorpresa", inclina=0.08)},
+        lineas=[L("brayan", "Don Jairo… entraron veinte.", 0.1)]),
+   dict(set="restaurante", musica="tension", cola=0.3, cam=[cerca(JAIRO, 0, 2.2, 8), cerca(JAIRO, 0, 1.95, 6)],
+        actores={**BAR, "jairo": dict(pos=JAIRO, gesto="trapo", mira="brayan", emo="sorpresa")},
+        lineas=[L("jairo", "¿Veinte?", 0.2), L("brayan", "Y uno dice que es vegano.", 0.3)]),
+   dict(set="restaurante", musica="heroe", cola=0.5, trans="flash", fx=[dict(tipo="destello", p=0.1), dict(tipo="destello", p=0.3), dict(tipo="destello", p=0.5)], cam=WIDE,
+        e=dict(qrLuz={"7": [[0, 0], [0.3, 1.0], [2.0, 0.3]], "4": [[0, 0], [0.6, 1.0], [2.2, 0.3]], "9": [[0, 0], [0.9, 1.0], [2.4, 0.3]], "2": [[0, 0], [1.2, 1.0], [2.6, 0.3]]}),
+        orbis=ORBIS_EN_CADENA(), actores=SALON,
+        lineas=[L("orbi", "Buenas noches. Tenemos opciones veganas. ¿Le recomiendo una?", 1.6)]),
+   dict(set="restaurante", musica="comico", cola=1.0, cam=[sobre(BRAYAN, JAIRO, 1.0, 0.72, 0.15, 38), sobre(BRAYAN, JAIRO, 1.0, 0.72, 0.12, 36)],
+        actores={**BAR, "jairo": dict(pos=JAIRO, gesto="reposo", mira="brayan", emo="feliz"), "brayan": dict(pos=BRAYAN, rot=180, mira="jairo", emo=[[0, "duda"], ["l2", "cansado"]])},
+        lineas=[L("brayan", "¿Y yo qué hago?", 0.2), L("jairo", "Lleve los platos.", 0.3), L("brayan", "…¿Los veinte?", 0.4)]),
+   CIERRE_PLAY("Veinte mesas. Un solo mesero. Nadie esperando.", "Un asistente de IA toma el pedido de cada mesa."),
+  ]),
+
+ "el-millon-de-domicilios": dict(producto="dom", stop=12, reparto=REPARTO, elenco=LADRILLO, extras=[], gancho=["Vendimos un millón en domicilios…", "¿y cuánto nos quedó?"],
+  copy="Vendimos un millón en domicilios. La aplicación también. 🧱 Turno de noche en stop-motion",
+  hashtags="#StopMotion #Animacion #Domicilios #Restaurantes #Emprendedores",
+  planos=[
+   dict(set="oficina", musica="tension", cola=0.2, fx=PUM, cam=[cerca(MAR, 180, 2.2, 26, 0.08, 36, 1.38), cerca(MAR, 180, 2.0, 24, 0.06, 36, 1.38)],
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, gesto="teclea", mira=30, emo="feliz"), "jairo": dict(pos=JPIE, rot=-25, mira="marcela")},
+        lineas=[L("marcela", "Don Jairo, vendimos un millón en domicilios.", 0.1)]),
+   dict(set="oficina", musica="tension", cola=0.3, cam=[cerca(JPIE, -25, 2.3, 10), cerca(JPIE, -25, 2.0, 8)],
+        actores={"jairo": dict(pos=JPIE, rot=-25, mira="marcela", emo="feliz", gesto="cadera"), "marcela": dict(pos=MAR, rot=180, sentado=True, mira="jairo")},
+        lineas=[L("jairo", "¡Un millón! ¿Y cuánto nos quedó?", 0.2)]),
+   dict(set="oficina", musica="tension", cola=0.4, cam=[[0.6, 1.52, 1.05, 0.19, 1.0, -0.3, 40], [0.5, 1.45, 0.95, 0.19, 1.0, -0.3, 36]],
+        e=dict(portatil={"titulo": "Domicilios del mes", "filas": [["Vendido", "$ 1.000.000", "#ffffff"], ["Comisiones y tarifas", "- $ 300.000", "#ff9a8a"], ["Le queda", "$ 700.000", "#bff3ff"]]}),
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, gesto="teclea", mira=0, miraY=0.2), "jairo": dict(pos=JPIE, rot=-25, mira="marcela")},
+        lineas=[L("marcela", "Setecientos. El resto se lo quedó la aplicación.", 0.2)]),
+   dict(set="oficina", musica="comico", cola=0.3, cam=[cerca(JPIE, -25, 2.2, -10), cerca(JPIE, -25, 1.9, -8)],
+        actores={"jairo": dict(pos=JPIE, rot=-25, mira="marcela", emo=[[0, "sorpresa"], ["l2", "serio"]], gesto="cruzado"), "marcela": dict(pos=MAR, rot=180, sentado=True, mira="jairo")},
+        lineas=[L("jairo", "¿La aplicación cocina?", 0.2), L("marcela", "No.", 0.3), L("jairo", "¿Lava los platos?", 0.3), L("marcela", "Tampoco.", 0.3)]),
+   dict(set="oficina", musica="esperanza", cola=0.3, fx=[dict(tipo="destello", p=0.05)], cam=[[-1.35, 1.8, 2.1, 0.1, 1.3, -0.25, 38], [-1.2, 1.74, 1.85, 0.1, 1.3, -0.25, 36]],
+        orbis={"oo": dict(pos=[0.15, 1.32, -0.05], nace=[0.05, 0.7], r=0.15, luz=0.45, mira="cam")},
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, mira="oo", emo="neutro"), "jairo": dict(pos=JPIE, rot=-25, mira="oo", emo="sorpresa")},
+        lineas=[L("orbi", "Con su propio link de pedidos, el millón es suyo. Cero comisión.", 0.7)]),
+   dict(set="oficina", musica="comico", cola=1.0, cam=[sobre(MAR, JPIE, 1.1, 0.72, 0.25, 38, 1.38, 1.72), sobre(MAR, JPIE, 1.0, 0.72, 0.22, 36, 1.38, 1.72)],
+        actores={"marcela": dict(pos=MAR, rot=180, sentado=True, mira="jairo", emo="neutro"), "jairo": dict(pos=JPIE, rot=-25, mira=-60, emo=[[0, "duda"], ["l2", "feliz"]])},
+        lineas=[L("jairo", "¿Y el link lava los platos?", 0.2), L("orbi", "No.", 0.3), L("jairo", "…Igual me sirve.", 0.4)]),
+   CIERRE_DOM("El millón es suyo.", "Su propio link de pedidos, sin comisión por pedido."),
   ]),
 }

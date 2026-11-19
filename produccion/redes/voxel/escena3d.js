@@ -58,6 +58,7 @@ function yawHacia(P, T) { return Math.atan2(T.x - P.x, T.z - P.z); }
 // ---------- Cuadro
 let grano = null;
 function render(t) {
+  const tReal = t; if (EP.stop) t = Math.floor(t * EP.stop + 1e-6) / EP.stop;   // «stop-motion»: la escena avanza a saltos (12 cuadros por segundo)
   const PL = EP.planos, LP = LINEA.planos; let i = LP.findIndex((L) => t < L.fin); if (i < 0) i = LP.length - 1;
   const pl = PL[i], L = LP[i], tt = t - L.ini, dur = L.fin - L.ini, p = cl(tt / dur);
   Object.entries(SETS).forEach(([n, s]) => { s.visible = n === pl.set; });
@@ -127,6 +128,6 @@ function render(t) {
   const inf = $("#info"); if (pl.info) { if (inf.dataset.i !== String(i)) { inf.dataset.i = i; inf.innerHTML = pl.info.html; }
     const a = cl((tt - tClave(pl.info.desde ?? 0.3, L)) / 0.5); inf.style.opacity = a * cl((dur - tt) / 0.3); inf.style.transform = `translateY(${(1 - suave(a)) * 40}px)`; } else { inf.style.opacity = 0; inf.dataset.i = ""; }
   // grano de película
-  const gc = $("#grano"), gg = gc.getContext("2d"); if (!grano) grano = gg.createImageData(360, 640); const r = semilla(Math.floor(t * 30) + 1);
+  const gc = $("#grano"), gg = gc.getContext("2d"); if (!grano) grano = gg.createImageData(360, 640); const r = semilla(Math.floor(tReal * 30) + 1);
   for (let k = 0; k < grano.data.length; k += 4) { const v = r() * 255; grano.data[k] = grano.data[k + 1] = grano.data[k + 2] = v; grano.data[k + 3] = 255; } gg.putImageData(grano, 0, 0);
 }

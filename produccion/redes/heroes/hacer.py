@@ -14,7 +14,8 @@ REDES = RAIZ + "produccion/redes/"
 TRABAJO = os.getenv("TRABAJO", "/tmp/orbi_heroes") + "/"
 SALIDA = RAIZ + "entregables/redes/heroes/"
 FPS, SR, COLA_SELLO = 30, 48000, 3.4
-CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+CHROME = next((c for c in ("/opt/pw-browsers/chromium-1194/chrome-linux/chrome", "/opt/pw-browsers/chromium/chrome-linux/chrome",
+                             "/opt/pw-browsers/chromium-1243/chrome-linux/chrome", "/opt/pw-browsers/chromium") if os.path.isfile(c)), None)
 dur = lambda f: float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f]))
 lp = lambda x, f: sosfilt(butter(2, f, "low", fs=SR, output="sos"), x)
 hp = lambda x, f: sosfilt(butter(2, f, "high", fs=SR, output="sos"), x)
