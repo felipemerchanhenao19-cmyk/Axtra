@@ -164,3 +164,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 
 ### «El millón de domicilios», stop-motion (35 s, Apex Domicilios)
 - «Vendimos un millón en domicilios. La aplicación también. 🧱» · #StopMotion #Animacion #Domicilios #Restaurantes #Emprendedores
+
+### «Sin cebolla»: figuras de vinil, «Basado en hechos reales» (38 s, Apex Play)
+- **Instagram:** «Tercera vez que pide "sin cebolla". La cuarta… no se la esperaba nadie. 🧅 ¿A usted le ha pasado? 👇» · #BasadoEnHechosReales #SinCebolla #Meseros #Restaurantes #Humor
+- **TikTok:** subir la versión sin música, con un audio de suspenso en tendencia a volumen bajo. «El cliente del "sin cebolla" existe 😭 #sincebolla #meseros #restaurantes #humor #basadoenhechosreales»
+- **Portada:** el primer plano del cliente diciendo «…Tiene cebolla.» (segundo 11).
+- **Comentario fijado:** «¿Cuál es el pedido más raro que le han hecho? 🧅»
