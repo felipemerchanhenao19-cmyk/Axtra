@@ -189,3 +189,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «Pedir almuerzo por teléfono es un deporte extremo 😭 #domicilios #oficina #almuerzo #humor #basadoenhechosreales»
 - **Portada:** el cliente gritando «¡OCHO! ¡DOCE! ¡CUARENTA!» (segundo 16).
 - **Comentario fijado:** «¿Cuántas veces ha tenido que repetir su dirección? 🏠»
+
+### «El indeciso»: figuras de vinil, fórmula «Sin cebolla» (corto, Apex Play). Cierre con pregunta
+- **Instagram:** «Doce cambios. Un mesero. Y un final que nadie vio venir. 🍔 ¿Quién es el indeciso de su grupo? 👇» · #BasadoEnHechosReales #Indeciso #Restaurantes #Amigos #Humor
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «Todos tenemos ese amigo 😭 #indeciso #amigos #restaurantes #humor #basadoenhechosreales»
+- **Portada:** Brayan agotado: «Señor… lleva doce cambios».
+- **Comentario fijado:** «Etiquete al indeciso. Sabemos que lo tiene 👀»
