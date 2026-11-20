@@ -195,3 +195,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «Todos tenemos ese amigo 😭 #indeciso #amigos #restaurantes #humor #basadoenhechosreales»
 - **Portada:** Brayan agotado: «Señor… lleva doce cambios».
 - **Comentario fijado:** «Etiquete al indeciso. Sabemos que lo tiene 👀»
+
+### «Más caro por la aplicación»: figuras de vinil, fórmula «Sin cebolla» (33 s, Apex Domicilios). Cierre con pregunta
+- **Instagram:** «Pagó dos almuerzos… y le llegó uno. 🧾 ¿Cuánto más ha pagado usted por pedir en una aplicación? 👇» · #BasadoEnHechosReales #Domicilios #Almuerzo #Oficina #Humor
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «El domicilio aparte, la tarifa aparte… 😭 #domicilios #almuerzo #oficina #humor #basadoenhechosreales»
+- **Portada:** el cliente agotado: «Pagué dos almuerzos… y me llegó uno».
+- **Comentario fijado:** «¿Usted también revisa el total y se arrepiente? 😅»
