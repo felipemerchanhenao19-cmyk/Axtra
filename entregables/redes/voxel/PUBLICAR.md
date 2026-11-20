@@ -170,3 +170,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio de suspenso en tendencia a volumen bajo. «El cliente del "sin cebolla" existe 😭 #sincebolla #meseros #restaurantes #humor #basadoenhechosreales»
 - **Portada:** el primer plano del cliente diciendo «…Tiene cebolla.» (segundo 11).
 - **Comentario fijado:** «¿Cuál es el pedido más raro que le han hecho? 🧅»
+
+### «La cuenta»: figuras de vinil, «Basado en hechos reales» (40 s, Apex Domicilios)
+- **Instagram:** «Llegó la cuenta de la aplicación de domicilios. Don Jairo no estaba preparado. 🧾 ¿Cuánto se le va a usted en comisiones? 👇» · #BasadoEnHechosReales #Domicilios #Restaurantes #Emprendedores #Humor
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «La tarifa por la tarifa 😭 #domicilios #restaurantes #emprendedores #humor #basadoenhechosreales»
+- **Portada:** Marcela con el recibo larguísimo que llega al piso (segundo 15).
+- **Comentario fijado:** «"Nos quedan las ganas" 😅 ¿A quién le ha pasado?»
