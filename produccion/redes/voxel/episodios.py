@@ -174,6 +174,11 @@ CINE_V = "contrast(1.1) saturate(1.1) brightness(1.03)"
 BT7 = [-1.55, 0.95]   # Brayan junto a la mesa 7
 CLI7 = [[0, -0.5, 1.62, -1.5, -2.6, 1.42, 1.35, 40], [0.22, -1.45, 1.5, -0.3, -2.6, 1.44, 1.35, 34], [9, -1.55, 1.5, -0.2, -2.6, 1.44, 1.35, 33]]   # «zoom» de golpe al cliente
 
+VINILES["marcela"] = dict(piel="#e6b494", pelo="#2e1e16", cejas="#2e1e16", peinado="moño", gafas="#141619", saco="#2f3a4a", camisa="#efeae2", pantalon="#262b33",
+                         iris="#3a2416", semilla=5, alto=0.95)
+MS = [-0.55, -1.0]   # Marcela de pie, frente a don Jairo (JPIE), en la oficina
+ORB_OF = [0.15, 1.32, -0.05]
+
 EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
  "mesa-siete": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
@@ -1325,5 +1330,43 @@ EPISODIOS = {
                  "brayan": dict(pos=BT7, rot=[[0, -66], [0.5, -66], [1.2, 20]], mira=[[0, "cliente"], [0.5, "cliente"], [1.1, "cam"]], gesto="bandeja", emo=[[0, "sorpresa"], [1.0, "cansado"]])},
         lineas=[L("orbi", "…Anotado.", 1.8)]),
    CIERRE_PLAY("Cada pedido, exactamente como lo pidieron.", "Las notas de cada mesa llegan claras a la cocina.", sinExtras=[6]),
+  ]),
+
+ "la-cuenta-vinil": dict(producto="dom", estilo="vinil", palabras=3, dof=1.0, subY=1150, reparto=REPARTO, elenco=VINILES, extras=[],
+  gancho=["La aplicación de domicilios mandó la cuenta del mes…", "Basado en hechos reales", 3.0],
+  copy="Llegó la cuenta de la aplicación de domicilios. Don Jairo no estaba preparado. 🧾 Basado en hechos reales.",
+  hashtags="#BasadoEnHechosReales #Domicilios #Restaurantes #Emprendedores #Humor",
+  planos=[
+   dict(set="oficina", grado=CINE_V, musica="tension", cola=0.2, fx=PUM, mano=0.008, cam=[cerca(MS, 80, 2.7, -22, 0.02, 34, 1.7), cerca(MS, 80, 2.45, -20, 0.02, 34, 1.7)],
+        actores={"marcela": dict(pos=MS, rot=80, mira="jairo", emo="serio", gesto="recibo", rollo=0.12), "jairo": dict(pos=JPIE, rot=-55, mira="marcela")},
+        lineas=[L("marcela", "Don Jairo, llegó la cuenta de la aplicación.", 0.1)]),
+   dict(set="oficina", grado=CINE_V, musica="tension", cola=0.3, mano=0.008, cam=[cerca(JPIE, -55, 2.6, 20, 0.02, 34, 1.74), cerca(JPIE, -55, 2.4, 18, 0.02, 34, 1.74)],
+        actores={"marcela": dict(pos=MS, rot=80, mira="jairo", gesto="recibo", rollo=0.12), "jairo": dict(pos=JPIE, rot=-55, mira="marcela", emo="serio", gesto="cruzado")},
+        lineas=[L("jairo", "Léala.", 0.2)]),
+   dict(set="oficina", grado=CINE_V, musica="tension", cola=0.2, mano=0.008, cam=[cerca(MS, 80, 2.6, -22, 0.02, 34, 1.7), cerca(MS, 80, 2.3, -20, 0.02, 34, 1.7)],
+        actores={"marcela": dict(pos=MS, rot=80, mira=-10, miraY=0.25, emo="neutro", gesto="recibo", rollo=[[0, 0.12], ["f0", 0.22], ["f1", 0.32], ["f2", 0.42]]), "jairo": dict(pos=JPIE, rot=-55, mira="marcela")},
+        lineas=[L("marcela", "Comisión por pedido.", 0.1), L("marcela", "Tarifa de servicio.", 0.25), L("marcela", "Tarifa por la tarifa de servicio.", 0.25)]),
+   dict(set="oficina", grado=CINE_V, musica="comico", cola=0.4, fx=[dict(tipo="pum", p=0.0)], mano=0.012,
+        cam=[[0] + cerca(JPIE, -55, 3.0, 20, 0.02, 34, 1.74), [0.22] + cerca(JPIE, -55, 2.15, 18, 0.0, 33, 1.76), [9] + cerca(JPIE, -55, 2.1, 18, 0.0, 33, 1.76)],
+        actores={"marcela": dict(pos=MS, rot=80, gesto="recibo", rollo=0.42), "jairo": dict(pos=JPIE, rot=-55, mira="marcela", emo="sorpresa", gesto="cabeza")},
+        lineas=[L("jairo", "¿Tarifa por la tarifa?", 0.25)]),
+   dict(set="oficina", grado=CINE_V, musica="comico", cola=0.4, mano=0.006, cam=[cerca(MS, 80, 3.6, -20, -0.15, 42, 1.25), cerca(MS, 80, 3.4, -20, -0.15, 42, 1.25)],
+        actores={"marcela": dict(pos=MS, rot=80, mira=-10, miraY=0.25, emo="neutro", gesto="recibo", rollo=[[0, 0.42], [1.8, 1.0]]), "jairo": dict(pos=JPIE, rot=-55, mira="marcela", emo="cansado")},
+        lineas=[L("marcela", "Y publicidad, para que lo encuentren en la aplicación… que usted ya paga.", 0.3)]),
+   dict(set="oficina", grado=CINE_V, musica="comico", cola=0.2, mano=0.008, cam=[cerca(JPIE, -55, 2.5, 20, 0.02, 34, 1.74), cerca(JPIE, -55, 2.3, 18, 0.02, 34, 1.74)],
+        actores={"marcela": dict(pos=MS, rot=80, gesto="recibo", rollo=1.0), "jairo": dict(pos=JPIE, rot=-55, mira="marcela", emo="triste", gesto="reposo")},
+        lineas=[L("jairo", "Marcela… ¿y cuánto nos queda?", 0.2)]),
+   dict(set="oficina", grado=CINE_V, musica="comico", cola=0.6, mano=0.008, cam=[cerca(MS, 80, 2.5, -20, 0.02, 34, 1.7), cerca(MS, 80, 2.35, -20, 0.02, 34, 1.7)],
+        actores={"marcela": dict(pos=MS, rot=80, mira="jairo", emo="cansado", gesto="recibo", rollo=1.0), "jairo": dict(pos=JPIE, rot=-55, mira="marcela")},
+        lineas=[L("marcela", "…Nos quedan las ganas, don Jairo.", 0.5)]),
+   dict(set="oficina", grado=CINE_V, musica="esperanza", cola=0.3, fx=[dict(tipo="destello", p=0.05)], cam=[[-1.35, 1.8, 2.1, 0.1, 1.3, -0.25, 38], [-1.2, 1.74, 1.85, 0.1, 1.3, -0.25, 36]],
+        orbis={"oo": dict(pos=ORB_OF, nace=[0.05, 0.7], r=0.15, luz=0.45, mira="cam")},
+        actores={"marcela": dict(pos=MS, rot=80, mira="oo", gesto="recibo", rollo=1.0, emo="sorpresa"), "jairo": dict(pos=JPIE, rot=-55, mira="oo", emo="sorpresa")},
+        lineas=[L("orbi", "Con su propio link de pedidos, la comisión es cero.", 0.7)]),
+   dict(set="oficina", grado=CINE_V, musica="esperanza", cola=1.1, mano=0.006, cam=[cerca(JPIE, -55, 2.4, 20, 0.02, 34, 1.74), cerca(JPIE, -55, 2.0, 18, 0.0, 32, 1.75)],
+        orbis={"oo": dict(pos=ORB_OF, r=0.15, luz=0.45, voz=True, mira="jairo")},
+        actores={"marcela": dict(pos=MS, rot=80, mira="jairo", gesto="recibo", rollo=1.0), "jairo": dict(pos=JPIE, rot=-55, mira=[[0, "oo"], ["l2", 10]], emo=[[0, "sorpresa"], ["l2", "cerrados"]], sonrisa=0.6)},
+        lineas=[L("jairo", "¿Cero?", 0.2), L("orbi", "Cero.", 0.3), L("jairo", "Dígalo otra vez.", 0.3), L("orbi", "Cero.", 0.4), L("jairo", "…Otra vez.", 0.5)]),
+   CIERRE_DOM("Su propio link de pedidos. Comisión cero.", "Cada venta es suya."),
   ]),
 }
