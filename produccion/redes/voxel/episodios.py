@@ -187,6 +187,8 @@ def CIERRE_CTA(marca, frase, pregunta, sub, **k):   # cierre que conecta con el 
                 actores={**SALON, "jairo": dict(pos=JAIRO, gesto="reposo", emo="feliz"), "brayan": dict(pos=BRAYAN, rot=180, emo="feliz")},
                 final=dict(marca=marca, frase=frase, desde=0.5, cta=f"{pregunta}<small>{sub}</small>")), **k)
 
+G_OF = "contrast(1.12) saturate(1.18) brightness(0.9)"
+
 EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
  "mesa-siete": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
@@ -1494,5 +1496,41 @@ EPISODIOS = {
                  "brayan": dict(pos=BT7, rot=[[0, -66], [0.4, -66], [1.0, 20]], mira=[[0, "cliente"], [0.4, "cliente"], [0.9, "cam"]], gesto="bandeja", emo=[[0, "sorpresa"], [0.9, "cansado"]])},
         lineas=[L("orbi", "…Anotado.", 1.4)]),
    CIERRE_CTA("Apex Play", "Hasta el más indeciso pide a la primera.", "¿Quién es el indeciso de su grupo? 👇", "Etiquételo sin miedo.", sinExtras=[6], min=4.5),
+  ]),
+
+ "mas-caro-por-la-app": dict(producto="dom", estilo="vinil", palabras=3, dof=1.0, subY=1150,
+  reparto=dict(REPARTO, amiga=dict(voz=("es-MX-DaliaNeural", "+4%", "+0Hz"))), elenco=dict(VINILES, cliente=dict(VINILES["cliente"], piel="#c08060")), extras=[],
+  gancho=["Cuando el almuerzo cuesta más por la aplicación…", "Basado en hechos reales", 2.6],
+  copy="Pagó dos almuerzos… y le llegó uno. 🧾 ¿Cuánto más ha pagado usted por pedir en una aplicación?",
+  hashtags="#BasadoEnHechosReales #Domicilios #Almuerzo #Oficina #Humor",
+  planos=[
+   dict(set="oficina", grado=G_OF, relleno=0.12, musica="tension", cola=0.1, fx=PUM, mano=0.01,
+        cam=[[0] + cerca(MAR, 180, 3.4, 26, 0.06, 36, 1.45), [0.22] + cerca(MAR, 180, 2.35, 24, 0.04, 34, 1.45), [9] + cerca(MAR, 180, 2.3, 24, 0.04, 34, 1.45)],
+        actores={"cliente": dict(pos=MAR, rot=180, sentado=True, gesto="celular", mira=10, miraY=0.15, emo="duda"), "amiga": dict(pos=JPIE, rot=-25, mira="cliente")},
+        lineas=[L("cliente", "¿Por qué la bandeja cuesta más en la aplicación?", 0.1)]),
+   dict(set="oficina", grado=G_OF, relleno=0.12, musica="comico", cola=0.1, mano=0.008, cam=[[-1.35, 1.8, 2.1, 0.45, 1.45, -0.3, 38], [-1.25, 1.76, 1.95, 0.45, 1.45, -0.3, 36]],
+        actores={"cliente": dict(pos=MAR, rot=180, sentado=True, gesto="celular", mira="amiga", emo="neutro"), "amiga": dict(pos=JPIE, rot=-25, mira="cliente", emo="duda")},
+        lineas=[L("amiga", "¿Cuánto más?", 0.05), L("cliente", "Ocho mil.", 0.05), L("amiga", "¿Y el domicilio?", 0.05), L("cliente", "Aparte.", 0.05),
+                L("amiga", "¿Y la tarifa de servicio?", 0.05), L("cliente", "…Aparte.", 0.15)]),
+   dict(set="oficina", grado=G_OF, relleno=0.12, musica="tension", cola=0.4, fx=[dict(tipo="pum", p=0.0)], mano=0.012,
+        cam=[[0] + cerca(MAR, 180, 3.2, 22, 0.04, 34, 1.45), [0.22] + cerca(MAR, 180, 2.25, 20, 0.02, 33, 1.46), [9] + cerca(MAR, 180, 2.2, 20, 0.02, 33, 1.46)],
+        actores={"cliente": dict(pos=MAR, rot=180, sentado=True, gesto="reposo", mira=-20, emo="cansado"), "amiga": dict(pos=JPIE, rot=-25, mira="cliente")},
+        lineas=[L("cliente", "Pagué dos almuerzos… y me llegó uno.", 0.3)]),
+   dict(set="oficina", grado=G_OF, relleno=0.12, musica="esperanza", cola=0.2, fx=[dict(tipo="destello", p=0.25)], cam=[[-1.35, 1.8, 2.1, 0.1, 1.3, -0.25, 38], [-1.2, 1.74, 1.85, 0.1, 1.3, -0.25, 36]],
+        orbis={"oo": dict(pos=ORB_OF, nace=["f0", "f0+0.6"], r=0.15, luz=0.45, mira=[[0, "cam"], ["l1+0.5", "cliente"]])},
+        actores={"cliente": dict(pos=MAR, rot=180, sentado=True, gesto="teclea", mira="oo", emo=[[0, "neutro"], ["l1", "sorpresa"]]), "amiga": dict(pos=JPIE, rot=-25, mira="cliente", emo="feliz")},
+        lineas=[L("amiga", "Pídale directo al restaurante, por su link.", 0.05), L("orbi", "¡Hola! Aquí la bandeja vale lo mismo que en la carta.", 0.6),
+                L("cliente", "¿Lo mismo?", 0.1), L("orbi", "Lo mismo.", 0.1)]),
+   dict(set="oficina", grado=G_OF, relleno=0.12, musica="tension", cola=0.5, mano=0.004, cam=[cerca(MAR, 180, 2.3, 22, 0.04, 33, 1.45), cerca(MAR, 180, 2.15, 20, 0.04, 32, 1.45)],
+        orbis={"oo": dict(pos=ORB_OF, r=0.15, luz=0.45, voz=False, mira="cliente")},
+        actores={"cliente": dict(pos=MAR, rot=180, sentado=True, gesto="teclea", mira=[[0, "oo"], [0.6, 25]], emo=[[0, "feliz"], ["l0", "duda"]]), "amiga": dict(pos=JPIE, rot=-25, mira="cliente")},
+        lineas=[L("cliente", "Entonces… ¿me alcanza para dos?", 0.8)]),
+   dict(set="oficina", grado=G_OF, relleno=0.12, musica="comico", cola=1.0, mano=0.004, fx=[dict(tipo="pum", p=0.02)], cam=[[-1.35, 1.8, 2.1, 0.3, 1.4, -0.4, 38], [-1.3, 1.78, 2.0, 0.3, 1.4, -0.4, 38]],
+        orbis={"oo": dict(pos=ORB_OF, r=0.15, luz=0.45, mira="cam")},
+        actores={"cliente": dict(pos=MAR, rot=180, sentado=True, gesto="teclea", mira="oo", emo="feliz"),
+                 "amiga": dict(pos=JPIE, rot=[[0, -25], [0.4, -25], [1.0, 30]], mira=[[0, "cliente"], [0.4, "cliente"], [0.9, "cam"]], emo=[[0, "sorpresa"], [0.9, "cansado"]])},
+        lineas=[L("orbi", "…Anotado.", 1.4)]),
+   CIERRE_CTA("Apex Domicilios", "Pedirle directo al restaurante sale mejor.", "¿Cuánto más ha pagado usted por pedir en una aplicación? 👇",
+              "Etiquete a quien almuerza a domicilio todos los días.", min=4.5),
   ]),
 }
