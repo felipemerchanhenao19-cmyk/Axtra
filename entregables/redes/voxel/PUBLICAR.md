@@ -183,3 +183,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **Portada:** el cliente de pie agitando la servilleta (segundo 14).
 - **Comentario fijado:** «Su récord de espera: ¿10, 20 o 40 minutos? ⏳»
 - **Si alguien pregunta por el producto,** se le responde por mensaje directo con la información y el WhatsApp. El video no lleva el número para que se sienta contenido y no publicidad.
+
+### «El domicilio por teléfono»: figuras de vinil (51 s, Apex Domicilios). Cierre con pregunta, sin teléfono
+- **Instagram:** «Pidió una bandeja paisa a la calle 8. Le llegaron dos… a la calle ocho mil. 📞 ¿A usted también le ha pasado? 👇» · #BasadoEnHechosReales #Domicilios #Almuerzo #Oficina #Humor
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «Pedir almuerzo por teléfono es un deporte extremo 😭 #domicilios #oficina #almuerzo #humor #basadoenhechosreales»
+- **Portada:** el cliente gritando «¡OCHO! ¡DOCE! ¡CUARENTA!» (segundo 16).
+- **Comentario fijado:** «¿Cuántas veces ha tenido que repetir su dirección? 🏠»
