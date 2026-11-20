@@ -183,9 +183,9 @@ VINILES["amiga"] = dict(piel="#d9a07a", pelo="#4a2a1c", cejas="#3a2016", peinado
 VINILES["cliente"] = dict(piel="#e0aa86", pelo="#2b1d16", cejas="#2b1d16", peinado="flequillo", camisa="#3a5a7a", pantalon="#2a2f3a", iris="#2a1a10", semilla=7)
 AMIGA = [-2.6, -0.15]; PASILLO = -0.55
 def CIERRE_CTA(marca, frase, pregunta, sub, **k):   # cierre que conecta con el público: sin teléfono, con una pregunta para comentar
-    return dict(set="restaurante", musica="pelicula", min=5.5, trans="negro", cam=WIDE, orbis=TODAS_ORBIS,
+    return dict(dict(set="restaurante", musica="pelicula", min=5.5, trans="negro", cam=WIDE, orbis=TODAS_ORBIS,
                 actores={**SALON, "jairo": dict(pos=JAIRO, gesto="reposo", emo="feliz"), "brayan": dict(pos=BRAYAN, rot=180, emo="feliz")},
-                final=dict(marca=marca, frase=frase, desde=0.5, cta=f"{pregunta}<small>{sub}</small>"), **k)
+                final=dict(marca=marca, frase=frase, desde=0.5, cta=f"{pregunta}<small>{sub}</small>")), **k)
 
 EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
@@ -1459,5 +1459,40 @@ EPISODIOS = {
         lineas=[L("cliente", "…Me entendió a la primera.", 0.5)]),
    CIERRE_CTA("Apex Domicilios", "Pedir domicilio no debería ser una pelea.", "¿Qué es lo más raro que le ha llegado a domicilio? 👇",
               "Etiquete a quien siempre pide gritando por teléfono."),
+  ]),
+
+ # ═══ Fórmula «Sin cebolla» (la más viral): zoom de golpe al cliente, frases de una línea, silencio incómodo, Orbi resuelve, giro final y «…Anotado». Máximo ~28 s.
+ "el-indeciso": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, subY=1150,
+  reparto=dict(REPARTO, amiga=dict(voz=("es-MX-DaliaNeural", "+4%", "+0Hz"))), elenco=VINILES, extras=EXTRAS,
+  gancho=["Cuando tu amigo no sabe qué pedir…", "Basado en hechos reales", 2.4],
+  copy="Doce cambios. Un mesero. Y un final que nadie vio venir. 🍔 ¿Quién es el indeciso de su grupo?",
+  hashtags="#BasadoEnHechosReales #Indeciso #Restaurantes #Amigos #Humor",
+  planos=[
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.1, fx=PUM, sinExtras=[6], mano=0.01, cam=CLI7,
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="duda"), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="cliente"),
+                 "brayan": dict(pos=BT7, rot=-66, mira="cliente", gesto="celular")},
+        lineas=[L("cliente", "Para mí… una hamburguesa.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.1, mano=0.008, sinExtras=[6], cam=[cerca(BT7, -66, 2.5, 28, 0.0, 34, 1.74), cerca(BT7, -66, 2.3, 26, 0.0, 34, 1.74)],
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan"), "brayan": dict(pos=BT7, rot=-66, mira="cliente", emo="neutro", gesto="celular")},
+        lineas=[L("brayan", "Hamburguesa.", 0.05), L("cliente", "No, mejor pasta.", 0.05), L("brayan", "Pasta.", 0.05), L("cliente", "No… ¿qué me recomienda?", 0.05), L("brayan", "La hamburguesa.", 0.05)]),
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.4, fx=[dict(tipo="pum", p=0.0)], mano=0.012, sinExtras=[6], titulo=["", "Diez minutos después"],
+        cam=[[0] + cerca(BT7, -66, 3.0, 28, 0.0, 34, 1.74), [0.22] + cerca(BT7, -66, 2.0, 26, 0.0, 33, 1.76), [9] + cerca(BT7, -66, 1.95, 26, 0.0, 33, 1.76)],
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan"), "brayan": dict(pos=BT7, rot=-66, mira="cliente", emo="cansado", gesto="celular")},
+        lineas=[L("brayan", "Señor… lleva doce cambios.", 0.3)]),
+   dict(set="restaurante", grado=CINE_V, musica="esperanza", cola=0.3, fx=[dict(tipo="destello", p=0.05)], cam=LADO7, sinExtras=[6],
+        e=dict(qrLuz={"7": [[0, 0], [0.2, 1.0], [1.6, 0.2]]}), orbis={"o7": dict(pos=O7, nace=[0.05, 0.6], mira=[[0, "cam"], [0.7, "cliente"]])},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo=[[0, "sorpresa"], ["l1", "feliz"]]), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="o7")},
+        lineas=[L("orbi", "Le recomiendo la bandeja de la casa. Es la favorita de los indecisos.", 0.4), L("cliente", "¡Esa!", 0.1), L("orbi", "Ya está en la cocina.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.6, sinExtras=[6], mano=0.004, cam=[[-1.5, 1.5, -0.25, -2.6, 1.3, 1.1, 36], [-1.6, 1.46, -0.05, -2.6, 1.28, 1.1, 32]],
+        orbis={"o7": dict(pos=O7, voz=False, luz=0.5)},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira=[[0, 0], [0.5, -40]], miraY=0.25, emo=[[0, "feliz"], ["l0", "duda"]]),
+                 "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="cliente")},
+        lineas=[L("cliente", "…Oiga, ¿y si cambiamos de plato?", 0.9)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=1.0, mano=0.004, fx=[dict(tipo="pum", p=0.02)], cam=[[-0.25, 1.75, 2.9, -1.9, 1.5, 0.9, 40], [-0.3, 1.72, 2.75, -1.9, 1.5, 0.9, 40]], sinExtras=[6],
+        orbis={"o7": dict(pos=O7, luz=0.5, mira="cam")},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="amiga", emo="feliz"), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="cam", emo="cansado"),
+                 "brayan": dict(pos=BT7, rot=[[0, -66], [0.4, -66], [1.0, 20]], mira=[[0, "cliente"], [0.4, "cliente"], [0.9, "cam"]], gesto="bandeja", emo=[[0, "sorpresa"], [0.9, "cansado"]])},
+        lineas=[L("orbi", "…Anotado.", 1.4)]),
+   CIERRE_CTA("Apex Play", "Hasta el más indeciso pide a la primera.", "¿Quién es el indeciso de su grupo? 👇", "Etiquételo sin miedo.", sinExtras=[6], min=4.5),
   ]),
 }
