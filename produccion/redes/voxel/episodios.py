@@ -179,6 +179,14 @@ VINILES["marcela"] = dict(piel="#e6b494", pelo="#2e1e16", cejas="#2e1e16", peina
 MS = [-0.55, -1.0]   # Marcela de pie, frente a don Jairo (JPIE), en la oficina
 ORB_OF = [0.15, 1.32, -0.05]
 
+VINILES["amiga"] = dict(piel="#d9a07a", pelo="#4a2a1c", cejas="#3a2016", peinado="largo", camisa="#b8556a", pantalon="#2e3442", iris="#3a2416", semilla=15, alto=0.94)
+VINILES["cliente"] = dict(piel="#e0aa86", pelo="#2b1d16", cejas="#2b1d16", peinado="flequillo", camisa="#3a5a7a", pantalon="#2a2f3a", iris="#2a1a10", semilla=7)
+AMIGA = [-2.6, -0.15]; PASILLO = -0.55
+def CIERRE_CTA(marca, frase, pregunta, sub, **k):   # cierre que conecta con el público: sin teléfono, con una pregunta para comentar
+    return dict(set="restaurante", musica="pelicula", min=5.5, trans="negro", cam=WIDE, orbis=TODAS_ORBIS,
+                actores={**SALON, "jairo": dict(pos=JAIRO, gesto="reposo", emo="feliz"), "brayan": dict(pos=BRAYAN, rot=180, emo="feliz")},
+                final=dict(marca=marca, frase=frase, desde=0.5, cta=f"{pregunta}<small>{sub}</small>"), **k)
+
 EPISODIOS = {
  # ─────────── Capítulo 1 · «Mesa siete» (Apex Play)
  "mesa-siete": dict(producto="play", reparto=REPARTO, elenco=ELENCO, extras=EXTRAS,
@@ -1368,5 +1376,46 @@ EPISODIOS = {
         actores={"marcela": dict(pos=MS, rot=80, mira="jairo", gesto="recibo", rollo=1.0), "jairo": dict(pos=JPIE, rot=-55, mira=[[0, "oo"], ["l2", 10]], emo=[[0, "sorpresa"], ["l2", "cerrados"]], sonrisa=0.6)},
         lineas=[L("jairo", "¿Cero?", 0.2), L("orbi", "Cero.", 0.3), L("jairo", "Dígalo otra vez.", 0.3), L("orbi", "Cero.", 0.4), L("jairo", "…Otra vez.", 0.5)]),
    CIERRE_DOM("Su propio link de pedidos. Comisión cero.", "Cada venta es suya."),
+  ]),
+
+ "el-mesero-invisible": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, subY=1150,
+  reparto=dict(REPARTO, amiga=dict(voz=("es-MX-DaliaNeural", "+2%", "+0Hz"))), elenco=VINILES, extras=EXTRAS,
+  gancho=["Cuando el mesero no te ve…", "Basado en hechos reales", 2.8],
+  copy="Levantó la mano. Hizo ojitos. Silbó. Mandó un audio. 🙋‍♂️ ¿Cuánto ha esperado usted para que le tomen el pedido?",
+  hashtags="#BasadoEnHechosReales #Restaurantes #Meseros #Humor #YaVoy",
+  planos=[
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.3, fx=PUM, sinExtras=[6], mano=0.01, cam=[[-1.45, 1.52, -0.45, -2.6, 1.5, 1.35, 36], [-1.55, 1.5, -0.3, -2.6, 1.52, 1.35, 34]],
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="mano_arriba", mira=-25, emo="neutro"), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="cliente"),
+                 "brayan": dict(pos=[[0, 1.6, 2.9], [2.6, -1.4, 2.9]], rot=-90, mira=0, gesto="bandeja", emo="serio")},
+        lineas=[L("cliente", "Disculpe…", 0.4)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.3, mano=0.006, cam=[[-1.25, 1.66, 0.85, 0.6, 1.62, PASILLO, 38], [-1.25, 1.66, 0.85, -0.6, 1.62, PASILLO, 40]],
+        actores={"brayan": dict(pos=[[0, 1.6, PASILLO], [1.8, -1.9, PASILLO]], rot=-90, mira=0, gesto="bandeja", emo="serio")},
+        lineas=[L("brayan", "¡Ya voy!", 0.5)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.3, sinExtras=[6], mano=0.008, titulo=["", "20 minutos después"],
+        cam=[[-1.3, 1.62, -1.6, -2.6, 1.42, 0.6, 40], [-1.4, 1.6, -1.45, -2.6, 1.42, 0.6, 38]],
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="amiga", emo="cansado"), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="cliente", emo="neutro")},
+        lineas=[L("amiga", "Hágale ojitos.", 1.4), L("cliente", "Ya le hice ojitos, le silbé… y le mandé un audio.", 0.3)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.3, mano=0.006, cam=[[0.75, 1.66, 0.85, -1.3, 1.62, PASILLO, 38], [0.75, 1.66, 0.85, 0.3, 1.62, PASILLO, 40]],
+        actores={"brayan": dict(pos=[[0, -1.9, PASILLO], [1.6, 0.9, PASILLO]], rot=90, mira=0, gesto="bandeja", emo="serio")},
+        lineas=[L("brayan", "¡Ya voy!", 0.4)]),
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.4, sinExtras=[6], mano=0.012, titulo=["", "40 minutos después"], fx=[dict(tipo="pum", p=0.3)],
+        cam=[[0.45, 1.45, 0.7, -1.95, 1.62, 1.25, 40], [0.3, 1.45, 0.75, -1.95, 1.64, 1.25, 38]],
+        actores={"cliente": dict(pos=[-1.95, 1.25], rot=75, gesto="trapo", mira=10, emo="triste", inclina=-0.05), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="cliente", emo="sorpresa")},
+        lineas=[L("cliente", "¡Señor! ¡Aquí! ¡Mesa siete! ¡Tengo hambre!", 1.2)]),
+   dict(set="restaurante", grado=CINE_V, musica="esperanza", cola=0.3, fx=[dict(tipo="destello", p=0.05)], cam=LADO7, sinExtras=[6],
+        e=dict(qrLuz={"7": [[0, 0], [0.2, 1.0], [1.6, 0.2]]}), orbis={"o7": dict(pos=O7, nace=[0.05, 0.7], mira=[[0, "cam"], [0.8, "cliente"]])},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo="sorpresa"), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="o7", emo="sorpresa")},
+        lineas=[L("orbi", "¡Hola! ¿Qué les provoca hoy?", 0.6)]),
+   dict(set="restaurante", grado=CINE_V, musica="esperanza", cola=0.3, sinExtras=[6], mano=0.006, cam=[[-1.5, 1.5, -0.25, -2.6, 1.44, 1.35, 34], [-1.6, 1.48, -0.1, -2.6, 1.45, 1.35, 32]],
+        orbis={"o7": dict(pos=O7, luz=0.5, voz=True, mira="cliente")},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo=[[0, "sorpresa"], ["f1", "triste"], ["l2", "feliz"]])},
+        lineas=[L("cliente", "¿Me… me vio?", 0.2), L("orbi", "Desde que llegaron.", 0.3), L("cliente", "…Nunca me deje.", 1.1)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=1.0, sinExtras=[6], mano=0.008, cam=[cerca(BT7, -66, 2.7, 24, -0.05, 36, 1.6), cerca(BT7, -66, 2.45, 22, -0.05, 36, 1.6)],
+        orbis={"o7": dict(pos=O7, luz=0.5, voz=False)},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"), "amiga": dict(pos=AMIGA, rot=0, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"),
+                 "brayan": dict(pos=[[0, -0.6, 0.6], [1.0, -1.55, 0.95]], rot=-66, mira="cliente", gesto="celular", emo=[[0, "feliz"], ["l1", "triste"]])},
+        lineas=[L("brayan", "¡Listo, ya llegué! ¿Qué van a pedir?", 0.9), L("amiga", "Ya pedimos.", 0.3), L("brayan", "…Ah.", 0.5)]),
+   CIERRE_CTA("Apex Play", "Nadie debería levantar la mano tres veces.", "¿Cuánto ha esperado usted para que le tomen el pedido? 👇",
+              "Etiquete a quien siempre termina levantando la mano.", sinExtras=[6]),
   ]),
 }
