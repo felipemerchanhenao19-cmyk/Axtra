@@ -176,3 +176,10 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «La tarifa por la tarifa 😭 #domicilios #restaurantes #emprendedores #humor #basadoenhechosreales»
 - **Portada:** Marcela con el recibo larguísimo que llega al piso (segundo 15).
 - **Comentario fijado:** «"Nos quedan las ganas" 😅 ¿A quién le ha pasado?»
+
+### «El mesero invisible»: figuras de vinil (40 s, Apex Play). Cierre con pregunta, sin teléfono
+- **Instagram:** «Levantó la mano. Hizo ojitos. Silbó. Mandó un audio. 🙋‍♂️ ¿Cuánto ha esperado usted para que le tomen el pedido? 👇» · #BasadoEnHechosReales #Restaurantes #Meseros #Humor #YaVoy
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «El "¡ya voy!" más largo de la historia 😭 #yavoy #meseros #restaurantes #humor #basadoenhechosreales»
+- **Portada:** el cliente de pie agitando la servilleta (segundo 14).
+- **Comentario fijado:** «Su récord de espera: ¿10, 20 o 40 minutos? ⏳»
+- **Si alguien pregunta por el producto,** se le responde por mensaje directo con la información y el WhatsApp. El video no lleva el número para que se sienta contenido y no publicidad.
