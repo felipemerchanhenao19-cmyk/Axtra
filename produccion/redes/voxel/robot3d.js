@@ -192,3 +192,53 @@ function robotPlayCaja(cfg = {}) {
     palo.rotation.z = Math.sin(t * 2.4) * 0.25; bola.position.x = 0.08 - Math.sin(t * 2.4) * 0.04; luzI.intensity = luzD.intensity = 0.5 + (s.voz || 0) * 0.6; pantalla(t, s.gesto || "normal", s.voz || 0); }
   return { raiz, animar };
 }
+
+// F · «Orbe adorable»: Play pequeño (≈ 0,9 m). Cuerpo de esfera brillante, visor negro con dos ojos grandes de colores distintos,
+// brazos y piernas de tubo redondo que se doblan (estilo manguera), manos y pies redondos, antena corta con bolita.
+function robotPlayOrbe(cfg = {}) {
+  const c = Object.assign({ cuerpo: "#f4f5f7", acento: "#9fb4c8", ojoI: "#36e0ff", ojoD: "#ff5fd2", mejillas: "#ff8fb3" }, cfg);
+  const raiz = new THREE.Group(), cuerpo = new THREE.Group(); raiz.add(cuerpo); const P = PLAY.P, A = PLAY.malla;
+  const mC = P(c.cuerpo, 0.25, 0.02, 1), mA = P(c.acento, 0.3, 0.1, 1);
+  const Y = 0.58, R = 0.27;                                            // centro y radio del orbe
+  A(cuerpo, new THREE.SphereGeometry(R, 64, 48), mC, 0, Y, 0);
+  const yb = 0.2, aro = A(cuerpo, new THREE.TorusGeometry(Math.sqrt(R * R - yb * yb) + 0.004, 0.013, 12, 64), mA, 0, Y - yb, 0); aro.rotation.x = PI / 2;
+  // visor y cara
+  const cv = document.createElement("canvas"); cv.width = 512; cv.height = 512; const g = cv.getContext("2d"), tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  const capa = new THREE.SphereGeometry(R * 1.006, 56, 28, 0, 2 * PI, 0, PI * 0.26); capa.rotateX(PI / 2);
+  { const pz = capa.attributes.position, uv = capa.attributes.uv, k = R * 1.006 * Math.sin(PI * 0.26); for (let i = 0; i < pz.count; i++) uv.setXY(i, pz.getX(i) / (2 * k) + 0.5, pz.getY(i) / (2 * k) + 0.5); uv.needsUpdate = true; }
+  const caraG = new THREE.Group(); caraG.position.set(0, Y, 0); caraG.rotation.x = -0.14; cuerpo.add(caraG);
+  const visor = A(caraG, capa, new THREE.MeshPhysicalMaterial({ map: tex, emissiveMap: tex, emissive: 0xffffff, emissiveIntensity: 1.05, color: 0x050608, roughness: 0.05, clearcoat: 1 }), 0, 0, 0);
+  const borde = A(caraG, new THREE.TorusGeometry(R * 1.006 * Math.sin(PI * 0.26), 0.012, 10, 56), mA, 0, 0, R * 1.006 * Math.cos(PI * 0.26));
+  function cara(t, gesto, voz) {
+    g.fillStyle = "#040507"; g.fillRect(0, 0, 512, 512); const parp = (t % 3.3) < 0.12, cy = 230;
+    [[180, c.ojoI, -1], [332, c.ojoD, 1]].forEach(([x, col, d]) => { g.save(); g.shadowColor = col; g.shadowBlur = 30; g.fillStyle = col; g.strokeStyle = col; g.lineWidth = 22; g.lineCap = "round";
+      if (parp) { g.beginPath(); g.moveTo(x - 38, cy); g.lineTo(x + 38, cy); g.stroke(); }
+      else if (gesto === "feliz" || (gesto === "guiño" && d > 0)) { g.beginPath(); g.arc(x, cy + 22, 40, PI * 1.12, PI * 1.88); g.stroke(); }
+      else { const ry = gesto === "enfoca" ? 26 : 52; g.beginPath(); g.ellipse(x, cy, 42, ry, 0, 0, 2 * PI); g.fill();
+        g.shadowBlur = 0; g.fillStyle = "rgba(255,255,255,.95)"; g.beginPath(); g.arc(x + 14, cy - ry * 0.35, 13, 0, 2 * PI); g.fill(); g.beginPath(); g.arc(x - 12, cy + ry * 0.3, 6, 0, 2 * PI); g.fill(); }
+      g.restore(); });
+    g.save(); g.fillStyle = c.mejillas; g.globalAlpha = 0.55; g.shadowColor = c.mejillas; g.shadowBlur = 20; [[118, 318], [394, 318]].forEach(([x, y]) => { g.beginPath(); g.ellipse(x, y, 30, 14, 0, 0, 2 * PI); g.fill(); }); g.restore();
+    g.save(); g.strokeStyle = "#e9f6ff"; g.fillStyle = "#e9f6ff"; g.shadowColor = "#e9f6ff"; g.shadowBlur = 12; g.lineWidth = 12; g.lineCap = "round";
+    if (voz > 0.05) { g.beginPath(); g.ellipse(256, 336, 26, 8 + 18 * voz * Math.abs(Math.sin(t * 15)), 0, 0, 2 * PI); g.fill(); } else { g.beginPath(); g.arc(256, 314, 28, PI * 0.2, PI * 0.8); g.stroke(); }
+    g.restore(); tex.needsUpdate = true; }
+  // antena corta con bolita
+  A(cuerpo, new THREE.CylinderGeometry(0.008, 0.01, 0.09, 8), mA, 0.05, Y + R + 0.03, 0).rotation.z = -0.25; const bola = A(cuerpo, new THREE.SphereGeometry(0.025, 16, 12), new THREE.MeshBasicMaterial({ color: c.ojoD, toneMapped: false }), 0.075, Y + R + 0.085, 0);
+  // brazos y piernas de tubo que se doblan: se reconstruyen cada cuadro sobre una curva suave
+  const mT = P(c.acento, 0.3, 0.15, 1), mM = P(c.cuerpo, 0.25, 0.02, 1);
+  const tubos = [0, 1, 2, 3].map(() => { const m = new THREE.Mesh(new THREE.BufferGeometry(), mT); m.castShadow = true; cuerpo.add(m); return m; });
+  const manos = [-1, 1].map(() => A(cuerpo, new THREE.SphereGeometry(0.05, 20, 14), mM)), pies = [-1, 1].map(() => { const p = A(cuerpo, new THREE.SphereGeometry(0.062, 20, 14), mM); p.scale.set(1, 0.6, 1.35); return p; });
+  const tubo = (m, pts, r) => { m.geometry.dispose(); m.geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(...p))), 20, r, 10, false); };
+  function animar(t, s = {}) {
+    const rebote = Math.abs(Math.sin(t * 3.2)) * 0.025; cuerpo.position.y = rebote; cuerpo.rotation.z = Math.sin(t * 1.6) * 0.04;
+    [-1, 1].forEach((d, i) => {   // brazos: salen de los lados del orbe y se curvan como manguera
+      const saluda = s.saluda && d > 0, ox = d * R * 0.95, oy = Y - 0.02;
+      const fin = saluda ? [d * 0.42, Y + 0.3 + Math.sin(t * 8) * 0.03, 0.05] : [d * 0.36, Y - 0.22 + Math.sin(t * 2.4 + i) * 0.02, 0.06];
+      const med = saluda ? [d * 0.42, Y + 0.05, 0.02] : [d * 0.38, Y - 0.08, 0.02];
+      tubo(tubos[i], [[ox, oy, 0], med, fin], 0.022); manos[i].position.set(...fin);
+      const paso = Math.sin(t * 3.2 + i * PI) * 0.03, cad = [d * 0.11, Y - R * 0.9, 0], pie = [d * 0.13, 0.04, 0.03 + paso];   // piernas cortas
+      tubo(tubos[2 + i], [cad, [d * 0.14, (cad[1] + pie[1]) / 2, 0.01 + paso * 0.5], pie], 0.025); pies[i].position.set(pie[0], pie[1], pie[2] + 0.02);
+    });
+    bola.scale.setScalar(0.85 + 0.3 * Math.abs(Math.sin(t * 3))); cara(t, s.gesto || "normal", s.voz || 0);
+  }
+  return { raiz, animar };
+}
