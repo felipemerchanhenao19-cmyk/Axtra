@@ -5,21 +5,21 @@ AQUI = os.path.dirname(os.path.abspath(__file__)) + "/"
 _spec = importlib.util.spec_from_file_location("motor", AQUI + "../heroes/hacer.py"); motor = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(motor)
 RAIZ = motor.RAIZ; SALIDA = RAIZ + "entregables/redes/bocetos/"; THREE = motor.TRABAJO + "three/package/build/three.min.js"
 OPCIONES = [
-    dict(letra="A", nombre="Andrés", desc="Tupé despeinado, barba de pocos días, camisa negra. Mandíbula marcada y mirada segura.", cfg=dict(semilla=11, fuerte=True, peinado="tupe", barbaNivel=0.75)),
-    dict(letra="B", nombre="Sebastián", desc="Pelo hacia atrás, barba corta y definida, camisa blanca. Elegante y un poco arrogante.",
+    dict(letra="01", nombre="", desc="Tupé despeinado, barba de pocos días, camisa negra. Mandíbula marcada y mirada segura.", cfg=dict(semilla=11, fuerte=True, peinado="tupe", barbaNivel=0.75)),
+    dict(letra="02", nombre="", desc="Pelo hacia atrás, barba corta y definida, camisa blanca. Elegante y un poco arrogante.",
          cfg=dict(semilla=21, fuerte=True, peinado="atras", barbaNivel=0.95, piel="#c88e6c", camisa="#ecebe7", pelo="#15100d", barba="#1c1410")),
-    dict(letra="C", nombre="Mateo", desc="Corte corto con volumen, barba de varios días, camisa verde oscuro. Moderno y directo.",
+    dict(letra="03", nombre="", desc="Corte corto con volumen, barba de varios días, camisa verde oscuro. Moderno y directo.",
          cfg=dict(semilla=22, fuerte=True, peinado="corto", barbaNivel=0.85, piel="#b27a58", camisa="#24382c", pelo="#0f0c0a", barba="#16110e")),
-    dict(letra="D", nombre="Gabriel", desc="Pelo largo ondulado hacia atrás, barba llena, camisa de jean. Galán de película.",
+    dict(letra="04", nombre="", desc="Pelo largo ondulado hacia atrás, barba llena, camisa de jean. Galán de película.",
          cfg=dict(semilla=23, fuerte=True, peinado="largo", barbaNivel=1.0, piel="#c99474", camisa="#34537a", pelo="#2a1b13", barba="#2a1b13")),
-    dict(letra="E", nombre="Daniel", desc="Pelo despeinado, sin barba, camisa negra. Rasgos fuertes y cara limpia.",
+    dict(letra="05", nombre="", desc="Pelo despeinado, sin barba, camisa negra. Rasgos fuertes y cara limpia.",
          cfg=dict(semilla=24, fuerte=True, peinado="despeinado", barbaNivel=0.25, piel="#d7a684", camisa="#18191d", pelo="#1e1410")),
-    dict(letra="F", nombre="Nicolás", desc="Moño alto, barba llena, camisa beige. Seguro, creativo y con estilo.",
+    dict(letra="06", nombre="", desc="Moño alto, barba llena, camisa beige. Seguro, creativo y con estilo.",
          cfg=dict(semilla=25, fuerte=True, peinado="mono", barbaNivel=1.0, piel="#bf8766", camisa="#c9b79a", pelo="#1a120d", barba="#1a120d")),
 ]
 def main():
     leer = lambda p: open(p).read(); W = motor.TRABAJO + "bocetos/"; os.makedirs(W, exist_ok=True); os.makedirs(SALIDA, exist_ok=True)
-    tarjetas = "".join(f'<div class="t"><div class="fotos"><img id="r{o["letra"]}"><img id="c{o["letra"]}"></div><h2><span>Opción {o["letra"]}</span> {o["nombre"]}</h2><p>{o["desc"]}</p></div>' for o in OPCIONES)
+    tarjetas = "".join(f'<div class="t"><div class="fotos"><img id="r{o["letra"]}"><img id="c{o["letra"]}"></div><h2><span>Opción</span> {o["letra"]}</h2><p>{o["desc"]}</p></div>' for o in OPCIONES)
     html = f'''<!doctype html><html><head><meta charset="utf-8">{leer(RAIZ + "produccion/videos/fuentes.html")}<style>
 body{{margin:0;background:#0b1020;color:#eef2f6;font-family:Figtree;width:1800px}} h1{{font:800 56px Figtree;margin:40px 50px 4px}} .sub{{margin:0 50px 26px;color:#8a98a8;font:500 25px Figtree}}
 .g{{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:0 50px 50px}} .t{{background:#141b2e;border-radius:24px;padding:16px 16px 22px}}

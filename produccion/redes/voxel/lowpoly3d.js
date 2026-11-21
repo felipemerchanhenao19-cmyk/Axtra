@@ -25,9 +25,9 @@ function personaLowPoly(cfg = {}) {
     p.setXYZ(i, x * 0.86, y * 1.16, z * 0.98);
     // color por vértice: piel, barba de pocos días en mandíbula y bigote, labios
     let cc = piel.clone(); const yb = y;
-    const zonaBarba = (yb < -0.14 && z > -0.3) && !(Math.abs(x) < 0.16 && yb > -0.32 && z > 0.85);
-    const fb = c.barbaNivel ?? (c.mujer ? 0 : 0.7); if (zonaBarba && fb > 0) cc.lerp(barba, Math.min(0.95, fb * Math.min(1, (-0.14 - yb) * 4 + 0.35 + (fb > 0.85 ? 0.5 : 0))));
-    if (yb < -0.36 && yb > -0.5 && Math.abs(x) < 0.28 && z > 0.82) cc = lab.clone();
+    const fbz = c.barbaNivel ?? (c.mujer ? 0 : 0.7), nariz = Math.abs(x) < 0.22 && yb > -0.34 && z > 0.78, bigote = Math.abs(x) < 0.24 && yb <= -0.34 && yb > -0.42 && z > 0.78, zonaBarba = !nariz && ((yb < -0.26 && z > -0.3) || (fbz >= 0.85 && bigote));
+    const fb = c.barbaNivel ?? (c.mujer ? 0 : 0.7); if (zonaBarba && fb > 0) cc.lerp(barba, Math.min(0.92, fb * Math.min(1, (-0.26 - yb) * 5 + 0.45 + (fb > 0.85 ? 0.4 : 0))));
+    if (yb < -0.4 && yb > -0.49 && Math.abs(x) < 0.2 && z > 0.84) cc = fbz > 0.85 ? lab.clone().lerp(barba, 0.35) : lab.clone();
     col.push(cc.r, cc.g, cc.b);
   }
   geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals(); geo.scale(R, R, R);
@@ -60,6 +60,13 @@ function personaLowPoly(cfg = {}) {
     for (let i = 0; i < 9; i++) { const x0 = R * (-0.42 + (i % 5) * 0.21), m = add(new THREE.IcosahedronGeometry(R * (0.3 + r() * 0.08), 0), mP, x0, R * (0.95 + r() * 0.12 + (i > 4 ? 0.08 : 0)), R * (0.42 - (i > 4 ? 0.35 : 0)), cabeza); m.scale.set(0.8, 0.6, 1.6); m.rotation.set(-0.7 - r() * 0.3, (r() - 0.5) * 0.4, (r() - 0.5) * 0.3); } }
   if (peinado === "atras") { for (let i = 0; i < 14; i++) { const x0 = R * (-0.5 + (i % 7) * 0.165), z0 = R * (0.35 - Math.floor(i / 7) * 0.6), m = add(new THREE.IcosahedronGeometry(R * 0.3, 0), mP, x0, R * (0.85 - Math.abs(x0 / R) * 0.25 - Math.floor(i / 7) * 0.06), z0, cabeza);
       m.scale.set(0.7, 0.42, 2.0); m.rotation.set(0.15, x0 / R * -0.4, 0); } }
+  if (peinado === "definitivo") {   // tupé peinado hacia atrás que termina en un moño alto; lados cortos
+    for (let i = 0; i < 10; i++) { const x0 = R * (-0.42 + (i % 5) * 0.21), z0 = R * (0.3 - Math.floor(i / 5) * 0.55), m = add(new THREE.IcosahedronGeometry(R * 0.3, 0), mP, x0, R * (0.9 - Math.abs(x0 / R) * 0.25 - Math.floor(i / 5) * 0.02), z0, cabeza);
+      m.scale.set(0.72, 0.45, 2.0); m.rotation.set(0.1, x0 / R * -0.35, 0); }
+    for (let i = 0; i < 5; i++) { const x0 = R * (-0.32 + i * 0.16), m = add(new THREE.IcosahedronGeometry(R * (0.3 + r() * 0.04), 0), mP, x0, R * (0.97 + r() * 0.04), R * 0.42, cabeza); m.scale.set(0.8, 0.42, 1.7); m.rotation.set(-0.22, (r() - 0.5) * 0.25, (r() - 0.5) * 0.15); }
+    const mono = add(new THREE.IcosahedronGeometry(R * 0.36, 1), mP, 0, R * 1.0, -R * 0.62, cabeza); mono.scale.set(1, 0.85, 1);
+    add(new THREE.TorusGeometry(R * 0.2, R * 0.05, 4, 8), F("#0b0908", 0.5), 0, R * 0.92, -R * 0.45, cabeza).rotation.x = 1.1;
+    [-1, 1].forEach((d) => { const lado = add(new THREE.IcosahedronGeometry(R * 0.34, 0), F(c.pelo, 0.7), d * R * 0.8, R * 0.38, -R * 0.15, cabeza); lado.scale.set(0.4, 0.75, 1.1); }); }
   if (peinado === "corto") { mech(10, 0.26, 0.74, -R * 0.02, [1, 0.4, 1.3]); }
   if (peinado === "rizado") { for (let i = 0; i < 40; i++) { const a = r() * PI * 2, el = r() * 1.25; const m = add(new THREE.IcosahedronGeometry(R * (0.17 + r() * 0.07), 0), mP,
       Math.cos(a) * Math.sin(el) * R * 1.0, R * (0.25 + Math.cos(el) * 0.85), Math.sin(a) * Math.sin(el) * R * 0.98 - R * 0.05, cabeza); m.rotation.set(r() * 3, r() * 3, r() * 3); } }
