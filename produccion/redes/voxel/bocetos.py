@@ -5,32 +5,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__)) + "/"
 _spec = importlib.util.spec_from_file_location("motor", AQUI + "../heroes/hacer.py"); motor = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(motor)
 RAIZ = motor.RAIZ; SALIDA = RAIZ + "entregables/redes/bocetos/"; THREE = motor.TRABAJO + "three/package/build/three.min.js"
 
-PERSONAJES = [
-    dict(id="valentina", nombre="Valentina", rol="La mesera estrella", frase="Atiende veinte mesas con una sonrisa… y una ceja levantada.",
-         cfg=dict(piel="#e6b08c", pelo="#2a1810", cejas="#2a1810", peinado="melena", modelo=True, pestanas="#120c0a", labios="#b8323e", almendra=True, narizFina=True, aretes="#e0b84a", torsoF=True,
-                  camisa="#1b1b20", pantalon="#1b1b20", zapatos="#0e0e10", iris="#5a3418", alto=0.96, semilla=41),
-         pose=dict(emo="seductor", gesto="cadera", mira=-12, miraY=-0.04)),
-    dict(id="sebastian", nombre="Sebastián", rol="El chef arrogante", frase="«Mi receta no se toca». Ni el dueño se atreve.",
-         cfg=dict(piel="#cf9670", pelo="#141010", cejas="#141010", peinado="galan", largo=True, modelo=True, barba="#1e1612", almendra=True, camisa="#f4f2ee", pantalon="#26282e", hombros=1.08,
-                  iris="#2a1a10", alto=1.04, semilla=42),
-         pose=dict(emo="arrogante", gesto="cruzado", mira=10, miraY=-0.12)),
-    dict(id="camila", nombre="Camila", rol="La influencer", frase="Antes de comer, la foto. Y si no hay buena luz, se va.",
-         cfg=dict(piel="#f2c9a8", pelo="#e3c272", cejas="#a88a40", peinado="melena", modelo=True, pestanas="#1a120c", labios="#d65a78", almendra=True, narizFina=True, aretes="#f0d070", torsoF=True,
-                  camisa="#f2a0be", pantalon="#e9e2d8", zapatos="#d9c9b9", iris="#3a6a8a", alto=0.95, semilla=43),
-         pose=dict(emo="feliz", gesto="celular", mira=-15, miraY=0.0)),
-    dict(id="ricardo", nombre="Don Ricardo", rol="El cliente VIP", frase="«¿Usted sabe quién soy yo?». Nadie sabe. Nadie pregunta.",
-         cfg=dict(piel="#dba987", pelo="#c4c2bf", cejas="#9a9692", peinado="galan", largo=True, modelo=True, barba="#bdb9b4", almendra=True, cadena="#e0b84a", saco="#14213a", camisa="#f4f2ee", pantalon="#14213a",
-                  hombros=1.1, iris="#3a2a1a", alto=1.02, semilla=44),
-         pose=dict(emo="arrogante", gesto="cadera", mira=12, miraY=-0.16)),
-    dict(id="mateo", nombre="Mateo", rol="El repartidor galán", frase="Llega a tiempo, sonríe… y todos piden otra vez.",
-         cfg=dict(piel="#b87c56", pelo="#121010", cejas="#121010", peinado="galan", largo=True, modelo=True, barba="#121010", almendra=True, saco="#1d2027", camisa="#f2efe8", pantalon="#2a2f3a",
-                  hombros=1.1, iris="#2a1a10", alto=1.03, semilla=45),
-         pose=dict(emo="seductor", gesto="reposo", mira=-8, miraY=-0.03)),
-    dict(id="daniela", nombre="Daniela", rol="La dueña de enfrente", frase="Su rival. Elegante, fría… y siempre un paso adelante.",
-         cfg=dict(piel="#dfa680", pelo="#3a1e14", cejas="#2a160e", peinado="melena", modelo=True, gafas="#141414", pestanas="#120c0a", labios="#8e2a3a", almendra=True, narizFina=True, torsoF=True,
-                  saco="#9a1f2e", camisa="#f4f1ea", pantalon="#1a1a1e", iris="#3a2416", alto=0.97, semilla=46),
-         pose=dict(emo="arrogante", gesto="cruzado", mira=-10, miraY=-0.1)),
-]
+from modelos import PERSONAJES
 
 def pagina(W):
     leer = lambda p: open(p).read()

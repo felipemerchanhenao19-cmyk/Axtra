@@ -52,6 +52,7 @@ def pagina(ep, lin, W):
 {leer(AQUI + "sets3d.js")}
 {leer(AQUI + "estacion3d.js")}
 {leer(AQUI + "vinil3d.js")}
+{leer(AQUI + "robot3d.js")}
 {leer(AQUI + "escena3d.js")}</script></body></html>'''
     open(W + "cuadro.html", "w").write(html)
     shutil.copytree(RAIZ + "produccion/redes/pelicula/fotos", W + "fotos", dirs_exist_ok=True)

@@ -10,7 +10,7 @@ const RELLENO = new THREE.DirectionalLight(0xffe6cc, 0.55); ESC.add(RELLENO); ES
 const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC) };
 if (EP.estilo) document.body.classList.add(EP.estilo);
 let DOF = null; const NIEBLA0 = [0x0a0806, 0.02], BLOOM = $("#bloom"), BCTX = BLOOM && BLOOM.getContext("2d");
-const ACT = {}, ORBIS = {};
+const ACT = {}, ORBIS = {}, ROBOTS = {};
 Object.entries(EP.elenco).forEach(([id, cfg]) => { ACT[id] = persona(cfg); ESC.add(ACT[id].raiz); });
 const EXTRAS = (EP.extras || []).map((x, i) => { const P = persona({ semilla: 100 + i, ...x.cfg }); ESC.add(P.raiz); return { P, x }; });
 
@@ -49,6 +49,7 @@ function origen(set) { return SETS[set].position; }
 function posMundo(id, pl, tt, L) {
   const o = origen(pl.set);
   if (id === "cam") return CAM.position.clone();
+  if (pl.robots && pl.robots[id]) { const r = continuo(pl.robots[id].pos, tt, L)[0]; return new THREE.Vector3(r[0] + o.x, 1.5, r[1] + o.z); }
   if (pl.orbis && pl.orbis[id]) { const p = pl.orbis[id].pos; return new THREE.Vector3(p[0] + o.x, p[1], p[2] + o.z); }
   const a = pl.actores && pl.actores[id]; if (!a) return null;
   const [p] = continuo(a.pos, tt, L); return new THREE.Vector3(p[0] + o.x, a.sentado ? 1.38 : 1.72, p[1] + o.z);
@@ -95,6 +96,17 @@ function render(t) {
   EXTRAS.forEach(({ P, x }, j) => { P.raiz.visible = x.set === pl.set && !(pl.sinExtras || []).includes(j);
     if (!P.raiz.visible) return; const habla = x.charla ? Math.max(0, Math.sin(t * 2.1 + j * 1.7)) * (0.3 + 0.5 * Math.abs(Math.sin(t * 9 + j))) : 0;
     const gx = (pl.extrasGesto || {})[j]; animarPersona(P, { x: x.x + o.x, z: x.z + o.z, rot: (x.rot || 0) * PI / 180, gesto: gx || x.gesto || "manos_mesa", sentado: true, voz: habla > 0.25 ? habla : 0, emo: x.emo || "neutro", mira: Math.sin(t * 0.3 + j) * 0.3 }, t); });
+  // robots (Chispa): flotan en el salón, miran a quien les habla, ojos LED con gestos
+  Object.values(ROBOTS).forEach((R) => { R.raiz.visible = false; });
+  Object.entries(pl.robots || {}).forEach(([id, d]) => {
+    if (!ROBOTS[id]) { ROBOTS[id] = robot3d(); ESC.add(ROBOTS[id].raiz); }
+    const R = ROBOTS[id]; R.raiz.visible = true; const [pos] = continuo(d.pos, tt, L);
+    R.raiz.position.set(pos[0] + o.x, 0, pos[1] + o.z); R.raiz.scale.setScalar(d.escala ?? 0.9);
+    const [m0, m1, km] = discreto(d.mira || "cam", tt, L), P0 = R.raiz.position.clone();
+    const yaw = (m) => { if (typeof m === "number") return m * PI / 180; const T = m === "cam" ? CAM.position : posMundo(m, pl, tt, L); return T ? yawHacia(P0, T) : 0; };
+    R.raiz.rotation.y = lerp(yaw(m0), yaw(m1), km);
+    R.animar(t, { voz: voz(id, t), gesto: discreto(d.gesto || "normal", tt, L)[1], saluda: discreto(d.saluda || false, tt, L)[1], mira: 0, ladea: d.ladea ?? 0.06 });
+  });
   // Orbis
   Object.values(ORBIS).forEach((O) => { O.raiz.visible = false; });
   Object.entries(pl.orbis || {}).forEach(([id, d], j) => {

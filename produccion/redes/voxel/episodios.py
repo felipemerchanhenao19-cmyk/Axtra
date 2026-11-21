@@ -188,6 +188,12 @@ def CIERRE_CTA(marca, frase, pregunta, sub, **k):   # cierre que conecta con el 
                 final=dict(marca=marca, frase=frase, desde=0.5, cta=f"{pregunta}<small>{sub}</small>")), **k)
 
 VINILES["turista"] = dict(piel="#f0c4a2", pelo="#d9b45a", cejas="#b8923a", peinado="flequillo", camisa="#3f8a8a", mangaCorta=True, pantalon="#c9b48a", iris="#2a5a8a", semilla=8)
+from modelos import MODELOS
+ELENCO_M = dict(MODELOS)   # Valentina, Sebastián, Camila, Don Ricardo, Mateo, Daniela
+VOCES_M = {"ricardo": dict(voz=("es-US-AlonsoNeural", "-6%", "-12Hz")), "valentina": dict(voz=("es-CO-SalomeNeural", "-2%", "-2Hz")),
+           "camila": dict(voz=("es-MX-DaliaNeural", "+8%", "+6Hz")), "sebastian": dict(voz=("es-ES-AlvaroNeural", "-6%", "-8Hz")),
+           "chispa": dict(voz=("es-MX-JorgeNeural", "+6%", "+10Hz"), fx="radio")}
+VAL = [-1.55, 0.95]; CHISPA = [-1.8, 0.15]
 G_OF = "contrast(1.12) saturate(1.18) brightness(0.9)"
 
 EPISODIOS = {
@@ -1597,5 +1603,45 @@ EPISODIOS = {
         lineas=[L("orbi", "…Faltan veinticuatro minutos.", 1.3)]),
    CIERRE_CTA("Apex Domicilios", "Que el cliente se entere solo.", "¿Usted es de los que pregunta «¿ya salió?» cada dos minutos? 👇",
               "Etiquete a quien siempre pregunta.", min=4.5),
+  ]),
+
+ # ═══════════ Elenco nuevo (modelos de vinil) + Chispa · fórmula «Sin cebolla» ═══════════
+ "usted-sabe-quien-soy-yo": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, subY=1150, reparto=VOCES_M, elenco=ELENCO_M, extras=EXTRAS,
+  gancho=["Cuando un cliente te dice «¿usted sabe quién soy yo?»…", "Basado en hechos reales", 2.8],
+  copy="«¿Usted sabe quién soy yo?». Nadie sabía. Hasta que llegó Chispa. 🤖 ¿Cuál es el cliente más difícil que ha atendido?",
+  hashtags="#BasadoEnHechosReales #ClienteVIP #Restaurantes #Meseros #Humor",
+  planos=[
+   dict(set="restaurante", grado="contrast(1.12) saturate(1.1) brightness(0.78)", relleno=0.05, musica="tension", cola=0.1, fx=PUM, sinExtras=[6], mano=0.01, cam=[[0, -0.4, 1.62, -1.6, -2.6, 1.42, 1.35, 40], [0.22, -1.15, 1.54, -0.75, -2.6, 1.44, 1.35, 36], [9, -1.2, 1.54, -0.7, -2.6, 1.44, 1.35, 35]],
+        actores={"ricardo": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="valentina", miraY=-0.12, emo="arrogante"),
+                 "camila": dict(pos=AMIGA, rot=0, sentado=True, gesto="celular", mira=-20, miraY=0.15), "valentina": dict(pos=VAL, rot=-66, mira="ricardo")},
+        lineas=[L("ricardo", "¿Usted sabe quién soy yo?", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.15, musica="comico", cola=0.1, mano=0.008, sinExtras=[6], cam=[cerca(VAL, -66, 2.5, 28, 0.0, 34, 1.72), cerca(VAL, -66, 2.3, 26, 0.0, 34, 1.72)],
+        actores={"ricardo": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="valentina"), "valentina": dict(pos=VAL, rot=-66, mira="ricardo", gesto="cadera", emo=[[0, "seductor"], ["l3", "arrogante"]])},
+        lineas=[L("valentina", "No, señor.", 0.05), L("ricardo", "¡Soy cliente VIP!", 0.05), L("valentina", "¿De aquí?", 0.05), L("ricardo", "…De otro restaurante.", 0.15)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.15, musica="comico", cola=0.2, mano=0.008, sinExtras=[6], cam=[[-1.3, 1.5, 1.55, -2.6, 1.4, -0.15, 36], [-1.4, 1.48, 1.45, -2.6, 1.4, -0.15, 34]],
+        actores={"camila": dict(pos=AMIGA, rot=0, sentado=True, gesto="celular", mira=30, emo="feliz"), "ricardo": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="camila")},
+        lineas=[L("camila", "Amor, no grites. Estoy en vivo.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.15, musica="tension", cola=0.3, fx=[dict(tipo="pum", p=0.0)], mano=0.012,
+        cam=[[0, 1.0, 1.85, -2.6, 1.0, 1.72, -4.3, 40], [0.25, 1.0, 1.82, -2.35, 1.0, 1.7, -4.3, 36], [9, 1.0, 1.82, -2.4, 1.0, 1.7, -4.3, 35]],
+        actores={"sebastian": dict(pos=JAIRO, gesto="cruzado", mira=0, miraY=-0.12, emo="arrogante")},
+        lineas=[L("ricardo", "¡Quiero el plato del chef, sin sal y sin esperar!", 0.05), L("sebastian", "Mi receta no se toca.", 0.3)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.15, musica="esperanza", cola=0.3, fx=[dict(tipo="destello", p=0.05)], sinExtras=[6], mano=0.006,
+        cam=[[-3.45, 1.98, 1.35, -1.8, 1.42, 0.15, 38], [-3.35, 1.95, 1.25, -1.8, 1.42, 0.15, 36]],
+        robots={"chispa": dict(pos=[[0, -0.2, -1.8], [1.0, CHISPA[0], CHISPA[1]]], mira=[[0, "cam"], [1.0, "ricardo"]], gesto=[[0, "feliz"], ["l1", "normal"], ["l2", "guiño"]])},
+        actores={"ricardo": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="chispa", emo=[[0, "sorpresa"], ["l1", "duda"]]),
+                 "camila": dict(pos=AMIGA, rot=0, sentado=True, gesto="celular", mira="chispa", emo="sorpresa")},
+        lineas=[L("chispa", "Buenas noches, señor VIP. ¿Le recomiendo algo que el chef sí aprueba?", 0.9), L("ricardo", "…¿Y usted quién es?", 0.1),
+                L("chispa", "Chispa. Y ya tomé su pedido.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.15, musica="comico", cola=1.0, mano=0.004, fx=[dict(tipo="pum", p=0.02)], sinExtras=[6],
+        cam=[[-0.25, 1.75, 2.9, -1.9, 1.4, 0.7, 40], [-0.3, 1.72, 2.75, -1.9, 1.4, 0.7, 40]],
+        robots={"chispa": dict(pos=CHISPA, mira=[[0, "ricardo"], ["f0", "cam"]], gesto=[[0, "normal"], ["f0", "feliz"]])},
+        actores={"camila": dict(pos=AMIGA, rot=0, sentado=True, gesto="celular", mira="ricardo", emo="feliz"),
+                 "ricardo": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira=[[0, "camila"], ["f0", "cam"]], emo=[[0, "sorpresa"], ["f0", "cansado"]])},
+        lineas=[L("camila", "¡Amor! El robot tiene más seguidores que tú.", 0.1), L("chispa", "…Anotado.", 0.9)]),
+   CIERRE_CTA("Apex Play", "Hasta el cliente más difícil queda atendido.", "¿Cuál es el cliente más difícil que ha atendido? 👇",
+              "Etiquete a quien siempre dice «¿usted sabe quién soy yo?».", sinExtras=[6], min=4.5, orbis={},
+              actores={"ricardo": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", emo="feliz"), "camila": dict(pos=AMIGA, rot=0, sentado=True, gesto="celular"),
+                       "valentina": dict(pos=VAL, rot=-66, mira="cam", gesto="cadera", emo="seductor"), "sebastian": dict(pos=JAIRO, gesto="cruzado", emo="arrogante")},
+              robots={"chispa": dict(pos=CHISPA, mira="cam", gesto="feliz", saluda=True)}),
   ]),
 }
