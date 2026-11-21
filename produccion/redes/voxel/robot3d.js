@@ -242,3 +242,52 @@ function robotPlayOrbe(cfg = {}) {
   }
   return { raiz, animar };
 }
+
+// ═══ «Play» definitivo (según la referencia): huevo crema brillante, ojos hundidos con anillo de luz, cejas y sonrisa en relieve,
+// orejas redondas, panel en la barriga con luz de encendido, brazos y piernas de tubo corrugado plateado, manos de guante y botas.
+function robotPlay(cfg = {}) {
+  const c = Object.assign({ cuerpo: "#efe7dc", metal: "#b9bcc2", luz: "#3aa8ff" }, cfg);
+  const raiz = new THREE.Group(), cuerpo = new THREE.Group(); raiz.add(cuerpo); const P = PLAY.P, A = PLAY.malla;
+  const mC = P(c.cuerpo, 0.3, 0, 1), mS = P("#e3d9cc", 0.45, 0, 0.6), mM = P(c.metal, 0.32, 0.45, 0.5), mOjo = P("#06080c", 0.06, 0.2, 1), mL = new THREE.MeshBasicMaterial({ color: c.luz, toneMapped: false });
+  const Y = 0.5, R = 0.27;
+  // cabeza-cuerpo: casco superior y concha inferior un poco más ancha, con la unión marcada
+  A(cuerpo, new THREE.SphereGeometry(R, 64, 40, 0, 2 * PI, 0, PI * 0.56), mC, 0, Y, 0).scale.set(1, 1.02, 0.96);
+  const baja = A(cuerpo, new THREE.SphereGeometry(R * 1.015, 64, 32, 0, 2 * PI, PI * 0.54, PI * 0.46), mC, 0, Y, 0); baja.scale.set(1, 0.92, 0.97);
+  const union = A(cuerpo, new THREE.TorusGeometry(R * 0.995, 0.006, 8, 64), mS, 0, Y - R * 0.19, 0); union.rotation.x = PI / 2; union.scale.y = 0.97;
+  const panel = A(cuerpo, new THREE.BoxGeometry(0.14, 0.07, 0.03), mC, 0, Y - 0.115, R * 0.9); panel.rotation.x = -0.35;
+  const boton = A(cuerpo, new THREE.CircleGeometry(0.009, 16), mL, 0, Y - 0.105, R * 0.9 + 0.022); boton.rotation.x = -0.35;
+  // ojos hundidos: cuenca oscura, anillo de luz, iris tenue y brillos
+  const ojos = [-1, 1].map((d) => { const g = new THREE.Group(); g.position.set(0, Y + 0.045, 0); g.rotation.set(-0.08, d * 0.33, 0); cuerpo.add(g);
+    const z = R * 0.93; A(g, new THREE.SphereGeometry(0.062, 32, 20), mOjo, 0, 0, z - 0.02).scale.set(1, 1.05, 0.55);
+    const anillo = A(g, new THREE.TorusGeometry(0.052, 0.01, 12, 40), mL, 0, 0, z + 0.004); const iris = A(g, new THREE.CircleGeometry(0.036, 32), new THREE.MeshBasicMaterial({ color: new THREE.Color(c.luz).multiplyScalar(0.35), toneMapped: false }), 0, 0, z + 0.006);
+    A(g, new THREE.SphereGeometry(0.011, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }), 0.018, 0.02, z + 0.014); A(g, new THREE.SphereGeometry(0.005, 10, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }), -0.014, -0.014, z + 0.012);
+    const luz = new THREE.PointLight(c.luz, 0.25, 0.4, 2); luz.position.set(0, 0, z + 0.06); g.add(luz);
+    const ceja = A(g, new THREE.CapsuleGeometry(0.006, 0.04, 4, 10), mS, 0, 0.085, z - 0.006); ceja.rotation.z = PI / 2 - d * 0.15; return { g, ceja }; });
+  const sonrisa = A(cuerpo, new THREE.TorusGeometry(0.035, 0.006, 8, 24, PI * 0.7), mS, 0, Y - 0.025, R * 0.955); sonrisa.rotation.z = -PI / 2 - PI * 0.35;
+  [-1, 1].forEach((d) => { const o = A(cuerpo, new THREE.CylinderGeometry(0.055, 0.055, 0.035, 32), mC, d * R * 0.99, Y + 0.02, 0); o.rotation.z = PI / 2;
+    const a = A(cuerpo, new THREE.TorusGeometry(0.035, 0.006, 8, 28), mM, d * (R * 0.99 + 0.019), Y + 0.02, 0); a.rotation.y = PI / 2; });
+  // tubos corrugados: anillos alineados sobre una curva (se actualizan cada cuadro)
+  const corrugado = (n, r) => { const anillos = []; for (let i = 0; i < n; i++) { const m = A(cuerpo, new THREE.TorusGeometry(r, r * 0.5, 10, 20), mM); anillos.push(m); } return anillos; };
+  const brazos = [corrugado(19, 0.026), corrugado(19, 0.026)], piernas = [corrugado(9, 0.03), corrugado(9, 0.03)];
+  const colocar = (anillos, pts) => { const cur = new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(...p))), z = new THREE.Vector3(0, 0, 1);
+    anillos.forEach((m, i) => { const u = (i + 0.5) / anillos.length; m.position.copy(cur.getPointAt(u)); m.quaternion.setFromUnitVectors(z, cur.getTangentAt(u)); }); return cur.getPointAt(1); };
+  const mano = () => { const g = new THREE.Group(); cuerpo.add(g); A(g, new THREE.SphereGeometry(0.045, 22, 16), mC).scale.set(1, 0.95, 0.8);
+    A(g, new THREE.CapsuleGeometry(0.014, 0.025, 4, 10), mC, 0.038, 0.02, 0.012).rotation.z = -0.7; return g; };
+  const manos = [mano(), mano()];
+  const botas = [-1, 1].map((d) => { const g = new THREE.Group(); cuerpo.add(g); A(g, new THREE.SphereGeometry(0.06, 24, 16), mC, 0, 0.05, 0).scale.set(1, 0.95, 1);
+    A(g, new THREE.SphereGeometry(0.058, 24, 12, 0, 2 * PI, PI * 0.5, PI * 0.5), mC, 0, 0.03, 0.025).scale.set(1, 0.5, 1.35); A(g, new THREE.CylinderGeometry(0.062, 0.062, 0.012, 24), mM, 0, 0.006, 0.02).scale.z = 1.25; return g; });
+  function animar(t, s = {}) {
+    const reb = Math.abs(Math.sin(t * 3)) * 0.015; cuerpo.position.y = reb; cuerpo.rotation.z = Math.sin(t * 1.4) * 0.035;
+    [-1, 1].forEach((d, i) => {
+      const hom = [d * R * 0.86, Y - 0.1, 0.03], saluda = s.saluda && d > 0;
+      const fin = saluda ? [d * 0.36, Y + 0.18 + Math.sin(t * 8) * 0.03, 0.08] : [d * 0.12, Y - 0.13 + Math.sin(t * 2.5 + i) * 0.01, R * 0.95];
+      const med = saluda ? [d * 0.42, Y - 0.08, 0.06] : [d * 0.37, Y - 0.22, 0.12];
+      const pm = colocar(brazos[i], [hom, med, fin]); manos[i].position.copy(pm); manos[i].rotation.set(0, d * 0.6, saluda ? d * 0.4 : -d * 0.3);
+      const cad = [d * 0.1, Y - R * 0.84, 0], pie = [d * 0.11, 0.09, 0.01];
+      colocar(piernas[i], [cad, [d * 0.105, (cad[1] + pie[1]) / 2, 0.005], pie]); botas[i].position.set(d * 0.11, 0, 0.01);
+    });
+    const parp = (t % 3.4) < 0.12, feliz = s.gesto === "feliz";
+    ojos.forEach(({ g, ceja }, i) => { g.scale.y = parp ? 0.12 : feliz ? 0.7 : 1; ceja.position.y = feliz ? 0.095 : 0.085; });
+  }
+  return { raiz, animar };
+}
