@@ -7,7 +7,7 @@ REN.toneMapping = THREE.ACESFilmicToneMapping; REN.toneMappingExposure = 1.35; R
 const ESC = new THREE.Scene(); ESC.background = new THREE.Color(0x060504); ESC.fog = new THREE.FogExp2(0x0a0806, 0.02);
 const CAM = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 90);
 const RELLENO = new THREE.DirectionalLight(0xffe6cc, 0.55); ESC.add(RELLENO); ESC.add(RELLENO.target);   // luz suave desde la cámara para leer las caras
-const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC), boda: boda(ESC) };
+const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC), boda: boda(ESC), despacho: despacho(ESC) };
 if (EP.estilo) document.body.classList.add(EP.estilo);
 let DOF = null; const NIEBLA0 = [0x0a0806, 0.02], BLOOM = $("#bloom"), BCTX = BLOOM && BLOOM.getContext("2d");
 const ACT = {}, ORBIS = {}, ROBOTS = {}, SATURNOS = {};
@@ -72,7 +72,7 @@ function render(t) {
   const eTab = discreto(est.tablet || {}, tt, L)[1], ePort = discreto(est.portatil || {}, tt, L)[1];
   const qrLuz = {}; Object.entries(est.qrLuz || {}).forEach(([n, s]) => { qrLuz[n] = continuo(s, tt, L)[0]; });
   const ev = {}; Object.entries(est).forEach(([k, v]) => { if (typeof v === "number" || (Array.isArray(v) && Array.isArray(v[0]) && v[0].length === 2 && typeof v[0][1] === "number")) ev[k] = continuo(v, tt, L)[0]; });
-  SETS[pl.set].userData.paso(t, { ...ev, lapRot: est.lapRot !== undefined ? continuo(est.lapRot, tt, L)[0] : undefined, rayo, comandas: est.comandas, tablet: eTab, portatil: ePort, qrLuz, rojo: discreto(est.rojo || false, tt, L)[1], luz: est.luz ? continuo(est.luz, tt, L)[0] : null, mesas: continuo(est.mesas ?? 0, tt, L)[0], alerta: continuo(est.alerta ?? 0, tt, L)[0], cometa: est.cometa ? continuo(est.cometa, tt, L)[0] : null });
+  SETS[pl.set].userData.paso(t, { ...ev, voz01: voz("p01", t), lapRot: est.lapRot !== undefined ? continuo(est.lapRot, tt, L)[0] : undefined, rayo, comandas: est.comandas, tablet: eTab, portatil: ePort, qrLuz, rojo: discreto(est.rojo || false, tt, L)[1], luz: est.luz ? continuo(est.luz, tt, L)[0] : null, mesas: continuo(est.mesas ?? 0, tt, L)[0], alerta: continuo(est.alerta ?? 0, tt, L)[0], cometa: est.cometa ? continuo(est.cometa, tt, L)[0] : null });
   const tinte = est.luz ? continuo(est.luz, tt, L)[0] : null;
   // cámara (claves [x,y,z, tx,ty,tz, fov]) con cámara en mano
   const [c] = continuo(pl.cam.map((k, j) => k.length === 8 ? k : [j === 0 ? 0 : dur * j / (pl.cam.length - 1), ...k]), tt, L);

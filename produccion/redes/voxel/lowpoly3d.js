@@ -45,6 +45,7 @@ function personaLowPoly(cfg = {}) {
     const lid = add(new THREE.BoxGeometry(c.mujer ? 0.048 : 0.044, c.mujer ? 0.009 : 0.006, 0.012), F(c.mujer ? "#0d0a09" : c.pelo, 0.6), 0, 0.009, 0.004, e); lid.rotation.z = d * (c.mujer ? -0.12 : 0.08);
     const ceja = add(new THREE.BoxGeometry(c.mujer ? 0.044 : 0.046, c.mujer ? 0.004 : 0.0075, 0.01), F(c.pelo, 0.7), d * 0.002, c.mujer ? 0.03 : 0.026, 0.006, e); ceja.rotation.z = c.mujer ? -d * 0.16 : -d * 0.05;
     return { e, iris, ceja }; });
+  const boca = add(new THREE.BoxGeometry(R * 0.32, R * 0.03, R * 0.05), new THREE.MeshBasicMaterial({ color: 0x1a0c0a }), 0, -R * 0.53, R * 0.86, cabeza);
   // pelo: mechones facetados despeinados (más volumen arriba y adelante)
   const mP = F(c.pelo, 0.6), r = semilla(c.semilla || 11);
   const tapa = add(new THREE.SphereGeometry(R * 1.04, 12, 8, 0, 2 * PI, 0, PI * 0.36), mP, 0, R * 0.14, -R * 0.06, cabeza); tapa.scale.set(0.92, 1.05, 1.02); tapa.rotation.x = -0.28;
@@ -91,10 +92,15 @@ function personaLowPoly(cfg = {}) {
     add(new THREE.CylinderGeometry(0.055, 0.046, 0.3, 8), mCam, 0, -0.16, 0, h); const codo = new THREE.Group(); codo.position.set(0, -0.31, 0); h.add(codo);
     add(new THREE.CylinderGeometry(0.046, 0.038, 0.27, 8), mCam, 0, -0.13, 0, codo); add(new THREE.CylinderGeometry(0.036, 0.034, 0.05, 8), mPiel, 0, -0.28, 0, codo);
     const mano = add(new THREE.BoxGeometry(0.06, 0.09, 0.03), mPiel, 0, -0.34, 0.005, codo); add(new THREE.BoxGeometry(0.018, 0.045, 0.02), mPiel, -d * 0.032, -0.325, 0.012, codo).rotation.z = d * 0.5;
-    return { h, codo }; });
+    return { h, codo, mano }; });
   const piernas = [-1, 1].map((d) => { const l = new THREE.Group(); l.position.set(d * 0.09, 0.92, 0); cuerpo.add(l); add(new THREE.CylinderGeometry(0.075, 0.06, 0.45, 8), mPan, 0, -0.22, 0, l);
     add(new THREE.CylinderGeometry(0.058, 0.048, 0.42, 8), mPan, 0, -0.66, 0, l); add(new THREE.BoxGeometry(0.09, 0.07, 0.24), F(c.zapatos, 0.5), 0, -0.88, 0.05, l); return l; });
+  const taza = new THREE.Group(); brazos[1].codo.add(taza); taza.position.set(0, -0.36, 0.05); add(new THREE.CylinderGeometry(0.04, 0.035, 0.1, 10), F("#e8e2d8", 0.5), 0, 0, 0, taza);
+  add(new THREE.TorusGeometry(0.025, 0.007, 4, 8), F("#e8e2d8", 0.5), 0.045, 0, 0, taza).rotation.y = PI / 2; taza.visible = false;
   function pose(s = {}) {
+    taza.visible = !!s.taza; taza.rotation.x = -(s.bd?.[0] ?? 0) - (s.bd?.[2] ?? 0);
+    boca.scale.y = 1 + (s.voz || 0) * 5; boca.position.y = -R * 0.53 - (s.voz || 0) * R * 0.04;
+    if (s.sentado) { cuerpo.position.y = -0.43; piernas.forEach((l) => l.rotation.x = -1.5); } else { cuerpo.position.y = 0; piernas.forEach((l) => l.rotation.x = 0); }
     cabeza.rotation.set(s.miraY || 0, s.mira || 0, s.ladea || 0); torso.rotation.x = s.inclina || 0;
     brazos[0].h.rotation.set(s.bi?.[0] ?? 0.05, 0, s.bi?.[1] ?? -0.08); brazos[0].codo.rotation.x = s.bi?.[2] ?? -0.15;
     brazos[1].h.rotation.set(s.bd?.[0] ?? 0.05, 0, s.bd?.[1] ?? 0.08); brazos[1].codo.rotation.x = s.bd?.[2] ?? -0.15;

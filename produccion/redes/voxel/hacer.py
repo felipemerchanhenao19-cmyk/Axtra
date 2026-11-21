@@ -54,6 +54,8 @@ def pagina(ep, lin, W):
 {leer(AQUI + "vinil3d.js")}
 {leer(AQUI + "robot3d.js")}
 {leer(AQUI + "boda3d.js")}
+{leer(AQUI + "lowpoly3d.js")}
+{leer(AQUI + "despacho3d.js")}
 {leer(AQUI + "orbe-saturno.js")}
 {leer(AQUI + "escena3d.js")}</script></body></html>'''
     open(W + "cuadro.html", "w").write(html)
