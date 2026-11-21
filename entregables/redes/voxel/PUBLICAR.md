@@ -227,3 +227,10 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio romántico en tendencia a volumen bajo. «"Ya me comí la decoración" 😭 #boda #matrimonio #comida #humor #basadoenhechosreales»
 - **Portada:** don Ricardo con el jardín y el sol de fondo.
 - **Comentario fijado:** «Etiquete a quien siempre pregunta "¿y la comida?" en las bodas 💍»
+
+## Personaje 01 (estilo low-poly, oficina de noche)
+### «Mi restaurante vende solo» (Apex Domicilios, más calidad: render a 1,5×). Cierre con pregunta
+- **Instagram:** «Mi restaurante vende solo. Yo me tomo el café. ☕ ¿Cuántos mensajes de WhatsApp respondes al día? 👇» · #ApexDomicilios #Restaurantes #InteligenciaArtificial #Emprendedores #Domicilios
+- **TikTok:** subir la versión sin música, con un audio lo-fi en tendencia a volumen bajo. «POV: tu restaurante vende mientras tú te tomas el café ☕ #restaurantes #ia #emprendedores #domicilios»
+- **Portada:** el primer plano del Personaje 01: «¿Y la comisión?».
+- **Comentario fijado:** «¿Cuánto tiempo pierdes al día respondiendo pedidos por WhatsApp? 📱»
