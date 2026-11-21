@@ -44,7 +44,7 @@ def playfair():
 def pagina(ep, lin, W):
     leer = lambda p: open(p).read()
     html = f'''<!doctype html><html><head><meta charset="utf-8">{leer(RAIZ + "produccion/videos/fuentes.html")}{playfair()}<style>{leer(AQUI + "estilo.css")}</style></head><body>
-<canvas id="lienzo" width="1080" height="1920"></canvas><canvas id="bloom" width="270" height="480"></canvas><div id="vineta"></div><canvas id="grano" width="360" height="640"></canvas>
+<canvas id="lienzo" width="1080" height="1920"></canvas><div id="vineta"></div><canvas id="grano" width="360" height="640"></canvas>
 <div id="titulo"></div><div id="gancho"></div><div id="info"></div><div id="sub"></div><div id="cortina"></div><div id="final"></div><div id="nota"></div><div id="blanco"></div><div id="negro"></div>
 <script src="file://{THREE}"></script>
 <script>const EP = {json.dumps(ep, ensure_ascii=False)}; const LINEA = {json.dumps(lin, ensure_ascii=False)};
@@ -57,14 +57,18 @@ def pagina(ep, lin, W):
 {leer(AQUI + "lowpoly3d.js")}
 {leer(AQUI + "despacho3d.js")}
 {leer(AQUI + "orbe-saturno.js")}
+{leer(AQUI + "post3d.js")}
 {leer(AQUI + "escena3d.js")}</script></body></html>'''
     open(W + "cuadro.html", "w").write(html)
     shutil.copytree(RAIZ + "produccion/redes/pelicula/fotos", W + "fotos", dirs_exist_ok=True)
 
 async def abrir(p, W):
     br = await p.chromium.launch(executable_path=motor.CHROME, args=ARGS)
-    pg = await br.new_page(viewport={"width": 1080, "height": 1920}); pg.on("pageerror", lambda e: print("ERR", e))
-    await pg.goto("file://" + W + "cuadro.html"); await pg.wait_for_timeout(1500); return br, pg
+    pg = await br.new_page(viewport={"width": 1080, "height": 1920}); pg.errores = []
+    pg.on("pageerror", lambda e: (print("ERR", e), pg.errores.append(str(e))))
+    await pg.goto("file://" + W + "cuadro.html"); await pg.wait_for_timeout(1500)
+    if not await pg.evaluate("typeof render === 'function'"): raise RuntimeError("La escena no cargó: " + "; ".join(pg.errores))
+    return br, pg
 
 async def obrero(W, i, a, b):
     from playwright.async_api import async_playwright
@@ -73,12 +77,15 @@ async def obrero(W, i, a, b):
                            "-c:v", "libx264", "-preset", "medium", "-crf", "12", "-pix_fmt", "yuv420p", seg], stdin=subprocess.PIPE)
     async with async_playwright() as p:
         br, pg = await abrir(p, W)
-        for f in range(a, b): await pg.evaluate("t => render(t)", f / FPS); ff.stdin.write(await pg.screenshot(type="jpeg", quality=94))
+        for f in range(a, b):
+            await pg.evaluate("t => render(t)", f / FPS)
+            if pg.errores: ff.kill(); raise RuntimeError(f"Error al dibujar el cuadro {f} ({f / FPS:.2f} s): {pg.errores[0]}")
+            ff.stdin.write(await pg.screenshot(type="jpeg", quality=94))
         await br.close()
     ff.stdin.close(); ff.wait(); return seg
 
 async def imagen(W, total):
-    n = int(os.getenv("OBREROS", "4")); ncu = int(total * FPS); tr = ncu // n + 1
+    n = int(os.getenv("OBREROS", "2")); ncu = int(total * FPS); tr = ncu // n + 1
     segs = await asyncio.gather(*[obrero(W, i, i * tr, min(ncu, (i + 1) * tr)) for i in range(n)])
     open(W + "segs.txt", "w").write("".join(f"file '{s}'\n" for s in segs))
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", W + "segs.txt", "-c", "copy", W + "imagen.mp4"], check=True)

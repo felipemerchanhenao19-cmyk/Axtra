@@ -26,21 +26,50 @@ def sala(x, seg=1.2, g=0.25):
     return x + fftconvolve(x, ir)[:len(x)] * g / np.sqrt(n) * 30
 
 # ---------- Voces (Microsoft, edge-tts) con caché y efecto por personaje
+VOCES_CLON = RAIZ + "produccion/voces/"
+PY_VOCES = os.getenv("PY_VOCES", "/home/user/voz-env/bin/python")
+TRATO = ("silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
+         "highpass=f=70,acompressor=threshold=-20dB:ratio=2.5,loudnorm=I=-16:TP=-1.5,aresample=48000")
+
+def clave_voz(voz, vel, tono, txt, extra):
+    """Voces clonadas («clon:nombre»): la clave incluye la muestra registrada, así una voz nueva no reutiliza audios viejos."""
+    if voz.startswith("clon:"):
+        ref = VOCES_CLON + "banco/" + voz[5:] + "/ref.wav"
+        if not os.path.exists(ref): sys.exit(f"La voz clonada «{voz[5:]}» no está registrada (produccion/voces/clonador.py registrar ...)")
+        voz += hashlib.md5(open(ref, "rb").read()).hexdigest()[:8] + f"e{extra.get('emo', 0.5)}"
+    return hashlib.md5(f"{voz}{vel}{tono}{txt}".encode()).hexdigest()
+
 async def voces(ep, W):
     import edge_tts
     os.makedirs(W + "voces", exist_ok=True); os.makedirs(TRABAJO + "cache", exist_ok=True)
+    # 1) voces clonadas: todas las líneas que falten se generan en un solo lote (una carga del modelo) con control de calidad
+    lote = []
+    for pl in ep["planos"]:
+        for (q, txt, _, extra) in pl.get("lineas", []):
+            voz, vel, tono = ep["reparto"][q]["voz"]; c = TRABAJO + f"cache/{clave_voz(voz, vel, tono, txt, extra or {})}.wav"
+            if voz.startswith("clon:") and not os.path.exists(c) and c + ".crudo.wav" not in [t["salida"] for t in lote]:
+                lote.append({"voz": voz[5:], "texto": txt, "salida": c + ".crudo.wav", "emocion": (extra or {}).get("emo", 0.5), "ritmo": (extra or {}).get("ritmo", 0.5)})
+    if lote:
+        json.dump(lote, open(W + "lote_voces.json", "w"), ensure_ascii=False)
+        if not os.path.exists(PY_VOCES):   # servidor nuevo: instala el clonador (una sola vez, ~6 GB)
+            print("Instalando el clonador de voces…", flush=True); subprocess.run(["bash", VOCES_CLON + "instalar.sh"], check=True)
+        print(f"Generando {len(lote)} líneas con voces clonadas…", flush=True)
+        subprocess.run([PY_VOCES, VOCES_CLON + "clonador.py", "lote", W + "lote_voces.json"], check=True)
+    # 2) cada línea: voz clonada o voz de Microsoft (edge-tts), con el mismo tratamiento
     k = 0
     for pl in ep["planos"]:
-        for (q, txt, _, _) in pl.get("lineas", []):
+        for (q, txt, _, extra) in pl.get("lineas", []):
             voz, vel, tono = ep["reparto"][q]["voz"]
-            h = hashlib.md5(f"{voz}{vel}{tono}{txt}".encode()).hexdigest(); c = TRABAJO + f"cache/{h}.wav"
+            c = TRABAJO + f"cache/{clave_voz(voz, vel, tono, txt, extra or {})}.wav"
             if not os.path.exists(c):
-                for intento in range(4):
-                    try: await edge_tts.Communicate(txt, voz, rate=vel, pitch=tono, proxy=os.getenv("HTTPS_PROXY")).save(c + ".mp3"); break
-                    except Exception as e: print("reintento voz", e); await asyncio.sleep(2 ** intento)
-                subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", c + ".mp3", "-af",
-                    "silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,"
-                    "highpass=f=70,acompressor=threshold=-20dB:ratio=2.5,loudnorm=I=-16:TP=-1.5,aresample=48000", "-ac", "1", c], check=True)
+                if voz.startswith("clon:"):   # la velocidad se ajusta sin cambiar el tono de la voz
+                    r = 1 + float(str(vel).replace("%", "") or 0) / 100
+                    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", c + ".crudo.wav", "-af", f"silenceremove=stop_periods=-1:stop_duration=0.32:stop_threshold=-42dB:stop_silence=0.2,atempo={r:.3f}," + TRATO, "-ac", "1", c], check=True)
+                else:
+                    for intento in range(4):
+                        try: await edge_tts.Communicate(txt, voz, rate=vel, pitch=tono, proxy=os.getenv("HTTPS_PROXY")).save(c + ".mp3"); break
+                        except Exception as e: print("reintento voz", e); await asyncio.sleep(2 ** intento)
+                    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", c + ".mp3", "-af", TRATO, "-ac", "1", c], check=True)
             subprocess.run(["cp", c, W + f"voces/l{k:02d}.wav"], check=True); k += 1
     t, k, planos = 0.0, 0, []
     for pl in ep["planos"]:

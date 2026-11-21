@@ -6,3 +6,6 @@ __pycache__/
 
 # visor 3D descargado con npm pack para volver a grabar el demo
 produccion/mv/
+# voces: no se suben las pruebas del clonador
+produccion/voces/banco/*/prueba/
+produccion/voces/banco/prueba/

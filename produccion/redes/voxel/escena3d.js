@@ -1,15 +1,17 @@
 // Motor de «Turno de noche»: cámara de cine, actores con claves de tiempo, voces con labios sincronizados, subtítulos y cortes.
 // Tiempos de las claves: número (segundos desde el inicio del plano) o "l1" / "l1+0.5" (inicio de la línea 1 del plano) o "f1" (fin de la línea 1).
 const $ = (s) => document.querySelector(s);
-const REN = new THREE.WebGLRenderer({ canvas: $("#lienzo"), antialias: true, preserveDrawingBuffer: true });
-REN.setPixelRatio(EP.calidad || 1); REN.setSize(1080, 1920, false);   // calidad > 1: se dibuja más grande y se reduce (bordes más finos) REN.shadowMap.enabled = true; REN.shadowMap.type = THREE.PCFSoftShadowMap;
+const REN = new THREE.WebGLRenderer({ canvas: $("#lienzo"), antialias: !(EP.dof || EP.bloom),   // con posproducción el antialias lo da la escena (post3d.js)
+  preserveDrawingBuffer: true });
+REN.setPixelRatio(EP.calidad || 1); REN.setSize(1080, 1920, false);   // calidad > 1: se dibuja más grande y se reduce (bordes más finos)
+REN.shadowMap.enabled = true; REN.shadowMap.type = THREE.PCFSoftShadowMap;
 REN.toneMapping = THREE.ACESFilmicToneMapping; REN.toneMappingExposure = 1.35; REN.outputColorSpace = THREE.SRGBColorSpace;
 const ESC = new THREE.Scene(); ESC.background = new THREE.Color(0x060504); ESC.fog = new THREE.FogExp2(0x0a0806, 0.02);
 const CAM = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 90);
 const RELLENO = new THREE.DirectionalLight(0xffe6cc, 0.55); ESC.add(RELLENO); ESC.add(RELLENO.target);   // luz suave desde la cámara para leer las caras
 const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC), boda: boda(ESC), despacho: despacho(ESC) };
 if (EP.estilo) document.body.classList.add(EP.estilo);
-let DOF = null; const NIEBLA0 = [0x0a0806, 0.02], BLOOM = $("#bloom"), BCTX = BLOOM && BLOOM.getContext("2d");
+let DOF = null; const NIEBLA0 = [0x0a0806, 0.02];
 const ACT = {}, ORBIS = {}, ROBOTS = {}, SATURNOS = {};
 Object.entries(EP.elenco).forEach(([id, cfg]) => { ACT[id] = persona(cfg); ESC.add(ACT[id].raiz); });
 const EXTRAS = (EP.extras || []).map((x, i) => { const P = persona({ semilla: 100 + i, ...x.cfg }); ESC.add(P.raiz); return { P, x }; });
@@ -128,31 +130,11 @@ function render(t) {
     const yaw = (m) => { const T = m === "cam" ? CAM.position : posMundo(m, pl, tt, L); return T ? yawHacia(P0, T) : 0; };
     O.animar({ x: P0.x, y: P0.y, z: P0.z, rot: lerp(yaw(m0), yaw(m1), km), nace, estado: v > 0.02 ? "habla" : s1, voz: v, fase: j * 1.3, luz: d.luz, tinte, brillo: d.brillo !== undefined ? continuo(d.brillo, tt, L)[0] : undefined }, t);
   });
-  if (EP.dof) {
-    if (!DOF) {
-      const sz = REN.getDrawingBufferSize(new THREE.Vector2()); const rt = new THREE.WebGLRenderTarget(sz.x, sz.y, { type: THREE.HalfFloatType, samples: 4 }); rt.depthTexture = new THREE.DepthTexture(sz.x, sz.y);
-      const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ depthTest: false, depthWrite: false,
-        uniforms: { tCol: { value: rt.texture }, tProf: { value: rt.depthTexture }, near: { value: 0.05 }, far: { value: 90 }, foco: { value: 2 }, fuerza: { value: 1 }, px: { value: new THREE.Vector2(1 / sz.x, 1 / sz.y).multiplyScalar(EP.calidad || 1) } },
-        vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }",
-        fragmentShader: `#include <packing>
-          uniform sampler2D tCol; uniform sampler2D tProf; uniform float near, far, foco, fuerza; uniform vec2 px; varying vec2 vUv;
-          float prof(vec2 uv){ return -perspectiveDepthToViewZ(texture2D(tProf, uv).x, near, far); }
-          float coc(float z){ return clamp(abs(z - foco) / max(z, 0.001) * fuerza * 34.0, 0.0, 26.0); }
-          void main(){ float c0 = coc(prof(vUv)); vec3 acc = texture2D(tCol, vUv).rgb; float w = 1.0;
-            for (int i = 1; i < 30; i++) { float fi = float(i); float r = sqrt(fi / 29.0) * c0; float a = fi * 2.39996;
-              vec2 o = vec2(cos(a), sin(a)) * r * px; float cs = coc(prof(vUv + o)); float wi = clamp(cs / max(c0, 0.001), 0.15, 1.0);
-              acc += texture2D(tCol, vUv + o).rgb * wi; w += wi; }
-            gl_FragColor = vec4(acc / w, 1.0);
-            #include <tonemapping_fragment>
-            #include <colorspace_fragment>
-          }` }));
-      q.frustumCulled = false; const qs = new THREE.Scene(); qs.add(q); DOF = { rt, q, qs, qc: new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1) };
-    }
-    const u = DOF.q.material.uniforms, foco = pl.foco ?? CAM.position.distanceTo(new THREE.Vector3(c[3] + o.x, c[4], c[5] + o.z));
-    u.near.value = CAM.near; u.far.value = CAM.far; u.foco.value = foco; u.fuerza.value = pl.dof ?? EP.dof;
-    REN.setRenderTarget(DOF.rt); REN.render(ESC, CAM); REN.setRenderTarget(null); REN.render(DOF.qs, DOF.qc);
-  } else REN.render(ESC, CAM);
-  if (BCTX) { const b = pl.bloom ?? EP.bloom ?? 0; BLOOM.style.opacity = b; if (b > 0) { BCTX.filter = "brightness(0.75) contrast(2.2) blur(7px)"; BCTX.clearRect(0, 0, 270, 480); BCTX.drawImage($("#lienzo"), 0, 0, 270, 480); } }
+  const fuerzaDof = EP.dof ? (pl.dof ?? EP.dof) : 0, brillo = pl.bloom ?? EP.bloom ?? 0;
+  if (fuerzaDof > 0 || brillo > 0) {   // posproducción en la GPU (post3d.js)
+    if (!DOF) DOF = crearPost(REN, EP);
+    DOF.render(ESC, CAM, pl.foco ?? CAM.position.distanceTo(new THREE.Vector3(c[3] + o.x, c[4], c[5] + o.z)), fuerzaDof, brillo);
+  } else { REN.setRenderTarget(null); REN.render(ESC, CAM); }
   // color de cine, viñeta, subtítulos, título, negro y destellos
   $("#lienzo").style.filter = pl.grado || "contrast(1.08) saturate(1.06)";
   const linea = L.lineas.find((l) => t >= l.ini - 0.05 && t < l.fin + 0.25), sub = $("#sub");
