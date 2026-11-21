@@ -65,3 +65,90 @@ function robot3d(cfg = {}) {
   }
   return { raiz, animar };
 }
+
+// ═══════════ «Play»: variantes de diseño (bocetos B, C y D). robot3d() es la variante A (clásico flotante). ═══════════
+const PLAY = {};
+PLAY.P = (col, r, m = 0, cc = 0) => new THREE.MeshPhysicalMaterial({ color: col, roughness: r, metalness: m, clearcoat: cc, clearcoatRoughness: 0.15 });
+PLAY.brillo = (() => { let t = null; return () => { if (t) return t; const cv = document.createElement("canvas"); cv.width = cv.height = 128; const g = cv.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.35, "rgba(255,255,255,.4)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return (t = new THREE.CanvasTexture(cv)); }; })();
+// cara de pantalla con ojos LED (gestos: normal, feliz, guiño, enfoca) y onda al hablar
+PLAY.cara = (ancho, alto, col) => { const cv = document.createElement("canvas"); cv.width = 512; cv.height = Math.round(512 * alto / ancho); const g = cv.getContext("2d"), tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  const dibujar = (t, gesto = "normal", voz = 0) => { const W = cv.width, H = cv.height, cy = H * 0.46; g.fillStyle = "#040507"; g.fillRect(0, 0, W, H);
+    g.save(); g.shadowColor = col; g.shadowBlur = 28; g.fillStyle = col; g.strokeStyle = col; g.lineWidth = H * 0.085; g.lineCap = "round"; const parp = (t % 3.4) < 0.12;
+    [[W * 0.33, -1], [W * 0.67, 1]].forEach(([x, d]) => { const r = H * 0.16;
+      if (parp) { g.beginPath(); g.moveTo(x - r, cy); g.lineTo(x + r, cy); g.stroke(); return; }
+      if (gesto === "feliz" || (gesto === "guiño" && d > 0)) { g.beginPath(); g.arc(x, cy + r * 0.45, r, PI * 1.15, PI * 1.85); g.stroke(); return; }
+      const h = gesto === "enfoca" ? r * 1.0 : r * 1.9; g.beginPath(); g.roundRect(x - r * 0.75, cy - h / 2, r * 1.5, h, r * 0.7); g.fill();
+      g.fillStyle = "rgba(255,255,255,.85)"; g.beginPath(); g.arc(x + r * 0.28, cy - h * 0.22, r * 0.22, 0, 2 * PI); g.fill(); g.fillStyle = col; });
+    if (voz > 0.05) { g.lineWidth = H * 0.03; g.beginPath(); for (let i = 0; i <= 20; i++) g.lineTo(W * 0.4 + i * W * 0.01, H * 0.8 + Math.sin(i * 1.3 + t * 18) * H * 0.05 * voz); g.stroke(); }
+    else { g.lineWidth = H * 0.03; g.beginPath(); g.arc(W / 2, H * 0.72, H * 0.09, PI * 0.15, PI * 0.85); g.stroke(); }
+    g.restore(); tex.needsUpdate = true; };
+  return { tex, dibujar }; };
+PLAY.malla = (padre, geo, m, x = 0, y = 0, z = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; padre.add(o); return o; };
+
+// B · «Compacto»: cápsula menta y blanca, visor ancho, manos flotantes (sin brazos) y una antena-hoja
+function robotPlayB() {
+  const raiz = new THREE.Group(), cuerpo = new THREE.Group(); raiz.add(cuerpo); const P = PLAY.P, A = PLAY.malla;
+  const mBl = P("#f6f7f8", 0.3, 0, 1), mMe = P("#5fd3b5", 0.35, 0.05, 1), mOs = P("#20262d", 0.4, 0.4, 0.5);
+  const cap = A(cuerpo, new THREE.CapsuleGeometry(0.33, 0.42, 16, 48), mBl, 0, 0.98, 0); cap.scale.set(1, 1, 0.9);
+  const banda = A(cuerpo, new THREE.CylinderGeometry(0.335, 0.335, 0.2, 48, 1, true), mMe, 0, 0.72, 0); banda.scale.z = 0.9;
+  const cara = PLAY.cara(1.4, 1.0, "#7ff0d2"); const visor = A(cuerpo, new THREE.CylinderGeometry(0.338, 0.338, 0.34, 48, 1, true, -PI * 0.32, PI * 0.64), new THREE.MeshPhysicalMaterial({ map: cara.tex, emissiveMap: cara.tex, emissive: 0xffffff, emissiveIntensity: 1, color: 0x050608, roughness: 0.06, clearcoat: 1 }), 0, 1.03, 0); visor.scale.z = 0.905;
+  const hoja = new THREE.Group(); hoja.position.set(0, 1.62, 0); cuerpo.add(hoja); A(hoja, new THREE.CylinderGeometry(0.01, 0.012, 0.16, 8), mOs, 0, 0.08, 0);
+  const lam = A(hoja, new THREE.SphereGeometry(0.07, 24, 12), mMe, 0.05, 0.18, 0); lam.scale.set(1, 0.35, 0.6); lam.rotation.z = -0.5;
+  const manos = [-1, 1].map((d) => { const m = new THREE.Group(); cuerpo.add(m); A(m, new THREE.SphereGeometry(0.075, 24, 16), mMe, 0, 0, 0).scale.set(1, 0.85, 0.7);
+    [-1, 0, 1].forEach((k) => A(m, new THREE.CapsuleGeometry(0.018, 0.04, 4, 10), mMe, k * 0.03, -0.07, 0.01)); return m; });
+  const base = A(cuerpo, new THREE.TorusGeometry(0.16, 0.025, 12, 40), new THREE.MeshBasicMaterial({ color: 0x7ff0d2, toneMapped: false }), 0, 0.42, 0); base.rotation.x = PI / 2;
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: PLAY.brillo(), color: 0x7ff0d2, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); halo.position.set(0, 0.36, 0); halo.scale.setScalar(0.9); cuerpo.add(halo);
+  function animar(t, s = {}) { cuerpo.position.y = 0.04 + Math.sin(t * 1.8) * 0.03; hoja.rotation.z = Math.sin(t * 2.2) * 0.2;
+    manos[0].position.set(-0.5, 0.95 + Math.sin(t * 2) * 0.03, 0.12); manos[1].position.set(0.5, s.saluda ? 1.45 + Math.sin(t * 8) * 0.03 : 0.95 + Math.sin(t * 2 + 1) * 0.03, 0.12); manos[1].rotation.z = s.saluda ? Math.sin(t * 8) * 0.4 : 0;
+    cara.dibujar(t, s.gesto, s.voz || 0); }
+  return { raiz, animar };
+}
+
+// C · «Retro-moderno»: cabeza de pantalla cuadrada redondeada (cara de emoji), cuerpo rojo y crema, orugas pequeñas y brazo-bandeja
+function robotPlayC() {
+  const raiz = new THREE.Group(), cuerpo = new THREE.Group(); raiz.add(cuerpo); const P = PLAY.P, A = PLAY.malla;
+  const mR = P("#d9443a", 0.32, 0.05, 1), mCr = P("#f1e7d4", 0.35, 0, 0.8), mOs = P("#2a2c31", 0.45, 0.5, 0.4), mOr = P("#c9a24a", 0.25, 0.9, 0.6);
+  [-1, 1].forEach((d) => { const o = A(cuerpo, new THREE.CapsuleGeometry(0.08, 0.26, 8, 20), mOs, d * 0.18, 0.1, 0); o.rotation.x = PI / 2; });
+  const tor = A(cuerpo, new THREE.CylinderGeometry(0.3, 0.26, 0.62, 40), mR, 0, 0.55, 0); tor.scale.z = 0.8;
+  A(cuerpo, new THREE.CylinderGeometry(0.305, 0.305, 0.06, 40), mOr, 0, 0.84, 0).scale.z = 0.8;
+  const pecho = A(cuerpo, new THREE.CylinderGeometry(0.12, 0.12, 0.02, 32), mCr, 0, 0.6, 0.24); pecho.rotation.x = PI / 2;
+  [0.62, 0.56, 0.5].forEach((y, i) => A(cuerpo, new THREE.SphereGeometry(0.018, 12, 8), [mOr, mOs, mOr][i], -0.03 + i * 0.03, y + 0.02, 0.255));
+  A(cuerpo, new THREE.CylinderGeometry(0.06, 0.08, 0.1, 20), mOs, 0, 0.92, 0);
+  const cabeza = new THREE.Group(); cabeza.position.set(0, 1.18, 0); cuerpo.add(cabeza);
+  const caja = A(cabeza, new THREE.BoxGeometry(0.5, 0.38, 0.34), mCr, 0, 0, 0); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(([a, b]) => A(cabeza, new THREE.CylinderGeometry(0.06, 0.06, 0.34, 16), mCr, a * 0.22, b * 0.16, 0).rotation.x = PI / 2);
+  const cara = PLAY.cara(0.42, 0.3, "#ffd27a"); A(cabeza, new THREE.PlaneGeometry(0.42, 0.3), new THREE.MeshBasicMaterial({ map: cara.tex, toneMapped: false }), 0, 0, 0.172);
+  A(cabeza, new THREE.TorusGeometry(0.23, 0.012, 8, 4), mOr, 0, 0, 0.17).rotation.z = PI / 4;
+  [-1, 1].forEach((d) => A(cabeza, new THREE.CylinderGeometry(0.05, 0.05, 0.05, 20), mR, d * 0.28, 0, 0).rotation.z = PI / 2);
+  const ant = A(cabeza, new THREE.CylinderGeometry(0.008, 0.008, 0.16, 8), mOs, 0.12, 0.27, 0); const bola = A(cabeza, new THREE.SphereGeometry(0.03, 14, 10), new THREE.MeshBasicMaterial({ color: 0xffd27a, toneMapped: false }), 0.12, 0.36, 0);
+  const brazos = [-1, 1].map((d) => { const p = new THREE.Group(); p.position.set(d * 0.33, 0.78, 0); cuerpo.add(p); A(p, new THREE.SphereGeometry(0.06, 20, 14), mOr);
+    A(p, new THREE.CapsuleGeometry(0.035, 0.32, 6, 14), mCr, 0, -0.2, 0); const m = A(p, new THREE.SphereGeometry(0.055, 18, 12), mR, 0, -0.42, 0); return p; });
+  function animar(t, s = {}) { cuerpo.position.y = Math.abs(Math.sin(t * 3)) * 0.01; cabeza.rotation.set(Math.sin(t * 0.8) * 0.05, s.mira ?? Math.sin(t * 0.5) * 0.15, s.ladea ?? 0.08);
+    brazos[0].rotation.z = -0.2; brazos[1].rotation.set(s.saluda ? 0 : -0.3, 0, s.saluda ? 2.4 + Math.sin(t * 7) * 0.3 : 0.2); bola.scale.setScalar(0.8 + 0.4 * Math.abs(Math.sin(t * 3))); cara.dibujar(t, s.gesto, s.voz || 0); }
+  return { raiz, animar };
+}
+
+// D · «Elegante»: alto y esbelto, colores de esmoquin (negro y blanco), corbatín dorado, cara ovalada negra brillante con ojos LED dorados
+function robotPlayD() {
+  const raiz = new THREE.Group(), cuerpo = new THREE.Group(); raiz.add(cuerpo); const P = PLAY.P, A = PLAY.malla;
+  const mN = P("#16181c", 0.3, 0.3, 1), mBl = P("#f4f4f2", 0.32, 0, 1), mOr = P("#d4af37", 0.22, 0.95, 0.8);
+  const falda = A(cuerpo, new THREE.LatheGeometry([[0.001, 0.32], [0.1, 0.3], [0.2, 0.42], [0.22, 0.6], [0.001, 0.6]].map(([r, h]) => new THREE.Vector2(r, h)), 40), mN);
+  const anillo = A(cuerpo, new THREE.TorusGeometry(0.11, 0.016, 10, 40), new THREE.MeshBasicMaterial({ color: 0xffd76a, toneMapped: false }), 0, 0.3, 0); anillo.rotation.x = PI / 2;
+  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: PLAY.brillo(), color: 0xffd76a, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false })); halo.position.set(0, 0.26, 0); halo.scale.setScalar(0.7); cuerpo.add(halo);
+  const tor = A(cuerpo, new THREE.LatheGeometry([[0.001, 0.58], [0.17, 0.58], [0.2, 0.75], [0.27, 1.0], [0.29, 1.12], [0.2, 1.22], [0.08, 1.26], [0.001, 1.27]].map(([r, h]) => new THREE.Vector2(r, h)), 48), mN); tor.scale.z = 0.7;
+  const camisa = A(cuerpo, new THREE.LatheGeometry([[0.12, 0.8], [0.2, 1.0], [0.22, 1.14], [0.12, 1.22]].map(([r, h]) => new THREE.Vector2(r + 0.012, h)), 30, -PI * 0.16, PI * 0.32), mBl); camisa.scale.z = 0.7;
+  [-1, 1].forEach((d) => A(cuerpo, new THREE.SphereGeometry(0.045, 16, 12), mOr, d * 0.045, 1.17, 0.17).scale.set(1.3, 0.8, 0.6)); A(cuerpo, new THREE.SphereGeometry(0.022, 12, 8), mOr, 0, 1.17, 0.185);
+  [1.04, 0.94].forEach((y) => A(cuerpo, new THREE.SphereGeometry(0.014, 10, 8), mOr, 0, y, 0.2));
+  A(cuerpo, new THREE.CylinderGeometry(0.045, 0.06, 0.1, 20), mN, 0, 1.3, 0);
+  const cabeza = new THREE.Group(); cabeza.position.set(0, 1.5, 0); cuerpo.add(cabeza);
+  A(cabeza, new THREE.SphereGeometry(0.17, 40, 28), mBl).scale.set(0.95, 1.18, 0.95);
+  const cara = PLAY.cara(1.0, 1.0, "#ffd76a"); const vis = A(cabeza, new THREE.SphereGeometry(0.172, 40, 24, PI * 0.22, PI * 0.56, PI * 0.25, PI * 0.42), new THREE.MeshPhysicalMaterial({ map: cara.tex, emissiveMap: cara.tex, emissive: 0xffffff, emissiveIntensity: 1, color: 0x050608, roughness: 0.06, clearcoat: 1 })); vis.scale.set(0.96, 1.19, 0.96);
+  [-1, 1].forEach((d) => A(cabeza, new THREE.CylinderGeometry(0.03, 0.03, 0.03, 16), mOr, d * 0.165, 0, 0).rotation.z = PI / 2);
+  const brazos = [-1, 1].map((d) => { const p = new THREE.Group(); p.position.set(d * 0.31, 1.1, 0); cuerpo.add(p); A(p, new THREE.SphereGeometry(0.065, 20, 14), mN);
+    A(p, new THREE.CapsuleGeometry(0.038, 0.24, 6, 14), mN, 0, -0.18, 0); const c = new THREE.Group(); c.position.set(0, -0.34, 0); p.add(c); A(c, new THREE.CapsuleGeometry(0.034, 0.2, 6, 14), mN, 0, -0.13, 0);
+    A(c, new THREE.CylinderGeometry(0.042, 0.042, 0.03, 16), mBl, 0, -0.25, 0); A(c, new THREE.SphereGeometry(0.048, 18, 12), mBl, 0, -0.3, 0).scale.set(1, 0.85, 0.7); return { p, c }; });
+  function animar(t, s = {}) { cuerpo.position.y = 0.05 + Math.sin(t * 1.5) * 0.02; cabeza.rotation.set(Math.sin(t * 0.7) * 0.03, s.mira ?? Math.sin(t * 0.45) * 0.15, s.ladea ?? 0.06);
+    brazos[0].p.rotation.set(-0.1, 0, -0.1); brazos[0].c.rotation.x = -0.25; if (s.saluda) { brazos[1].p.rotation.set(-0.3, 0, 2.3); brazos[1].c.rotation.z = 0.4 + Math.sin(t * 7) * 0.3; } else { brazos[1].p.rotation.set(-0.6, 0, 0.1); brazos[1].c.rotation.x = -1.2; }
+    halo.material.opacity = 0.55 + 0.2 * Math.sin(t * 4); cara.dibujar(t, s.gesto, s.voz || 0); }
+  return { raiz, animar };
+}
