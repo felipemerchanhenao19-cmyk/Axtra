@@ -25,6 +25,7 @@ const EMOS = {   // cejas: [alto, inclinación], ojos: alto, párpado (0 abierto
   sorpresa: { ceja: [-4, -0.05], ojo: 10, lid: 0, curva: 0 }, cansado: { ceja: [1, -0.1], ojo: 8, lid: 0.55, curva: -0.2 },
   cerrados: { ceja: [1, 0], ojo: 8, lid: 1, curva: 0 }, feliz: { ceja: [-2, 0], ojo: 8, lid: 0.1, curva: 1 },
   triste: { ceja: [-1, -0.3], ojo: 8, lid: 0.25, curva: -1 }, duda: { ceja: [-1, 0.15], ojo: 8, lid: 0, curva: -0.2, asim: true },
+  arrogante: { ceja: [-1, 0.12], ojo: 8, lid: 0.4, curva: 0.45, asim: true, ladeo: 1 }, seductor: { ceja: [-1.5, 0], ojo: 8, lid: 0.3, curva: 0.6, ladeo: 0.6 },
 };
 function dibujarCaraVoxel(g, c, s) {
   const e = EMOS[s.emo] || EMOS.neutro, e2 = EMOS[s.emo2] || e, k = s.mezcla ?? 1;
