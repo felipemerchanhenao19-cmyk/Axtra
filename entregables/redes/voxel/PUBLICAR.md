@@ -220,3 +220,10 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «El VIP… de otro restaurante 😭 #clientevip #meseros #restaurantes #humor #basadoenhechosreales»
 - **Portada:** Chispa en primer plano con los ojos LED.
 - **Comentario fijado:** «Etiquete al "¿usted sabe quién soy yo?" de su vida 👀»
+
+## Boda al aire libre (hora dorada) + orbe de Saturno
+### «La comida de la boda» (Apex Play). Cierre con pregunta
+- **Instagram:** «Dos horas esperando la comida en la boda. Hasta que llegó el orbe. 💍 ¿Cuánto ha esperado usted la comida en una boda? 👇» · #BasadoEnHechosReales #Boda #Matrimonio #Comida #Humor
+- **TikTok:** subir la versión sin música, con un audio romántico en tendencia a volumen bajo. «"Ya me comí la decoración" 😭 #boda #matrimonio #comida #humor #basadoenhechosreales»
+- **Portada:** don Ricardo con el jardín y el sol de fondo.
+- **Comentario fijado:** «Etiquete a quien siempre pregunta "¿y la comida?" en las bodas 💍»
