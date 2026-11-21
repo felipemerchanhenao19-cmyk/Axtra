@@ -5,17 +5,17 @@ AQUI = os.path.dirname(os.path.abspath(__file__)) + "/"
 _spec = importlib.util.spec_from_file_location("motor", AQUI + "../heroes/hacer.py"); motor = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(motor)
 RAIZ = motor.RAIZ; SALIDA = RAIZ + "entregables/redes/bocetos/"; THREE = motor.TRABAJO + "three/package/build/three.min.js"
 OPCIONES = [
-    dict(letra="A", nombre="Andrés", desc="Pelo despeinado, barba de pocos días, camisa negra. Relajado y seguro.", cfg=dict(semilla=11)),
-    dict(letra="B", nombre="Santiago", desc="Corte corto, barba llena, camisa blanca y delantal café. El dueño que cocina.",
-         cfg=dict(semilla=12, peinado="corto", barbaNivel=1.0, piel="#b98060", camisa="#efece6", delantal="#5a3b26", pelo="#120e0c", barba="#1e1612")),
-    dict(letra="C", nombre="Julián", desc="Pelo rizado, sin barba, gafas y suéter vino. Joven, creativo y techie.",
-         cfg=dict(semilla=13, peinado="rizado", barbaNivel=0.15, piel="#d8a582", camisa="#6e1f2a", gafas="#1a1a1c", pelo="#2a1a12")),
-    dict(letra="D", nombre="Camilo", desc="Pelo largo hasta el cuello, barba llena, camisa de jean. Galán y despreocupado.",
-         cfg=dict(semilla=14, peinado="largo", barbaNivel=1.0, piel="#c68b68", camisa="#3e5f86", pelo="#2b1c14", barba="#2b1c14")),
-    dict(letra="E", nombre="Laura", desc="Melena larga, camisa negra. Dueña elegante y directa.",
-         cfg=dict(semilla=15, mujer=True, peinado="melena", piel="#dcab88", labios="#a5404a", camisa="#1c1d22", pelo="#22140e", iris="#4a2c18")),
-    dict(letra="F", nombre="Sofía", desc="Cola de caballo, blusa blanca y delantal negro. Chef y dueña, siempre en movimiento.",
-         cfg=dict(semilla=16, mujer=True, peinado="coleta", piel="#c58a68", labios="#9a3a44", camisa="#f2efea", delantal="#1d1e22", pelo="#140e0b", iris="#3a2416")),
+    dict(letra="A", nombre="Andrés", desc="Tupé despeinado, barba de pocos días, camisa negra. Mandíbula marcada y mirada segura.", cfg=dict(semilla=11, fuerte=True, peinado="tupe", barbaNivel=0.75)),
+    dict(letra="B", nombre="Sebastián", desc="Pelo hacia atrás, barba corta y definida, camisa blanca. Elegante y un poco arrogante.",
+         cfg=dict(semilla=21, fuerte=True, peinado="atras", barbaNivel=0.95, piel="#c88e6c", camisa="#ecebe7", pelo="#15100d", barba="#1c1410")),
+    dict(letra="C", nombre="Mateo", desc="Corte corto con volumen, barba de varios días, camisa verde oscuro. Moderno y directo.",
+         cfg=dict(semilla=22, fuerte=True, peinado="corto", barbaNivel=0.85, piel="#b27a58", camisa="#24382c", pelo="#0f0c0a", barba="#16110e")),
+    dict(letra="D", nombre="Gabriel", desc="Pelo largo ondulado hacia atrás, barba llena, camisa de jean. Galán de película.",
+         cfg=dict(semilla=23, fuerte=True, peinado="largo", barbaNivel=1.0, piel="#c99474", camisa="#34537a", pelo="#2a1b13", barba="#2a1b13")),
+    dict(letra="E", nombre="Daniel", desc="Pelo despeinado, sin barba, camisa negra. Rasgos fuertes y cara limpia.",
+         cfg=dict(semilla=24, fuerte=True, peinado="despeinado", barbaNivel=0.25, piel="#d7a684", camisa="#18191d", pelo="#1e1410")),
+    dict(letra="F", nombre="Nicolás", desc="Moño alto, barba llena, camisa beige. Seguro, creativo y con estilo.",
+         cfg=dict(semilla=25, fuerte=True, peinado="mono", barbaNivel=1.0, piel="#bf8766", camisa="#c9b79a", pelo="#1a120d", barba="#1a120d")),
 ]
 def main():
     leer = lambda p: open(p).read(); W = motor.TRABAJO + "bocetos/"; os.makedirs(W, exist_ok=True); os.makedirs(SALIDA, exist_ok=True)
@@ -25,7 +25,7 @@ body{{margin:0;background:#0b1020;color:#eef2f6;font-family:Figtree;width:1800px
 .g{{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:0 50px 50px}} .t{{background:#141b2e;border-radius:24px;padding:16px 16px 22px}}
 .fotos{{display:flex;gap:10px}} .fotos img{{width:50%;border-radius:16px}} h2{{font:800 34px Figtree;margin:14px 6px 0}} h2 span{{font:700 18px Figtree;letter-spacing:.18em;text-transform:uppercase;color:#e8a04a;margin-right:8px}}
 p{{font:500 21px/1.35 Figtree;color:#b9c4d0;margin:6px 6px 0}}</style></head><body>
-<h1>Personaje principal · estilo low-poly</h1><div class="sub">Seis opciones con el acabado del video de referencia. Elija una (o mezcle rasgos).</div><div class="g">{tarjetas}</div>
+<h1>Personaje principal · hombre, rasgos fuertes</h1><div class="sub">Seis opciones masculinas con el acabado del video de referencia: mandíbula cuadrada, pómulos marcados, tabique recto, hombros anchos.</div><div class="g">{tarjetas}</div>
 <canvas id="lienzo" width="600" height="800" style="display:none"></canvas>
 <script src="file://{THREE}"></script>
 <script>const PI = Math.PI; function semilla(s) {{ return () => {{ s |= 0; s = (s + 0x6d2b79f5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }}
