@@ -114,6 +114,11 @@ function estacion(escena) {
   U.flares = [destello([-1.3, 3.3, 1.0], 6, 0x8fb4dc, 0.7), destello([0, 1.62, -0.28], 3.2, 0x8fb4dc, 0.35), destello([0, 0.73, 0.51], 4, 0xffb070, 0.25)];
   U.foco = nucleo([-1.3, 3.3, 1.0], 0.5, 0xffc080);
 
+  // guirnalda navideña (e.navidad): luces rojas, verdes y doradas que titilan sobre la pared del fondo
+  U.guirnalda = []; { const cols = [0xff3b30, 0x34c759, 0xffc94a, 0xff3b30, 0x34c759, 0xfff0c0];
+    for (let i = 0; i < 46; i++) { const u = i / 45, x = -3.6 + u * 7.2, y = 3.05 - Math.sin(u * PI * 3) ** 2 * 0.35 - 0.05;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: texturaRadial("rgba(255,255,255,1)", "rgba(255,255,255,0)"), color: cols[i % cols.length], transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+      sp.position.set(x, y, -3.05); sp.scale.setScalar(0.16); E.add(sp); U.guirnalda.push(sp); } }
   // ---------- dibujo de las interfaces
   function cabecera(x, W, marca, titulo, t) {
     x.fillStyle = "#06080b"; x.fillRect(0, 0, W, 1000);
@@ -156,7 +161,7 @@ function estacion(escena) {
       x.globalAlpha = 1; }
     U.mon.play.L.t.needsUpdate = true;
   }
-  function pDom(k, t) {
+  function pDom(k, t, e = {}) {
     const { x } = U.mon.dom.L, W = 576; cabecera(x, W, "Apex Domicilios", "Pedidos directos", t);
     esp(x, "Comisión por pedido", 36, 196, 16, GRIS, 0.2); txt(x, "$ 0", 36, 300, "800 110px Figtree", AMBAR2);
     txt(x, "Su propio enlace de pedidos", 36, 344, "500 24px Figtree", ACERO2);
@@ -165,10 +170,12 @@ function estacion(escena) {
     ped.forEach(([id, plato, precio, est], i) => { const a = cl((k - 0.08 - i * 0.12) / 0.1); if (a <= 0) return; const Y = 410 + i * 104;
       x.globalAlpha = a; x.save(); x.translate((1 - suave(a)) * 40, 0); rr(x, 36, Y, W - 72, 88, 14); x.fillStyle = "#0e131a"; x.fill(); x.strokeStyle = "rgba(111,143,168,0.3)"; x.lineWidth = 2; x.stroke();
       txt(x, id, 58, Y + 36, "700 18px Figtree", GRIS); txt(x, plato, 58, Y + 68, "600 25px Figtree", BLANCO); txt(x, precio, W - 60, Y + 36, "700 22px Figtree", BLANCO, "right");
-      const c = est === "En camino" ? AMBAR : est === "En cocina" ? ACERO2 : GRIS; esp(x, est, W - 60, Y + 70, 14, c, 0.18, "right"); x.restore(); x.globalAlpha = 1; });
-    const nk = cl((k - 0.62) / 0.1);
+      const c = est === "En camino" ? AMBAR : est === "En cocina" ? ACERO2 : GRIS; esp(x, est === "En camino" && (e.aviso ?? 0) > 0.5 ? "En camino · cliente avisado ✓" : est, W - 60, Y + 70, 14, c, 0.18, "right"); x.restore(); x.globalAlpha = 1; });
+    const nk = e.compro ?? (e.wompi !== undefined ? 0 : cl((k - 0.62) / 0.1)), wk = e.wompi ?? 0;
     if (nk > 0) { x.globalAlpha = nk; const Y = 840; rr(x, 36, Y, W - 72, 110, 16); x.fillStyle = "rgba(232,160,74,0.12)"; x.fill(); x.strokeStyle = "rgba(242,184,102,0.7)"; x.lineWidth = 2; x.stroke();
       esp(x, "Comprobante de pago", 60, Y + 42, 15, AMBAR, 0.22); txt(x, "Nequi · $ 32.000 · Verificado ✓", 60, Y + 82, "600 25px Figtree", BLANCO); x.globalAlpha = 1; }
+    if (wk > 0) { x.globalAlpha = wk; const Y = 840; rr(x, 36, Y, W - 72, 110, 16); x.fillStyle = "rgba(111,190,140,0.14)"; x.fill(); x.strokeStyle = "rgba(140,220,170,0.75)"; x.lineWidth = 2; x.stroke();
+      esp(x, "Pago con Wompi", 60, Y + 42, 15, "#8fdcae", 0.22); txt(x, "$ 64.000 · Aprobado automáticamente ✓", 60, Y + 82, "600 24px Figtree", BLANCO); x.globalAlpha = 1; }
     U.mon.dom.L.t.needsUpdate = true;
   }
   function pAna(k, t) {
@@ -198,6 +205,25 @@ function estacion(escena) {
       esp(x, "Mesa 7", 56, 180, 18, AMBAR2, 0.24); txt(x, "2 × Ajiaco de la casa", 56, 238, "600 32px Figtree", BLANCO); txt(x, "Uno sin alcaparras", 84, 280, "500 26px Figtree", GRIS);
       txt(x, "2 × Limonada de coco", 56, 338, "600 32px Figtree", BLANCO); x.globalAlpha = 1; }
     else txt(x, "Esperando pedidos…", 28, 200, "500 28px Figtree", GRIS);
+    U.tab.t.needsUpdate = true;
+  }
+
+  function pChat(k, t) {
+    const { x } = U.mon.play.L, W = 576; cabecera(x, W, "Apex Domicilios", "Su link de pedidos", t);
+    esp(x, "Asistente de IA · chat del cliente", 36, 186, 16, GRIS, 0.2);
+    let y = 214; const cK = (a, b) => cl((k - a) / (b - a));
+    y += burbuja(x, "Hola, quiero dos bandejas paisas a domicilio.", 36, y, 420, false, cK(0.02, 0.1)) + 16;
+    y += burbuja(x, tipeo("¡Claro! Son $ 64.000. ¿Paga con Wompi o envía el comprobante?", cK(0.18, 0.4)), 120, y, 420, true, cK(0.16, 0.22)) + 16;
+    y += burbuja(x, "Con Wompi.", 36, y, 420, false, cK(0.48, 0.55)) + 16;
+    y += burbuja(x, tipeo("Pago aprobado ✓ Su pedido ya está en la cocina.", cK(0.62, 0.82)), 120, y, 420, true, cK(0.6, 0.66)) + 16;
+    U.mon.play.L.t.needsUpdate = true;
+  }
+  function pAviso(k, t) {
+    const { x, c } = U.tab; x.fillStyle = "#06080b"; x.fillRect(0, 0, c.width, c.height);
+    esp(x, "Celular del cliente", 28, 52, 18, GRIS, 0.3); txt(x, "Notificaciones", 28, 96, "700 34px Figtree", BLANCO);
+    const a = cl(k * 3); if (a > 0) { x.globalAlpha = a; x.save(); x.translate(0, (1 - suave(a)) * -40); rr(x, 28, 130, 568, 220, 22); x.fillStyle = "#121a24"; x.fill();
+      x.strokeStyle = `rgba(242,184,102,${0.5 + 0.4 * Math.abs(Math.sin(t * 3))})`; x.lineWidth = 3; x.stroke();
+      esp(x, "Su restaurante", 56, 178, 18, AMBAR2, 0.24); txt(x, "¡Su pedido ya salió!", 56, 240, "700 38px Figtree", BLANCO); txt(x, "Llega en aproximadamente 25 minutos.", 56, 296, "500 26px Figtree", GRIS); x.restore(); x.globalAlpha = 1; }
     U.tab.t.needsUpdate = true;
   }
   function pFlujo(k, t) {
@@ -236,11 +262,12 @@ function estacion(escena) {
     U.ranura.material.color.setRGB(0.9 * enc, 0.55 * enc, 0.25 * enc);
     // encendido de pantallas con un parpadeo breve
     Object.values(U.mon).forEach((M, i) => { const k = cl(enc * 1.4 - i * 0.15), fl = k > 0 && k < 1 ? (0.6 + 0.4 * Math.sin(tt * 90 + i)) : 1; M.pant.material.color.setScalar(k * fl); M.luz.intensity = 0.6 * k; });
-    pPlay(e.play ?? 0, tt, enc); pDom(e.dom ?? 0, tt); pAna(e.ana ?? 0, tt); pTab(e.play ?? 0, tt); pFlujo(e.flujo ?? 0, tt); pCarta(e.menu ?? 0, tt);
+    if (e.chat !== undefined) pChat(e.chat, tt); else pPlay(e.play ?? 0, tt, enc); pDom(e.dom ?? 0, tt, e); pAna(e.ana ?? 0, tt); if (e.aviso !== undefined) pAviso(e.aviso, tt); else pTab(e.play ?? 0, tt); pFlujo(e.flujo ?? 0, tt); pCarta(e.menu ?? 0, tt);
     [[U.flujo, e.holo ?? 0], [U.carta, e.holoC ?? e.holo ?? 0]].forEach(([H, k]) => { const s = suave(k); H.g.position.y = H.y0 - (1 - s) * 0.12; H.m.opacity = s * (0.92 + 0.08 * Math.sin(tt * 7));
       H.tinte.material.opacity = 0.05 * s; H.borde.material.opacity = 0.6 * s; H.g.visible = k > 0.01; });
     const pos = U.polvo.geometry.attributes.position; U.polvoB.forEach(([x, y, z, f], i) => pos.setXYZ(i, x + Math.sin(tt * 0.3 + f) * 0.04, y + Math.sin(tt * 0.21 + f * 1.7) * 0.05, z + Math.cos(tt * 0.25 + f) * 0.04)); pos.needsUpdate = true;
     U.polvo.material.opacity = 0.8 * I;
+    const nav = e.navidad ?? 0; U.guirnalda.forEach((g, i) => { g.material.opacity = nav * (0.55 + 0.45 * Math.sin(tt * 2.2 + i * 1.3)); });
     U.bokeh.forEach(({ s, b, f, o }) => { s.position.set(b[0] + Math.sin(tt * 0.2 + f) * 0.08, b[1] + Math.sin(tt * 0.15 + f) * 0.06, b[2]); s.material.opacity = o * (0.7 + 0.3 * Math.sin(tt * 0.8 + f)) * (e.bokeh ?? 1); });
     U.flares.forEach(({ s, op }, i) => { s.material.opacity = op * (i === 0 ? I : i === 2 ? fil : enc) * (0.85 + 0.15 * Math.sin(tt * 1.3 + i)); });
   };
