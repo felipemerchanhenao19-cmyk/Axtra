@@ -7,10 +7,10 @@ REN.toneMapping = THREE.ACESFilmicToneMapping; REN.toneMappingExposure = 1.35; R
 const ESC = new THREE.Scene(); ESC.background = new THREE.Color(0x060504); ESC.fog = new THREE.FogExp2(0x0a0806, 0.02);
 const CAM = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 90);
 const RELLENO = new THREE.DirectionalLight(0xffe6cc, 0.55); ESC.add(RELLENO); ESC.add(RELLENO.target);   // luz suave desde la cámara para leer las caras
-const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC) };
+const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC), boda: boda(ESC) };
 if (EP.estilo) document.body.classList.add(EP.estilo);
 let DOF = null; const NIEBLA0 = [0x0a0806, 0.02], BLOOM = $("#bloom"), BCTX = BLOOM && BLOOM.getContext("2d");
-const ACT = {}, ORBIS = {}, ROBOTS = {};
+const ACT = {}, ORBIS = {}, ROBOTS = {}, SATURNOS = {};
 Object.entries(EP.elenco).forEach(([id, cfg]) => { ACT[id] = persona(cfg); ESC.add(ACT[id].raiz); });
 const EXTRAS = (EP.extras || []).map((x, i) => { const P = persona({ semilla: 100 + i, ...x.cfg }); ESC.add(P.raiz); return { P, x }; });
 
@@ -49,6 +49,7 @@ function origen(set) { return SETS[set].position; }
 function posMundo(id, pl, tt, L) {
   const o = origen(pl.set);
   if (id === "cam") return CAM.position.clone();
+  if (pl.saturno && pl.saturno[id]) { const r = continuo(pl.saturno[id].pos, tt, L)[0]; return new THREE.Vector3(r[0] + o.x, r[1], r[2] + o.z); }
   if (pl.robots && pl.robots[id]) { const r = continuo(pl.robots[id].pos, tt, L)[0]; return new THREE.Vector3(r[0] + o.x, 1.5, r[1] + o.z); }
   if (pl.orbis && pl.orbis[id]) { const p = pl.orbis[id].pos; return new THREE.Vector3(p[0] + o.x, p[1], p[2] + o.z); }
   const a = pl.actores && pl.actores[id]; if (!a) return null;
@@ -106,6 +107,16 @@ function render(t) {
     const yaw = (m) => { if (typeof m === "number") return m * PI / 180; const T = m === "cam" ? CAM.position : posMundo(m, pl, tt, L); return T ? yawHacia(P0, T) : 0; };
     R.raiz.rotation.y = lerp(yaw(m0), yaw(m1), km);
     R.animar(t, { voz: voz(id, t), gesto: discreto(d.gesto || "normal", tt, L)[1], saluda: discreto(d.saluda || false, tt, L)[1], mira: 0, ladea: d.ladea ?? 0.06 });
+  });
+  // orbe de Saturno (el asistente de la página): cristal con Saturno girando; late y brilla cuando habla. Siempre de frente a la cámara.
+  Object.values(SATURNOS).forEach((S) => { S.sp.visible = false; });
+  Object.entries(pl.saturno || {}).forEach(([id, d]) => {
+    if (!SATURNOS[id]) { const cv = document.createElement("canvas"); cv.width = cv.height = 512; const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false, fog: false })); ESC.add(sp); SATURNOS[id] = { cv, tex, sp }; }
+    const S = SATURNOS[id], p = continuo(d.pos, tt, L)[0], nace = d.nace ? cl((tt - tClave(d.nace[0], L)) / Math.max(0.01, tClave(d.nace[1], L) - tClave(d.nace[0], L))) : 1;
+    const v = d.voz !== false ? voz("orbi", t) : 0; S.sp.visible = nace > 0.01;
+    S.sp.position.set(p[0] + o.x, p[1] + Math.sin(t * 1.4) * 0.02, p[2] + o.z); S.sp.scale.setScalar((d.escala ?? 0.34) / 0.6 * suave(nace) * (1 + 0.06 * v));
+    OrbeSaturno.dibujar(S.cv, t, Math.min(1, v * 1.3), { habla: v > 0.02 }); S.tex.needsUpdate = true;
   });
   // Orbis
   Object.values(ORBIS).forEach((O) => { O.raiz.visible = false; });

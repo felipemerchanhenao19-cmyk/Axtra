@@ -194,6 +194,11 @@ VOCES_M = {"ricardo": dict(voz=("es-US-AlonsoNeural", "-6%", "-12Hz")), "valenti
            "camila": dict(voz=("es-MX-DaliaNeural", "+8%", "+6Hz")), "sebastian": dict(voz=("es-ES-AlvaroNeural", "-6%", "-8Hz")),
            "chispa": dict(voz=("es-MX-JorgeNeural", "+6%", "+10Hz"), fx="radio")}
 VAL = [-1.55, 0.95]; CHISPA = [-1.8, 0.15]
+# ═══ «Boda»: jardín a la hora dorada, estilo de película animada; el asistente es el orbe de Saturno de la página (sin cara, late al hablar)
+ELENCO_BODA = dict(ELENCO_M, daniela=dict(MODELOS["daniela"], saco="#f8f5f0", camisa="#ffffff", pantalon="#f8f5f0", gafas=None))
+VOCES_BODA = dict(VOCES_M, orbi=dict(voz=("es-CO-SalomeNeural", "+6%", "+6Hz")), daniela=dict(voz=("es-VE-PaolaNeural", "+6%", "+3Hz")))
+RIC_B = [0.384, 1.242]; CAM_B = [1.267, 0.287]; VAL_B = [1.9, -0.6]; SEB_B = [3.4, -2.15]; ORBE_B = [-0.18, 1.55, 1.0]
+G_BODA = "saturate(1.12) contrast(1.06) brightness(1.04)"
 G_OF = "contrast(1.12) saturate(1.18) brightness(0.9)"
 
 EPISODIOS = {
@@ -1643,5 +1648,47 @@ EPISODIOS = {
               actores={"ricardo": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", emo="feliz"), "camila": dict(pos=AMIGA, rot=0, sentado=True, gesto="celular"),
                        "valentina": dict(pos=VAL, rot=-66, mira="cam", gesto="cadera", emo="seductor"), "sebastian": dict(pos=JAIRO, gesto="cruzado", emo="arrogante")},
               robots={"chispa": dict(pos=CHISPA, mira="cam", gesto="feliz", saluda=True)}),
+  ]),
+
+ "la-comida-de-la-boda": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, bloom=0.22, subY=1150, reparto=VOCES_BODA, elenco=ELENCO_BODA, extras=[],
+  gancho=["Cuando en una boda la comida no llega…", "Basado en hechos reales", 2.6],
+  copy="Dos horas esperando la comida en la boda. Hasta que llegó el orbe. 💍 ¿Cuánto ha esperado usted la comida en una boda?",
+  hashtags="#BasadoEnHechosReales #Boda #Matrimonio #Comida #Humor",
+  planos=[
+   dict(set="boda", grado=G_BODA, relleno=0.35, musica="tension", cola=0.1, fx=PUM, mano=0.01,
+        cam=[[0, -0.1, 1.85, -2.7, 0.384, 1.45, 1.242, 40], [0.22, 0.15, 1.6, -1.45, 0.384, 1.46, 1.242, 36], [9, 0.16, 1.6, -1.4, 0.384, 1.46, 1.242, 35]],
+        actores={"ricardo": dict(pos=RIC_B, rot=197, sentado=True, gesto="manos_mesa", mira=-10, miraY=-0.05, emo="serio"), "camila": dict(pos=CAM_B, rot=257, sentado=True, gesto="celular", mira="ricardo")},
+        lineas=[L("ricardo", "¿Y la comida a qué hora?", 0.1)]),
+   dict(set="boda", grado=G_BODA, relleno=0.35, musica="comico", cola=0.1, mano=0.008, cam=[[-1.5, 1.6, -0.36, 1.267, 1.44, 0.287, 36], [-1.4, 1.59, -0.33, 1.267, 1.44, 0.287, 35]],
+        actores={"camila": dict(pos=CAM_B, rot=257, sentado=True, gesto="celular", mira=-15, miraY=0.12, emo="cansado"), "ricardo": dict(pos=RIC_B, rot=197, sentado=True, gesto="manos_mesa", mira="camila")},
+        lineas=[L("camila", "Llevamos dos horas, papá.", 0.05)]),
+   dict(set="boda", grado=G_BODA, relleno=0.35, musica="comico", cola=0.3, mano=0.008, cam=[[0.14, 1.6, -1.45, 0.384, 1.46, 1.242, 36], [0.16, 1.6, -1.35, 0.384, 1.46, 1.242, 35]],
+        actores={"ricardo": dict(pos=RIC_B, rot=197, sentado=True, gesto="manos_mesa", mira="camila", emo=[[0, "neutro"], ["l0", "cansado"]]), "camila": dict(pos=CAM_B, rot=257, sentado=True, gesto="celular")},
+        lineas=[L("ricardo", "Ya me comí la decoración.", 0.3)]),
+   dict(set="boda", grado=G_BODA, relleno=0.35, musica="tension", cola=0.2, fx=[dict(tipo="pum", p=0.0)], mano=0.014,
+        cam=[[0, -1.4, 1.8, 0.6, 1.9, 1.72, -0.6, 40], [0.22, -0.95, 1.74, 0.4, 1.9, 1.72, -0.6, 36], [9, -0.9, 1.74, 0.38, 1.9, 1.72, -0.6, 35]],
+        actores={"valentina": dict(pos=VAL_B, rot=-72, gesto="cabeza", mira=0, emo="sorpresa")},
+        lineas=[L("valentina", "¡Ciento cincuenta invitados… y yo sola!", 0.1)]),
+   dict(set="boda", grado=G_BODA, relleno=0.35, musica="comico", cola=0.3, mano=0.008, cam=[[4.2, 1.74, 0.5, 3.4, 1.65, -2.15, 36], [4.1, 1.73, 0.3, 3.4, 1.65, -2.15, 35]],
+        actores={"sebastian": dict(pos=SEB_B, rot=0, gesto="cruzado", mira=8, miraY=-0.12, emo="arrogante")},
+        lineas=[L("sebastian", "Mi bufé no se apura.", 0.25)]),
+   dict(set="boda", grado=G_BODA, relleno=0.35, musica="esperanza", cola=0.3, fx=[dict(tipo="destello", p=0.05)], mano=0.006,
+        cam=[[0.35, 1.66, -1.6, 0.1, 1.46, 1.1, 40], [0.32, 1.65, -1.45, 0.1, 1.46, 1.1, 39]],
+        saturno={"orbe": dict(pos=ORBE_B, nace=[0.1, 0.8], escala=0.46)},
+        actores={"ricardo": dict(pos=RIC_B, rot=197, sentado=True, gesto="manos_mesa", mira="orbe", miraY=-0.1, emo=[[0, "sorpresa"], ["l2", "feliz"]]),
+                 "camila": dict(pos=CAM_B, rot=257, sentado=True, gesto="celular", mira="orbe", emo="sorpresa")},
+        lineas=[L("orbi", "¡Buenas tardes! Ya tomo el pedido de todas las mesas.", 0.8), L("ricardo", "¿De todas?", 0.1), L("orbi", "De todas. Al mismo tiempo.", 0.1)]),
+   dict(set="boda", grado=G_BODA, relleno=0.35, musica="comico", cola=1.1, mano=0.004, fx=[dict(tipo="pum", p=0.02)],
+        cam=[[1.9, 2.0, -5.6, -0.6, 1.15, 0.2, 46], [1.8, 1.98, -5.4, -0.6, 1.15, 0.2, 46]],
+        saturno={"orbe": dict(pos=ORBE_B, escala=0.46)},
+        actores={"ricardo": dict(pos=RIC_B, rot=197, sentado=True, gesto="manos_mesa", mira=[[0, "daniela"], ["f0", "cam"]], emo=[[0, "sorpresa"], ["f0", "cansado"]]),
+                 "camila": dict(pos=CAM_B, rot=257, sentado=True, gesto="celular", mira=[[0, "daniela"], ["f0", "cam"]], emo="sorpresa"),
+                 "daniela": dict(pos=[[0, -3.6, -2.4], [1.2, -1.45, -0.55]], rot=55, mira=[[0, "ricardo"], ["f0+0.3", "cam"]], gesto="mano_arriba", emo="sorpresa")},
+        lineas=[L("daniela", "¡Nadie coma todavía! ¡Faltan las fotos!", 0.6), L("orbi", "…Anotado.", 0.6)]),
+   CIERRE_CTA("Apex Play", "En una boda o en su restaurante, nadie se queda esperando.", "¿Cuánto ha esperado usted la comida en una boda? 👇",
+              "Etiquete a quien siempre pregunta «¿y la comida?».", set="boda", grado=G_BODA, relleno=0.35, min=4.5, orbis={},
+              cam=[[2.6, 2.4, 3.6, 0, 1.1, -1.0, 44], [2.3, 2.3, 3.3, 0, 1.1, -1.0, 44]], saturno={"orbe": dict(pos=ORBE_B, escala=0.46, voz=False)},
+              actores={"ricardo": dict(pos=RIC_B, rot=197, sentado=True, gesto="manos_mesa", emo="feliz"), "camila": dict(pos=CAM_B, rot=257, sentado=True, gesto="celular", emo="feliz"),
+                       "daniela": dict(pos=[-1.45, -0.55], rot=55, emo="feliz"), "valentina": dict(pos=VAL_B, rot=-72, emo="feliz"), "sebastian": dict(pos=SEB_B, rot=0, gesto="cruzado", emo="arrogante")}),
   ]),
 }
