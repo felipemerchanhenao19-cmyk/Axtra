@@ -207,3 +207,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «Yes, yes… ¿yes? 😭 #ingles #turistas #meseros #humor #basadoenhechosreales»
 - **Portada:** don Jairo: «Ajiaco, Brayan».
 - **Comentario fijado:** «Etiquete al que le dice "yes" a todo 😂»
+
+### «¿Ya salió?»: figuras de vinil, fórmula «Sin cebolla» (Apex Domicilios). Cierre con pregunta
+- **Instagram:** «"¿Ya salió?" × 14. 📱 ¿Usted es de los que pregunta cada dos minutos? 👇» · #BasadoEnHechosReales #Domicilios #YaSalio #Restaurantes #Humor
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «"¿Siguen vivos?" 😭 #domicilios #yasalio #restaurantes #humor #basadoenhechosreales»
+- **Portada:** Marcela agotada con el celular: «Mensaje número 14».
+- **Comentario fijado:** «¿Cuántas veces ha preguntado usted "¿ya salió?"? Sea sincero 😅»
