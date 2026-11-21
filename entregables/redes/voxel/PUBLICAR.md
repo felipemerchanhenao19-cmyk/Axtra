@@ -201,3 +201,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «El domicilio aparte, la tarifa aparte… 😭 #domicilios #almuerzo #oficina #humor #basadoenhechosreales»
 - **Portada:** el cliente agotado: «Pagué dos almuerzos… y me llegó uno».
 - **Comentario fijado:** «¿Usted también revisa el total y se arrepiente? 😅»
+
+### «El turista»: figuras de vinil, fórmula «Sin cebolla» (Apex Play). Cierre con pregunta
+- **Instagram:** «Le preguntó si picaba. Brayan dijo "yes" a todo. 🌶️ ¿Cuál es la palabra en inglés que usted siempre dice mal? 👇» · #BasadoEnHechosReales #Turistas #Ingles #Restaurantes #Humor
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «Yes, yes… ¿yes? 😭 #ingles #turistas #meseros #humor #basadoenhechosreales»
+- **Portada:** don Jairo: «Ajiaco, Brayan».
+- **Comentario fijado:** «Etiquete al que le dice "yes" a todo 😂»
