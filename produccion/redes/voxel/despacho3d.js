@@ -23,23 +23,24 @@ function despacho(escena) {
   add(new THREE.CylinderGeometry(0.008, 0.008, 0.42, 6), F(0xb07a3a, 0.35, { metalness: 0.6 }), 0, 0.21, 0, lampG).rotation.z = 0.2;
   const pant = add(new THREE.ConeGeometry(0.09, 0.13, 7, 1, true), F(0x3a2e24, 0.5, { side: THREE.DoubleSide }), -0.06, 0.44, 0.04, lampG); pant.rotation.z = 0.9;
   const bomb = add(new THREE.SphereGeometry(0.022, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe2b0 }), -0.1, 0.4, 0.05, lampG);
-  U.luzLampara = new THREE.SpotLight(0xffc98f, 6, 3.2, 0.9, 0.7, 1.4); U.luzLampara.position.set(0.5, 1.2, -0.05); U.luzLampara.target.position.set(0, 0.95, -0.6); U.luzLampara.castShadow = true; D.add(U.luzLampara); D.add(U.luzLampara.target);
+  U.luzLampara = new THREE.SpotLight(0xffc98f, 6, 3.2, 0.9, 0.7, 1.4); U.luzLampara.position.set(0.5, 1.2, -0.05); U.luzLampara.target.position.set(0, 0.95, -0.6); U.luzLampara.castShadow = true; U.luzLampara.shadow.mapSize.set(2048, 2048); U.luzLampara.shadow.bias = -0.0003; U.luzLampara.shadow.radius = 3; D.add(U.luzLampara); D.add(U.luzLampara.target);
   const mug = add(new THREE.CylinderGeometry(0.045, 0.04, 0.1, 9), F(0x8a7e72, 0.5), 0.32, 0.825, 0.12); const tapa = add(new THREE.CircleGeometry(0.04, 9), new THREE.MeshBasicMaterial({ color: 0xffe6b8 }), 0.32, 0.876, 0.12); tapa.rotation.x = -PI / 2;
   [0x6a2a2a, 0x2a4a6a, 0xc9a24a].forEach((c, i) => add(new THREE.BoxGeometry(0.22, 0.04, 0.16), F(c, 0.8), -0.68, 0.795 + i * 0.04, -0.22));
   // portátil girado hacia el personaje, con la pantalla de Apex Domicilios
   const lap = new THREE.Group(); lap.position.set(-0.28, 0.775, -0.05); lap.rotation.y = PI + 0.42; D.add(lap);
   add(new THREE.BoxGeometry(0.46, 0.018, 0.32), F(0xa9adb8, 0.35, { metalness: 0.5 }), 0, 0.009, 0, lap);
   const bis = new THREE.Group(); bis.position.set(0, 0.018, -0.16); bis.rotation.x = -0.32; lap.add(bis); add(new THREE.BoxGeometry(0.46, 0.3, 0.012), F(0xa9adb8, 0.35, { metalness: 0.5 }), 0, 0.15, 0, bis);
-  const cv = document.createElement("canvas"); cv.width = 1024; cv.height = 640; const gx = cv.getContext("2d"), tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+  const cv = document.createElement("canvas"); cv.width = 2048; cv.height = 1280; const gx = cv.getContext("2d"); gx.scale(2, 2), tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const pantalla = add(new THREE.PlaneGeometry(0.43, 0.27), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), 0, 0.15, 0.0065, bis); pantalla.castShadow = false;
   U.luzPantalla = new THREE.PointLight(0x8fb8ff, 1.2, 1.6, 2); U.luzPantalla.position.set(0, 0.15, 0.25); bis.add(U.luzPantalla);
   U.pantallaMundo = () => { const v = new THREE.Vector3(); pantalla.getWorldPosition(v); return v; };
   // personaje 01 sentado detrás del escritorio
-  U.p01 = personaLowPoly(Object.assign({ semilla: 31, fuerte: true, peinado: "definitivo", barbaNivel: 0.95, piel: "#c98e6b", pelo: "#16100c", barba: "#1a120e", camisa: "#17181c", iris: "#3a281a" }));
+  U.p01 = personaLowPoly(Object.assign({ semilla: 31, fuerte: true, peinado: "definitivo", barbaNivel: 0.95, detalle: true, piel: "#c98e6b", pelo: "#16100c", barba: "#1a120e", camisa: "#17181c", iris: "#3a281a" }));
   U.p01.raiz.position.set(0, 0, -0.68); D.add(U.p01.raiz);
   // luces generales: azul de la ciudad y relleno cálido suave
   D.add(new THREE.HemisphereLight(0x5a78d8, 0x2a2440, 0.85));
-  const contra = new THREE.DirectionalLight(0x6f8fff, 1.5); contra.position.set(1.6, 2.6, -3); D.add(contra);
+  const contra = new THREE.DirectionalLight(0x6f8fff, 2.1); contra.position.set(1.6, 2.6, -3); contra.castShadow = true; contra.shadow.mapSize.set(2048, 2048); Object.assign(contra.shadow.camera, { left: -2, right: 2, top: 2.5, bottom: -1, near: 0.5, far: 10 }); D.add(contra);
+  const rim = new THREE.SpotLight(0x9fb8ff, 5, 4, 0.5, 0.8, 1.5); rim.position.set(-1.2, 1.8, -2.0); rim.target.position.set(0, 1.25, -0.68); D.add(rim); D.add(rim.target);
   const relleno = new THREE.DirectionalLight(0xffe2c8, 0.55); relleno.position.set(0.5, 1.8, 3); D.add(relleno);
   // ---------- interfaz de Apex Domicilios en el portátil
   const rr = (X, Y, w, h, rad) => { gx.beginPath(); gx.roundRect(X, Y, w, h, rad); };

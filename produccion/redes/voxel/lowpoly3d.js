@@ -7,7 +7,7 @@ function personaLowPoly(cfg = {}) {
   const add = (geo, m, x = 0, y = 0, z = 0, padre) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; padre.add(o); return o; };
   const raiz = new THREE.Group(), cuerpo = new THREE.Group(); raiz.add(cuerpo); raiz.scale.setScalar(c.alto);
   // ---------- cabeza esculpida
-  const R = 0.118, geo = new THREE.SphereGeometry(1, 22, 16), p = geo.attributes.position, col = [], piel = new THREE.Color(c.piel), barba = new THREE.Color(c.barba), lab = new THREE.Color(c.labios);
+  const R = 0.118, geo = new THREE.SphereGeometry(1, c.detalle ? 34 : 22, c.detalle ? 24 : 16), p = geo.attributes.position, col = [], piel = new THREE.Color(c.piel), barba = new THREE.Color(c.barba), lab = new THREE.Color(c.labios);
   const g = (x, y, sx, sy) => Math.exp(-(x * x) / sx - (y * y) / sy);
   for (let i = 0; i < p.count; i++) {
     let x = p.getX(i), y = p.getY(i), z = p.getZ(i); const fr = Math.max(0, z);
@@ -38,8 +38,8 @@ function personaLowPoly(cfg = {}) {
   [-1, 1].forEach((d) => { const o = add(new THREE.SphereGeometry(0.03, 6, 5), F(c.piel), d * R * 0.86, -0.005, -0.01, cabeza); o.scale.set(0.45, 1, 0.8); });
   // ojos: almendra blanca, iris oscuro con brillo, párpado y pestaña
   const ojos = [-1, 1].map((d) => { const e = new THREE.Group(); e.position.set(d * R * 0.31, R * 0.13, R * 0.84); e.rotation.y = d * 0.22; cabeza.add(e);
-    add(new THREE.SphereGeometry(0.017, 10, 6), F("#efe9e2", 0.35), 0, 0, 0, e).scale.set(1.35, 0.62, 0.5);
-    const iris = add(new THREE.CircleGeometry(0.0098, 10), new THREE.MeshStandardMaterial({ color: c.iris, roughness: 0.2 }), 0, -0.001, 0.0086, e);
+    add(new THREE.SphereGeometry(0.017, 16, 10), F("#efe9e2", 0.3), 0, 0, 0, e).scale.set(1.35, 0.62, 0.5);
+    const iris = add(new THREE.CircleGeometry(0.0098, 18), new THREE.MeshStandardMaterial({ color: c.iris, roughness: 0.15, emissive: c.iris, emissiveIntensity: 0.25 }), 0, -0.001, 0.0086, e);
     add(new THREE.CircleGeometry(0.0048, 8), new THREE.MeshBasicMaterial({ color: 0x050403 }), 0, -0.001, 0.0088, e);
     add(new THREE.CircleGeometry(0.0022, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }), 0.003, 0.003, 0.009, e);
     const lid = add(new THREE.BoxGeometry(c.mujer ? 0.048 : 0.044, c.mujer ? 0.009 : 0.006, 0.012), F(c.mujer ? "#0d0a09" : c.pelo, 0.6), 0, 0.009, 0.004, e); lid.rotation.z = d * (c.mujer ? -0.12 : 0.08);

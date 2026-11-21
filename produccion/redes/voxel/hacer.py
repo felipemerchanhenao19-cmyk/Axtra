@@ -70,7 +70,7 @@ async def obrero(W, i, a, b):
     from playwright.async_api import async_playwright
     seg = W + f"seg{i}.mp4"
     ff = subprocess.Popen(["ffmpeg", "-y", "-v", "error", "-f", "image2pipe", "-framerate", str(FPS), "-c:v", "mjpeg", "-i", "-",
-                           "-c:v", "libx264", "-preset", "medium", "-crf", "15", "-pix_fmt", "yuv420p", seg], stdin=subprocess.PIPE)
+                           "-c:v", "libx264", "-preset", "medium", "-crf", "12", "-pix_fmt", "yuv420p", seg], stdin=subprocess.PIPE)
     async with async_playwright() as p:
         br, pg = await abrir(p, W)
         for f in range(a, b): await pg.evaluate("t => render(t)", f / FPS); ff.stdin.write(await pg.screenshot(type="jpeg", quality=94))
@@ -99,8 +99,8 @@ def hacer(eid):
         asyncio.run(prueba(W, ts)); print("pruebas en", W, ts); return
     motor.sonido(ep, lin, W); asyncio.run(imagen(W, lin["dur"]))
     os.makedirs(SALIDA, exist_ok=True)
-    for son, nombre, extra in (("sonido.wav", f"{eid}.mp4", ["-crf", "19"]), ("sonido_sin_musica.wav", f"{eid}-sin-musica.mp4", ["-crf", "19"]),
-                               ("sonido.wav", f"{eid}-liviano.mp4", ["-crf", "27", "-vf", "scale=720:-2"])):
+    for son, nombre, extra in (("sonido.wav", f"{eid}.mp4", ["-crf", "16", "-tune", "film"]), ("sonido_sin_musica.wav", f"{eid}-sin-musica.mp4", ["-crf", "16", "-tune", "film"]),
+                               ("sonido.wav", f"{eid}-liviano.mp4", ["-crf", "23", "-vf", "scale=720:-2:flags=lanczos"])):
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", W + "imagen.mp4", "-i", W + son, "-c:v", "libx264", "-preset", "slow", *extra, "-pix_fmt", "yuv420p",
                         "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", SALIDA + nombre], check=True)
     print("listo", eid, lin["dur"], "s de video en", round(time.time() - t0), "s")

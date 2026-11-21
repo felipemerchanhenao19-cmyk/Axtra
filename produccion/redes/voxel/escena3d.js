@@ -2,7 +2,7 @@
 // Tiempos de las claves: número (segundos desde el inicio del plano) o "l1" / "l1+0.5" (inicio de la línea 1 del plano) o "f1" (fin de la línea 1).
 const $ = (s) => document.querySelector(s);
 const REN = new THREE.WebGLRenderer({ canvas: $("#lienzo"), antialias: true, preserveDrawingBuffer: true });
-REN.setPixelRatio(1); REN.setSize(1080, 1920, false); REN.shadowMap.enabled = true; REN.shadowMap.type = THREE.PCFSoftShadowMap;
+REN.setPixelRatio(EP.calidad || 1); REN.setSize(1080, 1920, false);   // calidad > 1: se dibuja más grande y se reduce (bordes más finos) REN.shadowMap.enabled = true; REN.shadowMap.type = THREE.PCFSoftShadowMap;
 REN.toneMapping = THREE.ACESFilmicToneMapping; REN.toneMappingExposure = 1.35; REN.outputColorSpace = THREE.SRGBColorSpace;
 const ESC = new THREE.Scene(); ESC.background = new THREE.Color(0x060504); ESC.fog = new THREE.FogExp2(0x0a0806, 0.02);
 const CAM = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 90);
@@ -130,9 +130,9 @@ function render(t) {
   });
   if (EP.dof) {
     if (!DOF) {
-      const rt = new THREE.WebGLRenderTarget(1080, 1920, { type: THREE.HalfFloatType, samples: 4 }); rt.depthTexture = new THREE.DepthTexture(1080, 1920);
+      const sz = REN.getDrawingBufferSize(new THREE.Vector2()); const rt = new THREE.WebGLRenderTarget(sz.x, sz.y, { type: THREE.HalfFloatType, samples: 4 }); rt.depthTexture = new THREE.DepthTexture(sz.x, sz.y);
       const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ depthTest: false, depthWrite: false,
-        uniforms: { tCol: { value: rt.texture }, tProf: { value: rt.depthTexture }, near: { value: 0.05 }, far: { value: 90 }, foco: { value: 2 }, fuerza: { value: 1 }, px: { value: new THREE.Vector2(1 / 1080, 1 / 1920) } },
+        uniforms: { tCol: { value: rt.texture }, tProf: { value: rt.depthTexture }, near: { value: 0.05 }, far: { value: 90 }, foco: { value: 2 }, fuerza: { value: 1 }, px: { value: new THREE.Vector2(1 / sz.x, 1 / sz.y).multiplyScalar(EP.calidad || 1) } },
         vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }",
         fragmentShader: `#include <packing>
           uniform sampler2D tCol; uniform sampler2D tProf; uniform float near, far, foco, fuerza; uniform vec2 px; varying vec2 vUv;
