@@ -213,3 +213,10 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «"¿Siguen vivos?" 😭 #domicilios #yasalio #restaurantes #humor #basadoenhechosreales»
 - **Portada:** Marcela agotada con el celular: «Mensaje número 14».
 - **Comentario fijado:** «¿Cuántas veces ha preguntado usted "¿ya salió?"? Sea sincero 😅»
+
+## Elenco nuevo + Chispa
+### «¿Usted sabe quién soy yo?» (Apex Play). Cierre con pregunta
+- **Instagram:** «"¿Usted sabe quién soy yo?". Nadie sabía. Hasta que llegó Chispa. 🤖 ¿Cuál es el cliente más difícil que ha atendido? 👇» · #BasadoEnHechosReales #ClienteVIP #Restaurantes #Meseros #Humor
+- **TikTok:** subir la versión sin música, con un audio en tendencia a volumen bajo. «El VIP… de otro restaurante 😭 #clientevip #meseros #restaurantes #humor #basadoenhechosreales»
+- **Portada:** Chispa en primer plano con los ojos LED.
+- **Comentario fijado:** «Etiquete al "¿usted sabe quién soy yo?" de su vida 👀»
