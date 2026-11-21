@@ -187,6 +187,7 @@ def CIERRE_CTA(marca, frase, pregunta, sub, **k):   # cierre que conecta con el 
                 actores={**SALON, "jairo": dict(pos=JAIRO, gesto="reposo", emo="feliz"), "brayan": dict(pos=BRAYAN, rot=180, emo="feliz")},
                 final=dict(marca=marca, frase=frase, desde=0.5, cta=f"{pregunta}<small>{sub}</small>")), **k)
 
+VINILES["turista"] = dict(piel="#f0c4a2", pelo="#d9b45a", cejas="#b8923a", peinado="flequillo", camisa="#3f8a8a", mangaCorta=True, pantalon="#c9b48a", iris="#2a5a8a", semilla=8)
 G_OF = "contrast(1.12) saturate(1.18) brightness(0.9)"
 
 EPISODIOS = {
@@ -1532,5 +1533,35 @@ EPISODIOS = {
         lineas=[L("orbi", "…Anotado.", 1.4)]),
    CIERRE_CTA("Apex Domicilios", "Pedirle directo al restaurante sale mejor.", "¿Cuánto más ha pagado usted por pedir en una aplicación? 👇",
               "Etiquete a quien almuerza a domicilio todos los días.", min=4.5),
+  ]),
+
+ "el-turista-vinil": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, subY=1150, reparto=REPARTO, elenco=VINILES, extras=EXTRAS,
+  gancho=["Cuando llega un turista y nadie habla inglés…", "Basado en hechos reales", 2.6],
+  copy="Le preguntó si picaba. Brayan dijo «yes» a todo. 🌶️ ¿Cuál es la palabra en inglés que usted siempre dice mal?",
+  hashtags="#BasadoEnHechosReales #Turistas #Ingles #Restaurantes #Humor",
+  planos=[
+   dict(set="restaurante", grado=CINE_V, musica="tension", cola=0.1, fx=PUM, sinExtras=[6], mano=0.01, cam=CLI7,
+        actores={"turista": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"), "brayan": dict(pos=BT7, rot=-66, mira="turista", gesto="celular")},
+        lineas=[L("turista", "Hi! Is the ajiaco spicy?", 0.1, sub="¡Hola! ¿El ajiaco pica?")]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.1, mano=0.008, sinExtras=[6], cam=[cerca(BT7, -66, 2.5, 28, 0.0, 34, 1.74), cerca(BT7, -66, 2.3, 26, 0.0, 34, 1.74)],
+        actores={"turista": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan"), "brayan": dict(pos=BT7, rot=-66, mira="turista", emo=[[0, "feliz"], ["l3", "duda"]], gesto="celular")},
+        lineas=[L("brayan", "Yes!", 0.05), L("turista", "So… it IS spicy?", 0.05, sub="¿Entonces… SÍ pica?"), L("brayan", "Yes!", 0.05),
+                L("turista", "Wait… it's not spicy?", 0.05, sub="Espere… ¿no pica?"), L("brayan", "…Yes.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=0.3, fx=[dict(tipo="pum", p=0.0)], mano=0.012,
+        cam=[[0, 1.0, 1.85, -2.6, 1.0, 1.78, -4.3, 40], [0.25, 1.0, 1.8, -2.9, 1.0, 1.78, -4.3, 36], [9, 1.0, 1.8, -2.95, 1.0, 1.78, -4.3, 35]],
+        actores={"jairo": dict(pos=JAIRO, gesto="trapo", mira=0, emo="serio"), "brayan": dict(pos=BRAYAN, rot=180)},
+        lineas=[L("brayan", "Don Jairo, ¿cómo se dice «ajiaco» en inglés?", 0.05), L("jairo", "Ajiaco, Brayan.", 0.35)]),
+   dict(set="restaurante", grado=CINE_V, musica="esperanza", cola=0.3, fx=[dict(tipo="destello", p=0.05)], cam=LADO7, sinExtras=[6],
+        e=dict(qrLuz={"7": [[0, 0], [0.2, 1.0], [1.6, 0.2]]}), orbis={"o7": dict(pos=O7, nace=[0.05, 0.6], mira=[[0, "cam"], [0.7, "turista"]])},
+        actores={"turista": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo=[[0, "sorpresa"], ["l1", "feliz"]])},
+        lineas=[L("orbi_en", "Hello! The ajiaco is a chicken and potato soup. Not spicy at all.", 0.4, sub="¡Hola! El ajiaco es una sopa de pollo y papa. Nada picante."),
+                L("turista", "Perfect!", 0.1, sub="¡Perfecto!")]),
+   dict(set="restaurante", grado=CINE_V, musica="comico", cola=1.0, mano=0.004, fx=[dict(tipo="pum", p=0.02)], cam=[[-0.25, 1.75, 2.9, -1.9, 1.5, 0.9, 40], [-0.3, 1.72, 2.75, -1.9, 1.5, 0.9, 40]], sinExtras=[6],
+        orbis={"o7": dict(pos=O7, luz=0.5, mira="cam")},
+        actores={"turista": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"),
+                 "brayan": dict(pos=BT7, rot=[[0, -66], ["f0", -66], ["f0+0.5", 20]], mira=[[0, "turista"], ["f0", "turista"], ["f0+0.4", "cam"]], gesto="cadera", emo=[[0, "sorpresa"], ["f0+0.4", "feliz"]])},
+        lineas=[L("turista", "Thank you, amigo!", 0.1, sub="¡Gracias, amigo!"), L("brayan", "…De nada. Yo le expliqué.", 0.7), L("orbi", "…Anotado.", 0.4)]),
+   CIERRE_CTA("Apex Play", "Su asistente habla seis idiomas.", "¿Cuál es la palabra en inglés que usted siempre dice mal? 👇",
+              "Etiquete al amigo que le dice «yes» a todo.", sinExtras=[6], min=4.5),
   ]),
 }
