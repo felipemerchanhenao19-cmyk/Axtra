@@ -25,6 +25,12 @@ VIN.rostro = (geo, R) => {   // deforma una esfera de radio R: mandíbula en V, 
     if (yn < -0.7 && v.z > 0) v.z += 0.025 * R / 0.3 * Math.exp(-(v.x * v.x) / 0.006);          // mentón
     p.setXYZ(i, v.x, v.y, v.z); }
   p.needsUpdate = true; geo.computeVertexNormals(); return geo; };
+VIN.irisMat = (col) => { const cv = document.createElement("canvas"); cv.width = cv.height = 128; const g = cv.getContext("2d"), base = new THREE.Color(col);
+  const c1 = "#" + base.clone().multiplyScalar(1.7).getHexString(), c0 = "#" + base.clone().multiplyScalar(0.45).getHexString();
+  g.fillStyle = c0; g.fillRect(0, 0, 128, 128); const gr = g.createRadialGradient(64, 64, 6, 64, 64, 64); gr.addColorStop(0, c1); gr.addColorStop(0.7, col); gr.addColorStop(0.92, c0); gr.addColorStop(1, "#0a0605");
+  g.fillStyle = gr; g.beginPath(); g.arc(64, 64, 64, 0, 2 * PI); g.fill(); g.strokeStyle = "rgba(255,255,255,.18)"; g.lineWidth = 1.5;
+  for (let i = 0; i < 46; i++) { const a = (i / 46) * 2 * PI; g.beginPath(); g.moveTo(64 + Math.cos(a) * 16, 64 + Math.sin(a) * 16); g.lineTo(64 + Math.cos(a) * 54, 64 + Math.sin(a) * 54); g.stroke(); }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return new THREE.MeshStandardMaterial({ map: t, roughness: 0.15 }); };
 VIN.crecer = (perfil, d) => perfil.map(([r, h]) => [r > 0.01 ? r + d : r, h]);
 
 function personaVinil(cfg) {
@@ -75,7 +81,10 @@ function personaVinil(cfg) {
     if (c.peinado === "galan") {   // tupé con raya al lado: mechones largos que suben y caen hacia atrás
       [[-0.08, 0.24, 0.15, 0.14, -0.25, 0.3], [0.04, 0.29, 0.1, 0.15, -0.35, 0.08], [0.13, 0.27, 0.05, 0.13, -0.45, -0.25], [-0.02, 0.32, -0.04, 0.16, -0.7, 0.1], [0.07, 0.3, -0.14, 0.14, -0.95, -0.1]]
         .forEach(([x0, y0, z0, r, rx, rz]) => { const m = VIN.esfera(r, mPelo, x0, y0, z0, H, 0.95, 0.42, 1.55); m.rotation.set(rx, 0, rz); });
-      [-1, 1].forEach((d) => VIN.esfera(0.13, mPelo, d * 0.25, 0.12, -0.04, H, 0.42, 0.9, 1.3)); }
+      [-1, 1].forEach((d) => VIN.esfera(0.13, mPelo, d * 0.25, 0.12, -0.04, H, 0.42, 0.9, 1.3));
+      if (c.largo) { const mL = M(c.pelo, { r: 0.45, bump: VIN.surcos, bs: 1.3, lado: THREE.DoubleSide });
+        VIN.malla(new THREE.CylinderGeometry(0.3, 0.33, 0.42, 44, 1, true, PI * 0.6, PI * 0.8), mL, 0, -0.2, -0.03, H);
+        [-1, 1].forEach((d) => { for (let i = 0; i < 3; i++) VIN.esfera(0.08, mPelo, d * 0.27, -0.06 - i * 0.12, -0.08 - i * 0.03, H, 0.7, 1.3, 0.9); }); } }
     if (c.peinado === "melena") { const mL = M(c.pelo, { r: 0.4, bump: VIN.surcos, bs: 1.4, lado: THREE.DoubleSide });   // melena larga en capas con flequillo abierto
       VIN.malla(new THREE.CylinderGeometry(0.29, 0.38, 0.78, 48, 1, true, PI * 0.55, PI * 0.9), mL, 0, -0.38, -0.04, H);
       [-1, 1].forEach((d) => { for (let i = 0; i < 5; i++) { const m = VIN.esfera(0.1 - i * 0.008, mPelo, d * (0.25 + 0.02 * Math.sin(i * 1.7)), 0.08 - i * 0.14, 0.02 - i * 0.03, H, 0.7, 1.35, 0.85); m.rotation.z = d * 0.15; }
@@ -88,11 +97,13 @@ function personaVinil(cfg) {
   const mPar = M(c.piel, { r: 0.62 }), mCeja = M(c.cejas, { r: 0.55 });
   const ojos = [-1, 1].map((d) => { const g = new THREE.Group(); g.position.set(d * 0.108, 0.035, 0.235); H.add(g);
     const bola = new THREE.Group(); g.add(bola); if (c.almendra) g.scale.set(1.12, 0.86, 1); VIN.esfera(0.07, mBlanco, 0, 0, 0, bola, 1, 1.12, 0.8);
-    VIN.esfera(0.042, mIris, 0, 0, 0.042, bola, 1, 1.05, 0.5); VIN.esfera(0.022, mPupila, 0, 0, 0.058, bola, 1, 1, 0.4);
+    VIN.esfera(0.042, c.modelo ? VIN.irisMat(c.iris) : mIris, 0, 0, 0.042, bola, 1, 1.05, 0.5); if (c.modelo) VIN.esfera(0.007, mBrillo, -0.016, -0.014, 0.064, bola); VIN.esfera(0.022, mPupila, 0, 0, 0.058, bola, 1, 1, 0.4);
     const br = VIN.esfera(0.011, mBrillo, 0.014, 0.018, 0.066, bola); br.castShadow = false;
     const par = VIN.malla(new THREE.SphereGeometry(0.076, 32, 16, 0, 2 * PI, 0, PI / 2), mPar, 0, 0, 0, g); par.scale.set(1.02, 1.14, 1.1);
     const parInf = VIN.malla(new THREE.SphereGeometry(0.075, 32, 16, 0, 2 * PI, PI / 2, PI / 2), mPar, 0, 0, 0, g); parInf.scale.set(1.02, 1.1, 1.1); parInf.rotation.x = 0.5;
-    const ceja = VIN.capsula(0.026, 0.09, mCeja, 0, 0.115, 0.03, g); ceja.rotation.z = PI / 2; ceja.scale.set(1, 1, 0.7);
+    let ceja; if (c.modelo) { ceja = new THREE.Group(); ceja.position.set(0, 0.115, 0.03); g.add(ceja);
+      const arco = VIN.malla(new THREE.TorusGeometry(0.085, 0.011, 8, 28, PI * 0.5), mCeja, 0, -0.07, 0, ceja); arco.rotation.z = PI * 0.25 + d * 0.12; arco.scale.set(1.05, 0.8, 0.7); }
+    else { ceja = VIN.capsula(0.026, 0.09, mCeja, 0, 0.115, 0.03, g); ceja.rotation.z = PI / 2; ceja.scale.set(1, 1, 0.7); }
     return { g, bola, par, parInf, ceja, d }; });
   if (c.narizFina) VIN.esfera(0.036, mPiel, 0, -0.04, 0.29, H, 0.8, 1.1, 1.0); else VIN.esfera(0.052, mPiel, 0, -0.045, 0.285, H, 0.85, 1.0, 1.05);   // nariz
   if (c.narizGrande) VIN.esfera(0.068, mPiel, 0, -0.05, 0.285, H, 0.85, 1.05, 1.1);
@@ -102,8 +113,13 @@ function personaVinil(cfg) {
   if (c.bigoteFino) { const b = VIN.capsula(0.01, 0.1, M(c.bigoteFino), 0, -0.098, 0.283, H); b.rotation.z = PI / 2; }
   if (c.gafas) { const mg = M(c.gafas, { r: 0.3 }); ojos.forEach(({ g }) => { const ar = VIN.malla(new THREE.TorusGeometry(0.085, 0.011, 8, 36), mg, 0, 0, 0.045, g); ar.scale.y = 0.85; });
     VIN.capsula(0.008, 0.05, mg, 0, 0.035, 0.29, H).rotation.z = PI / 2; }
-  if (c.barba) { const mb = new THREE.MeshStandardMaterial({ color: c.barba, roughness: 0.95, transparent: true, opacity: 0.38, bumpMap: VIN.surcos, bumpScale: 0.5 });
-    const bb = VIN.malla(new THREE.SphereGeometry(0.304, 48, 16, PI * 0.1, PI * 0.8, PI * 0.74, PI * 0.2), mb, 0, 0, 0, H); bb.scale.set(1, c.modelo ? 1.1 : 1.06, 0.965); if (c.modelo) VIN.rostro(bb.geometry, 0.304); bb.castShadow = false; }
+  if (c.barba) { const mb = M(c.barba, { r: 0.55, bump: VIN.surcos, bs: 1.6, lado: THREE.DoubleSide });
+    const sy = c.modelo ? 1.1 : 1.06, capa = (ph0, phL, th0, thL) => { const o = VIN.malla(new THREE.SphereGeometry(0.312, 56, 20, ph0, phL, th0, thL), mb, 0, 0, 0, H); o.scale.set(1.01, sy, 0.98);
+      if (c.modelo) VIN.rostro(o.geometry, 0.312); return o; };
+    capa(PI * 0.02, PI * 0.96, PI * 0.72, PI * 0.27);                                        // mandíbula y mentón
+    capa(PI * 0.02, PI * 0.24, PI * 0.42, PI * 0.32); capa(PI * 0.74, PI * 0.24, PI * 0.42, PI * 0.32);   // patillas
+    const bg = VIN.capsula(0.026, 0.11, mb, 0, -0.112, 0.268, H); bg.rotation.z = PI / 2; bg.scale.z = 0.6;   // bigote
+    VIN.esfera(0.022, mb, 0, -0.2, 0.25, H, 1, 0.9, 0.6); }
   if (c.pestanas) { const mp = M(c.pestanas, { r: 0.35 }); ojos.forEach(({ par, d }) => {   // delineado sobre el párpado y una «colita» hacia afuera
       const arco = VIN.malla(new THREE.TorusGeometry(0.077, 0.0085, 8, 30, PI * 0.95), mp, 0, 0.004, 0, par); arco.rotation.set(PI / 2, 0, PI * 0.025);
       const cola = VIN.capsula(0.007, 0.03, mp, d * 0.078, 0.012, 0.012, par); cola.rotation.set(0, 0, -d * 1.1); }); }
@@ -138,7 +154,7 @@ function personaVinil(cfg) {
         bola.rotation.set(-(s.my || 0) * 0.25, (s.mx || 0) * 0.35, 0); const eo = 0.92 + 0.08 * ojo; g.scale.set(eo * (c.almendra ? 1.12 : 1), eo * (c.almendra ? 0.86 : 1), eo);
         par.rotation.x = lerp(-1.0, 1.6, Math.pow(cl(lid), 1.7)); parInf.rotation.x = lerp(0.62, 0.35, cl(lid));
         const asim = e.asim && d > 0 ? 1 : 0;
-        ceja.position.y = 0.112 - alto * 0.0075 + asim * 0.018; ceja.rotation.z = PI / 2 + inc * d * 1.25 * (asim ? -1.4 : 1);
+        ceja.position.y = (c.modelo ? 0.125 : 0.112) - alto * 0.0075 + asim * 0.018; ceja.rotation.z = (c.modelo ? 0 : PI / 2) + inc * d * 1.25 * (asim ? -1.4 : 1);
       });
       boca.scale.set(1.25 - ab * 0.25, 0.08 + ab * 0.85, 0.45); boca.visible = ab > 0.05;
       sonrisa.visible = ab <= 0.05; const sg = curva >= 0 ? 1 : -1;

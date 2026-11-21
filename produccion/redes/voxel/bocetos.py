@@ -11,7 +11,7 @@ PERSONAJES = [
                   camisa="#1b1b20", pantalon="#1b1b20", zapatos="#0e0e10", iris="#5a3418", alto=0.96, semilla=41),
          pose=dict(emo="seductor", gesto="cadera", mira=-12, miraY=-0.04)),
     dict(id="sebastian", nombre="Sebastián", rol="El chef arrogante", frase="«Mi receta no se toca». Ni el dueño se atreve.",
-         cfg=dict(piel="#cf9670", pelo="#141010", cejas="#141010", peinado="galan", modelo=True, barba="#2a1e18", almendra=True, camisa="#f4f2ee", pantalon="#26282e", hombros=1.08,
+         cfg=dict(piel="#cf9670", pelo="#141010", cejas="#141010", peinado="galan", largo=True, modelo=True, barba="#1e1612", almendra=True, camisa="#f4f2ee", pantalon="#26282e", hombros=1.08,
                   iris="#2a1a10", alto=1.04, semilla=42),
          pose=dict(emo="arrogante", gesto="cruzado", mira=10, miraY=-0.12)),
     dict(id="camila", nombre="Camila", rol="La influencer", frase="Antes de comer, la foto. Y si no hay buena luz, se va.",
@@ -19,15 +19,15 @@ PERSONAJES = [
                   camisa="#f2a0be", pantalon="#e9e2d8", zapatos="#d9c9b9", iris="#3a6a8a", alto=0.95, semilla=43),
          pose=dict(emo="feliz", gesto="celular", mira=-15, miraY=0.0)),
     dict(id="ricardo", nombre="Don Ricardo", rol="El cliente VIP", frase="«¿Usted sabe quién soy yo?». Nadie sabe. Nadie pregunta.",
-         cfg=dict(piel="#dba987", pelo="#c4c2bf", cejas="#9a9692", peinado="galan", modelo=True, almendra=True, cadena="#e0b84a", saco="#14213a", camisa="#f4f2ee", pantalon="#14213a",
+         cfg=dict(piel="#dba987", pelo="#c4c2bf", cejas="#9a9692", peinado="galan", largo=True, modelo=True, barba="#bdb9b4", almendra=True, cadena="#e0b84a", saco="#14213a", camisa="#f4f2ee", pantalon="#14213a",
                   hombros=1.1, iris="#3a2a1a", alto=1.02, semilla=44),
          pose=dict(emo="arrogante", gesto="cadera", mira=12, miraY=-0.16)),
     dict(id="mateo", nombre="Mateo", rol="El repartidor galán", frase="Llega a tiempo, sonríe… y todos piden otra vez.",
-         cfg=dict(piel="#b87c56", pelo="#121010", cejas="#121010", peinado="galan", modelo=True, barba="#1e1612", almendra=True, saco="#1d2027", camisa="#f2efe8", pantalon="#2a2f3a",
+         cfg=dict(piel="#b87c56", pelo="#121010", cejas="#121010", peinado="galan", largo=True, modelo=True, barba="#121010", almendra=True, saco="#1d2027", camisa="#f2efe8", pantalon="#2a2f3a",
                   hombros=1.1, iris="#2a1a10", alto=1.03, semilla=45),
          pose=dict(emo="seductor", gesto="reposo", mira=-8, miraY=-0.03)),
     dict(id="daniela", nombre="Daniela", rol="La dueña de enfrente", frase="Su rival. Elegante, fría… y siempre un paso adelante.",
-         cfg=dict(piel="#dfa680", pelo="#3a1e14", cejas="#2a160e", peinado="bob", modelo=True, gafas="#141414", pestanas="#120c0a", labios="#8e2a3a", almendra=True, narizFina=True, torsoF=True,
+         cfg=dict(piel="#dfa680", pelo="#3a1e14", cejas="#2a160e", peinado="melena", modelo=True, gafas="#141414", pestanas="#120c0a", labios="#8e2a3a", almendra=True, narizFina=True, torsoF=True,
                   saco="#9a1f2e", camisa="#f4f1ea", pantalon="#1a1a1e", iris="#3a2416", alto=0.97, semilla=46),
          pose=dict(emo="arrogante", gesto="cruzado", mira=-10, miraY=-0.1)),
 ]
@@ -41,7 +41,7 @@ body{{margin:0;background:#0d1118;color:#eef2f6;font-family:Figtree;width:1800px
 .g{{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;padding:0 50px 50px}} .t{{background:#161c26;border-radius:26px;padding:18px 18px 22px}}
 .fotos{{display:flex;gap:10px}} .fotos img{{width:50%;border-radius:18px;background:#222}} h2{{font:800 36px Figtree;margin:16px 6px 0}} h3{{font:700 20px Figtree;letter-spacing:.18em;text-transform:uppercase;color:#e8a04a;margin:6px 6px}}
 p{{font:500 22px/1.35 Figtree;color:#b9c4d0;margin:8px 6px 0}}</style></head><body>
-<h1>Bocetos de personajes · Apex</h1><div class="sub">Versión 2: rostro de modelo, pómulos marcados, ojos almendrados, piel lisa y peinados de galán.</div><div class="g">{tarjetas}</div>
+<h1>Bocetos de personajes · Apex</h1><div class="sub">Versión 3: barba esculpida, cabello largo, cejas finas arqueadas y ojos con brillo.</div><div class="g">{tarjetas}</div>
 <canvas id="lienzo" width="600" height="800" style="display:none"></canvas>
 <script src="file://{THREE}"></script>
 <script>const EP = {{ estilo: "vinil" }}; const PERS = {json.dumps(PERSONAJES, ensure_ascii=False)};
