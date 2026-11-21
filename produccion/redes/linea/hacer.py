@@ -8,12 +8,13 @@ _spec = importlib.util.spec_from_file_location("motor", AQUI + "../heroes/hacer.
 RAIZ, FPS = motor.RAIZ, motor.FPS
 NOMBRE = "apex-domicilios-diciembre"; SALIDA = RAIZ + "entregables/redes/linea/"; W = motor.TRABAJO + "linea_" + NOMBRE + "/"
 # segmentos de sonido alineados con las escenas de linea.js
-SEG = [(0.0, 2.7, "tension", [dict(tipo="pum", p=0.0), dict(tipo="destello", p=0.2)]), (2.7, 5.4, "tension", [dict(tipo="pum", p=0.62)]),
-       (5.4, 6.6, "heroe", [dict(tipo="pum", p=0.0), dict(tipo="destello", p=0.3)]), (6.6, 9.4, "synth", [dict(tipo="destello", p=0.0)]),
-       (9.4, 12.6, "synth", [dict(tipo="destello", p=0.0), dict(tipo="monedas", p=0.45)]), (12.6, 15.0, "synth", [dict(tipo="destello", p=0.0)]),
-       (15.0, 18.4, "synth", [dict(tipo="destello", p=0.0)]), (18.4, 21.4, "pelicula", [dict(tipo="pum", p=0.0), dict(tipo="monedas", p=0.55)]),
-       (21.4, 25.0, "corporativo", [dict(tipo="destello", p=0.0)])]
-SELLO = 21.6
+SEG = [(0.0, 4.9, "tension", [dict(tipo="pum", p=0.0), dict(tipo="destello", p=0.1)]), (4.9, 7.8, "tension", [dict(tipo="pum", p=0.0)]),
+       (7.8, 9.8, "heroe", [dict(tipo="pum", p=0.0), dict(tipo="destello", p=0.2)]), (9.8, 14.4, "synth", [dict(tipo="destello", p=0.0)]),
+       (14.4, 20.6, "synth", [dict(tipo="destello", p=0.0), dict(tipo="monedas", p=0.3)]), (20.6, 25.1, "synth", [dict(tipo="destello", p=0.0)]),
+       (25.1, 31.0, "synth", [dict(tipo="destello", p=0.0)]), (31.0, 35.4, "pelicula", [dict(tipo="pum", p=0.0), dict(tipo="monedas", p=0.5)]),
+       (35.4, 45.5, "corporativo", [dict(tipo="destello", p=0.0)])]
+VOZ, VOZ_DESDE = AQUI + "voz-higgsfield.wav", 0.0   # locución generada en Higgsfield (Seed Audio, voz «Juan»)
+SELLO = 42.1
 
 def pagina():
     leer = lambda p: open(p).read()
@@ -60,10 +61,17 @@ def main():
     if os.getenv("PRUEBA"): ts = [float(v) for v in os.getenv("PRUEBA").split(",")]; asyncio.run(prueba(ts)); print("pruebas en", W); return
     ep = {"planos": [dict(musica=m, fx=fx) for (_, _, m, fx) in SEG], "reparto": {}}
     lin = {"planos": [{"ini": a, "fin": b, "lineas": []} for (a, b, _, _) in SEG], "sello": SELLO, "dur": SELLO + motor.COLA_SELLO}
-    motor.sonido(ep, lin, W); asyncio.run(imagen(lin["dur"]))
+    motor.sonido(ep, lin, W)
+    # voz encima: la música baja sola cuando habla (sidechain) y la voz queda clara
+    for base, salida, gm in (("sonido.wav", "mezcla.wav", 0.55), ("sonido_sin_musica.wav", "mezcla_sin_musica.wav", 0.8)):
+        subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", W + base, "-i", VOZ, "-filter_complex",
+            f"[1:a]adelay={int(VOZ_DESDE*1000)}|{int(VOZ_DESDE*1000)},aresample=48000,highpass=f=70,acompressor=threshold=-20dB:ratio=2.5,loudnorm=I=-15:TP=-1.5,asplit=2[v][sc];"
+            f"[0:a]volume={gm}[m];[m][sc]sidechaincompress=threshold=0.04:ratio=6:attack=20:release=400[md];[md][v]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95",
+            "-ar", "48000", W + salida], check=True)
+    asyncio.run(imagen(lin["dur"]))
     os.makedirs(SALIDA, exist_ok=True)
-    for son, nombre, extra in (("sonido.wav", f"{NOMBRE}.mp4", ["-crf", "18"]), ("sonido_sin_musica.wav", f"{NOMBRE}-sin-musica.mp4", ["-crf", "18"]),
-                               ("sonido.wav", f"{NOMBRE}-liviano.mp4", ["-crf", "26", "-vf", "scale=720:-2"])):
+    for son, nombre, extra in (("mezcla.wav", f"{NOMBRE}.mp4", ["-crf", "18"]), ("mezcla_sin_musica.wav", f"{NOMBRE}-sin-musica.mp4", ["-crf", "18"]),
+                               ("mezcla.wav", f"{NOMBRE}-liviano.mp4", ["-crf", "26", "-vf", "scale=720:-2"])):
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", W + "imagen.mp4", "-i", W + son, "-c:v", "libx264", "-preset", "slow", *extra, "-pix_fmt", "yuv420p",
                         "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", SALIDA + nombre], check=True)
     print("listo", NOMBRE, lin["dur"], "s")

@@ -142,12 +142,17 @@ function escena9(t) {   // cierre
   texto("APEX CORPORATION", 540, 1640, 28, GR, 700, "center", 8, seg(u, 2.2, 2.6));
 }
 const ESCENAS = [[T.s1, escena1], [T.s2, escena2], [T.s3, escena3], [T.s4, escena4], [T.s5, escena5], [T.s6, escena6], [T.s7, escena7], [T.s8, escena8], [T.s9, escena9]];
+// ritmo con voz: cada escena empieza cuando la locución dice esa frase; su animación se estira (hasta 1,8×) y luego se queda quieta
+const NUEVO = [0, 4.9, 7.8, 9.8, 14.4, 20.6, 25.1, 31.0, 35.4], FIN = 45.5, VIEJO = ESCENAS.map((e) => e[0]).concat([T.fin]);
+function tiempoEscena(t) { let i = 0; NUEVO.forEach((a, j) => { if (t >= a) i = j; });
+  const nl = (NUEVO[i + 1] ?? FIN) - NUEVO[i], ol = VIEJO[i + 1] - VIEJO[i], r = Math.min(1.8, nl / ol);
+  return [i, VIEJO[i] + Math.min(ol - 0.001, (t - NUEVO[i]) / r)]; }
 // grano
 const G = document.getElementById("g"), gx = G.getContext("2d"), GD = gx.createImageData(360, 640);
 function render(t) {
-  let f = ESCENAS[0][1]; ESCENAS.forEach(([a, fn]) => { if (t >= a) f = fn; }); f(t);
+  const [i, tv] = tiempoEscena(t); ESCENAS[i][1](tv);
   // destello de corte al cambiar de escena
-  ESCENAS.forEach(([a]) => { const d = t - a; if (a > 0 && d >= 0 && d < 0.18) { x.fillStyle = `rgba(160,225,255,${0.35 * (1 - d / 0.18)})`; x.fillRect(0, 0, W, H); } });
+  NUEVO.forEach((a) => { const d = t - a; if (a > 0 && d >= 0 && d < 0.18) { x.fillStyle = `rgba(160,225,255,${0.35 * (1 - d / 0.18)})`; x.fillRect(0, 0, W, H); } });
   const r = semilla(Math.floor(t * 30) + 7); for (let i = 0; i < GD.data.length; i += 4) { const v = r() * 255; GD.data[i] = GD.data[i + 1] = GD.data[i + 2] = v; GD.data[i + 3] = 255; } gx.putImageData(GD, 0, 0);
 }
-window.render = render; window.DURACION = T.fin;
+window.render = render; window.DURACION = FIN;
