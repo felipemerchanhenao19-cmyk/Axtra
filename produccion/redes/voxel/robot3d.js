@@ -152,3 +152,43 @@ function robotPlayD() {
     halo.material.opacity = 0.55 + 0.2 * Math.sin(t * 4); cara.dibujar(t, s.gesto, s.voz || 0); }
   return { raiz, animar };
 }
+
+// E · «Caja arcade»: caja con bordes redondeados, pantalla con ojos de píxeles de colores distintos, bordes de neón,
+// palanca de juego en la cabeza, brazos cortos y pies redondos. Inspiración arcade de los 80 (sin copiar personajes).
+function robotPlayCaja(cfg = {}) {
+  const c = Object.assign({ cuerpo: "#1b2440", borde: "#36e0ff", ojoI: "#36e0ff", ojoD: "#ff4fd8", bola: "#ff3b3b" }, cfg);
+  const raiz = new THREE.Group(), cuerpo = new THREE.Group(); raiz.add(cuerpo); const P = PLAY.P, A = PLAY.malla;
+  const mC = P(c.cuerpo, 0.3, 0.1, 1), mO = P("#1a1c22", 0.4, 0.4, 0.6), mNe = new THREE.MeshBasicMaterial({ color: c.borde, toneMapped: false });
+  // caja redondeada (extrusión con bisel)
+  const L = 0.62, R = 0.09, f = new THREE.Shape(); f.moveTo(-L / 2 + R, -L / 2); f.lineTo(L / 2 - R, -L / 2); f.quadraticCurveTo(L / 2, -L / 2, L / 2, -L / 2 + R); f.lineTo(L / 2, L / 2 - R);
+  f.quadraticCurveTo(L / 2, L / 2, L / 2 - R, L / 2); f.lineTo(-L / 2 + R, L / 2); f.quadraticCurveTo(-L / 2, L / 2, -L / 2, L / 2 - R); f.lineTo(-L / 2, -L / 2 + R); f.quadraticCurveTo(-L / 2, -L / 2, -L / 2 + R, -L / 2);
+  const geo = new THREE.ExtrudeGeometry(f, { depth: 0.46, bevelEnabled: true, bevelSize: 0.05, bevelThickness: 0.05, bevelSegments: 8, curveSegments: 12 }); geo.translate(0, 0, -0.23);
+  const caja = A(cuerpo, geo, mC, 0, 0.78, 0);
+  // pantalla con ojos de píxeles (cada ojo de un color) y boca de píxeles
+  const cv = document.createElement("canvas"); cv.width = cv.height = 256; const g = cv.getContext("2d"), tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+  A(cuerpo, new THREE.PlaneGeometry(0.5, 0.5), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }), 0, 0.8, 0.282);
+  [[0, 0.255, 0.52, 0.018], [0, -0.255, 0.52, 0.018], [0.255, 0, 0.018, 0.52], [-0.255, 0, 0.018, 0.52]].forEach(([x, y, w, h]) => A(cuerpo, new THREE.BoxGeometry(w, h, 0.012), mNe, x, 0.8 + y, 0.284));
+  const luzI = new THREE.PointLight(c.ojoI, 0.6, 1.0, 2); luzI.position.set(-0.12, 0.85, 0.4); cuerpo.add(luzI); const luzD = new THREE.PointLight(c.ojoD, 0.6, 1.0, 2); luzD.position.set(0.12, 0.85, 0.4); cuerpo.add(luzD);
+  function pantalla(t, gesto, voz) {
+    g.fillStyle = "#05060a"; g.fillRect(0, 0, 256, 256); g.fillStyle = "rgba(255,255,255,.03)"; for (let y = 0; y < 256; y += 6) g.fillRect(0, y, 256, 2);
+    const pix = 16, parp = (t % 3.2) < 0.12, ojo = (cx, col, d) => { g.save(); g.shadowColor = col; g.shadowBlur = 18; g.fillStyle = col;
+      if (parp) { g.fillRect(cx - 32, 100, 64, pix); g.restore(); return; }
+      if (gesto === "feliz" || (gesto === "guiño" && d > 0)) { [[-32, 104], [-16, 88], [0, 80], [16, 88], [32, 104]].forEach(([dx, y]) => g.fillRect(cx + dx - 8, y, pix, pix)); g.restore(); return; }
+      const h = gesto === "enfoca" ? 32 : 64; g.fillRect(cx - 24, 108 - h / 2, 48, h); g.fillStyle = "rgba(255,255,255,.9)"; g.fillRect(cx + 4, 108 - h / 2 + 6, 12, 12); g.restore(); };
+    ojo(80, c.ojoI, -1); ojo(176, c.ojoD, 1);
+    g.save(); g.fillStyle = "#e8f6ff"; g.shadowColor = "#e8f6ff"; g.shadowBlur = 10; const ab = voz > 0.05 ? Math.round(1 + 2 * Math.abs(Math.sin(t * 16)) * voz) : 0;
+    if (ab) { g.fillRect(104, 180, 48, pix * ab); } else { [[96, 176], [112, 184], [128, 184], [144, 176]].forEach(([x, y]) => g.fillRect(x, y, pix, 8)); } g.restore();
+    tex.needsUpdate = true; }
+  // detalles arcade: ranura de moneda y botones a un lado; palanca de juego encima
+  A(cuerpo, new THREE.BoxGeometry(0.012, 0.09, 0.03), mNe, 0.36, 0.7, 0.1); [[0.1, "#ff3b3b"], [0.0, "#ffd23b"], [-0.1, "#3bff8a"]].forEach(([z, col]) => A(cuerpo, new THREE.CylinderGeometry(0.025, 0.025, 0.02, 16), new THREE.MeshBasicMaterial({ color: col, toneMapped: false }), 0.365, 0.88, z).rotation.z = PI / 2);
+  A(cuerpo, new THREE.CylinderGeometry(0.06, 0.07, 0.03, 24), mO, 0.08, 1.15, -0.05); const palo = A(cuerpo, new THREE.CylinderGeometry(0.012, 0.012, 0.16, 10), mO, 0.08, 1.24, -0.05);
+  const bola = A(cuerpo, new THREE.SphereGeometry(0.045, 20, 14), P(c.bola, 0.2, 0, 1), 0.08, 1.33, -0.05);
+  // brazos cortos y manos redondas; piernas cortas con pies
+  const brazos = [-1, 1].map((d) => { const p = new THREE.Group(); p.position.set(d * 0.42, 0.74, 0.02); cuerpo.add(p); A(p, new THREE.SphereGeometry(0.05, 16, 12), mO);
+    A(p, new THREE.CapsuleGeometry(0.038, 0.1, 6, 12), mO, 0, -0.08, 0); A(p, new THREE.SphereGeometry(0.068, 18, 14), P("#f2f2f2", 0.3, 0, 1), 0, -0.19, 0); return p; });
+  [-1, 1].forEach((d) => { A(cuerpo, new THREE.CapsuleGeometry(0.04, 0.08, 6, 12), mO, d * 0.15, 0.36, 0); A(cuerpo, new THREE.SphereGeometry(0.08, 20, 14), P("#f2f2f2", 0.3, 0, 1), d * 0.15, 0.27, 0.04).scale.set(1, 0.55, 1.3); });
+  function animar(t, s = {}) { const salto = Math.abs(Math.sin(t * 3)) * 0.02; cuerpo.position.y = salto; cuerpo.rotation.z = Math.sin(t * 1.5) * 0.03;
+    brazos[0].rotation.set(0, 0, -0.55 + Math.sin(t * 3) * 0.1); brazos[1].rotation.set(0, 0, s.saluda ? 2.5 + Math.sin(t * 8) * 0.35 : 0.55 - Math.sin(t * 3) * 0.1);
+    palo.rotation.z = Math.sin(t * 2.4) * 0.25; bola.position.x = 0.08 - Math.sin(t * 2.4) * 0.04; luzI.intensity = luzD.intensity = 0.5 + (s.voz || 0) * 0.6; pantalla(t, s.gesto || "normal", s.voz || 0); }
+  return { raiz, animar };
+}
