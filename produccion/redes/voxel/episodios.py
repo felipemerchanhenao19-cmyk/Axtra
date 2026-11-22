@@ -203,6 +203,7 @@ G_BODA = "saturate(1.12) contrast(1.06) brightness(1.04)"
 VOCES_P01 = {"p01": dict(voz=("es-CO-GonzaloNeural", "-2%", "-6Hz")), "orbi": dict(voz=("es-CO-SalomeNeural", "+6%", "+6Hz"))}
 ORBE_D = [0.58, 1.32, -0.25]; PANT_D = [[-0.56, 1.07, -0.96, -0.17, 0.93, -0.16, 31], [-0.8, 1.06, -0.84, -0.4, 0.95, -0.05, 30]]; PANT_D2 = [[-0.82, 1.06, -0.84, -0.4, 0.95, -0.05, 30], [-0.8, 1.05, -0.8, -0.4, 0.95, -0.05, 29]]
 G_LP = "contrast(1.08) saturate(1.08) brightness(1.03)"
+G_LAB = "contrast(1.06) saturate(1.12) brightness(1.02)"
 G_OF = "contrast(1.12) saturate(1.18) brightness(0.9)"
 
 EPISODIOS = {
@@ -1787,5 +1788,33 @@ EPISODIOS = {
    CIERRE_CTA("Apex Domicilios", "Este diciembre, que el WhatsApp descanse.", "¿Cuántos pedidos le llegan en una noche de diciembre? 👇", "Etiquete a quien responde los pedidos en su restaurante.",
               set="despacho", grado=G_LP, relleno=0.2, min=4.5, orbis={}, actores={}, cam=[[1.3, 1.5, 2.2, 0, 1.1, -0.6, 40], [1.15, 1.45, 2.0, 0, 1.1, -0.6, 40]],
               saturno={"orbe": dict(pos=ORBE_D, escala=0.24, voz=False)}, e=dict(navidad=1, taza=1, mira=0.0, panel=5, avance=1, pedidos=200, cejas=1)),
+  ]),
+ # ═══ Ganchos de curiosidad («experimento de física»): pregunta → «casi todo el mundo cree…» → «pero no» → sale directo al producto
+ "lab-tubo-espiral": dict(producto="dom", estilo="vinil", palabras=3, subY=1150, dof=0.35, calidad=1.5, bloom=0.22, reparto={"nar": dict(voz=("es-MX-JorgeNeural", "+8%", "+0Hz"))}, elenco={}, extras=[],
+  gancho=["¿Por dónde sale la bola? 🤔", "", 2.4],
+  copy="Si lanzas una bola por un tubo en espiral… ¿por dónde sale? 🤔 Casi todo el mundo falla. Comenta qué respondiste antes del final.",
+  hashtags="#Fisica #SabiasQue #ApexDomicilios #Restaurantes #Emprendedores",
+  planos=[
+   dict(set="laboratorio", grado=G_LAB, relleno=0.1, musica="misterio", cola=0.05, fx=PUM, mano=0.004, cam=[[0, -3.2, 1.8, 3.6, -1.2, 1.25, 0.8, 42], [2.8, -1.2, 2.6, 4.2, 0.2, 1.3, 0.2, 44]],
+        e=dict(bola=[[0, 0.0], [2.8, 0.42]]),
+        lineas=[L("nar", "Si lanzas una bola de luz por un tubo en espiral…", 0.25)]),
+   dict(set="laboratorio", grado=G_LAB, relleno=0.1, musica="misterio", cola=0.1, mano=0.003, cam=[[0, 0.3, 5.6, 3.6, 0.3, 1.2, -0.3, 40], [3.5, 0.6, 5.0, 3.3, 0.4, 1.25, -0.4, 40]],
+        e=dict(bola=[[0, 0.42], [2.2, 0.985]], idea=[[0, 0], [1.6, 0], [3.4, 1]]),
+        lineas=[L("nar", "casi todo el mundo cree que al salir seguirá girando.", 0.05)]),
+   dict(set="laboratorio", grado=G_LAB, relleno=0.1, musica="tension", cola=0.1, fx=[dict(tipo="pum", p=0.0)], mano=0.003, cam=[[0, 0.3, 5.0, 3.3, 0.4, 1.25, -0.4, 40], [2.4, 2.6, 2.6, 2.4, 1.0, 1.4, -2.6, 42]],
+        e=dict(idea=1, tache=[[0, 0], [0.5, 1]], bola=[[0, 0.985], [0.9, 1.0], [2.6, 1.22]], real=[[0, 0], [0.9, 0], [2.6, 0.6]]),
+        lineas=[L("nar", "Pero no.", 0.05), L("nar", "Sale en línea recta…", 0.2)]),
+   dict(set="laboratorio", grado=G_LAB, relleno=0.1, musica="heroe", cola=0.35, fx=[dict(tipo="destello", p=0.62)], mano=0.005, cam=[[0, 2.3, 2.1, -0.4, 1.2, 1.5, -5.0, 40], [1.6, 1.7, 2.1, -3.6, 1.2, 1.7, -9.5, 44]],
+        e=dict(idea=[[0, 1], [0.6, 0]], tache=[[0, 1], [0.6, 0]], real=[[0, 0.6], [1.0, 1]], bola=[[0, 1.22], [1.6, 1.69]], impacto=[[0, 0], [1.55, 0], [1.75, 1]]),
+        lineas=[L("nar", "directo a tu restaurante.", 0.05)]),
+   dict(set="laboratorio", grado=G_LAB, relleno=0.1, musica="corporativo", cola=0.2, mano=0.004, dof=0.15, cam=[[1.35, 2.5, -1.6, 1.2, 2.75, -9.5, 46], [1.3, 2.55, -2.2, 1.2, 2.8, -9.5, 44]],
+        e=dict(real=1, bola=1.69, impacto=1, tarjeta=[[0, 0], [0.5, 1]]),
+        lineas=[L("nar", "Así deberían llegar tus pedidos: directo, sin apps en el medio y sin comisión.", 0.1)]),
+   dict(set="laboratorio", grado=G_LAB, relleno=0.1, musica="corporativo", cola=0.6, mano=0.004, dof=0.15, cam=[[1.3, 2.55, -2.2, 1.2, 2.8, -9.5, 44], [1.25, 2.6, -2.7, 1.2, 2.85, -9.5, 42]],
+        e=dict(real=1, bola=1.69, impacto=1, tarjeta=[[0, 1], [0.35, 0]], tarjeta2=[[0, 0], [0.45, 0], [0.9, 1]]),
+        lineas=[L("nar", "Con Apex Domicilios, tu restaurante tiene su propio link de pedidos.", 0.1)]),
+   CIERRE_CTA("Apex Domicilios", "Tus pedidos, en línea recta.", "¿Usted también creía que seguía girando? 👇", "Comente qué respondió antes de ver el final.",
+              set="laboratorio", grado=G_LAB, relleno=0.1, min=4.5, orbis={}, actores={}, cam=[[0.0, 3.6, 6.2, 1.0, 1.2, -2.5, 44], [0.4, 3.4, 5.6, 1.0, 1.2, -2.5, 44]],
+              e=dict(real=1, bola=1.69, impacto=1)),
   ]),
 }

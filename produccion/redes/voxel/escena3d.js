@@ -9,7 +9,7 @@ REN.toneMapping = THREE.ACESFilmicToneMapping; REN.toneMappingExposure = 1.35; R
 const ESC = new THREE.Scene(); ESC.background = new THREE.Color(0x060504); ESC.fog = new THREE.FogExp2(0x0a0806, 0.02);
 const CAM = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.05, 90);
 const RELLENO = new THREE.DirectionalLight(0xffe6cc, 0.55); ESC.add(RELLENO); ESC.add(RELLENO.target);   // luz suave desde la cámara para leer las caras
-const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC), boda: boda(ESC), despacho: despacho(ESC) };
+const SETS = { restaurante: restaurante(ESC), oficina: oficina(ESC), sala: sala(ESC), espacio: espacio(ESC), estacion: estacion(ESC), boda: boda(ESC), despacho: despacho(ESC), laboratorio: laboratorio(ESC) };
 if (EP.estilo) document.body.classList.add(EP.estilo);
 let DOF = null; const NIEBLA0 = [0x0a0806, 0.02];
 const ACT = {}, ORBIS = {}, ROBOTS = {}, SATURNOS = {};

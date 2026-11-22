@@ -246,3 +246,11 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un villancico en tendencia a volumen bajo. «POV: llegó diciembre y tu restaurante no vive pegado al WhatsApp 🎄 #diciembre #navidad #restaurantes #emprendedores #humor»
 - **Portada:** el Personaje 01 con las luces de Navidad detrás: «Pagar las primas».
 - **Comentario fijado:** «Este diciembre los primeros 5 restaurantes tienen el primer mes gratis. Escríbanos 🎁»
+
+## Ganchos de curiosidad («experimento de física», escenario cuadriculado azul)
+### «El tubo en espiral» (Apex Domicilios). Pregunta → «casi todo el mundo cree…» → «pero no» → directo al restaurante
+- **Instagram:** «Si lanzas una bola por un tubo en espiral… ¿por dónde sale? 🤔 Casi todo el mundo falla. Comenta qué respondiste antes del final. 👇» · #Fisica #SabiasQue #ApexDomicilios #Restaurantes #Emprendedores
+- **TikTok:** subir la versión con música (la voz narra todo). «¿Por dónde sale la bola? 🤔 El 90 % falla #fisica #sabiasque #experimento #restaurantes #emprendedores»
+- **Portada:** el tubo en espiral con el arco rojo tachado: «¿Por dónde sale?».
+- **Comentario fijado:** «Yo también creía que seguía girando 😅 ¿Y usted?»
+- **Por qué engancha:** la pregunta de los primeros 2 segundos obliga a ver el final, y quien acierta o falla comenta.
