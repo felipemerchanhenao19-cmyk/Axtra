@@ -156,6 +156,7 @@ function render(t) {
   if (pl.final) { const f = pl.final; if (fi.dataset.i !== String(i)) { fi.dataset.i = i; fi.className = f.clase || ""; fi.innerHTML = `<div class="logo">${f.logo ?? '<i class="pin"></i>'}${f.marca}</div><div class="frase">${f.frase}</div>${f.detalle ? `<div class="detalle">${f.detalle}</div>` : ""}${f.cta ? `<div class="cta">${f.cta}</div>` : `<div class="wa"><i></i><div><small>Escríbanos por WhatsApp</small><b>310 789 7960</b></div></div>`}<div class="pie">Apex Corporation</div>`; }
     fi.style.opacity = cl((tt - (f.desde || 0.3)) / 0.7); $("#cortina").style.opacity = 0.78 * cl((tt - (f.desde || 0.3) + 0.3) / 0.8); } else { fi.style.opacity = 0; $("#cortina").style.opacity = 0; }
   $("#nota").textContent = pl.nota || "";
+  if (typeof HUD !== "undefined") HUD.paso(t, pl, tt, L);
   // tarjeta de información (cifras, beneficios): entra con un leve desplazamiento
   const inf = $("#info"); if (pl.info) { if (inf.dataset.i !== String(i)) { inf.dataset.i = i; inf.innerHTML = pl.info.html; }
     const a = cl((tt - tClave(pl.info.desde ?? 0.3, L)) / 0.5); inf.style.opacity = a * cl((dur - tt) / 0.3); inf.style.transform = `translateY(${(1 - suave(a)) * 40}px)`; } else { inf.style.opacity = 0; inf.dataset.i = ""; }

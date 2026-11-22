@@ -260,3 +260,10 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio cómico en tendencia a volumen bajo. «POV: se cae el WhatsApp en pleno turno y tu equipo entra en pánico… menos tú ☕ #restaurantes #trabajoenequipo #emprendedores #humor»
 - **Portada:** Valeria señalando con alarma y el Personaje 01 tranquilo con su café.
 - **Comentario fijado:** «Etiquete a la Valeria de su equipo 😂»
+
+## Formato «contador» (marcador fijo arriba + mapa de viajes)
+### «Manos levantadas» (Apex Play). Cierre con pregunta
+- **Instagram:** «Sábado, 12 mesas y un solo mesero. 🙋 «Renuncio»… hasta que la mesa empezó a pedir sola. ¿Cuántos viajes hace un mesero en su restaurante un sábado? 👇» · #ApexPlay #Meseros #Restaurantes #Emprendedores #Humor
+- **TikTok:** subir la versión con música. «De cinco viajes por mesa… a uno 🙌 #meseros #restaurantes #emprendedores #humor #sabado»
+- **Portada:** Brayan con la bandeja y el contador «MANOS LEVANTADAS 12».
+- **Comentario fijado:** «Etiquete al mesero que más camina en su restaurante 🏃»

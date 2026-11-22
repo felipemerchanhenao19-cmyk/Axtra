@@ -208,6 +208,11 @@ C_SOF = [[-0.59, 1.62, 1.92, 0.6, 1.5, 0.64, 34], [-0.49, 1.62, 1.81, 0.6, 1.5, 
 ORBE_D = [0.58, 1.32, -0.25]; PANT_D = [[-0.56, 1.07, -0.96, -0.17, 0.93, -0.16, 31], [-0.8, 1.06, -0.84, -0.4, 0.95, -0.05, 30]]; PANT_D2 = [[-0.82, 1.06, -0.84, -0.4, 0.95, -0.05, 30], [-0.8, 1.05, -0.8, -0.4, 0.95, -0.05, 29]]
 G_LP = "contrast(1.08) saturate(1.08) brightness(1.03)"
 G_LAB = "contrast(1.06) saturate(1.12) brightness(1.02)"
+MAR_M = [1.9, -3.95]   # Marcela, la administradora, frente a Brayan junto a la barra
+TEL7 = ('<div style="margin:0 auto;width:540px;background:#0b0f18;border:12px solid #20252f;border-radius:60px;padding:46px 38px 40px;color:#fff;box-shadow:0 40px 90px rgba(0,0,0,.65)">'
+        '<div style="font:700 22px Figtree;letter-spacing:.16em;color:#7d8b99">APEX PLAY · SALÓN</div><div style="font:900 78px/1.05 Figtree;color:#f5a636;margin-top:10px">MESA 7</div>'
+        '<div style="font:800 36px Figtree">PEDIDO NUEVO</div><div style="font:600 32px Figtree;color:#cfd8e2;margin-top:12px">1 × Bandeja paisa</div>'
+        '<div style="margin-top:30px;background:#4ce08a;color:#04140a;border-radius:44px;padding:18px;text-align:center;font:900 32px Figtree">Enviado a cocina ✓</div></div>')
 G_OF = "contrast(1.12) saturate(1.18) brightness(0.9)"
 
 EPISODIOS = {
@@ -1854,5 +1859,43 @@ EPISODIOS = {
    CIERRE_CTA("Apex Domicilios", "Su equipo, sin estrés.", "¿Quién en su equipo se estresa más con los pedidos? 👇", "Etiquételo sin miedo.",
               set="despacho", grado=G_LP, relleno=0.22, min=4.5, orbis={}, actores={}, cam=[[1.3, 1.6, 2.6, 0, 1.2, -0.3, 42], [1.15, 1.55, 2.4, 0, 1.2, -0.3, 42]],
               saturno={"orbe": dict(pos=ORBE_D, escala=0.24, voz=False)}, e=dict(equipo=1, taza=1, tazas=1, mira=0.7, miraVal=0.35, miraSof=-0.35, panel=4, avance=1, pedidos=40)),
+  ]),
+ # ═══ Formato «contador» (como los reels de manos levantadas): marcador fijo arriba, mapa de viajes, el asistente en la mesa y el contador que baja
+ "manos-levantadas": dict(producto="play", estilo="vinil", palabras=3, dof=1.0, subY=330, reparto=REPARTO, elenco=VINILES, extras=EXTRAS,
+  hud=dict(linea="SÁBADO · 9:40 P. M. · 12 MESAS, 1 MESERO", etiqueta="MANOS LEVANTADAS"),
+  copy="Sábado, 12 mesas y un solo mesero. 🙋 «Renuncio»… hasta que la mesa empezó a pedir sola. ¿Cuántos viajes hace un mesero en su restaurante un sábado?",
+  hashtags="#ApexPlay #Meseros #Restaurantes #Emprendedores #Humor",
+  planos=[
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="tension", cola=0.1, fx=PUM, sinExtras=[6], mano=0.01, hud=12, cam=[cerca(BRAYAN, 127, 1.6, 26, 0.12, 50, 1.5), cerca(BRAYAN, 127, 1.6, 26, 0.12, 50, 1.5)],
+        actores={"brayan": dict(pos=BRAYAN, rot=127, mira="marcela", emo="cansado", gesto="bandeja"), "marcela": dict(pos=MAR_M, rot=-53, mira="brayan", emo="neutro")},
+        lineas=[L("brayan", "Renuncio.", 0.3)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="comico", cola=0.1, mano=0.01, hud=12, cam=[cerca(MAR_M, -53, 1.6, -26, 0.12, 50, 1.46), cerca(MAR_M, -53, 1.6, -26, 0.12, 50, 1.46)],
+        actores={"brayan": dict(pos=BRAYAN, rot=127, mira="marcela", emo="cansado", gesto="bandeja"), "marcela": dict(pos=MAR_M, rot=-53, mira="brayan", emo="sorpresa", gesto="mano_arriba")},
+        lineas=[L("marcela", "¡Espera, espera, espera! ¿Por qué?", 0.05)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="tension", cola=0.15, mano=0.008, hud=12, cam=[cerca(BRAYAN, 127, 1.6, 26, 0.12, 50, 1.5), cerca(BRAYAN, 127, 1.6, 26, 0.12, 50, 1.5)],
+        actores={"brayan": dict(pos=BRAYAN, rot=127, mira="marcela", emo="serio", gesto="explica"), "marcela": dict(pos=MAR_M, rot=-53, mira="brayan", emo="neutro")},
+        lineas=[L("brayan", "No es la gente, Marcela. Son los viajes.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="tension", cola=0.6, hud=12, diagrama=dict(modo=5, avance=[[0, 0], ["f0", 1]]), cam=WIDE,
+        lineas=[L("brayan", "Cinco viajes por mesa… por doce mesas.", 0.2)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="esperanza", cola=0.1, mano=0.008, hud=12, cam=[cerca(MAR_M, -53, 1.6, -26, 0.12, 50, 1.46), cerca(MAR_M, -53, 1.6, -26, 0.12, 50, 1.46)],
+        actores={"brayan": dict(pos=BRAYAN, rot=127, mira="marcela", emo="cansado", gesto="bandeja"), "marcela": dict(pos=MAR_M, rot=[[0, -53], ["f0", -120]], mira="brayan", emo="serio", gesto="explica")},
+        lineas=[L("marcela", "Tienes razón. Mira la mesa siete.", 0.05)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="esperanza", cola=0.2, fx=[dict(tipo="destello", p=0.05)], cam=LADO7, sinExtras=[6], hud=[[0, 12], ["f2", 11]],
+        e=dict(qrLuz={"7": [[0, 0], [0.2, 1.0], [1.6, 0.2]]}), orbis={"o7": dict(pos=O7, nace=[0.05, 0.6], mira=[[0, "cam"], [0.7, "cliente"]])},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="o7", emo=[[0, "neutro"], ["f1", "feliz"]])},
+        lineas=[L("cliente", "¿Qué me recomiendas?", 0.6), L("orbi", "La bandeja paisa. ¿Te la pido?", 0.15), L("cliente", "¡Dale!", 0.15)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="synth", cola=0.3, mano=0.006, hud=11, cam=[cerca(BRAYAN, 127, 1.6, 26, 0.12, 50, 1.5), cerca(BRAYAN, 127, 1.6, 26, 0.12, 50, 1.5)],
+        info=dict(desde=0.1, html=TEL7), actores={"brayan": dict(pos=BRAYAN, rot=127, mira=0, miraY=0.25, emo="feliz", gesto="celular")},
+        lineas=[L("brayan", "El pedido me llega solo… y ya está en cocina.", 0.1)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="heroe", cola=0.3, cam=WIDE, orbis=TODAS_ORBIS, hud=[[0, 11], ["f1", 2]],
+        actores={**SALON, "brayan": dict(pos=BRAYAN, rot=180, emo="feliz"), "marcela": dict(pos=MAR_M, rot=-53, mira="brayan", emo="feliz", gesto="cruzado")},
+        lineas=[L("marcela", "Piden desde la mesa.", 0.2), L("marcela", "Y nadie levanta la mano.", 0.2)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="esperanza", cola=0.2, sinExtras=[6], hud=1, cam=[[-1.5, 1.5, -0.25, -2.6, 1.38, 1.2, 36], [-1.55, 1.48, -0.15, -2.6, 1.4, 1.25, 34]],
+        orbis={"o7": dict(pos=O7, voz=False, luz=0.5)},
+        actores={"cliente": dict(pos=CLIENTE, rot=180, sentado=True, gesto="manos_mesa", mira="brayan", emo="feliz"), "brayan": dict(pos=BT7, rot=-66, mira="cliente", gesto="bandeja", emo="feliz")},
+        lineas=[L("brayan", "¡Permiso! Bandeja paisa.", 0.2)]),
+   dict(set="restaurante", grado=CINE_V, relleno=0.3, musica="comico", cola=1.0, hud=1, diagrama=dict(modo=1, avance=[[0, 0], ["f0", 1]]), cam=WIDE,
+        lineas=[L("brayan", "De cinco viajes… a uno.", 0.3)]),
+   CIERRE_CTA("Apex Play", "Un asistente en cada mesa.", "¿Cuántos viajes hace un mesero en su restaurante un sábado? 👇", "Etiquete al mesero que más camina.", sinExtras=[6], min=4.5),
   ]),
 }
