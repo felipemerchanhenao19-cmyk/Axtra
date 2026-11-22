@@ -267,3 +267,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión con música. «De cinco viajes por mesa… a uno 🙌 #meseros #restaurantes #emprendedores #humor #sabado»
 - **Portada:** Brayan con la bandeja y el contador «MANOS LEVANTADAS 12».
 - **Comentario fijado:** «Etiquete al mesero que más camina en su restaurante 🏃»
+
+### «Treinta millones» (Apex Domicilios, Personaje 01 solo en la oficina). Cierre con pregunta
+- **Instagram:** «Hizo la cuenta de las comisiones… y casi se ahoga con el café. ☕💸 ¿Cuánto cree que le paga a las apps al año? 👇» · #ApexDomicilios #Restaurantes #Comisiones #Emprendedores #Humor
+- **TikTok:** subir la versión sin música, con un audio de suspenso en tendencia a volumen bajo. «POV: haces la cuenta de lo que le pagas a las apps 😳 #restaurantes #emprendedores #comisiones #domicilios»
+- **Portada:** el Personaje 01 con las cejas arriba: «¿¡Treinta millones!?».
+- **Comentario fijado:** «Ejemplo con ventas de $10 millones al mes y 25 % de comisión. ¿Cuánto le sale a usted? 🧮»
