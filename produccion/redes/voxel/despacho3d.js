@@ -68,12 +68,35 @@ function despacho(escena) {
       txt("Enviado automáticamente", 652, 350, "600 18px Figtree", "#4ce08a"); }
     tex.needsUpdate = true;
   }
+  // ---------- interfaz de Apex Play (e.app = 1): el asistente de cada mesa, en vivo. panel: 0 salón, 1 mesa 7, 2 mesa 12 (inglés), 3 mesa 3 (cuenta), 4 mesa 7 (cliente frecuente)
+  function uiPlay(panel, k, t) {
+    gx.fillStyle = "#070b14"; gx.fillRect(0, 0, 1024, 640); gx.fillStyle = "#0e1626"; gx.fillRect(0, 0, 1024, 70);
+    gx.fillStyle = "#f5a636"; rr(30, 18, 34, 34, 17); gx.fill(); txt("Apex Play", 78, 46, "800 28px Figtree", "#eef4fa"); txt("Salón en vivo", 994, 46, "600 20px Figtree", "#7d8b99", "right");
+    txt("MESAS ATENDIDAS", 40, 112, "700 16px Figtree", "#7d8b99"); txt("12 / 12", 40, 160, "800 46px Figtree", "#f5a636");
+    txt("ESPERA PROMEDIO", 300, 112, "700 16px Figtree", "#7d8b99"); txt("0 min", 300, 160, "800 46px Figtree", "#eef4fa");
+    const foco = [0, 7, 12, 3, 7][Math.min(4, panel)];
+    for (let i = 0; i < 12; i++) { const n = i + 1, X = 40 + (i % 4) * 142, Y = 196 + Math.floor(i / 4) * 128, f = n === foco;
+      rr(X, Y, 128, 112, 16); gx.fillStyle = f ? "rgba(245,166,54,.22)" : "#121b2b"; gx.fill(); if (f) { gx.strokeStyle = "#f5a636"; gx.lineWidth = 3; gx.stroke(); }
+      txt("Mesa " + n, X + 16, Y + 34, "700 20px Figtree", "#eef4fa");
+      const pul = 0.55 + 0.45 * Math.sin(t * 3 + i); gx.globalAlpha = pul; gx.fillStyle = "#4ce08a"; gx.beginPath(); gx.arc(X + 24, Y + 72, 8, 0, 7); gx.fill(); gx.globalAlpha = 1;
+      txt(n === 7 ? "Pidiendo" : n === 12 ? "English" : n === 3 ? "Cuenta" : "Asistente ✓", X + 40, Y + 79, "600 16px Figtree", "#9fb0c2"); }
+    rr(630, 100, 360, 500, 18); gx.fillStyle = "#0e1626"; gx.fill();
+    const b = (s, Y, ia, a) => { if (a <= 0) return; gx.globalAlpha = Math.min(1, a); rr(ia ? 690 : 652, Y, 280, 64, 16); gx.fillStyle = ia ? "rgba(245,166,54,.2)" : "#18233a"; gx.fill(); txt(s, ia ? 706 : 668, Y + 40, "600 19px Figtree", "#eef4fa"); gx.globalAlpha = 1; };
+    const ok = (s, Y, a) => { if (a <= 0) return; gx.globalAlpha = Math.min(1, a); rr(652, Y, 316, 60, 30); gx.fillStyle = "#4ce08a"; gx.fill(); txt(s, 810, Y + 39, "800 21px Figtree", "#04140a", "center"); gx.globalAlpha = 1; };
+    const A = (x) => (k - x) * 4;
+    if (panel === 0) { txt("ASISTENTE EN CADA MESA", 652, 136, "700 15px Figtree", "#7d8b99"); txt("Toma pedidos", 652, 200, "800 34px Figtree", "#eef4fa"); txt("Recomienda platos", 652, 248, "800 34px Figtree", "#eef4fa"); txt("Habla idiomas", 652, 296, "800 34px Figtree", "#eef4fa"); txt("Llama al mesero", 652, 344, "800 34px Figtree", "#eef4fa"); }
+    if (panel === 1) { txt("MESA 7", 652, 136, "700 15px Figtree", "#7d8b99"); b("Otra ronda de limonadas", 160, false, A(0.05)); b("¡Claro! 4 limonadas", 240, true, A(0.3)); ok("ENVIADO A COCINA ✓", 330, A(0.55)); }
+    if (panel === 2) { txt("MESA 12 · ENGLISH", 652, 136, "700 15px Figtree", "#7d8b99"); b("What do you recommend?", 160, false, A(0.05)); b("Try our bandeja paisa!", 240, true, A(0.3)); ok("PEDIDO TOMADO ✓", 330, A(0.55)); }
+    if (panel === 3) { txt("MESA 3", 652, 136, "700 15px Figtree", "#7d8b99"); b("La cuenta, por favor", 160, false, A(0.05)); ok("MESERO AVISADO ✓", 250, A(0.35)); }
+    if (panel >= 4) { txt("MESA 7 · CLIENTE FRECUENTE", 652, 136, "700 15px Figtree", "#7d8b99"); txt("Doña Marta", 652, 200, "800 40px Figtree", "#f5a636"); txt("Viene cada domingo", 652, 244, "500 20px Figtree", "#9fb0c2"); txt("Pide: limonada de coco", 652, 278, "500 20px Figtree", "#9fb0c2"); }
+    tex.needsUpdate = true;
+  }
   D.userData = U;
   U.paso = (tt, e = {}) => {
     U.luces.forEach(([s, f]) => { s.material.opacity = Math.max(0.15, s.material.opacity * 0.98 + 0.02 * (0.5 + 0.4 * Math.sin(tt * 0.7 + f))); });
     U.p01.pose({ sentado: true, mira: e.mira ?? 0.35, miraY: e.miraY ?? 0.08, ladea: e.ladea ?? 0, voz: e.voz01 || 0, taza: e.taza > 0.5,
       bi: e.manos === 0 ? [0.15, -0.12, -0.35] : [-0.95, -0.12, -0.75], bd: e.taza > 0.5 ? [-0.55, 0.42, -1.85] : e.manos === 0 ? [0.15, 0.12, -0.35] : [-0.95, 0.12, -0.75], cejas: e.cejas || 0 });
-    ui(Math.round(e.panel ?? 0), e.avance ?? 1, tt);
+    (e.app > 0.5 ? uiPlay : ui)(Math.round(e.panel ?? 0), e.avance ?? 1, tt);
   };
   return D;
 }

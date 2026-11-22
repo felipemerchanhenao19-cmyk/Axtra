@@ -66,7 +66,11 @@ async def abrir(p, W):
     br = await p.chromium.launch(executable_path=motor.CHROME, args=ARGS)
     pg = await br.new_page(viewport={"width": 1080, "height": 1920}); pg.errores = []
     pg.on("pageerror", lambda e: (print("ERR", e), pg.errores.append(str(e))))
-    await pg.goto("file://" + W + "cuadro.html"); await pg.wait_for_timeout(1500)
+    await pg.goto("file://" + W + "cuadro.html")
+    # las pantallas 3D se dibujan en canvas: las fuentes deben estar cargadas antes del primer cuadro (si no, sale una letra de respaldo)
+    await pg.evaluate("""Promise.all(['500','600','700','800'].map(p => document.fonts.load(p + ' 24px Figtree'))
+        .concat(['italic 700 24px Playfair', 'italic 800 24px Playfair'].map(f => document.fonts.load(f)))).then(() => document.fonts.ready)""")
+    await pg.wait_for_timeout(1500)
     if not await pg.evaluate("typeof render === 'function'"): raise RuntimeError("La escena no cargó: " + "; ".join(pg.errores))
     return br, pg
 

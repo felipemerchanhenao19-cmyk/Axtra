@@ -234,3 +234,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio lo-fi en tendencia a volumen bajo. «POV: tu restaurante vende mientras tú te tomas el café ☕ #restaurantes #ia #emprendedores #domicilios»
 - **Portada:** el primer plano del Personaje 01: «¿Y la comisión?».
 - **Comentario fijado:** «¿Cuánto tiempo pierdes al día respondiendo pedidos por WhatsApp? 📱»
+
+### «La mesa siete» (Apex Play, Personaje 01). Cierre con pregunta
+- **Instagram:** «Doce mesas llenas y yo en la oficina. 🍋 El asistente atiende cada mesa… hasta a la suegra. ¿Quién es el cliente que nunca falta en su restaurante? 👇» · #ApexPlay #Restaurantes #InteligenciaArtificial #Emprendedores #Meseros
+- **TikTok:** subir la versión sin música, con un audio de suspenso cómico en tendencia a volumen bajo. «POV: tu asistente atiende las 12 mesas… y te avisa que llegó tu suegra 😅 #restaurantes #ia #emprendedores #suegra #humor»
+- **Portada:** el Personaje 01 con las cejas arriba: «Es su suegra».
+- **Comentario fijado:** «Etiquete al cliente que viene todos los domingos 🍋»
