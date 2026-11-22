@@ -240,3 +240,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio de suspenso cómico en tendencia a volumen bajo. «POV: tu asistente atiende las 12 mesas… y te avisa que llegó tu suegra 😅 #restaurantes #ia #emprendedores #suegra #humor»
 - **Portada:** el Personaje 01 con las cejas arriba: «Es su suegra».
 - **Comentario fijado:** «Etiquete al cliente que viene todos los domingos 🍋»
+
+### «Llegó diciembre» (Apex Domicilios, Personaje 01, oficina navideña). Cierre con pregunta
+- **Instagram:** «Llegó diciembre: 200 pedidos por noche y nadie pegado al WhatsApp. 🎄 ¿Cuántos pedidos le llegan en una noche de diciembre? 👇» · #ApexDomicilios #Diciembre #Navidad #Restaurantes #Emprendedores
+- **TikTok:** subir la versión sin música, con un villancico en tendencia a volumen bajo. «POV: llegó diciembre y tu restaurante no vive pegado al WhatsApp 🎄 #diciembre #navidad #restaurantes #emprendedores #humor»
+- **Portada:** el Personaje 01 con las luces de Navidad detrás: «Pagar las primas».
+- **Comentario fijado:** «Este diciembre los primeros 5 restaurantes tienen el primer mes gratis. Escríbanos 🎁»

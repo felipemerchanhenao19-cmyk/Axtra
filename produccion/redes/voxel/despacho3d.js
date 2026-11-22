@@ -42,13 +42,27 @@ function despacho(escena) {
   const contra = new THREE.DirectionalLight(0x6f8fff, 2.1); contra.position.set(1.6, 2.6, -3); contra.castShadow = true; contra.shadow.mapSize.set(2048, 2048); Object.assign(contra.shadow.camera, { left: -2, right: 2, top: 2.5, bottom: -1, near: 0.5, far: 10 }); D.add(contra);
   const rim = new THREE.SpotLight(0x9fb8ff, 5, 4, 0.5, 0.8, 1.5); rim.position.set(-1.2, 1.8, -2.0); rim.target.position.set(0, 1.25, -0.68); D.add(rim); D.add(rim.target);
   const relleno = new THREE.DirectionalLight(0xffe2c8, 0.55); relleno.position.set(0.5, 1.8, 3); D.add(relleno);
+  // ---------- Navidad (e.navidad > 0.5): guirnalda de bombillos en el ventanal y arbolito low-poly con esferas
+  const NAV = new THREE.Group(); NAV.visible = false; D.add(NAV); U.bombillos = [];
+  const colN = [0xff3b3b, 0x3bff7a, 0xffd23b, 0x3bb8ff, 0xff7ad9];
+  for (let i = 0; i <= 44; i++) { const x = -3 + i * (6 / 44), y = 2.05 - 0.2 * Math.abs(Math.sin((x + 3) / 1.5 * PI));
+    const m = new THREE.MeshBasicMaterial({ color: colN[i % 5], fog: false }); const b = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), m); b.position.set(x, y, -3.0); NAV.add(b);
+    const h = new THREE.Sprite(new THREE.SpriteMaterial({ map: bok, color: colN[i % 5], transparent: true, opacity: 0.55, depthWrite: false, fog: false })); h.position.copy(b.position); h.scale.setScalar(0.32); NAV.add(h); U.bombillos.push([m, h, i]); }
+  const arbol = new THREE.Group(); arbol.position.set(-0.85, 0, -1.75); arbol.scale.setScalar(1.25); NAV.add(arbol);
+  add(new THREE.CylinderGeometry(0.05, 0.06, 0.18, 6), F(0x4a2c18, 0.8), 0, 0.09, 0, arbol);
+  [[0.46, 0.5, 0.42], [0.36, 0.42, 0.74], [0.25, 0.34, 1.02]].forEach(([rad, h, y]) => add(new THREE.ConeGeometry(rad, h, 7), F(0x1e5a34, 0.8), 0, y, 0, arbol));
+  add(new THREE.OctahedronGeometry(0.06), new THREE.MeshBasicMaterial({ color: 0xffd23b }), 0, 1.24, 0, arbol);
+  for (let i = 0; i < 16; i++) { const a = i * 2.4, y = 0.32 + (i / 16) * 0.8, rad = 0.4 * (1 - (y - 0.25) / 1.0) + 0.03;
+    add(new THREE.SphereGeometry(0.03, 7, 5), F(colN[i % 5], 0.3, { metalness: 0.4, emissive: colN[i % 5], emissiveIntensity: 0.35 }), Math.cos(a) * rad, y, Math.sin(a) * rad, arbol); }
+  const calido = new THREE.PointLight(0xffb070, 0.9, 2.2, 2); calido.position.set(-0.75, 1.0, -1.4); NAV.add(calido);
   // ---------- interfaz de Apex Domicilios en el portátil
   const rr = (X, Y, w, h, rad) => { gx.beginPath(); gx.roundRect(X, Y, w, h, rad); };
   const txt = (s, X, Y, f, c, al = "left") => { gx.font = f; gx.fillStyle = c; gx.textAlign = al; gx.fillText(s, X, Y); };
-  function ui(panel, k, t) {
+  function ui(panel, k, t, e = {}) {
     gx.fillStyle = "#070b14"; gx.fillRect(0, 0, 1024, 640); gx.fillStyle = "#0e1626"; gx.fillRect(0, 0, 1024, 70);
     gx.fillStyle = "#36c2f5"; rr(30, 18, 34, 34, 9); gx.fill(); txt("Apex Domicilios", 78, 46, "800 28px Figtree", "#eef4fa"); txt("Panel del restaurante", 994, 46, "600 20px Figtree", "#7d8b99", "right");
-    txt("PEDIDOS DE HOY", 40, 120, "700 18px Figtree", "#7d8b99"); txt(String(Math.round(38 + 4 * Math.min(1, k * 2))), 40, 182, "800 64px Figtree", "#36c2f5");
+    txt("PEDIDOS DE HOY", 40, 120, "700 18px Figtree", "#7d8b99"); txt(String(Math.round(e.pedidos ?? 38 + 4 * Math.min(1, k * 2))), 40, 182, "800 64px Figtree", "#36c2f5");
+    if (e.navidad > 0.5) { rr(560, 22, 190, 28, 14); gx.fillStyle = "rgba(255,59,59,.22)"; gx.fill(); txt("✦ Tema navideño", 655, 42, "700 16px Figtree", "#ff8a8a", "center"); }
     txt("COMISIÓN", 300, 120, "700 18px Figtree", "#7d8b99"); txt("$ 0", 300, 182, "800 64px Figtree", panel >= 4 ? "#ffc35a" : "#eef4fa");
     const peds = [["#1042", "2 × Bandeja paisa", "$ 64.000"], ["#1043", "Ajiaco de la casa", "$ 24.000"], ["#1044", "Hamburguesa artesanal", "$ 28.000"]];
     peds.forEach(([id, pl, pr], i) => { const a = Math.min(1, Math.max(0, k * 3 - i * 0.6)); if (a <= 0) return; const Y = 220 + i * 88; gx.globalAlpha = a; rr(40, Y, 560, 74, 14); gx.fillStyle = "#121b2b"; gx.fill();
@@ -66,6 +80,10 @@ function despacho(escena) {
     if (panel >= 3) { txt("AVISO AL CLIENTE", 652, 136, "700 15px Figtree", "#7d8b99"); rr(652, 160, 316, 150, 20); gx.fillStyle = "#18233a"; gx.fill();
       txt("Su restaurante", 676, 200, "700 18px Figtree", "#ffc35a"); txt("¡Su pedido ya salió!", 676, 244, "800 28px Figtree", "#eef4fa"); txt("Llega en unos 25 minutos", 676, 282, "500 18px Figtree", "#7d8b99");
       txt("Enviado automáticamente", 652, 350, "600 18px Figtree", "#4ce08a"); }
+    if (panel >= 5) { rr(630, 100, 360, 500, 18); gx.fillStyle = "#0e1626"; gx.fill(); txt("REGALO DE DICIEMBRE", 652, 136, "700 15px Figtree", "#7d8b99");
+      txt("Tema navideño", 652, 196, "800 34px Figtree", "#ff8a8a"); txt("para su restaurante", 652, 230, "500 20px Figtree", "#9fb0c2");
+      txt("8 platos en 3D", 652, 300, "800 34px Figtree", "#ffd23b"); txt("de obsequio", 652, 334, "500 20px Figtree", "#9fb0c2");
+      txt("Soporte 24/7", 652, 404, "800 34px Figtree", "#4ce08a"); txt("para la temporada alta", 652, 438, "500 20px Figtree", "#9fb0c2"); }
     tex.needsUpdate = true;
   }
   // ---------- interfaz de Apex Play (e.app = 1): el asistente de cada mesa, en vivo. panel: 0 salón, 1 mesa 7, 2 mesa 12 (inglés), 3 mesa 3 (cuenta), 4 mesa 7 (cliente frecuente)
@@ -96,7 +114,9 @@ function despacho(escena) {
     U.luces.forEach(([s, f]) => { s.material.opacity = Math.max(0.15, s.material.opacity * 0.98 + 0.02 * (0.5 + 0.4 * Math.sin(tt * 0.7 + f))); });
     U.p01.pose({ sentado: true, mira: e.mira ?? 0.35, miraY: e.miraY ?? 0.08, ladea: e.ladea ?? 0, voz: e.voz01 || 0, taza: e.taza > 0.5,
       bi: e.manos === 0 ? [0.15, -0.12, -0.35] : [-0.95, -0.12, -0.75], bd: e.taza > 0.5 ? [-0.55, 0.42, -1.85] : e.manos === 0 ? [0.15, 0.12, -0.35] : [-0.95, 0.12, -0.75], cejas: e.cejas || 0 });
-    (e.app > 0.5 ? uiPlay : ui)(Math.round(e.panel ?? 0), e.avance ?? 1, tt);
+    NAV.visible = e.navidad > 0.5;
+    if (NAV.visible) U.bombillos.forEach(([m, h, i]) => { const on = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(tt * 2.2 + i * 1.7)); m.color.setHex(colN[i % 5]).multiplyScalar(0.4 + 0.6 * on); h.material.opacity = 0.2 + 0.45 * on; });
+    (e.app > 0.5 ? uiPlay : ui)(Math.round(e.panel ?? 0), e.avance ?? 1, tt, e);
   };
   return D;
 }
