@@ -201,6 +201,10 @@ RIC_B = [0.384, 1.242]; CAM_B = [1.267, 0.287]; VAL_B = [1.9, -0.6]; SEB_B = [3.
 G_BODA = "saturate(1.12) contrast(1.06) brightness(1.04)"
 # ═══ «Personaje 01»: estilo low-poly, oficina de noche, Apex Domicilios funcionando en el portátil; el orbe de Saturno le habla
 VOCES_P01 = {"p01": dict(voz=("es-CO-GonzaloNeural", "-2%", "-6Hz")), "orbi": dict(voz=("es-CO-SalomeNeural", "+6%", "+6Hz"))}
+VOCES_EQ = dict(VOCES_P01, val=dict(voz=("es-MX-DaliaNeural", "+6%", "+2Hz")), sof=dict(voz=("es-VE-PaolaNeural", "+8%", "+0Hz")))
+W3 = [[0.0, 1.95, 4.1, 0.0, 1.3, 0.2, 50], [0.0, 1.9, 3.8, 0.0, 1.3, 0.2, 49]]
+C_VAL = [[0.59, 1.62, 1.94, -0.6, 1.5, 0.66, 34], [0.49, 1.62, 1.83, -0.6, 1.5, 0.66, 33]]
+C_SOF = [[-0.59, 1.62, 1.92, 0.6, 1.5, 0.64, 34], [-0.49, 1.62, 1.81, 0.6, 1.5, 0.64, 33]]
 ORBE_D = [0.58, 1.32, -0.25]; PANT_D = [[-0.56, 1.07, -0.96, -0.17, 0.93, -0.16, 31], [-0.8, 1.06, -0.84, -0.4, 0.95, -0.05, 30]]; PANT_D2 = [[-0.82, 1.06, -0.84, -0.4, 0.95, -0.05, 30], [-0.8, 1.05, -0.8, -0.4, 0.95, -0.05, 29]]
 G_LP = "contrast(1.08) saturate(1.08) brightness(1.03)"
 G_LAB = "contrast(1.06) saturate(1.12) brightness(1.02)"
@@ -1816,5 +1820,39 @@ EPISODIOS = {
    CIERRE_CTA("Apex Domicilios", "Tus pedidos, en línea recta.", "¿Usted también creía que seguía girando? 👇", "Comente qué respondió antes de ver el final.",
               set="laboratorio", grado=G_LAB, relleno=0.1, min=4.5, orbis={}, actores={}, cam=[[0.0, 3.6, 6.2, 1.0, 1.2, -2.5, 44], [0.4, 3.4, 5.6, 1.0, 1.2, -2.5, 44]],
               e=dict(real=1, bola=1.69, impacto=1)),
+  ]),
+ # Personaje 01 + su equipo (Valeria en caja, Sofía en cocina): «se cayó el WhatsApp» y el orbe ya lo resolvió. Remate: tres cafés.
+ "p04-se-cayo-el-whatsapp": dict(producto="dom", subY=520, dof=0.6, calidad=1.5, bloom=0.16, reparto=VOCES_EQ, elenco={}, extras=[],
+  gancho=["Cuando se cae el WhatsApp en pleno turno", "", 2.6],
+  copy="Se cayó el WhatsApp en pleno turno… y nadie se enteró. 😌☕ ¿Quién en su equipo se estresa más con los pedidos?",
+  hashtags="#ApexDomicilios #Restaurantes #TrabajoEnEquipo #Emprendedores #Humor",
+  planos=[
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="tension", cola=0.15, fx=PUM, mano=0.008, cam=W3, saturno={"orbe": dict(pos=ORBE_D, escala=0.24, voz=False)},
+        e=dict(equipo=1, taza=1, mira=0.0, panel=0, avance=0.5, miraVal=0.35, miraSof=-0.35, brazoVal=1, cejasEq=1),
+        lineas=[L("val", "¡Jefe, se cayó el WhatsApp!", 0.4)]),
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="tension", cola=0.15, mano=0.006, subY=1240, cam=C_SOF, saturno={"orbe": dict(pos=ORBE_D, escala=0.24, voz=False)},
+        e=dict(equipo=1, taza=1, mira=0.0, panel=0, avance=0.5, miraVal=0.35, miraSof=-0.35, brazoSof=1, cejasEq=1),
+        lineas=[L("sof", "¡Y hay cuarenta pedidos esperando!", 0.1)]),
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="comico", cola=0.2, mano=0.006, cam=[[0.4, 1.34, 0.6, 0.0, 1.27, -0.68, 32], [0.36, 1.33, 0.5, 0.0, 1.27, -0.68, 31]],
+        saturno={"orbe": dict(pos=ORBE_D, escala=0.24)}, e=dict(equipo=1, taza=1, mira=[[0, 0.0], [0.5, 0.7]], panel=0, avance=0.5, miraVal=0.35, miraSof=-0.35),
+        lineas=[L("p01", "Orbe…", 0.3), L("orbi", "Ya los tomé todos. Por su propio link.", 0.2)]),
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="synth", cola=0.15, fx=[dict(tipo="destello", p=0.0)], mano=0.004, dof=0.25, subY=1480, cam=PANT_D,
+        saturno={"orbe": dict(pos=ORBE_D, escala=0.24)}, e=dict(equipo=1, manos=0, mira=-0.35, miraY=0.25, panel=1, avance=[[0, 0.1], [2.4, 1]], pedidos=[[0, 12], [2.6, 40]]),
+        lineas=[L("orbi", "Cada pedido entra directo al panel. Sin WhatsApp.", 0.05)]),
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="synth", cola=0.15, mano=0.006, subY=1240, cam=C_VAL, saturno={"orbe": dict(pos=ORBE_D, escala=0.24)},
+        e=dict(equipo=1, taza=1, mira=0.7, panel=1, avance=1, miraVal=0.35, miraSof=-0.35, cejasEq=1, pedidos=40),
+        lineas=[L("val", "¿Y quién le avisa a cada cliente?", 0.1)]),
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="synth", cola=0.3, fx=[dict(tipo="destello", p=0.0)], mano=0.004, dof=0.25, subY=1480, cam=PANT_D2,
+        saturno={"orbe": dict(pos=ORBE_D, escala=0.24)}, e=dict(equipo=1, manos=0, mira=-0.35, miraY=0.25, panel=3, avance=1, pedidos=40),
+        lineas=[L("orbi", "Ya les avisé a todos: su pedido salió.", 0.05)]),
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="comico", cola=0.2, mano=0.006, cam=W3, saturno={"orbe": dict(pos=ORBE_D, escala=0.24)},
+        e=dict(equipo=1, taza=1, mira=[[0, 0.0], ["f0", 0.0], ["l1", 0.0]], panel=4, avance=1, miraVal=0.35, miraSof=-0.35, pedidos=40, cejasEq=[[0, 1], ["f0", 0]]),
+        lineas=[L("sof", "Entonces… ¿nosotras qué hacemos?", 0.3), L("p01", "Lo mismo que yo.", 0.3)]),
+   dict(set="despacho", grado=G_LP, relleno=0.22, musica="comico", cola=1.1, mano=0.006, cam=[[0.0, 1.9, 3.8, 0.0, 1.3, 0.2, 49], [0.0, 1.82, 3.3, 0.0, 1.3, 0.1, 47]], saturno={"orbe": dict(pos=ORBE_D, escala=0.24)},
+        e=dict(equipo=1, taza=1, mira=0.7, panel=4, avance=1, miraVal=[[0, 0.35], ["f0", 0.7]], miraSof=[[0, -0.35], ["f0", -0.7]], pedidos=40, tazas=[[0, 0], ["f0", 1]]),
+        lineas=[L("orbi", "Ya pedí tres cafés.", 0.3)]),
+   CIERRE_CTA("Apex Domicilios", "Su equipo, sin estrés.", "¿Quién en su equipo se estresa más con los pedidos? 👇", "Etiquételo sin miedo.",
+              set="despacho", grado=G_LP, relleno=0.22, min=4.5, orbis={}, actores={}, cam=[[1.3, 1.6, 2.6, 0, 1.2, -0.3, 42], [1.15, 1.55, 2.4, 0, 1.2, -0.3, 42]],
+              saturno={"orbe": dict(pos=ORBE_D, escala=0.24, voz=False)}, e=dict(equipo=1, taza=1, tazas=1, mira=0.7, miraVal=0.35, miraSof=-0.35, panel=4, avance=1, pedidos=40)),
   ]),
 }

@@ -45,7 +45,7 @@ function personaLowPoly(cfg = {}) {
     const lid = add(new THREE.BoxGeometry(c.mujer ? 0.048 : 0.044, c.mujer ? 0.009 : 0.006, 0.012), F(c.mujer ? "#0d0a09" : c.pelo, 0.6), 0, 0.009, 0.004, e); lid.rotation.z = d * (c.mujer ? -0.12 : 0.08);
     const ceja = add(new THREE.BoxGeometry(c.mujer ? 0.044 : 0.046, c.mujer ? 0.004 : 0.0075, 0.01), F(c.pelo, 0.7), d * 0.002, c.mujer ? 0.03 : 0.026, 0.006, e); ceja.rotation.z = c.mujer ? -d * 0.16 : -d * 0.05;
     return { e, iris, ceja }; });
-  const boca = add(new THREE.BoxGeometry(R * 0.32, R * 0.03, R * 0.05), new THREE.MeshBasicMaterial({ color: 0x1a0c0a }), 0, -R * 0.53, R * 0.86, cabeza);
+  const boca = add(new THREE.BoxGeometry(R * (c.mujer ? 0.24 : 0.32), R * (c.mujer ? 0.02 : 0.03), R * 0.05), new THREE.MeshBasicMaterial({ color: c.mujer ? 0x2a0c10 : 0x1a0c0a }), 0, -R * 0.53, R * (c.mujer ? 0.85 : 0.86), cabeza);   // en ellas: más fina y del tono de los labios
   // pelo: mechones facetados despeinados (más volumen arriba y adelante)
   const mP = F(c.pelo, 0.6), r = semilla(c.semilla || 11);
   const tapa = add(new THREE.SphereGeometry(R * 1.04, 12, 8, 0, 2 * PI, 0, PI * 0.36), mP, 0, R * 0.14, -R * 0.06, cabeza); tapa.scale.set(0.92, 1.05, 1.02); tapa.rotation.x = -0.28;

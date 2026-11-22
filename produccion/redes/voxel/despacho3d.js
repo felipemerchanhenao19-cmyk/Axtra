@@ -37,6 +37,11 @@ function despacho(escena) {
   // personaje 01 sentado detrás del escritorio
   U.p01 = personaLowPoly(Object.assign({ semilla: 31, fuerte: true, peinado: "definitivo", barbaNivel: 0.95, detalle: true, piel: "#c98e6b", pelo: "#16100c", barba: "#1a120e", camisa: "#17181c", iris: "#3a281a" }));
   U.p01.raiz.position.set(0, 0, -0.68); D.add(U.p01.raiz);
+  // compañeras de trabajo (aparecen con e.equipo > 0.5): Valeria (caja) a la izquierda y Sofía (cocina) a la derecha, de pie frente al escritorio
+  U.val = personaLowPoly({ semilla: 57, mujer: true, detalle: true, peinado: "melena", piel: "#d9a383", pelo: "#2a1810", labios: "#b8615a", camisa: "#7a2e3a", pantalon: "#1f2230", iris: "#4a2e1a" });
+  U.sof = personaLowPoly({ semilla: 73, mujer: true, detalle: true, peinado: "coleta", piel: "#a8714f", pelo: "#140d0a", labios: "#9a4a44", camisa: "#f2efe9", pantalon: "#2a2a30", iris: "#2e1e14", delantal: true });
+  U.val.raiz.position.set(-0.6, 0, 0.66); U.val.raiz.rotation.y = 0.75; U.sof.raiz.position.set(0.6, 0, 0.64); U.sof.raiz.rotation.y = -0.75;
+  [U.val, U.sof].forEach((q) => { q.raiz.visible = false; D.add(q.raiz); });
   // luces generales: azul de la ciudad y relleno cálido suave
   D.add(new THREE.HemisphereLight(0x5a78d8, 0x2a2440, 0.85));
   const contra = new THREE.DirectionalLight(0x6f8fff, 2.1); contra.position.set(1.6, 2.6, -3); contra.castShadow = true; contra.shadow.mapSize.set(2048, 2048); Object.assign(contra.shadow.camera, { left: -2, right: 2, top: 2.5, bottom: -1, near: 0.5, far: 10 }); D.add(contra);
@@ -114,6 +119,11 @@ function despacho(escena) {
     U.luces.forEach(([s, f]) => { s.material.opacity = Math.max(0.15, s.material.opacity * 0.98 + 0.02 * (0.5 + 0.4 * Math.sin(tt * 0.7 + f))); });
     U.p01.pose({ sentado: true, mira: e.mira ?? 0.35, miraY: e.miraY ?? 0.08, ladea: e.ladea ?? 0, voz: e.voz01 || 0, taza: e.taza > 0.5,
       bi: e.manos === 0 ? [0.15, -0.12, -0.35] : [-0.95, -0.12, -0.75], bd: e.taza > 0.5 ? [-0.55, 0.42, -1.85] : e.manos === 0 ? [0.15, 0.12, -0.35] : [-0.95, 0.12, -0.75], cejas: e.cejas || 0 });
+    const eq = e.equipo > 0.5, vz = e.vozDe || (() => 0);
+    [[U.val, "val", e.miraVal ?? 0, e.brazoVal ?? 0], [U.sof, "sof", e.miraSof ?? 0, e.brazoSof ?? 0]].forEach(([q, id, m, br], j) => { q.raiz.visible = eq; if (!eq) return;
+      const v = vz(id), resp = Math.sin(tt * 1.6 + j * 2) * 0.012;
+      q.pose({ mira: m, miraY: -0.08 + resp, ladea: (j ? -1 : 1) * 0.05, voz: v, taza: e.tazas > 0.5, cejas: e.cejasEq || 0,
+        bi: br > 0.5 ? [-0.9, -0.25, -1.2] : [0.05, -0.1, -0.2 - v * 0.3], bd: e.tazas > 0.5 ? [-0.55, 0.42, -1.85] : br > 0.5 ? [-0.9, 0.25, -1.2] : [0.05, 0.1, -0.2 - v * 0.3] }); });
     NAV.visible = e.navidad > 0.5;
     if (NAV.visible) U.bombillos.forEach(([m, h, i]) => { const on = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(tt * 2.2 + i * 1.7)); m.color.setHex(colN[i % 5]).multiplyScalar(0.4 + 0.6 * on); h.material.opacity = 0.2 + 0.45 * on; });
     (e.app > 0.5 ? uiPlay : ui)(Math.round(e.panel ?? 0), e.avance ?? 1, tt, e);

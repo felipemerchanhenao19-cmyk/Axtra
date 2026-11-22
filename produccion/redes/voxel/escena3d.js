@@ -74,7 +74,7 @@ function render(t) {
   const eTab = discreto(est.tablet || {}, tt, L)[1], ePort = discreto(est.portatil || {}, tt, L)[1];
   const qrLuz = {}; Object.entries(est.qrLuz || {}).forEach(([n, s]) => { qrLuz[n] = continuo(s, tt, L)[0]; });
   const ev = {}; Object.entries(est).forEach(([k, v]) => { if (typeof v === "number" || (Array.isArray(v) && Array.isArray(v[0]) && v[0].length === 2 && typeof v[0][1] === "number")) ev[k] = continuo(v, tt, L)[0]; });
-  SETS[pl.set].userData.paso(t, { ...ev, voz01: voz("p01", t), lapRot: est.lapRot !== undefined ? continuo(est.lapRot, tt, L)[0] : undefined, rayo, comandas: est.comandas, tablet: eTab, portatil: ePort, qrLuz, rojo: discreto(est.rojo || false, tt, L)[1], luz: est.luz ? continuo(est.luz, tt, L)[0] : null, mesas: continuo(est.mesas ?? 0, tt, L)[0], alerta: continuo(est.alerta ?? 0, tt, L)[0], cometa: est.cometa ? continuo(est.cometa, tt, L)[0] : null });
+  SETS[pl.set].userData.paso(t, { ...ev, voz01: voz("p01", t), vozDe: (q) => voz(q, t), lapRot: est.lapRot !== undefined ? continuo(est.lapRot, tt, L)[0] : undefined, rayo, comandas: est.comandas, tablet: eTab, portatil: ePort, qrLuz, rojo: discreto(est.rojo || false, tt, L)[1], luz: est.luz ? continuo(est.luz, tt, L)[0] : null, mesas: continuo(est.mesas ?? 0, tt, L)[0], alerta: continuo(est.alerta ?? 0, tt, L)[0], cometa: est.cometa ? continuo(est.cometa, tt, L)[0] : null });
   const tinte = est.luz ? continuo(est.luz, tt, L)[0] : null;
   // cámara (claves [x,y,z, tx,ty,tz, fov]) con cámara en mano
   const [c] = continuo(pl.cam.map((k, j) => k.length === 8 ? k : [j === 0 ? 0 : dur * j / (pl.cam.length - 1), ...k]), tt, L);

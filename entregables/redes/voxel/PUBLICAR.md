@@ -254,3 +254,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **Portada:** el tubo en espiral con el arco rojo tachado: «¿Por dónde sale?».
 - **Comentario fijado:** «Yo también creía que seguía girando 😅 ¿Y usted?»
 - **Por qué engancha:** la pregunta de los primeros 2 segundos obliga a ver el final, y quien acierta o falla comenta.
+
+### «Se cayó el WhatsApp» (Apex Domicilios, Personaje 01 + Valeria y Sofía). Cierre con pregunta
+- **Instagram:** «Se cayó el WhatsApp en pleno turno… y nadie se enteró. 😌☕ ¿Quién en su equipo se estresa más con los pedidos? 👇» · #ApexDomicilios #Restaurantes #TrabajoEnEquipo #Emprendedores #Humor
+- **TikTok:** subir la versión sin música, con un audio cómico en tendencia a volumen bajo. «POV: se cae el WhatsApp en pleno turno y tu equipo entra en pánico… menos tú ☕ #restaurantes #trabajoenequipo #emprendedores #humor»
+- **Portada:** Valeria señalando con alarma y el Personaje 01 tranquilo con su café.
+- **Comentario fijado:** «Etiquete a la Valeria de su equipo 😂»
