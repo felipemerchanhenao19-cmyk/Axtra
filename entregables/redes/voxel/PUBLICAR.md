@@ -273,3 +273,9 @@ Las bocas se mueven con el volumen real de cada voz. Las voces son de Microsoft 
 - **TikTok:** subir la versión sin música, con un audio de suspenso en tendencia a volumen bajo. «POV: haces la cuenta de lo que le pagas a las apps 😳 #restaurantes #emprendedores #comisiones #domicilios»
 - **Portada:** el Personaje 01 con las cejas arriba: «¿¡Treinta millones!?».
 - **Comentario fijado:** «Ejemplo con ventas de $10 millones al mes y 25 % de comisión. ¿Cuánto le sale a usted? 🧮»
+
+### «Ochenta y siete» (Apex Domicilios, Personaje 01 solo en la oficina). Cierre con pregunta
+- **Instagram:** «"¿Tienen menú?" 87 veces en un día. 😮‍💨 Y la número 88… ¿Cuál es la pregunta que más le hacen por WhatsApp? 👇» · #ApexDomicilios #Restaurantes #WhatsApp #Emprendedores #Humor
+- **TikTok:** subir la versión sin música, con un audio cómico en tendencia a volumen bajo. «La misma pregunta 87 veces… y la 88 era mi mamá 😂 #restaurantes #whatsapp #emprendedores #humor»
+- **Portada:** el Personaje 01 con las cejas arriba: «¿Y quién les respondió?».
+- **Comentario fijado:** «Dejen la pregunta que más les repiten. La más votada sale en el próximo video 👀»

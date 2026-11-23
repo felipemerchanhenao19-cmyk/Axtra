@@ -94,7 +94,12 @@ function despacho(escena) {
         gx.globalAlpha = A(0); txt("Plan mensual", 652, 182, "600 20px Figtree", "#9fb0c2"); txt("$ 120.000", 968, 182, "800 24px Figtree", "#eef4fa", "right");
         gx.globalAlpha = A(0.15); txt("Comisión por pedido", 652, 232, "600 20px Figtree", "#9fb0c2"); txt("$ 0", 968, 232, "800 24px Figtree", "#4ce08a", "right");
         gx.globalAlpha = A(0.4); gx.fillStyle = "#0f2a1c"; rr(652, 270, 316, 130, 16); gx.fill(); txt("AHORRO AL AÑO", 672, 306, "700 16px Figtree", "#9dffbf"); txt("$ 28.560.000", 672, 370, "900 44px Figtree", "#4ce08a"); gx.globalAlpha = 1; } }
-    if (panel === 5 || panel >= 8) { rr(630, 100, 360, 500, 18); gx.fillStyle = "#0e1626"; gx.fill(); txt("REGALO DE DICIEMBRE", 652, 136, "700 15px Figtree", "#7d8b99");
+    if (panel === 9) { rr(630, 100, 360, 500, 18); gx.fillStyle = "#0e1626"; gx.fill(); txt("ASISTENTE · CHATS DE HOY", 652, 136, "700 15px Figtree", "#7d8b99"); txt("87", 968, 136, "900 22px Figtree", "#36c2f5", "right");
+      const QA = [["¿Tienen menú?", "¡Claro! Aquí está 👇"], ["¿Cuánto vale la bandeja?", "$ 32.000"], ["¿Llegan a mi barrio?", "Sí, en 30 min 🛵"], ["¿Puedo pagar con Nequi?", "Sí, con Wompi ✓"]];
+      QA.forEach(([q, r], i) => { const a = Math.min(1, Math.max(0, (k - i * 0.22) * 4)); if (a <= 0) return; gx.globalAlpha = a; const Y = 156 + i * 108;
+        rr(652, Y, 236, 40, 12); gx.fillStyle = "#18233a"; gx.fill(); txt(q, 664, Y + 27, "600 15px Figtree", "#eef4fa");
+        rr(744, Y + 46, 226, 40, 12); gx.fillStyle = "rgba(54,194,245,.2)"; gx.fill(); txt(r, 756, Y + 73, "700 15px Figtree", "#eef4fa"); gx.globalAlpha = 1; }); }
+    if (panel === 5 || (panel >= 8 && panel !== 9)) { rr(630, 100, 360, 500, 18); gx.fillStyle = "#0e1626"; gx.fill(); txt("REGALO DE DICIEMBRE", 652, 136, "700 15px Figtree", "#7d8b99");
       txt("Tema navideño", 652, 196, "800 34px Figtree", "#ff8a8a"); txt("para su restaurante", 652, 230, "500 20px Figtree", "#9fb0c2");
       txt("8 platos en 3D", 652, 300, "800 34px Figtree", "#ffd23b"); txt("de obsequio", 652, 334, "500 20px Figtree", "#9fb0c2");
       txt("Soporte 24/7", 652, 404, "800 34px Figtree", "#4ce08a"); txt("para la temporada alta", 652, 438, "500 20px Figtree", "#9fb0c2"); }
