@@ -34,6 +34,16 @@ El mismo servidor entrega la app. En el celular se abre la dirección de Axtra y
 - **Aprender:** tu Sincronización (con sus cinco partes), los temas del Protocolo de inteligencia avanzada y tus idiomas.
 - **Recordatorios:** *"Recuérdame en 20 minutos sacar la ropa"*, *"Despiértame mañana a las 6:30"*, *"¿Qué recordatorios tengo?"*. Llegan como **notificación** al celular aunque la app esté cerrada (actívalas en *Yo*).
 
+## Agente de contenido (TikTok e Instagram)
+En `axtra.chat/contenido.html` (solo con tu sesión). Nada se publica sin que lo apruebes.
+- **Apex:** el agente escribe y arma dos videos al día con la voz de Apex, pantallas del demo y el orbe.
+- **Mi marca personal** (tus propias cuentas, no las de Apex):
+  - **Tus videos:** grabas con el celular y lo subes (llega por partes, aunque pese cientos de MB). El agente lo pone vertical 1080×1920 (si lo grabaste acostado, va completo sobre el mismo video desenfocado), quita el arranque, el final y las pausas largas, le pone subtítulos con lo que dijiste (Groq Whisper, gratis) y el gancho arriba, y escribe título, texto y hashtags si no los tenía. Los subtítulos se corrigen a mano si entendió algo mal. Los videos HDR del iPhone se ajustan para que no se vean lavados.
+  - **Ideas para grabar:** una por día (a las 18:00): qué decir, en puntos, y cómo grabarlo. No inventa cifras ni anécdotas: te pide que cuentes las tuyas.
+  - **Tu voz clonada** (ElevenLabs, plan pago): subes 1 a 3 minutos hablando y queda lista. Sirve para los días en que no puedes grabar: el agente arma videos con tu voz y textos grandes. Esos llevan «Voz generada con IA» en el texto. Se puede borrar desde la página.
+  - Los originales que subes son privados (no van a la carpeta pública de donde Instagram descarga) y se borran dos semanas después de publicados.
+- Variables en el `.env` del servidor: ver la sección *Agente de contenido* de `.env.ejemplo`.
+
 ## Conexión con el Axtra del PC
 El Axtra del PC (`nube.py`) sube cada 10 minutos tus recuerdos, el perfil de tus empresas, el CRM, tareas, Sincronización y Protocolo. Entra con su propio **token de servicio** de Cloudflare: tu cuenta no puede subir datos en su nombre y nadie más tampoco. En la nube esos datos **solo** se le dan a Claude o Grok (de pago); los cerebros gratis nunca los ven. Prueba: `python axtra.py nube`.
 
@@ -71,5 +81,6 @@ Pruebas automáticas: `python -m pytest servidor/tests`
 - `voz.py`, `oido.py`: la voz de Axtra (edge-tts) y entender tu voz (Groq Whisper / Google).
 - `idiomas.py`: lecciones, pronunciación y progreso.
 - `app_movil/`: la app del celular (página instalable, funciona en el A32).
+- `contenido.py`: el agente de contenido de TikTok e Instagram (Apex y tu marca personal).
 - `contexto.py`: tus datos del PC para los cerebros de pago. `recordatorios.py` y `push.py`: recordatorios y notificaciones.
 - `Dockerfile` y `despliegue/`: para publicarlo (guía en `despliegue/DESPLIEGUE.md`).
