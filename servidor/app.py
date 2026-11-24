@@ -332,6 +332,16 @@ class CambioPieza(BaseModel):
     hashtags: list[str] | None = None
     escenas: list[dict] | None = None
     hora: str | None = Field(None, pattern=r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")   # hora de Colombia
+    voz: str | None = Field(None, pattern=r"^(apex|felipe)$")          # felipe: su voz clonada
+    notas: str | None = Field(None, max_length=600)                     # cómo grabarlo (videos de Felipe)
+    opciones: dict[str, bool] | None = None                             # cortar_silencios, cierre
+
+
+class Subtitulos(BaseModel):
+    texto: str = Field(min_length=1, max_length=8000)
+
+
+PARTE_MAXIMA = 16 * 1024 * 1024        # el celular manda los videos en partes de 8 MB
 
 
 def _hilo(fn, *args):
@@ -339,13 +349,24 @@ def _hilo(fn, *args):
     threading.Thread(target=fn, args=args, daemon=True).start()
 
 
+def _armar_en_fondo(pid: int):
+    from . import contenido
+    try:
+        contenido.armar_video(pid)
+    except Exception as e:
+        contenido.actualizar(pid, error=f"no se pudo armar el video: {e}"[:400])
+
+
 @app.get("/api/contenido")
 def contenido_lista(u: str = Depends(usuario)):
     import time as _t
     from . import contenido
     contenido.sembrar()
-    return {"piezas": contenido.piezas(desde=_t.time() - 3 * 86400), "instagram": contenido.instagram_listo(),
-            "tiktok": contenido.tiktok_listo(), "tiktok_app": bool(os.getenv("TIKTOK_CLIENT_KEY"))}
+    return {"piezas": [contenido.para_pantalla(p) for p in contenido.piezas(desde=_t.time() - 3 * 86400)],
+            "instagram": contenido.instagram_listo(), "tiktok": contenido.tiktok_listo(), "tiktok_app": bool(os.getenv("TIKTOK_CLIENT_KEY")),
+            "personal": {"instagram": contenido.instagram_listo("personal"), "tiktok": contenido.tiktok_listo("personal")},
+            "voz_felipe": contenido.voz_felipe_lista(), "elevenlabs": bool(os.getenv("ELEVENLABS_API_KEY")),
+            "personal_cuenta": contenido.PERSONAL_CUENTA}
 
 
 @app.patch("/api/contenido/{pid}")
@@ -356,7 +377,7 @@ def contenido_cambiar(pid: int, c: CambioPieza, u: str = Depends(usuario)):
     if c.hora:
         campos["cuando"] = _dt.datetime.strptime(c.hora, "%Y-%m-%d %H:%M").replace(tzinfo=contenido.COLOMBIA).timestamp()
     try:
-        return contenido.actualizar(pid, **campos)
+        return contenido.para_pantalla(contenido.actualizar(pid, **campos))
     except KeyError:
         raise HTTPException(404, "no existe")
     except ValueError as e:
@@ -367,17 +388,96 @@ def contenido_cambiar(pid: int, c: CambioPieza, u: str = Depends(usuario)):
 def contenido_video(pid: int, u: str = Depends(usuario)):
     from . import contenido
     try:
+        p = contenido.pieza(pid)
+    except KeyError:
+        raise HTTPException(404, "no existe")
+    if p["tipo"] == "grabado" and not p["grabacion"]:
+        raise HTTPException(422, "primero suba el video que grabó")
+    contenido.actualizar(pid, error="armando el video…")
+    _hilo(_armar_en_fondo, pid)
+    return {"ok": True}
+
+
+@app.post("/api/contenido/nueva")
+def contenido_nueva(u: str = Depends(usuario)):
+    """Felipe va a subir un video suyo sin idea previa (marca personal)."""
+    from . import contenido
+    return contenido.para_pantalla(contenido.nueva_grabada())
+
+
+@app.post("/api/contenido/{pid}/grabacion")
+async def contenido_grabacion(pid: int, request: Request, desde: int = 0, total: int = 0, nombre: str = "", u: str = Depends(usuario)):
+    """El video que grabó Felipe, por partes. Con la última parte empieza a editarse solo."""
+    from starlette.concurrency import run_in_threadpool
+    from . import contenido
+    try:
         contenido.pieza(pid)
     except KeyError:
         raise HTTPException(404, "no existe")
+    datos = await request.body()
+    if len(datos) > PARTE_MAXIMA:
+        raise HTTPException(413, "parte demasiado grande")
+    try:
+        f = await run_in_threadpool(contenido.recibir_parte, f"pieza{pid}", desde, total, datos)
+        if f is None:
+            return {"recibido": desde + len(datos)}
+        await run_in_threadpool(contenido.guardar_grabacion, pid, f, nombre[:120])
+    except ValueError as e:
+        raise HTTPException(422, str(e))
     contenido.actualizar(pid, error="armando el video…")
+    _hilo(_armar_en_fondo, pid)
+    return {"listo": True, "recibido": total}
 
-    def armar():
-        try:
-            contenido.armar_video(pid)
-        except Exception as e:
-            contenido.actualizar(pid, error=f"no se pudo armar el video: {e}"[:400])
-    _hilo(armar)
+
+@app.post("/api/contenido/{pid}/subtitulos")
+def contenido_subtitulos(pid: int, s: Subtitulos, u: str = Depends(usuario)):
+    """Felipe corrige lo que se entendió mal y el video se vuelve a armar con sus palabras."""
+    from . import contenido
+    try:
+        contenido.corregir_subtitulos(pid, s.texto)
+    except KeyError:
+        raise HTTPException(404, "no existe")
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    contenido.actualizar(pid, error="armando el video…")
+    _hilo(_armar_en_fondo, pid)
+    return {"ok": True}
+
+
+@app.post("/api/contenido/voz")
+async def contenido_clonar_voz(request: Request, desde: int = 0, total: int = 0, confirmo: int = 0, u: str = Depends(usuario)):
+    """La muestra de voz de Felipe (audio o video), por partes; con la última se clona en ElevenLabs."""
+    from starlette.concurrency import run_in_threadpool
+    from . import contenido
+    if confirmo != 1:
+        raise HTTPException(422, "confirme que la voz es suya")
+    datos = await request.body()
+    if len(datos) > PARTE_MAXIMA:
+        raise HTTPException(413, "parte demasiado grande")
+    try:
+        f = await run_in_threadpool(contenido.recibir_parte, "voz", desde, total, datos)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    if f is None:
+        return {"recibido": desde + len(datos)}
+    try:
+        await run_in_threadpool(contenido.clonar_voz, f)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    except RuntimeError as e:
+        raise HTTPException(502, str(e))
+    finally:
+        f.unlink(missing_ok=True)
+    return {"listo": True}
+
+
+@app.delete("/api/contenido/voz")
+def contenido_borrar_voz(u: str = Depends(usuario)):
+    from . import contenido
+    try:
+        contenido.borrar_voz()
+    except RuntimeError as e:
+        raise HTTPException(502, str(e))
     return {"ok": True}
 
 
@@ -407,9 +507,11 @@ def contenido_publicar(pid: int, u: str = Depends(usuario)):
 
 
 @app.post("/api/contenido/proponer")
-def contenido_proponer(u: str = Depends(usuario)):
+def contenido_proponer(cuenta: str = "apex", u: str = Depends(usuario)):
     from . import contenido
     try:
+        if cuenta == "personal":
+            return {"nuevas": contenido.proponer_personal(7, enrutador())}
         return {"nuevas": contenido.proponer(7, enrutador())}
     except Exception as e:
         raise HTTPException(502, f"no se pudieron proponer ideas: {e}")
@@ -419,13 +521,15 @@ TIKTOK_VUELTA = os.getenv("TIKTOK_REDIRECT", "https://axtra.chat/api/contenido/t
 
 
 @app.get("/api/contenido/tiktok/conectar")
-def tiktok_conectar(u: str = Depends(usuario)):
+def tiktok_conectar(cuenta: str = "apex", u: str = Depends(usuario)):
+    """cuenta=personal: conecta el TikTok de la marca personal de Felipe (debe entrar a TikTok con esa cuenta)."""
     import secrets as _s
     from urllib.parse import urlencode
     from fastapi.responses import RedirectResponse
     from . import contenido
     if not os.getenv("TIKTOK_CLIENT_KEY"):
         raise HTTPException(503, "falta TIKTOK_CLIENT_KEY en el .env del servidor")
+    contenido.ajuste("tiktok_oauth_cuenta", "personal" if cuenta == "personal" else "apex")
     estado = contenido.ajuste("tiktok_estado_oauth", _s.token_urlsafe(16))
     return RedirectResponse("https://www.tiktok.com/v2/auth/authorize/?" + urlencode({
         "client_key": os.getenv("TIKTOK_CLIENT_KEY"), "scope": "user.info.basic,video.upload", "response_type": "code",
@@ -440,9 +544,10 @@ def tiktok_vuelta(code: str = "", state: str = "", u: str = Depends(usuario)):
     if not code or not state or not _h.compare_digest(state, contenido.ajuste("tiktok_estado_oauth") or "-"):
         raise HTTPException(400, "la conexión con TikTok no es válida; intente de nuevo")
     try:
-        contenido.tiktok_conectar(code, TIKTOK_VUELTA)
+        contenido.tiktok_conectar(code, TIKTOK_VUELTA, contenido.ajuste("tiktok_oauth_cuenta") or "apex")
     except RuntimeError as e:
         raise HTTPException(502, str(e))
+    contenido.ajuste("tiktok_estado_oauth", "")              # cada código de TikTok sirve una sola vez
     return RedirectResponse("/contenido.html?tiktok=ok")
 
 
